@@ -10,7 +10,7 @@ class SettingSeeder extends Seeder
     // Seed initial pharma company and business settings.
     public function run(): void
     {
-         = [
+        $settings = [
             // General & Identity
             ['key' => 'company_name', 'value' => 'Ciplon Life Sciences', 'group' => 'general', 'type' => 'string', 'description' => 'Brand and trade name of the pharmaceutical company'],
             ['key' => 'legal_name', 'value' => 'Ciplon Pharmaceuticals Ltd.', 'group' => 'general', 'type' => 'string', 'description' => 'Full legally registered corporate entity name'],
@@ -46,10 +46,10 @@ class SettingSeeder extends Seeder
             ['key' => 'twitter_url', 'value' => 'https://x.com/ciplon_pharma', 'group' => 'social', 'type' => 'string', 'description' => 'Official Twitter / X profile'],
         ];
 
-        foreach ( as ) {
+        foreach ($settings as $setting) {
             Setting::updateOrCreate(
-                ['key' => ['key']],
-                
+                ['key' => $setting['key']],
+                $setting
             );
         }
     }

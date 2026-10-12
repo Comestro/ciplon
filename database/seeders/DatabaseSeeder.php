@@ -52,11 +52,13 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        // Seed Company Profile & System Settings
+        // Seed Company Profile, Catalog, Doctors & Visits
         $this->call([
             SettingSeeder::class,
             CategorySeeder::class,
             ProductSeeder::class,
+            DoctorSeeder::class,
+            VisitSeeder::class,
         ]);
     }
 }
