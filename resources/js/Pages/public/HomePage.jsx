@@ -1,24 +1,18 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import { router, usePage } from '@inertiajs/react';
 import PublicLayout from '../../layouts/PublicLayout';
-import HeroSection from '../../components/home/HeroSection';
-import FeaturedProducts from '../../components/home/FeaturedProducts';
-import TherapeuticAreas from '../../components/home/TherapeuticAreas';
-import QualitySection from '../../components/home/QualitySection';
-import ResearchSection from '../../components/home/ResearchSection';
-import EditorialBanner from '../../components/home/EditorialBanner';
-import NewsPreview from '../../components/home/NewsPreview';
-import CTASection from '../../components/home/CTASection';
+import IntasHeroBanner from '../../components/home/IntasHeroBanner';
+import CompanyIntroSection from '../../components/home/CompanyIntroSection';
+import ExcellenceStatsSection from '../../components/home/ExcellenceStatsSection';
+import ScienceIntoSmilesSection from '../../components/home/ScienceIntoSmilesSection';
+import LatestNewsSection from '../../components/home/LatestNewsSection';
+import FeaturedProductsSection from '../../components/home/FeaturedProductsSection';
 import EnquiryModal from '../../components/home/EnquiryModal';
-import { therapeuticAreas as defaultAreas } from '../../data/therapeuticAreasData';
-import { latestNews as defaultNews } from '../../data/newsData';
 
 export default function HomePage({ featuredProducts = [], categories = [], company = null }) {
   const { props } = usePage();
   const companyData = company || props.company || {};
   const products = featuredProducts.length > 0 ? featuredProducts : [];
-  const therapeuticAreas = defaultAreas;
-  const news = defaultNews;
   const [isEnquiryModalOpen, setIsEnquiryModalOpen] = useState(false);
 
   // Smooth scroll helper to products catalog
@@ -26,52 +20,45 @@ export default function HomePage({ featuredProducts = [], categories = [], compa
     const el = document.getElementById('products');
     if (el) {
       el.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
-  // Smooth scroll helper to contact section or open modal
-  const handleScrollToContact = () => {
-    setIsEnquiryModalOpen(true);
-  };
-
-  // Navigate to products catalog filtered by selected therapeutic area
-  const handleSelectArea = (area) => {
-    if (area?.name) {
-      router.get(`/products?category=${encodeURIComponent(area.name)}`);
     } else {
       router.get('/products');
     }
   };
 
+  // Contact / Supply inquiry helper
+  const handleContactUs = () => {
+    setIsEnquiryModalOpen(true);
+  };
+
   return (
     <PublicLayout companyData={companyData} categories={categories}>
-      <div className="w-full">
-        <HeroSection
+      <div className="w-full bg-white text-slate-900 selection:bg-[#0069b4] selection:text-white">
+        {/* 1. Hero Banner with Carousel, Quality Ribbon & 4 Feature Cards */}
+        <IntasHeroBanner
           onExploreProducts={handleScrollToProducts}
-          onContactUs={handleScrollToContact}
+          onContactUs={handleContactUs}
           onOpenEnquiryModal={() => setIsEnquiryModalOpen(true)}
         />
 
-        <FeaturedProducts products={products} />
+        {/* 2. Company Introduction ("CIPLON PHARMACEUTICALS LTD.") */}
+        <CompanyIntroSection />
 
-        <TherapeuticAreas
-          areas={therapeuticAreas}
-          onSelectArea={handleSelectArea}
+        {/* 3. Excellence is a Matter of Fact (Stats Grid Banner) */}
+        <ExcellenceStatsSection />
+
+        {/* 4. Transforming Science into Smiles (R&D Section with Circular Montage) */}
+        <ScienceIntoSmilesSection />
+
+        {/* 5. Latest News Section */}
+        <LatestNewsSection />
+
+        {/* 6. Featured Products (3D Pharma Carton Boxes & Filters) */}
+        <FeaturedProductsSection
+          products={products}
+          onOpenEnquiryModal={() => setIsEnquiryModalOpen(true)}
         />
 
-        <QualitySection onContactUs={handleScrollToContact} />
-
-        <ResearchSection onContactUs={handleScrollToContact} />
-
-        <EditorialBanner onContactUs={handleScrollToContact} />
-
-        <NewsPreview
-          news={news}
-          onReadNews={handleScrollToContact}
-        />
-
-        <CTASection onOpenEnquiryModal={() => setIsEnquiryModalOpen(true)} />
-
+        {/* 7. Institutional Supply Inquiry Modal */}
         <EnquiryModal
           isOpen={isEnquiryModalOpen}
           onClose={() => setIsEnquiryModalOpen(false)}

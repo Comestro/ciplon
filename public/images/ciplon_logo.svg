@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 120" width="100%" height="100%" fill="none">
+  <defs>
+    <!-- Gold metallic gradient -->
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f6d365" />
+      <stop offset="35%" stop-color="#d4af37" />
+      <stop offset="70%" stop-color="#aa771c" />
+      <stop offset="100%" stop-color="#855812" />
+    </linearGradient>
+    <linearGradient id="goldText" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#c59b27" />
+      <stop offset="100%" stop-color="#9a6e11" />
+    </linearGradient>
+  </defs>
+
+  <!-- Left CP Emblem Circle -->
+  <g transform="translate(10, 10)">
+    <!-- Outer Ring - Left Gold Half -->
+    <path d="M 50,5 A 45,45 0 0,0 50,95" stroke="url(#goldGrad)" stroke-width="7" fill="none" stroke-linecap="round" />
+    <!-- Outer Ring - Right Navy Half -->
+    <path d="M 50,5 A 45,45 0 0,1 50,95" stroke="#1c2d42" stroke-width="7" fill="none" stroke-linecap="round" />
+
+    <!-- Stylized Monogram "C" (Gold) -->
+    <path d="M 45,28 A 22,22 0 0,0 23,50 A 22,22 0 0,0 45,72 L 45,61 A 11,11 0 0,1 34,50 A 11,11 0 0,1 45,39 Z" fill="url(#goldGrad)" />
+
+    <!-- Stylized Monogram "P" (Navy) -->
+    <path d="M 52,28 L 68,28 C 76,28 82,33 82,42 C 82,51 76,56 68,56 L 63,56 L 63,72 L 52,72 Z M 63,38 L 63,46 L 67,46 C 70,46 72,44 72,42 C 72,40 70,38 67,38 Z" fill="#1c2d42" />
+  </g>
+
+  <!-- Ciplon Wordmark -->
+  <!-- Golden Leaf above i -->
+  <path d="M 172,32 C 172,24 179,19 184,18 C 183,24 178,29 172,32 Z" fill="url(#goldGrad)" />
+  <path d="M 172,32 C 168,26 172,20 178,19 C 176,25 174,30 172,32 Z" fill="#aa771c" opacity="0.6" />
+
+  <!-- "Ciplon" Brand Name in Dark Navy -->
+  <text x="125" y="62" font-family="'Times New Roman', Georgia, serif" font-size="44" font-weight="bold" fill="#1c2d42" letter-spacing="-0.5">Ciplon</text>
+  <!-- TM mark -->
+  <text x="246" y="38" font-family="Arial, sans-serif" font-size="13" font-weight="bold" fill="#1c2d42">TM</text>
+
+  <!-- "PHARMA PVT. LTD." in Gold -->
+  <text x="126" y="86" font-family="Arial, sans-serif" font-size="12" font-weight="800" fill="url(#goldText)" letter-spacing="2.5">PHARMA PVT. LTD.</text>
+
+  <!-- ECG / Pulse Line & Arrow -->
+  <g stroke="url(#goldGrad)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <path d="M 285,73 L 305,73 L 311,57 L 316,84 L 321,73 L 395,73" />
+    <!-- Arrowhead -->
+    <path d="M 390,68 L 398,73 L 390,78 Z" fill="url(#goldGrad)" stroke="none" />
+  </g>
+</svg>
