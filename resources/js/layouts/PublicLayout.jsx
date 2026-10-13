@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { usePage } from '@inertiajs/react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
@@ -15,7 +15,7 @@ export default function PublicLayout({ children, companyData: propCompanyData, c
   }, [url]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-white text-slate-900 selection:bg-teal-600 selection:text-white antialiased">
+    <div className="min-h-screen flex flex-col bg-white text-slate-900 selection:bg-[#c59324] selection:text-white antialiased">
       <Header
         companyData={companyData}
         categories={categories}

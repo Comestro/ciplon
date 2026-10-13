@@ -37,10 +37,10 @@ export default function ScienceIntoSmilesSection() {
       <Container>
         {/* Main Section Heading */}
         <div className="text-center mb-12 sm:mb-16">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight text-[#0069b4] uppercase">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-[#0c2340] uppercase">
             TRANSFORMING SCIENCE INTO SMILES
           </h2>
-          <div className="w-16 h-1 bg-[#0069b4] mx-auto mt-2 rounded-full" />
+          <div className="w-20 h-1 bg-gradient-to-r from-[#c59324] to-[#dfad36] mx-auto mt-2 rounded-full" />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
@@ -49,25 +49,25 @@ export default function ScienceIntoSmilesSection() {
             <div className="relative w-[300px] h-[300px] sm:w-[380px] sm:h-[380px] md:w-[420px] md:h-[420px] flex items-center justify-center">
               {/* Outer decorative orbit rings */}
               <div className="absolute inset-0 rounded-full border border-slate-200 animate-spin-slow pointer-events-none" />
-              <div className="absolute inset-4 rounded-full border-2 border-dashed border-[#0069b4]/20 pointer-events-none" />
-              <div className="absolute inset-10 rounded-full border border-sky-100 pointer-events-none" />
+              <div className="absolute inset-4 rounded-full border-2 border-dashed border-[#c59324]/30 pointer-events-none" />
+              <div className="absolute inset-10 rounded-full border border-amber-100 pointer-events-none" />
 
               {/* Central Primary Circular Lens: Cleanroom Laboratory */}
-              <div className="relative z-10 w-48 h-48 sm:w-60 sm:h-60 md:w-64 md:h-64 rounded-full p-2 bg-white shadow-2xl border-4 border-[#0069b4] overflow-hidden group">
+              <div className="relative z-10 w-48 h-48 sm:w-60 sm:h-60 md:w-64 md:h-64 rounded-full p-2 bg-white shadow-2xl border-4 border-[#c59324] overflow-hidden group">
                 <img
-                  src="/images/pharma_rd_lab.jpg"
+                  src="/images/hero_indian_scientists.jpg"
                   alt="Ciplon Formulation R&D Laboratory"
                   className="w-full h-full object-cover rounded-full group-hover:scale-110 transition-transform duration-500"
                 />
-                <div className="absolute inset-0 rounded-full bg-gradient-to-t from-[#003e6d]/60 via-transparent to-transparent flex items-end justify-center pb-3">
-                  <span className="text-[11px] sm:text-xs font-bold text-white uppercase tracking-wider bg-[#0069b4]/80 px-2.5 py-0.5 rounded-full">
+                <div className="absolute inset-0 rounded-full bg-gradient-to-t from-[#0c2340]/80 via-transparent to-transparent flex items-end justify-center pb-3">
+                  <span className="text-[11px] sm:text-xs font-bold text-[#dfad36] uppercase tracking-wider bg-[#0c2340]/90 border border-[#c59324]/50 px-2.5 py-0.5 rounded-full shadow-md">
                     Core R&D Hub
                   </span>
                 </div>
               </div>
 
               {/* Satellite Orbit Lens 1: Automation Line (Top Right) */}
-              <div className="absolute -top-2 right-4 sm:top-2 sm:right-6 z-20 w-24 h-24 sm:w-28 sm:h-28 rounded-full p-1.5 bg-white shadow-xl border-2 border-sky-400 overflow-hidden hover:scale-110 transition-transform cursor-pointer group">
+              <div className="absolute -top-2 right-4 sm:top-2 sm:right-6 z-20 w-24 h-24 sm:w-28 sm:h-28 rounded-full p-1.5 bg-white shadow-xl border-2 border-[#dfad36] overflow-hidden hover:scale-110 transition-transform cursor-pointer group">
                 <img
                   src="/images/pharma_automation_line.jpg"
                   alt="High Speed Robotic Packaging Line"
@@ -76,7 +76,7 @@ export default function ScienceIntoSmilesSection() {
               </div>
 
               {/* Satellite Orbit Lens 2: Formulation Facility (Bottom Left) */}
-              <div className="absolute -bottom-2 left-2 sm:bottom-4 sm:left-4 z-20 w-22 h-22 sm:w-26 sm:h-26 rounded-full p-1.5 bg-white shadow-xl border-2 border-sky-400 overflow-hidden hover:scale-110 transition-transform cursor-pointer group">
+              <div className="absolute -bottom-2 left-2 sm:bottom-4 sm:left-4 z-20 w-22 h-22 sm:w-26 sm:h-26 rounded-full p-1.5 bg-white shadow-xl border-2 border-[#dfad36] overflow-hidden hover:scale-110 transition-transform cursor-pointer group">
                 <img
                   src="/images/ciplon_facility.jpg"
                   alt="Formulation Cleanroom"
@@ -85,7 +85,7 @@ export default function ScienceIntoSmilesSection() {
               </div>
 
               {/* Satellite Orbit Lens 3: Scientists (Bottom Right) */}
-              <div className="absolute bottom-6 right-2 sm:bottom-8 sm:right-4 z-20 w-20 h-20 sm:w-24 sm:h-24 rounded-full p-1.5 bg-white shadow-xl border-2 border-sky-400 overflow-hidden hover:scale-110 transition-transform cursor-pointer group">
+              <div className="absolute bottom-6 right-2 sm:bottom-8 sm:right-4 z-20 w-20 h-20 sm:w-24 sm:h-24 rounded-full p-1.5 bg-white shadow-xl border-2 border-[#dfad36] overflow-hidden hover:scale-110 transition-transform cursor-pointer group">
                 <img
                   src="/images/ciplon_lab.jpg"
                   alt="Analytical Spectroscopy"
@@ -94,10 +94,10 @@ export default function ScienceIntoSmilesSection() {
               </div>
 
               {/* Decorative Pulsing Connection Nodes */}
-              <div className="absolute top-1/2 -left-2 w-5 h-5 rounded-full bg-[#0069b4] border-2 border-white shadow-md flex items-center justify-center">
+              <div className="absolute top-1/2 -left-2 w-5 h-5 rounded-full bg-[#c59324] border-2 border-white shadow-md flex items-center justify-center">
                 <div className="w-2 h-2 rounded-full bg-white animate-ping" />
               </div>
-              <div className="absolute top-1/2 -right-2 w-5 h-5 rounded-full bg-[#0069b4] border-2 border-white shadow-md flex items-center justify-center">
+              <div className="absolute top-1/2 -right-2 w-5 h-5 rounded-full bg-[#c59324] border-2 border-white shadow-md flex items-center justify-center">
                 <div className="w-2 h-2 rounded-full bg-white animate-ping" />
               </div>
             </div>
@@ -109,15 +109,15 @@ export default function ScienceIntoSmilesSection() {
               R&D is the cornerstone of Ciplon's success. A high-calibre team works round the clock with a quest to develop a progressive and formidable product basket that includes novel doses, generics, biosimilars and parenteral formulations to address unmet global healthcare needs.
             </p>
 
-            {/* Bullets with Blue Chevrons */}
+            {/* Bullets with Golden Chevrons */}
             <div className="space-y-3.5 pt-2">
               {bulletPoints.map((item, index) => (
                 <div key={index} className="flex items-start gap-3 group">
-                  <div className="w-5 h-5 rounded-full bg-sky-100 text-[#0069b4] flex items-center justify-center shrink-0 mt-0.5 group-hover:bg-[#0069b4] group-hover:text-white transition-colors">
+                  <div className="w-5 h-5 rounded-full bg-amber-50 text-[#c59324] border border-amber-200/60 flex items-center justify-center shrink-0 mt-0.5 group-hover:bg-[#0c2340] group-hover:text-[#dfad36] transition-colors">
                     <ChevronRight className="w-3.5 h-3.5 stroke-[3]" />
                   </div>
                   <p className="text-xs sm:text-sm text-slate-700 leading-snug">
-                    <strong className="text-[#0069b4] font-bold">{item.highlight}</strong>{' '}
+                    <strong className="text-[#0c2340] font-bold">{item.highlight}</strong>{' '}
                     <span>{item.text}</span>
                   </p>
                 </div>
@@ -129,7 +129,7 @@ export default function ScienceIntoSmilesSection() {
               <button
                 type="button"
                 onClick={() => setIsModalOpen(true)}
-                className="px-8 py-3 rounded-full bg-[#0069b4] hover:bg-[#00528e] text-white font-bold text-xs sm:text-sm tracking-wider uppercase transition-all shadow-md shadow-[#0069b4]/25 hover:shadow-lg hover:scale-105 cursor-pointer"
+                className="px-8 py-3 rounded-full bg-[#0c2340] hover:bg-[#123055] text-white border border-[#c59324]/40 font-bold text-xs sm:text-sm tracking-wider uppercase transition-all shadow-md shadow-[#0c2340]/25 hover:shadow-lg hover:scale-105 cursor-pointer"
               >
                 READ MORE
               </button>

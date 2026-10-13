@@ -34,13 +34,13 @@ export default function ExcellenceStatsSection() {
   ];
 
   return (
-    <section id="excellence" className="py-16 sm:py-20 bg-gradient-to-r from-[#0069b4] via-[#005a9c] to-[#004780] text-white relative overflow-hidden">
+    <section id="excellence" className="py-16 sm:py-20 bg-gradient-to-r from-[#0c2340] via-[#07172b] to-[#040e1b] text-white relative overflow-hidden border-y border-[#c59324]/20">
       {/* Decorative molecular pattern / subtle background circles */}
       <div className="absolute inset-0 opacity-10 pointer-events-none">
         <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <pattern id="dotPattern" width="40" height="40" patternUnits="userSpaceOnUse">
-              <circle cx="20" cy="20" r="2" fill="white" />
+              <circle cx="20" cy="20" r="2" fill="#c59324" />
             </pattern>
           </defs>
           <rect width="100%" height="100%" fill="url(#dotPattern)" />
@@ -50,10 +50,10 @@ export default function ExcellenceStatsSection() {
       <Container className="relative z-10">
         {/* Title */}
         <div className="text-center mb-12 sm:mb-16">
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-white">
-            <span className="text-[#f59e0b] drop-shadow-sm">Excellence</span> is a Matter of Fact
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white">
+            <span className="text-[#dfad36] drop-shadow-sm">Excellence</span> is a Matter of Fact
           </h2>
-          <div className="w-16 h-1 bg-[#f59e0b] mx-auto mt-3 rounded-full" />
+          <div className="w-20 h-1 bg-gradient-to-r from-[#c59324] to-[#dfad36] mx-auto mt-3 rounded-full" />
         </div>
 
         {/* 4 Stats Grid */}
@@ -63,27 +63,27 @@ export default function ExcellenceStatsSection() {
             return (
               <div
                 key={idx}
-                className="group p-6 rounded-2xl bg-white/10 hover:bg-white/15 backdrop-blur-md border border-white/15 hover:border-white/30 text-center transition-all duration-300 hover:scale-105 hover:shadow-2xl flex flex-col items-center justify-center cursor-default"
+                className="group p-6 rounded-2xl bg-white/5 hover:bg-white/10 backdrop-blur-md border border-[#c59324]/25 hover:border-[#c59324]/60 text-center transition-all duration-300 hover:scale-105 hover:shadow-2xl flex flex-col items-center justify-center cursor-default shadow-lg"
               >
                 {/* Icon */}
-                <div className="w-14 h-14 rounded-full bg-white/20 border border-white/30 flex items-center justify-center text-white mb-4 group-hover:scale-110 group-hover:bg-[#f59e0b] group-hover:text-slate-900 transition-all duration-300">
+                <div className="w-14 h-14 rounded-full bg-[#c59324]/20 border border-[#c59324]/40 flex items-center justify-center text-[#dfad36] mb-4 group-hover:scale-110 group-hover:bg-[#c59324] group-hover:text-[#07172b] transition-all duration-300">
                   <Icon className="w-7 h-7 stroke-[2.2]" />
                 </div>
 
                 {/* Number */}
                 <div className="flex items-baseline justify-center gap-1">
-                  <span className="text-3xl sm:text-4xl md:text-5xl font-black font-mono tracking-tight text-white">
+                  <span className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white group-hover:text-[#dfad36] transition-colors">
                     {item.value}
                   </span>
                   {item.unit && (
-                    <span className="text-xl sm:text-2xl font-black text-amber-300">
+                    <span className="text-xl sm:text-2xl font-bold text-[#dfad36]">
                       {item.unit}
                     </span>
                   )}
                 </div>
 
                 {/* Subtitle Label */}
-                <p className="text-xs sm:text-sm font-semibold text-sky-100 mt-2 leading-snug">
+                <p className="text-xs sm:text-sm font-semibold text-slate-300 mt-2 leading-snug">
                   {item.label}
                 </p>
               </div>

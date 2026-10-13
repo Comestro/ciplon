@@ -3,16 +3,26 @@
  * Structure matches future Laravel API: GET /api/v1/company-profile or /api/v1/settings
  */
 export const companyProfile = {
-  name: "Ciplon Life Sciences",
-  legalName: "Ciplon Pharmaceuticals Ltd.",
-  tagline: "Advancing Global Healthcare Through Scientific Precision & Quality",
-  description: "A research-driven pharmaceutical enterprise dedicated to developing, manufacturing, and supplying high-quality finished formulations across diverse therapeutic areas.",
-  foundedYear: 2004,
-  headquarters: "Innovation Park, Sector 62, Bio-Tech Corridor",
-  email: "corporate@ciplon.com",
-  enquiriesEmail: "enquiry@ciplon.com",
-  phone: "+1 (800) 458-7290",
-  businessHours: "Monday – Friday: 09:00 – 18:00 (EST)",
+  name: "Ciplon Pharma Private Limited",
+  legalName: "Ciplon Pharma Private Limited",
+  shortName: "Ciplon Pharma",
+  tagline: "Committed to Healthcare Excellence",
+  logoUrl: "/images/ciplon_logo.png",
+  logo_url: "/images/ciplon_logo.png",
+  description: "An ISO 9001: 2015 certified company dedicated to marketing high-quality, accessible healthcare formulations across diverse therapeutic areas.",
+  foundedYear: 2024,
+  headquarters: "M24/A, KH No. 294, 1st Floor, Batla House, Okhla, Jamia Nagar, South Delhi, New Delhi, Delhi, India - 110025",
+  email: "info@ciplonpharma.in",
+  enquiriesEmail: "info@ciplonpharma.in",
+  website: "https://www.ciplonpharma.in",
+  fssaiLicNo: "10426340000172",
+  trademarkStatus: "TM-Trademark Under Registration",
+  isoCertification: "An ISO 9001: 2015 certified company",
+  manufacturer: {
+    name: "WALPAR WELLNESS PVT.LTD.",
+    certification: "WHO-GMP & An ISO 9001 : 2015 Certified Company",
+    address: "PLOT NO.2/A & 06, OPP, SABARMATI GAS STATION, KHATRAJ, KALOL, GANDHINAGAR., Gujarat-382721"
+  },
   
   stats: [
     {

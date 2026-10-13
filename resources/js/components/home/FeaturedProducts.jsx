@@ -1,4 +1,4 @@
-﻿import { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { Link } from '@inertiajs/react';
 import { ArrowRight, Sparkles, Filter, FileText } from 'lucide-react';
 import Container from '../common/Container';
@@ -61,7 +61,7 @@ export default function FeaturedProducts({ products = [] }) {
               <Sparkles className="w-3.5 h-3.5 text-teal-600" />
               <span>Pharmaceutical Formulations</span>
             </div>
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 tracking-tight">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#0c2340] tracking-tight">
               Featured Formulations Portfolio
             </h2>
             <p className="text-sm sm:text-base text-slate-600 mt-2 max-w-2xl">

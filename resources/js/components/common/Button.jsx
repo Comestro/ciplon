@@ -16,12 +16,12 @@ export default function Button({
   const baseStyles = "inline-flex items-center justify-center font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none cursor-pointer";
 
   const variants = {
-    primary: "bg-slate-900 text-white hover:bg-slate-800 active:bg-slate-950 focus:ring-slate-900",
-    medical: "bg-teal-700 text-white hover:bg-teal-800 active:bg-teal-900 focus:ring-teal-700",
-    secondary: "bg-teal-50 text-teal-900 hover:bg-teal-100 active:bg-teal-200 focus:ring-teal-600",
-    outline: "bg-white text-slate-700 border border-slate-200 hover:bg-slate-50 hover:text-slate-900 active:bg-slate-100 focus:ring-slate-400",
+    primary: "bg-[#0c2340] text-white hover:bg-[#123055] active:bg-[#07172b] focus:ring-[#c59324] shadow-xs",
+    medical: "bg-gradient-to-r from-[#c59324] via-[#d4a029] to-[#b8831b] text-white hover:from-[#b8831b] hover:to-[#9f6d0f] focus:ring-[#c59324] shadow-xs",
+    secondary: "bg-amber-50 text-[#0c2340] border border-amber-200/80 hover:bg-amber-100/70 focus:ring-[#c59324]",
+    outline: "bg-white text-slate-700 border border-slate-200 hover:border-[#c59324] hover:text-[#0c2340] active:bg-slate-100 focus:ring-[#c59324]",
     white: "bg-white text-slate-900 hover:bg-slate-100 active:bg-slate-200 focus:ring-white",
-    ghost: "bg-transparent text-slate-700 hover:bg-slate-100/80 active:bg-slate-200 focus:ring-slate-400"
+    ghost: "bg-transparent text-slate-700 hover:bg-amber-50/50 hover:text-[#0c2340] active:bg-slate-200 focus:ring-[#c59324]"
   };
 
   const sizes = {

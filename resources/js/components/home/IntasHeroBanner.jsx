@@ -9,12 +9,12 @@ export default function IntasHeroBanner({ onExploreProducts, onContactUs, onOpen
   const slides = [
     {
       id: 0,
-      image: '/images/hero_pharma_scientists.jpg',
+      image: '/images/hero_indian_doctors.jpg',
       headlinePre: 'Advancing Modern Healthcare',
       headlineMain: 'Transforming Patient Care',
       headlineSub: 'Embarking on a journey of',
-      headlineSubBold: 'scientific innovation',
-      description: 'An emerging pharmaceutical enterprise committed to developing high-potency, affordable finished formulations.',
+      headlineSubBold: 'clinical excellence',
+      description: 'An emerging Indian pharmaceutical enterprise committed to developing high-potency, affordable finished formulations.',
       tag: 'Quality Formulations',
     },
     {
@@ -29,13 +29,23 @@ export default function IntasHeroBanner({ onExploreProducts, onContactUs, onOpen
     },
     {
       id: 2,
-      image: '/images/pharma_rd_lab.jpg',
+      image: '/images/hero_indian_scientists.jpg',
       headlinePre: 'Translating Analytical Science',
       headlineMain: 'Into Life-Changing Smiles',
       headlineSub: 'Continuous focus on',
       headlineSubBold: 'essential medicines',
-      description: 'Dedicated research personnel and formulation chemists upholding high standards of quality assurance.',
+      description: 'Dedicated Indian research personnel and formulation chemists upholding high standards of quality assurance.',
       tag: 'Advanced R&D',
+    },
+    {
+      id: 3,
+      image: '/images/hero_indian_consultation.jpg',
+      headlinePre: 'Patient-Centric Healthcare',
+      headlineMain: 'Compassionate Medical Care',
+      headlineSub: 'Trusted by doctors across',
+      headlineSubBold: 'clinical therapies',
+      description: 'Delivering bioequivalent, accessible therapeutic treatments that enhance patient outcomes and community wellness.',
+      tag: 'Clinical Trust',
     },
   ];
 
@@ -92,7 +102,7 @@ export default function IntasHeroBanner({ onExploreProducts, onContactUs, onOpen
   return (
     <section className="relative w-full bg-slate-50 select-none overflow-hidden">
       {/* Hero Visual Container */}
-      <div className="relative w-full h-[420px] sm:h-[480px] md:h-[540px] lg:h-[580px] overflow-hidden bg-slate-900">
+      <div className="relative w-full h-[460px] sm:h-[520px] md:h-[580px] lg:h-[620px] overflow-hidden bg-slate-900">
         {/* Background Slide Images with smooth fade */}
         {slides.map((slide, index) => (
           <div
@@ -120,10 +130,10 @@ export default function IntasHeroBanner({ onExploreProducts, onContactUs, onOpen
               <div className="flex items-center gap-1 text-amber-300 text-xs mb-0.5">
                 <span>★</span><span>★</span><span>★</span>
               </div>
-              <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-center leading-tight">
+              <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-center leading-tight">
                 QUALITY FIRST
               </span>
-              <span className="text-[8px] sm:text-[9px] font-bold uppercase tracking-wider text-center text-sky-100">
+              <span className="text-[8px] sm:text-[9px] font-medium uppercase tracking-wider text-center text-sky-100">
                 PATIENT CENTRIC
               </span>
             </div>
@@ -135,10 +145,10 @@ export default function IntasHeroBanner({ onExploreProducts, onContactUs, onOpen
                 clipPath: 'polygon(0% 0%, 100% 0%, 100% 82%, 50% 100%, 0% 82%)',
               }}
             >
-              <span className="text-[9px] sm:text-[10px] font-extrabold uppercase tracking-widest text-white leading-none">
+              <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-white leading-none">
                 COMMITTED
               </span>
-              <span className="text-[7px] sm:text-[8px] font-semibold text-sky-200 uppercase tracking-tight mt-1 block">
+              <span className="text-[7px] sm:text-[8px] font-medium text-sky-200 uppercase tracking-tight mt-1 block">
                 TO EXCELLENCE
               </span>
               <span className="text-[8px] sm:text-[9px] font-bold text-amber-300 uppercase tracking-wider mt-0.5 block">
@@ -149,23 +159,23 @@ export default function IntasHeroBanner({ onExploreProducts, onContactUs, onOpen
         </div>
 
         {/* Slide Content Overlay */}
-        <div className="absolute inset-0 z-20 flex items-center">
+        <div className="absolute inset-0 z-20 flex items-center pt-2 pb-14 sm:pb-20">
           <Container>
             <div className="max-w-2xl sm:max-w-3xl text-white pl-2 sm:pl-4">
               {/* Slide Pre-Headline */}
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs sm:text-sm font-semibold tracking-wide text-sky-200 mb-3 sm:mb-4">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-black/40 backdrop-blur-md border border-[#c59324]/40 text-xs sm:text-sm font-semibold tracking-wide text-[#dfad36] mb-3 sm:mb-4">
                 <span>{currentSlide.headlinePre}</span>
               </div>
 
               {/* Main Headline */}
-              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black tracking-tight leading-[1.1] text-white drop-shadow-md">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[54px] font-bold tracking-tight leading-[1.18] text-white drop-shadow-md">
                 {currentSlide.headlineMain}
               </h1>
 
               {/* Sub-Headline */}
-              <div className="mt-3 sm:mt-4 text-xl sm:text-2xl md:text-3xl font-light text-slate-100 flex items-center gap-2">
+              <div className="mt-3 sm:mt-4 text-lg sm:text-2xl md:text-3xl font-light text-slate-100 flex flex-wrap items-center gap-x-2 gap-y-1">
                 <span>{currentSlide.headlineSub}</span>
-                <span className="font-extrabold text-[#38bdf8] underline decoration-[#0069b4] decoration-4 underline-offset-4">
+                <span className="font-bold text-[#dfad36] underline decoration-[#c59324] decoration-2 underline-offset-4">
                   {currentSlide.headlineSubBold}
                 </span>
               </div>
@@ -179,9 +189,9 @@ export default function IntasHeroBanner({ onExploreProducts, onContactUs, onOpen
                 <button
                   type="button"
                   onClick={onExploreProducts}
-                  className="px-6 py-2.5 sm:py-3 rounded-full bg-[#0069b4] hover:bg-[#005a9c] text-white font-bold text-xs sm:text-sm transition-all shadow-lg shadow-[#0069b4]/30 hover:scale-[1.02] cursor-pointer flex items-center gap-2"
+                  className="px-6 py-2.5 sm:py-3 rounded-full bg-gradient-to-r from-[#c59324] via-[#d4a029] to-[#b8831b] hover:from-[#b8831b] hover:to-[#9f6d0f] text-white font-bold text-xs sm:text-sm transition-all shadow-lg shadow-[#c59324]/30 hover:scale-[1.02] cursor-pointer flex items-center gap-2"
                 >
-                  <span>Explore Products</span>
+                  <span>Explore Formulations</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
 
@@ -204,7 +214,7 @@ export default function IntasHeroBanner({ onExploreProducts, onContactUs, onOpen
         <button
           type="button"
           onClick={handlePrevSlide}
-          className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 z-30 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-black/30 hover:bg-[#0069b4] text-white backdrop-blur-md border border-white/20 flex items-center justify-center transition-all cursor-pointer shadow-lg group"
+          className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 z-30 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-black/40 hover:bg-[#0c2340] hover:border-[#c59324] text-white backdrop-blur-md border border-white/20 flex items-center justify-center transition-all cursor-pointer shadow-lg group"
           aria-label="Previous Slide"
         >
           <ChevronLeft className="w-6 h-6 group-hover:-translate-x-0.5 transition-transform" />
@@ -213,7 +223,7 @@ export default function IntasHeroBanner({ onExploreProducts, onContactUs, onOpen
         <button
           type="button"
           onClick={handleNextSlide}
-          className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 z-30 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-black/30 hover:bg-[#0069b4] text-white backdrop-blur-md border border-white/20 flex items-center justify-center transition-all cursor-pointer shadow-lg group"
+          className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 z-30 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-black/40 hover:bg-[#0c2340] hover:border-[#c59324] text-white backdrop-blur-md border border-white/20 flex items-center justify-center transition-all cursor-pointer shadow-lg group"
           aria-label="Next Slide"
         >
           <ChevronRight className="w-6 h-6 group-hover:translate-x-0.5 transition-transform" />
@@ -227,7 +237,7 @@ export default function IntasHeroBanner({ onExploreProducts, onContactUs, onOpen
               type="button"
               onClick={() => setActiveSlide(idx)}
               className={`h-2.5 rounded-full transition-all cursor-pointer ${
-                idx === activeSlide ? 'w-8 bg-[#0069b4]' : 'w-2.5 bg-white/50 hover:bg-white'
+                idx === activeSlide ? 'w-8 bg-[#c59324]' : 'w-2.5 bg-white/50 hover:bg-white'
               }`}
               aria-label={`Go to slide ${idx + 1}`}
             />
@@ -259,8 +269,8 @@ export default function IntasHeroBanner({ onExploreProducts, onContactUs, onOpen
                 }}
                 className={`p-5 sm:p-6 rounded-2xl cursor-pointer transition-all duration-300 flex flex-col justify-between border ${
                   card.isPrimary || isSelected
-                    ? 'bg-[#0069b4] text-white border-[#005a9c] shadow-xl shadow-[#0069b4]/25 scale-[1.02]'
-                    : 'bg-white text-slate-800 border-slate-200/90 hover:border-[#0069b4]/40 hover:shadow-xl shadow-md'
+                    ? 'bg-gradient-to-br from-[#0c2340] to-[#07172b] text-white border-[#c59324] shadow-xl shadow-[#0c2340]/30 scale-[1.02]'
+                    : 'bg-white text-slate-800 border-slate-200/90 hover:border-[#c59324]/50 hover:shadow-xl shadow-md'
                 }`}
               >
                 <div>
@@ -268,8 +278,8 @@ export default function IntasHeroBanner({ onExploreProducts, onContactUs, onOpen
                   <div
                     className={`w-11 h-11 rounded-xl flex items-center justify-center mb-4 transition-transform group-hover:scale-110 ${
                       card.isPrimary || isSelected
-                        ? 'bg-white/20 text-white'
-                        : 'bg-sky-50 text-[#0069b4] border border-sky-100'
+                        ? 'bg-[#c59324]/20 text-[#dfad36] border border-[#c59324]/40'
+                        : 'bg-amber-50 text-[#0c2340] border border-amber-100'
                     }`}
                   >
                     <Icon className="w-6 h-6 stroke-[2.2]" />
@@ -278,7 +288,7 @@ export default function IntasHeroBanner({ onExploreProducts, onContactUs, onOpen
                   {/* Title */}
                   <h3
                     className={`text-base font-bold tracking-tight mb-2 leading-snug ${
-                      card.isPrimary || isSelected ? 'text-white' : 'text-[#004b87]'
+                      card.isPrimary || isSelected ? 'text-white' : 'text-[#0c2340]'
                     }`}
                   >
                     {card.title}
@@ -287,7 +297,7 @@ export default function IntasHeroBanner({ onExploreProducts, onContactUs, onOpen
                   {/* Description */}
                   <p
                     className={`text-xs leading-relaxed ${
-                      card.isPrimary || isSelected ? 'text-sky-100' : 'text-slate-600'
+                      card.isPrimary || isSelected ? 'text-slate-300' : 'text-slate-600'
                     }`}
                   >
                     {card.description}
@@ -296,12 +306,12 @@ export default function IntasHeroBanner({ onExploreProducts, onContactUs, onOpen
 
                 {/* Footer action link */}
                 <div className="pt-4 mt-3 border-t border-black/10 flex items-center justify-between text-xs font-bold">
-                  <span className={card.isPrimary || isSelected ? 'text-white' : 'text-[#0069b4]'}>
+                  <span className={card.isPrimary || isSelected ? 'text-[#dfad36]' : 'text-[#c59324]'}>
                     {card.actionText}
                   </span>
                   <ArrowRight
                     className={`w-4 h-4 transition-transform group-hover:translate-x-1 ${
-                      card.isPrimary || isSelected ? 'text-white' : 'text-[#0069b4]'
+                      card.isPrimary || isSelected ? 'text-[#dfad36]' : 'text-[#c59324]'
                     }`}
                   />
                 </div>

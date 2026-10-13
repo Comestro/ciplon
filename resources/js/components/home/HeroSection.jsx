@@ -1,4 +1,4 @@
-﻿import { ArrowRight, ShieldCheck, Microscope, CheckCircle2, Award, Building2, Sparkles } from 'lucide-react';
+import { ArrowRight, ShieldCheck, Microscope, CheckCircle2, Award, Building2, Sparkles } from 'lucide-react';
 import Container from '../common/Container';
 import Button from '../common/Button';
 
@@ -14,7 +14,7 @@ export default function HeroSection({ onExploreProducts, onContactUs, onOpenEnqu
               <span>WHO-GMP & ISO 9001:2015 Certified Pharmaceutical Enterprise</span>
             </div>
 
-            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-slate-950 leading-[1.14]">
+            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-slate-950 leading-[1.14]">
               Precision Formulations. <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-800 via-teal-700 to-emerald-700">
                 Trusted Global Healthcare.

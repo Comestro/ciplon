@@ -1,4 +1,4 @@
-﻿import { ArrowRight, Award } from 'lucide-react';
+import { ArrowRight, Award } from 'lucide-react';
 import Container from '../common/Container';
 
 export default function EditorialBanner({ onContactUs }) {
@@ -18,7 +18,7 @@ export default function EditorialBanner({ onContactUs }) {
             <span>The Ciplon Formulation Charter</span>
           </div>
 
-          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight text-slate-950 leading-tight">
+          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-[#0c2340] leading-tight">
             Advancing Human Health Through <br className="hidden sm:inline" />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-800 via-teal-700 to-emerald-700">
               Scientific Precision & Uncompromising Quality

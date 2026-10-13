@@ -97,12 +97,12 @@ export default function FeaturedProductsSection({ products = [], onOpenEnquiryMo
   return (
     <section id="products" className="py-16 sm:py-24 bg-white border-b border-slate-100">
       <Container>
-        {/* Section Header matching Intas: Bold Blue Title + Accent Line */}
+        {/* Section Header matching Intas: Bold Title + Accent Line */}
         <div className="text-center mb-10 sm:mb-12">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight text-[#0069b4] uppercase">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-[#0c2340] uppercase">
             FEATURED PRODUCTS
           </h2>
-          <div className="w-16 h-1 bg-[#0069b4] mx-auto mt-2 rounded-full" />
+          <div className="w-20 h-1 bg-gradient-to-r from-[#c59324] to-[#dfad36] mx-auto mt-2 rounded-full" />
           <p className="text-xs sm:text-sm text-slate-500 max-w-xl mx-auto mt-3">
             High-purity plasma therapeutics and finished formulations manufactured under strict WHO-GMP compliance.
           </p>
@@ -117,8 +117,8 @@ export default function FeaturedProductsSection({ products = [], onOpenEnquiryMo
               onClick={() => setSelectedFilter(cat)}
               className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
                 selectedFilter === cat
-                  ? 'bg-[#0069b4] text-white'
-                  : 'bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-900 border border-slate-200'
+                  ? 'bg-[#0c2340] text-white border border-[#c59324] shadow-sm'
+                  : 'bg-slate-50 text-slate-600 hover:bg-amber-50/50 hover:text-[#c59324] border border-slate-200'
               }`}
             >
               {cat === 'ALL' ? 'All Formulations' : cat}
@@ -143,12 +143,12 @@ export default function FeaturedProductsSection({ products = [], onOpenEnquiryMo
                 />
 
                 {/* Subtle Hover Action Overlay */}
-                <div className="absolute inset-0 rounded-2xl bg-gradient-to-t from-slate-950/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-end justify-center pb-6 gap-2">
+                <div className="absolute inset-0 rounded-2xl bg-gradient-to-t from-slate-950/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-end justify-center pb-6 gap-2">
                   <Link
                     href={`/products`}
-                    className="px-4 py-2 rounded-full bg-white text-slate-900 font-bold text-xs hover:bg-slate-100 transition-all flex items-center gap-1.5"
+                    className="px-4 py-2 rounded-full bg-white text-slate-900 font-bold text-xs hover:bg-amber-50 transition-all flex items-center gap-1.5 shadow-md"
                   >
-                    <Eye className="w-3.5 h-3.5 text-[#0069b4]" />
+                    <Eye className="w-3.5 h-3.5 text-[#c59324]" />
                     <span>Monograph</span>
                   </Link>
 
@@ -159,18 +159,18 @@ export default function FeaturedProductsSection({ products = [], onOpenEnquiryMo
                         onOpenEnquiryModal();
                       }
                     }}
-                    className="px-4 py-2 rounded-full bg-[#0069b4] text-white font-bold text-xs hover:bg-[#005a9c] transition-all"
+                    className="px-4 py-2 rounded-full bg-[#0c2340] text-white border border-[#c59324]/50 font-bold text-xs hover:bg-[#c59324] transition-all shadow-md cursor-pointer"
                   >
                     Enquire
                   </button>
                 </div>
               </div>
 
-              {/* Product Label under the Box (Exact Intas Blue Title Style) */}
+              {/* Product Label under the Box */}
               <div className="mt-4 text-center space-y-1">
                 <Link
                   href="/products"
-                  className="text-lg sm:text-xl font-bold text-[#0069b4] hover:text-[#004780] transition-colors block leading-tight cursor-pointer"
+                  className="text-lg sm:text-xl font-bold text-[#0c2340] hover:text-[#c59324] transition-colors block leading-tight cursor-pointer"
                 >
                   {item.name}
                 </Link>
@@ -182,7 +182,7 @@ export default function FeaturedProductsSection({ products = [], onOpenEnquiryMo
                 <div className="pt-2 flex items-center justify-center gap-2">
                   <Link
                     href="/products"
-                    className="px-3.5 py-1 rounded-full bg-white border border-slate-200 text-slate-600 hover:text-[#0069b4] hover:border-[#0069b4] text-[11px] font-semibold transition-all"
+                    className="px-3.5 py-1 rounded-full bg-white border border-slate-200 text-slate-600 hover:text-[#c59324] hover:border-[#c59324] text-[11px] font-semibold transition-all"
                   >
                     View Details
                   </Link>
@@ -194,7 +194,7 @@ export default function FeaturedProductsSection({ products = [], onOpenEnquiryMo
                         onOpenEnquiryModal();
                       }
                     }}
-                    className="px-3.5 py-1 rounded-full bg-[#0069b4] hover:bg-[#00528e] text-white text-[11px] font-semibold transition-all cursor-pointer"
+                    className="px-3.5 py-1 rounded-full bg-[#0c2340] hover:bg-[#c59324] text-white text-[11px] font-semibold transition-all cursor-pointer"
                   >
                     Enquire
                   </button>
@@ -204,14 +204,14 @@ export default function FeaturedProductsSection({ products = [], onOpenEnquiryMo
           ))}
         </div>
 
-        {/* Global CTA Bar matching Intas */}
+        {/* Global CTA Bar */}
         <div className="mt-14 sm:mt-16 text-center">
           <Link
             href="/products"
-            className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-[#0069b4] hover:bg-[#00528e] text-white font-bold text-xs sm:text-sm tracking-wider uppercase transition-all hover:scale-105 cursor-pointer"
+            className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-[#0c2340] hover:bg-[#123055] text-white border border-[#c59324]/40 font-bold text-xs sm:text-sm tracking-wider uppercase transition-all hover:scale-105 shadow-md shadow-[#0c2340]/25 cursor-pointer"
           >
             <span>EXPLORE ALL FINISHED FORMULATIONS</span>
-            <ArrowRight className="w-4 h-4" />
+            <ArrowRight className="w-4 h-4 text-[#dfad36]" />
           </Link>
         </div>
       </Container>

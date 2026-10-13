@@ -65,16 +65,16 @@ export default function EnquiryModal({ isOpen, onClose, initialProduct = null })
         aria-modal="true"
       >
         {/* Header */}
-        <div className="p-6 sm:p-7 bg-slate-900 text-white rounded-t-3xl relative">
+        <div className="p-6 sm:p-7 bg-gradient-to-r from-[#0c2340] via-[#07172b] to-[#0c2340] text-white rounded-t-3xl relative border-b border-[#c59324]/20">
           <button
             onClick={handleResetAndClose}
-            className="absolute top-6 right-6 p-2 rounded-full text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
+            className="absolute top-6 right-6 p-2 rounded-full text-slate-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
             aria-label="Close modal"
           >
             <X className="w-5 h-5" />
           </button>
 
-          <span className="text-[11px] font-mono tracking-wider uppercase text-teal-400 font-semibold">
+          <span className="text-[11px] font-mono tracking-wider uppercase text-[#dfad36] font-semibold">
             Institutional & Distributor Desk
           </span>
           <h3 className="text-xl sm:text-2xl font-bold text-white mt-1">
@@ -214,7 +214,7 @@ export default function EnquiryModal({ isOpen, onClose, initialProduct = null })
               </div>
 
               <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 text-[11px] text-slate-500 flex items-center gap-2">
-                <ShieldCheck className="w-4 h-4 text-teal-600 shrink-0" />
+                <ShieldCheck className="w-4 h-4 text-[#c59324] shrink-0" />
                 <span>All proprietary business information is handled under commercial non-disclosure protocols.</span>
               </div>
 

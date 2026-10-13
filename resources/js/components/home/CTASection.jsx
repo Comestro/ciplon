@@ -1,4 +1,4 @@
-﻿import { ArrowRight, Mail, Phone, Building2, FileCheck2, Clock } from 'lucide-react';
+import { ArrowRight, Mail, Phone, Building2, FileCheck2, Clock } from 'lucide-react';
 import Container from '../common/Container';
 import Button from '../common/Button';
 
@@ -12,7 +12,7 @@ export default function CTASection({ onOpenEnquiryModal }) {
               Commercial & Institutional Partnerships
             </span>
 
-            <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight text-slate-950 leading-tight">
+            <h2 className="text-2xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-[#0c2340] leading-tight">
               Looking for Trusted Formulation Supply?
             </h2>
 

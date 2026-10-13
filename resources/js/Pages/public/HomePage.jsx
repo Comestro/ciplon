@@ -32,7 +32,7 @@ export default function HomePage({ featuredProducts = [], categories = [], compa
 
   return (
     <PublicLayout companyData={companyData} categories={categories}>
-      <div className="w-full bg-white text-slate-900 selection:bg-[#0069b4] selection:text-white">
+      <div className="w-full bg-white text-slate-900 selection:bg-[#c59324] selection:text-white">
         {/* 1. Hero Banner with Carousel, Quality Ribbon & 4 Feature Cards */}
         <IntasHeroBanner
           onExploreProducts={handleScrollToProducts}

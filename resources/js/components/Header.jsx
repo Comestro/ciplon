@@ -81,12 +81,12 @@ export default function Header({ companyData, onOpenEnquiryModal }) {
       {/* Main Navigation Bar */}
       <nav
         className={`bg-white/95 backdrop-blur-md transition-all duration-200 ${
-          isScrolled ? 'border-b border-slate-200/90 py-2.5 shadow-sm' : 'border-b border-slate-200 py-3.5'
+          isScrolled ? 'border-b border-slate-200/90 py-2.5 shadow-sm' : 'border-b border-slate-200 py-3 sm:py-4'
         }`}
       >
         <Container size="wide">
           <div className="flex items-center justify-between gap-4 xl:gap-8">
-            {/* Intas-Style Oval Capsule Logo */}
+            {/* Intas-Style Oval Capsule Logo - Significantly enlarged for crisp readability */}
             <Link
               href="/"
               onClick={() => {
@@ -97,66 +97,56 @@ export default function Header({ companyData, onOpenEnquiryModal }) {
               className="flex items-center shrink-0 group focus:outline-none"
               title="Ciplon Pharmaceuticals"
             >
-              {logoUrl ? (
-                <div className="h-9 flex items-center">
-                  <img
-                    src={logoUrl}
-                    alt={rawCompanyName}
-                    className="h-8 w-auto max-w-[150px] object-contain"
-                    onError={(e) => {
-                      e.currentTarget.style.display = 'none';
-                    }}
-                  />
-                </div>
-              ) : (
-                <div className="px-5 py-1 rounded-full border-2 border-[#0069b4] bg-white flex items-center justify-center shadow-xs group-hover:border-[#00528e] group-hover:shadow-sm transition-all">
-                  <span className="text-base sm:text-lg font-black tracking-widest text-[#0069b4] font-sans leading-none">
-                    CIPLON
-                  </span>
-                </div>
-              )}
+              <img
+                src={logoUrl || '/images/ciplon_logo.png'}
+                alt="Ciplon Pharma Private Limited"
+                className="h-12 sm:h-14 md:h-16 lg:h-17 xl:h-18 w-auto max-w-[260px] sm:max-w-[320px] lg:max-w-[360px] object-contain transition-all drop-shadow-xs"
+                onError={(e) => {
+                  e.currentTarget.src = '/images/ciplon_logo.png';
+                }}
+              />
             </Link>
 
-            {/* Desktop Navigation Links (Single Line, No Wrap, Intas Spacing) */}
-            <nav className="hidden lg:flex items-center gap-4 xl:gap-6 text-[11px] xl:text-[12px] font-bold tracking-wider text-slate-700 whitespace-nowrap">
+            {/* Desktop Navigation Links (Clean Semibold Poppins Font, Wide Dropdowns, Responsive Spacing) */}
+            <nav className="hidden lg:flex items-center gap-3 xl:gap-5 2xl:gap-6 text-xs xl:text-[13px] font-semibold tracking-wide text-slate-700 whitespace-nowrap">
               {/* ABOUT US with dropdown */}
               <div className="relative group/menu py-2">
                 <a
                   href="#about"
-                  className="flex items-center gap-1 hover:text-[#0069b4] transition-colors uppercase whitespace-nowrap cursor-pointer"
+                  className="flex items-center gap-1 hover:text-[#c59324] transition-colors uppercase whitespace-nowrap cursor-pointer"
                 >
                   <span>ABOUT US</span>
-                  <span className="text-[8px] text-slate-400 group-hover/menu:text-[#0069b4] transition-transform group-hover/menu:rotate-180">▼</span>
+                  <span className="text-[8px] text-slate-400 group-hover/menu:text-[#c59324] transition-transform group-hover/menu:rotate-180">▼</span>
                 </a>
-                <div className="absolute top-full left-0 hidden group-hover/menu:block w-48 bg-white rounded-xl shadow-xl border border-slate-100 py-2 z-50 animate-in fade-in slide-in-from-top-1 duration-150">
-                  <a href="#about" className="block px-4 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 hover:text-[#0069b4]">Corporate Overview</a>
-                  <a href="#excellence" className="block px-4 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 hover:text-[#0069b4]">Excellence & Growth</a>
-                  <a href="#science" className="block px-4 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 hover:text-[#0069b4]">Scientific Vision</a>
-                  <a href="#news" className="block px-4 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 hover:text-[#0069b4]">Corporate Media</a>
+                <div className="absolute top-full left-0 hidden group-hover/menu:block min-w-[240px] w-max bg-white rounded-2xl shadow-xl border border-slate-100 py-2.5 px-1.5 z-50 animate-in fade-in slide-in-from-top-1 duration-150">
+                  <a href="#about" className="block px-4 py-2 text-xs font-medium text-slate-700 hover:bg-amber-50/60 hover:text-[#c59324] rounded-lg transition-colors whitespace-nowrap">Corporate Overview</a>
+                  <a href="#excellence" className="block px-4 py-2 text-xs font-medium text-slate-700 hover:bg-amber-50/60 hover:text-[#c59324] rounded-lg transition-colors whitespace-nowrap">Excellence & Growth</a>
+                  <a href="#science" className="block px-4 py-2 text-xs font-medium text-slate-700 hover:bg-amber-50/60 hover:text-[#c59324] rounded-lg transition-colors whitespace-nowrap">Scientific Vision</a>
+                  <a href="#news" className="block px-4 py-2 text-xs font-medium text-slate-700 hover:bg-amber-50/60 hover:text-[#c59324] rounded-lg transition-colors whitespace-nowrap">Corporate Media</a>
                 </div>
               </div>
 
-              {/* BUSINESS OPERATIONS */}
+              {/* BUSINESS OPERATIONS (Responsive label to prevent laptop overflow) */}
               <a
                 href="#business"
-                className="hover:text-[#0069b4] transition-colors uppercase whitespace-nowrap"
+                className="hover:text-[#c59324] transition-colors uppercase whitespace-nowrap"
               >
-                BUSINESS OPERATIONS
+                <span className="hidden xl:inline">BUSINESS </span>OPERATIONS
               </a>
 
-              {/* R&D with dropdown */}
+              {/* R&D with dropdown - generous min-width to prevent any text wrap */}
               <div className="relative group/menu py-2">
                 <a
                   href="#science"
-                  className="flex items-center gap-1 hover:text-[#0069b4] transition-colors uppercase whitespace-nowrap cursor-pointer"
+                  className="flex items-center gap-1 hover:text-[#c59324] transition-colors uppercase whitespace-nowrap cursor-pointer"
                 >
                   <span>R&D</span>
-                  <span className="text-[8px] text-slate-400 group-hover/menu:text-[#0069b4] transition-transform group-hover/menu:rotate-180">▼</span>
+                  <span className="text-[8px] text-slate-400 group-hover/menu:text-[#c59324] transition-transform group-hover/menu:rotate-180">▼</span>
                 </a>
-                <div className="absolute top-full left-0 hidden group-hover/menu:block w-48 bg-white rounded-xl shadow-xl border border-slate-100 py-2 z-50 animate-in fade-in slide-in-from-top-1 duration-150">
-                  <a href="#science" className="block px-4 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 hover:text-[#0069b4]">R&D Infrastructure</a>
-                  <a href="#science" className="block px-4 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 hover:text-[#0069b4]">Formulations & Biosimilars</a>
-                  <a href="#science" className="block px-4 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 hover:text-[#0069b4]">Regulatory Dossiers</a>
+                <div className="absolute top-full left-0 hidden group-hover/menu:block min-w-[260px] w-max bg-white rounded-2xl shadow-xl border border-slate-100 py-2 px-1 z-50 animate-in fade-in slide-in-from-top-1 duration-150">
+                  <a href="#science" className="block px-4 py-2 text-xs font-medium text-slate-700 hover:bg-amber-50/60 hover:text-[#c59324] rounded-lg transition-colors whitespace-nowrap">R&D Infrastructure</a>
+                  <a href="#science" className="block px-4 py-2 text-xs font-medium text-slate-700 hover:bg-amber-50/60 hover:text-[#c59324] rounded-lg transition-colors whitespace-nowrap">Formulations & Biosimilars</a>
+                  <a href="#science" className="block px-4 py-2 text-xs font-medium text-slate-700 hover:bg-amber-50/60 hover:text-[#c59324] rounded-lg transition-colors whitespace-nowrap">Regulatory Dossiers</a>
                 </div>
               </div>
 
@@ -164,22 +154,22 @@ export default function Header({ companyData, onOpenEnquiryModal }) {
               <div className="relative group/menu py-2">
                 <a
                   href="#manufacturing"
-                  className="flex items-center gap-1 hover:text-[#0069b4] transition-colors uppercase whitespace-nowrap cursor-pointer"
+                  className="flex items-center gap-1 hover:text-[#c59324] transition-colors uppercase whitespace-nowrap cursor-pointer"
                 >
                   <span>MANUFACTURING</span>
-                  <span className="text-[8px] text-slate-400 group-hover/menu:text-[#0069b4] transition-transform group-hover/menu:rotate-180">▼</span>
+                  <span className="text-[8px] text-slate-400 group-hover/menu:text-[#c59324] transition-transform group-hover/menu:rotate-180">▼</span>
                 </a>
-                <div className="absolute top-full left-0 hidden group-hover/menu:block w-48 bg-white rounded-xl shadow-xl border border-slate-100 py-2 z-50 animate-in fade-in slide-in-from-top-1 duration-150">
-                  <a href="#manufacturing" className="block px-4 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 hover:text-[#0069b4]">WHO-GMP Facilities</a>
-                  <a href="#manufacturing" className="block px-4 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 hover:text-[#0069b4]">Robotics & Automation</a>
-                  <a href="#manufacturing" className="block px-4 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 hover:text-[#0069b4]">Quality Control (QC)</a>
+                <div className="absolute top-full left-0 hidden group-hover/menu:block min-w-[240px] w-max bg-white rounded-2xl shadow-xl border border-slate-100 py-2 px-1 z-50 animate-in fade-in slide-in-from-top-1 duration-150">
+                  <a href="#manufacturing" className="block px-4 py-2 text-xs font-medium text-slate-700 hover:bg-amber-50/60 hover:text-[#c59324] rounded-lg transition-colors whitespace-nowrap">WHO-GMP Facilities</a>
+                  <a href="#manufacturing" className="block px-4 py-2 text-xs font-medium text-slate-700 hover:bg-amber-50/60 hover:text-[#c59324] rounded-lg transition-colors whitespace-nowrap">Robotics & Automation</a>
+                  <a href="#manufacturing" className="block px-4 py-2 text-xs font-medium text-slate-700 hover:bg-amber-50/60 hover:text-[#c59324] rounded-lg transition-colors whitespace-nowrap">Quality Control (QC)</a>
                 </div>
               </div>
 
               {/* PRODUCTS */}
               <Link
                 href="/products"
-                className="hover:text-[#0069b4] transition-colors uppercase whitespace-nowrap"
+                className="hover:text-[#c59324] transition-colors uppercase whitespace-nowrap"
               >
                 PRODUCTS
               </Link>
@@ -187,7 +177,7 @@ export default function Header({ companyData, onOpenEnquiryModal }) {
               {/* MEDIA */}
               <a
                 href="#news"
-                className="hover:text-[#0069b4] transition-colors uppercase whitespace-nowrap"
+                className="hover:text-[#c59324] transition-colors uppercase whitespace-nowrap"
               >
                 MEDIA
               </a>
@@ -203,7 +193,7 @@ export default function Header({ companyData, onOpenEnquiryModal }) {
                     if (el) el.scrollIntoView({ behavior: 'smooth' });
                   }
                 }}
-                className="hover:text-[#0069b4] transition-colors uppercase whitespace-nowrap cursor-pointer"
+                className="hover:text-[#c59324] transition-colors uppercase whitespace-nowrap cursor-pointer"
               >
                 CONTACT
               </button>
@@ -216,7 +206,7 @@ export default function Header({ companyData, onOpenEnquiryModal }) {
                 <button
                   type="button"
                   onClick={() => setMobileSearchOpen(!mobileSearchOpen)}
-                  className="p-1.5 text-slate-600 hover:text-[#0069b4] transition-colors cursor-pointer rounded-full hover:bg-slate-100"
+                  className="p-1.5 text-slate-600 hover:text-[#c59324] transition-colors cursor-pointer rounded-full hover:bg-amber-50/50"
                   aria-label="Search"
                   title="Search products and molecules"
                 >
@@ -234,7 +224,7 @@ export default function Header({ companyData, onOpenEnquiryModal }) {
                         onChange={(e) => setSearchTerm(e.target.value)}
                         placeholder="Search molecules, brands..."
                         autoFocus
-                        className="w-full pl-9 pr-7 py-1.5 bg-slate-50 focus:bg-white border border-slate-200 focus:border-[#0069b4] rounded-xl text-xs text-slate-800 focus:outline-none"
+                        className="w-full pl-9 pr-7 py-1.5 bg-slate-50 focus:bg-white border border-slate-200 focus:border-[#c59324] rounded-xl text-xs text-slate-800 focus:outline-none"
                       />
                       {searchTerm && (
                         <button
@@ -256,12 +246,6 @@ export default function Header({ companyData, onOpenEnquiryModal }) {
                 className="flex items-center gap-1.5 text-[#e05e00] hover:text-[#c44e00] transition-colors group py-1 px-1 focus:outline-none"
                 title="MR Portal & Accord Healthcare Partner Network"
               >
-                <div className="w-5 h-5 rounded-full bg-gradient-to-tr from-amber-500 to-orange-500 text-white flex items-center justify-center text-[11px] font-black italic shadow-2xs">
-                  a
-                </div>
-                <span className="font-extrabold tracking-tight text-sm text-[#e05e00] font-sans leading-none group-hover:underline">
-                  accord
-                </span>
               </Link>
             </div>
 

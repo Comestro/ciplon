@@ -5,15 +5,32 @@
 @source '../views/**/*.blade.php';
 @source '../js/**/*.{js,jsx}';
 
+@theme {
+  --font-serif: 'Poppins', system-ui, -apple-system, sans-serif;
+  --font-sans: 'Poppins', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+
+  --color-navy-950: #07172b;
+  --color-navy-900: #0c2340;
+  --color-navy-800: #123055;
+  --color-navy-700: #19406f;
+
+  --color-gold-600: #a97715;
+  --color-gold-500: #c59324;
+  --color-gold-400: #dfad36;
+  --color-gold-300: #f2cb6b;
+  --color-gold-50: #fdfaf0;
+}
+
 @layer base {
   html {
     scroll-behavior: smooth;
+    font-family: 'Poppins', sans-serif;
   }
 
   body {
     background-color: #ffffff;
-    color: #0f172a;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    color: #0c2340;
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }

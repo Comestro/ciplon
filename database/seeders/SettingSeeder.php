@@ -17,7 +17,7 @@ class SettingSeeder extends Seeder
             ['key' => 'short_name', 'value' => 'Ciplon Pharma', 'group' => 'general', 'type' => 'string', 'description' => 'Short display brand name'],
             ['key' => 'tagline', 'value' => 'Committed to Healthcare Excellence', 'group' => 'general', 'type' => 'string', 'description' => 'Company mission tagline'],
             ['key' => 'description', 'value' => 'Ciplon Pharma Private Limited is an ISO 9001: 2015 certified pharmaceutical formulations company dedicated to marketing high-quality, accessible healthcare therapeutics across diverse therapeutic segments.', 'group' => 'general', 'type' => 'text', 'description' => 'Detailed corporate overview'],
-            ['key' => 'logo_url', 'value' => '/images/ciplon_logo.svg', 'group' => 'general', 'type' => 'image', 'description' => 'Official logo image URL'],
+            ['key' => 'logo_url', 'value' => '/images/ciplon_logo.png', 'group' => 'general', 'type' => 'image', 'description' => 'Official logo image URL'],
 
             // Regulatory & Certifications
             ['key' => 'iso_certification', 'value' => 'An ISO 9001: 2015 certified company', 'group' => 'regulatory', 'type' => 'string', 'description' => 'Quality management standards certifications'],
