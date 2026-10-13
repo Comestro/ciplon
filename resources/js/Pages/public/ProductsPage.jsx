@@ -92,11 +92,31 @@ export default function ProductsPage({ products = [], categories = [], filters =
 
   return (
     <PublicLayout categories={categories}>
-      <div className="min-h-screen bg-slate-50/50 pb-12">
-        <div className="sticky top-[57px] sm:top-[61px] z-30 bg-white/95 backdrop-blur-md border-b border-slate-100">
+      <div className="min-h-screen bg-slate-50/60 pb-16">
+        {/* Hero Header matching Home Page Corporate Theme */}
+        <div className="bg-[#0c2340] text-white py-10 sm:py-12 border-b border-[#c59324]/40 relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-r from-[#0c2340] via-[#091b30] to-[#05101d] pointer-events-none" />
+          <Container className="relative z-10">
+            <div className="max-w-3xl">
+              <span className="text-[11px] font-bold text-[#dfad36] uppercase tracking-widest block mb-1.5">
+                Therapeutic Portfolio & Catalog
+              </span>
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-white uppercase">
+                Finished Pharmaceutical Formulations
+              </h1>
+              <div className="w-16 h-1 bg-gradient-to-r from-[#c59324] to-[#dfad36] mt-2 mb-2.5 rounded-full" />
+              <p className="text-xs sm:text-sm text-slate-300 max-w-2xl leading-relaxed">
+                WHO-GMP validated finished oral solids, injectables, lyophilized vials, and plasma therapeutics produced under stringent pharmacopoeial quality control.
+              </p>
+            </div>
+          </Container>
+        </div>
+
+        {/* Category Pills Navigation Bar */}
+        <div className="sticky top-[68px] sm:top-[76px] z-30 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-xs">
           <Container>
-            <div className="flex items-center justify-between gap-4 py-2 sm:py-2.5">
-              <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
+            <div className="flex items-center justify-between gap-4 py-2.5 sm:py-3">
+              <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-0.5">
                 {availableCategories.map((cat) => {
                   const isSelected = selectedCategory.toLowerCase() === cat.toLowerCase();
                   return (
@@ -104,13 +124,13 @@ export default function ProductsPage({ products = [], categories = [], filters =
                       key={cat}
                       type="button"
                       onClick={() => handleCategorySelect(cat)}
-                      className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-200 cursor-pointer ${
+                      className={`px-4 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-200 cursor-pointer ${
                         isSelected
-                          ? 'bg-teal-700 text-white'
-                          : 'bg-slate-100 text-slate-600 hover:text-slate-900 hover:bg-slate-200/70'
+                          ? 'bg-[#0c2340] text-white border border-[#c59324] shadow-xs'
+                          : 'bg-slate-100 text-slate-700 hover:text-[#c59324] hover:bg-amber-50/60 border border-slate-200/80'
                       }`}
                     >
-                      {cat}
+                      {cat === 'All' ? 'All Formulations' : cat}
                     </button>
                   );
                 })}
@@ -119,18 +139,18 @@ export default function ProductsPage({ products = [], categories = [], filters =
           </Container>
         </div>
 
-        <Container className="pt-4 sm:pt-5">
+        <Container className="pt-6 sm:pt-8">
           {hasActiveFilters && (
-            <div className="mb-4 flex items-center justify-between gap-3 text-xs text-slate-600 bg-white rounded-xl px-3.5 py-2 border border-slate-100">
+            <div className="mb-6 flex items-center justify-between gap-3 text-xs text-slate-700 bg-white rounded-2xl px-4 py-2.5 border border-slate-200/80 shadow-xs">
               <div className="flex items-center gap-2 flex-wrap">
-                <span>Showing results for</span>
+                <span className="text-slate-500">Showing formulations for:</span>
                 {selectedCategory !== 'All' && (
-                  <span className="font-semibold text-teal-800 bg-teal-50 px-2 py-0.5 rounded-md">
+                  <span className="font-semibold text-[#0c2340] bg-amber-50 border border-amber-200/70 px-2.5 py-0.5 rounded-lg">
                     {selectedCategory}
                   </span>
                 )}
                 {searchQuery.trim() && (
-                  <span className="font-semibold text-slate-800 bg-slate-100 px-2 py-0.5 rounded-md">
+                  <span className="font-semibold text-slate-800 bg-slate-100 px-2.5 py-0.5 rounded-lg border border-slate-200">
                     "{searchQuery.trim()}"
                   </span>
                 )}
@@ -138,36 +158,38 @@ export default function ProductsPage({ products = [], categories = [], filters =
               <button
                 type="button"
                 onClick={handleResetFilters}
-                className="text-rose-600 hover:text-rose-800 font-semibold cursor-pointer shrink-0 inline-flex items-center gap-1"
+                className="text-[#c59324] hover:text-[#9f6d0f] font-semibold cursor-pointer shrink-0 inline-flex items-center gap-1.5"
               >
-                <RefreshCw className="w-3 h-3" />
-                <span>Reset</span>
+                <RefreshCw className="w-3.5 h-3.5" />
+                <span>Reset Filters</span>
               </button>
             </div>
           )}
 
           {filteredProducts.length === 0 ? (
-            <div className="bg-white rounded-2xl border border-slate-100 p-8 sm:p-10 text-center max-w-lg mx-auto space-y-3.5 my-6">
-              <div className="w-12 h-12 rounded-2xl bg-teal-50 flex items-center justify-center mx-auto text-teal-600">
-                <Pill className="w-6 h-6" />
+            <div className="bg-white rounded-3xl border border-slate-200/80 p-10 sm:p-14 text-center max-w-lg mx-auto space-y-4 my-8 shadow-xs">
+              <div className="w-14 h-14 rounded-2xl bg-amber-50 border border-amber-200/60 flex items-center justify-center mx-auto text-[#c59324]">
+                <Pill className="w-7 h-7 stroke-[2]" />
               </div>
-              <h3 className="text-base font-bold text-slate-900">
+              <h3 className="text-lg font-bold text-[#0c2340]">
                 No Formulations Found
               </h3>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-slate-500 leading-relaxed">
                 No products match your current search query or category filter. Try searching for other molecules or reset filters.
               </p>
-              <button
-                type="button"
-                onClick={handleResetFilters}
-                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-semibold transition-colors cursor-pointer"
-              >
-                <RefreshCw className="w-3.5 h-3.5" />
-                <span>Reset All Filters</span>
-              </button>
+              <div className="pt-2">
+                <button
+                  type="button"
+                  onClick={handleResetFilters}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#0c2340] hover:bg-[#c59324] text-white text-xs font-bold transition-colors cursor-pointer shadow-xs"
+                >
+                  <RefreshCw className="w-3.5 h-3.5" />
+                  <span>Reset All Filters</span>
+                </button>
+              </div>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
               {filteredProducts.map((product) => (
                 <ProductCard
                   key={product.id || product.product_code || product.brand_name}

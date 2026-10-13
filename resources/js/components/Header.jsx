@@ -57,11 +57,10 @@ export default function Header({ companyData, onOpenEnquiryModal }) {
 
   const navLinks = [
     { name: 'Home', href: '/' },
-    { name: 'Formulations', href: '/products' },
-    { name: 'Therapeutic Areas', href: '/#therapeutic-areas' },
-    { name: 'Quality & GMP', href: '/#quality' },
-    { name: 'R&D Pipeline', href: '/#rd' },
-    { name: 'Corporate', href: '/#about' },
+    { name: 'About Us', href: '/about' },
+    { name: 'Products & Formulations', href: '/products' },
+    { name: 'Quality & WHO-GMP', href: '/quality' },
+    { name: 'Contact Corporate Desk', href: '/contact' },
   ];
 
   const rawCompanyName = companyData?.company_name || companyData?.companyName || 'Ciplon Life Sciences';
@@ -111,58 +110,18 @@ export default function Header({ companyData, onOpenEnquiryModal }) {
             <nav className="hidden lg:flex items-center gap-3 xl:gap-5 2xl:gap-6 text-xs xl:text-[13px] font-semibold tracking-wide text-slate-700 whitespace-nowrap">
               {/* ABOUT US with dropdown */}
               <div className="relative group/menu py-2">
-                <a
-                  href="#about"
+                <Link
+                  href="/about"
                   className="flex items-center gap-1 hover:text-[#c59324] transition-colors uppercase whitespace-nowrap cursor-pointer"
                 >
                   <span>ABOUT US</span>
                   <span className="text-[8px] text-slate-400 group-hover/menu:text-[#c59324] transition-transform group-hover/menu:rotate-180">▼</span>
-                </a>
+                </Link>
                 <div className="absolute top-full left-0 hidden group-hover/menu:block min-w-[240px] w-max bg-white rounded-2xl shadow-xl border border-slate-100 py-2.5 px-1.5 z-50 animate-in fade-in slide-in-from-top-1 duration-150">
-                  <a href="#about" className="block px-4 py-2 text-xs font-medium text-slate-700 hover:bg-amber-50/60 hover:text-[#c59324] rounded-lg transition-colors whitespace-nowrap">Corporate Overview</a>
-                  <a href="#excellence" className="block px-4 py-2 text-xs font-medium text-slate-700 hover:bg-amber-50/60 hover:text-[#c59324] rounded-lg transition-colors whitespace-nowrap">Excellence & Growth</a>
-                  <a href="#science" className="block px-4 py-2 text-xs font-medium text-slate-700 hover:bg-amber-50/60 hover:text-[#c59324] rounded-lg transition-colors whitespace-nowrap">Scientific Vision</a>
-                  <a href="#news" className="block px-4 py-2 text-xs font-medium text-slate-700 hover:bg-amber-50/60 hover:text-[#c59324] rounded-lg transition-colors whitespace-nowrap">Corporate Media</a>
-                </div>
-              </div>
-
-              {/* BUSINESS OPERATIONS (Responsive label to prevent laptop overflow) */}
-              <a
-                href="#business"
-                className="hover:text-[#c59324] transition-colors uppercase whitespace-nowrap"
-              >
-                <span className="hidden xl:inline">BUSINESS </span>OPERATIONS
-              </a>
-
-              {/* R&D with dropdown - generous min-width to prevent any text wrap */}
-              <div className="relative group/menu py-2">
-                <a
-                  href="#science"
-                  className="flex items-center gap-1 hover:text-[#c59324] transition-colors uppercase whitespace-nowrap cursor-pointer"
-                >
-                  <span>R&D</span>
-                  <span className="text-[8px] text-slate-400 group-hover/menu:text-[#c59324] transition-transform group-hover/menu:rotate-180">▼</span>
-                </a>
-                <div className="absolute top-full left-0 hidden group-hover/menu:block min-w-[260px] w-max bg-white rounded-2xl shadow-xl border border-slate-100 py-2 px-1 z-50 animate-in fade-in slide-in-from-top-1 duration-150">
-                  <a href="#science" className="block px-4 py-2 text-xs font-medium text-slate-700 hover:bg-amber-50/60 hover:text-[#c59324] rounded-lg transition-colors whitespace-nowrap">R&D Infrastructure</a>
-                  <a href="#science" className="block px-4 py-2 text-xs font-medium text-slate-700 hover:bg-amber-50/60 hover:text-[#c59324] rounded-lg transition-colors whitespace-nowrap">Formulations & Biosimilars</a>
-                  <a href="#science" className="block px-4 py-2 text-xs font-medium text-slate-700 hover:bg-amber-50/60 hover:text-[#c59324] rounded-lg transition-colors whitespace-nowrap">Regulatory Dossiers</a>
-                </div>
-              </div>
-
-              {/* MANUFACTURING with dropdown */}
-              <div className="relative group/menu py-2">
-                <a
-                  href="#manufacturing"
-                  className="flex items-center gap-1 hover:text-[#c59324] transition-colors uppercase whitespace-nowrap cursor-pointer"
-                >
-                  <span>MANUFACTURING</span>
-                  <span className="text-[8px] text-slate-400 group-hover/menu:text-[#c59324] transition-transform group-hover/menu:rotate-180">▼</span>
-                </a>
-                <div className="absolute top-full left-0 hidden group-hover/menu:block min-w-[240px] w-max bg-white rounded-2xl shadow-xl border border-slate-100 py-2 px-1 z-50 animate-in fade-in slide-in-from-top-1 duration-150">
-                  <a href="#manufacturing" className="block px-4 py-2 text-xs font-medium text-slate-700 hover:bg-amber-50/60 hover:text-[#c59324] rounded-lg transition-colors whitespace-nowrap">WHO-GMP Facilities</a>
-                  <a href="#manufacturing" className="block px-4 py-2 text-xs font-medium text-slate-700 hover:bg-amber-50/60 hover:text-[#c59324] rounded-lg transition-colors whitespace-nowrap">Robotics & Automation</a>
-                  <a href="#manufacturing" className="block px-4 py-2 text-xs font-medium text-slate-700 hover:bg-amber-50/60 hover:text-[#c59324] rounded-lg transition-colors whitespace-nowrap">Quality Control (QC)</a>
+                  <Link href="/about" className="block px-4 py-2 text-xs font-medium text-slate-700 hover:bg-amber-50/60 hover:text-[#c59324] rounded-lg transition-colors whitespace-nowrap">Corporate Overview</Link>
+                  <Link href="/about" className="block px-4 py-2 text-xs font-medium text-slate-700 hover:bg-amber-50/60 hover:text-[#c59324] rounded-lg transition-colors whitespace-nowrap">Walpar Manufacturing</Link>
+                  <Link href="/quality" className="block px-4 py-2 text-xs font-medium text-slate-700 hover:bg-amber-50/60 hover:text-[#c59324] rounded-lg transition-colors whitespace-nowrap">Quality & Certifications</Link>
+                  <a href="/#news" className="block px-4 py-2 text-xs font-medium text-slate-700 hover:bg-amber-50/60 hover:text-[#c59324] rounded-lg transition-colors whitespace-nowrap">Corporate Media</a>
                 </div>
               </div>
 
@@ -174,29 +133,45 @@ export default function Header({ companyData, onOpenEnquiryModal }) {
                 PRODUCTS
               </Link>
 
+              {/* QUALITY & GMP with dropdown */}
+              <div className="relative group/menu py-2">
+                <Link
+                  href="/quality"
+                  className="flex items-center gap-1 hover:text-[#c59324] transition-colors uppercase whitespace-nowrap cursor-pointer"
+                >
+                  <span>QUALITY &amp; GMP</span>
+                  <span className="text-[8px] text-slate-400 group-hover/menu:text-[#c59324] transition-transform group-hover/menu:rotate-180">▼</span>
+                </Link>
+                <div className="absolute top-full left-0 hidden group-hover/menu:block min-w-[240px] w-max bg-white rounded-2xl shadow-xl border border-slate-100 py-2 px-1 z-50 animate-in fade-in slide-in-from-top-1 duration-150">
+                  <Link href="/quality" className="block px-4 py-2 text-xs font-medium text-slate-700 hover:bg-amber-50/60 hover:text-[#c59324] rounded-lg transition-colors whitespace-nowrap">WHO-GMP Facilities</Link>
+                  <Link href="/quality" className="block px-4 py-2 text-xs font-medium text-slate-700 hover:bg-amber-50/60 hover:text-[#c59324] rounded-lg transition-colors whitespace-nowrap">ISO 9001:2015 Standards</Link>
+                  <Link href="/quality" className="block px-4 py-2 text-xs font-medium text-slate-700 hover:bg-amber-50/60 hover:text-[#c59324] rounded-lg transition-colors whitespace-nowrap">Quality Control (QC)</Link>
+                </div>
+              </div>
+
+              {/* R&D */}
+              <a
+                href="/#science"
+                className="hover:text-[#c59324] transition-colors uppercase whitespace-nowrap"
+              >
+                R&amp;D
+              </a>
+
               {/* MEDIA */}
               <a
-                href="#news"
+                href="/#news"
                 className="hover:text-[#c59324] transition-colors uppercase whitespace-nowrap"
               >
                 MEDIA
               </a>
 
               {/* CONTACT */}
-              <button
-                type="button"
-                onClick={() => {
-                  if (typeof onOpenEnquiryModal === 'function') {
-                    onOpenEnquiryModal();
-                  } else {
-                    const el = document.getElementById('contact');
-                    if (el) el.scrollIntoView({ behavior: 'smooth' });
-                  }
-                }}
+              <Link
+                href="/contact"
                 className="hover:text-[#c59324] transition-colors uppercase whitespace-nowrap cursor-pointer"
               >
                 CONTACT
-              </button>
+              </Link>
             </nav>
 
             {/* Right Side: Search Icon + Accord Partner / MR Portal Badge (Matching Intas Screenshot) */}
@@ -265,7 +240,7 @@ export default function Header({ companyData, onOpenEnquiryModal }) {
               <button
                 type="button"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="p-2 rounded-xl text-slate-700 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-600 cursor-pointer"
+                className="p-2 rounded-xl text-slate-700 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-[#c59324] cursor-pointer"
                 aria-label="Toggle navigation menu"
               >
                 {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -284,7 +259,7 @@ export default function Header({ companyData, onOpenEnquiryModal }) {
                   onChange={(e) => setSearchTerm(e.target.value)}
                   placeholder="Search molecules, brands, indications..."
                   autoFocus
-                  className="w-full pl-9 pr-8 py-2 bg-slate-100/90 focus:bg-white border border-slate-200 focus:border-teal-500 rounded-xl text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all"
+                  className="w-full pl-9 pr-8 py-2 bg-slate-100/90 focus:bg-white border border-slate-200 focus:border-[#c59324] rounded-xl text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#c59324]/20 transition-all"
                 />
                 {searchTerm && (
                   <button
@@ -308,7 +283,7 @@ export default function Header({ companyData, onOpenEnquiryModal }) {
                   key={link.name}
                   href={link.href}
                   onClick={() => setMobileMenuOpen(false)}
-                  className="block px-3 py-2 rounded-lg text-xs font-semibold text-slate-800 hover:bg-teal-50 hover:text-teal-700 transition-colors"
+                  className="block px-3 py-2 rounded-lg text-xs font-semibold text-slate-800 hover:bg-amber-50 hover:text-[#c59324] transition-colors"
                 >
                   {link.name}
                 </Link>
@@ -317,26 +292,25 @@ export default function Header({ companyData, onOpenEnquiryModal }) {
               <Link
                 href="/login"
                 onClick={() => setMobileMenuOpen(false)}
-                className="block px-3 py-2 rounded-lg text-xs font-semibold text-slate-700 hover:bg-teal-50 hover:text-teal-700 transition-colors flex items-center gap-2"
+                className="block px-3 py-2 rounded-lg text-xs font-semibold text-slate-700 hover:bg-amber-50 hover:text-[#c59324] transition-colors flex items-center gap-2"
               >
                 <LogIn className="w-4 h-4 text-slate-500" />
                 <span>Portal Login</span>
               </Link>
 
               <div className="pt-2 mt-2 border-t border-slate-100 space-y-2">
-                <Button
-                  variant="primary"
-                  className="w-full justify-center bg-teal-700 hover:bg-teal-800 text-white text-xs font-semibold py-2.5"
-                  icon={ArrowRight}
+                <Link
                   href="/products"
                   onClick={() => setMobileMenuOpen(false)}
+                  className="w-full justify-center bg-gradient-to-r from-[#c59324] to-[#dfad36] hover:brightness-105 text-[#07172b] text-xs font-bold py-2.5 px-4 rounded-xl flex items-center gap-2 transition-all shadow-sm"
                 >
-                  View Product Catalog
-                </Button>
+                  <span>View Product Catalog</span>
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
 
                 {companyPhone && (
                   <div className="pt-2 text-center text-xs text-slate-500">
-                    <a href={`tel:${companyPhone.replace(/\s+/g, '')}`} className="block py-1 font-medium text-teal-700">
+                    <a href={`tel:${companyPhone.replace(/\s+/g, '')}`} className="block py-1 font-medium text-[#c59324]">
                       {companyPhone}
                     </a>
                   </div>

@@ -29,19 +29,18 @@ export default function Footer({ companyData, categories = [], onOpenEnquiryModa
         <Container>
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-8 items-start">
             
-            {/* Left Column: Official Packaging & Marketed By Details (lg:col-span-5) */}
-            <div className="lg:col-span-5 space-y-4">
-              {/* Marketed By Header */}
-              <div className="text-[11px] font-semibold text-[#dfad36] uppercase tracking-widest">
+            {/* Column 1: Marketed By & Official Corporate Details (lg:col-span-4) */}
+            <div className="lg:col-span-4 space-y-3.5">
+              <span className="text-[10px] font-bold text-[#dfad36] uppercase tracking-widest block">
                 Marketed by :
-              </div>
+              </span>
 
-              {/* Logo Card - Enlarged for clear legibility */}
-              <div className="bg-white p-3.5 sm:p-4 rounded-2xl inline-block shadow-md">
+              {/* Logo Card */}
+              <div className="bg-white p-3 rounded-2xl inline-block shadow-md">
                 <img
                   src={logoUrl}
                   alt="Ciplon Pharma Private Limited"
-                  className="h-14 sm:h-16 md:h-18 w-auto max-w-[280px] sm:max-w-[320px] object-contain"
+                  className="h-12 sm:h-14 w-auto max-w-[260px] object-contain"
                   onError={(e) => {
                     e.currentTarget.src = '/images/ciplon_logo.png';
                   }}
@@ -49,8 +48,8 @@ export default function Footer({ companyData, categories = [], onOpenEnquiryModa
               </div>
 
               {/* Company Entity & Certification */}
-              <div className="space-y-0.5 pt-1">
-                <h3 className="text-base sm:text-lg font-bold text-white tracking-tight uppercase">
+              <div className="space-y-0.5">
+                <h3 className="text-sm sm:text-base font-bold text-white tracking-tight uppercase">
                   {legalName}
                 </h3>
                 <p className="text-xs font-semibold text-amber-200/90">
@@ -59,23 +58,20 @@ export default function Footer({ companyData, categories = [], onOpenEnquiryModa
               </div>
 
               {/* Registered Corporate Address */}
-              <div className="text-xs sm:text-[13px] text-slate-300 leading-relaxed font-light space-y-0.5">
+              <div className="text-xs text-slate-300 leading-relaxed font-light space-y-0.5">
                 <p>{headquarters},</p>
                 <p>{city}, {state}, {country}-{postalCode}.</p>
               </div>
 
-              {/* Query & Feedback */}
-              <div className="pt-2 pb-1 border-t border-white/15 space-y-1">
-                <p className="text-xs font-semibold text-[#dfad36]">
-                  For any query or feedback, please contact us at:
-                </p>
-                <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-white">
-                  <span>Contact :</span>
-                  <a href={`mailto:${email}`} className="font-semibold text-amber-200 hover:text-white underline hover:no-underline">
+              {/* Contact & Trademark */}
+              <div className="pt-1 text-xs text-slate-300 space-y-1 border-t border-white/10">
+                <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs">
+                  <span className="text-slate-400">Contact:</span>
+                  <a href={`mailto:${email}`} className="font-semibold text-amber-200 hover:text-white underline">
                     {email}
                   </a>
                   <span className="text-[#c59324]">|</span>
-                  <a href={website} target="_blank" rel="noopener noreferrer" className="font-semibold text-amber-200 hover:text-white underline hover:no-underline">
+                  <a href={website} target="_blank" rel="noopener noreferrer" className="font-semibold text-amber-200 hover:text-white underline">
                     www.ciplonpharma.in
                   </a>
                 </div>
@@ -85,83 +81,88 @@ export default function Footer({ companyData, categories = [], onOpenEnquiryModa
               </div>
 
               {/* FSSAI Regulatory License Badge */}
-              <div className="pt-1">
-                <div className="inline-flex items-center gap-2.5 px-3 py-1.5 rounded-xl bg-white/10 border border-[#c59324]/30 backdrop-blur-xs">
-                  <span className="italic font-extrabold text-sm tracking-tight text-white">
+              <div className="pt-0.5">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-xl bg-white/10 border border-[#c59324]/30">
+                  <span className="italic font-extrabold text-xs tracking-tight text-white">
                     <span className="text-amber-400">fss</span><span className="text-emerald-400">ai</span>
                   </span>
                   <span className="text-xs font-mono text-slate-200">
-                    Lic. No. : <strong className="text-[#dfad36] font-bold tracking-wider">{fssaiLicNo}</strong>
+                    Lic. No. : <strong className="text-[#dfad36] font-bold">{fssaiLicNo}</strong>
                   </span>
                 </div>
               </div>
             </div>
 
-            {/* Middle Column: Manufacturing Facility & Partner (lg:col-span-4) */}
-            <div className="lg:col-span-4 space-y-5">
-              <div className="p-5 rounded-2xl bg-white/5 border border-[#c59324]/30 backdrop-blur-xs space-y-3">
-                <div className="flex items-center gap-2 text-[#dfad36] text-xs font-bold uppercase tracking-wider">
-                  <ShieldCheck className="w-4 h-4 text-[#dfad36] shrink-0" />
-                  <span>Manufacturing Partner</span>
-                </div>
+            {/* Column 2: Manufacturing Partner (lg:col-span-3) */}
+            <div className="lg:col-span-3 space-y-3.5">
+              <span className="text-[10px] font-bold text-[#dfad36] uppercase tracking-widest block">
+                Manufactured in India by :
+              </span>
 
-                <div className="space-y-1 text-xs text-slate-300">
-                  <p className="font-bold text-white text-sm">
-                    Mfg. in India by: {manufacturerName}
-                  </p>
-                  <p className="text-amber-200/90 font-medium">
-                    ({manufacturerCert})
-                  </p>
-                  <p className="pt-2 text-slate-300/90 leading-relaxed font-light">
-                    {manufacturerAddress}
-                  </p>
-                </div>
+              <div className="space-y-1.5 pt-1">
+                <h4 className="text-sm sm:text-base font-bold text-white tracking-tight">
+                  {manufacturerName}
+                </h4>
+                <p className="text-xs font-semibold text-amber-200/90">
+                  ({manufacturerCert})
+                </p>
               </div>
 
-              {/* Quick Links */}
-              <div className="space-y-3">
-                <h4 className="text-xs font-bold uppercase tracking-wider text-[#dfad36] border-b border-white/15 pb-1">
-                  Quick Navigation
-                </h4>
-                <div className="grid grid-cols-2 gap-2 text-xs text-slate-300">
-                  <a href="/" className="hover:text-[#dfad36] hover:underline transition-colors">• Home</a>
-                  <a href="/products" className="hover:text-[#dfad36] hover:underline transition-colors">• Products & Pipeline</a>
-                  <a href="#about" className="hover:text-[#dfad36] hover:underline transition-colors">• About Us</a>
-                  <a href="#science" className="hover:text-[#dfad36] hover:underline transition-colors">• R&D Infrastructure</a>
-                  <a href="#excellence" className="hover:text-[#dfad36] hover:underline transition-colors">• Quality Standards</a>
-                  <Link href="/login" className="font-bold text-[#dfad36] hover:text-white transition-colors">• MR Portal Login</Link>
-                </div>
+              {/* Unit Address */}
+              <div className="text-xs text-slate-300 leading-relaxed font-light space-y-1 pt-1">
+                <p className="text-slate-400 font-medium text-[11px] uppercase tracking-wider">Manufacturing Unit :</p>
+                <p>{manufacturerAddress}</p>
+              </div>
+
+              <div className="pt-2 text-[11px] text-slate-400 leading-relaxed border-t border-white/10">
+                Certified cGMP & ISO facility adhering to stringent national pharmacopoeial formulation standards.
               </div>
             </div>
 
-            {/* Right Column: Institutional Supply & Follow (lg:col-span-3) */}
-            <div className="lg:col-span-3 space-y-5 flex flex-col justify-between">
-              <div className="space-y-3">
-                <span className="text-[10px] uppercase font-bold tracking-widest text-[#dfad36] block">
-                  Commercial Partnerships
-                </span>
-                <p className="text-xs text-slate-300 leading-relaxed">
-                  For distributor appointments, institutional supplies, and third-party manufacturing alliances:
-                </p>
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (typeof onOpenEnquiryModal === 'function') {
-                      onOpenEnquiryModal();
-                    } else {
-                      const el = document.getElementById('contact');
-                      if (el) el.scrollIntoView({ behavior: 'smooth' });
-                    }
-                  }}
-                  className="w-full px-4 py-2.5 rounded-full bg-gradient-to-r from-[#c59324] via-[#d4a029] to-[#b8831b] hover:from-[#b8831b] hover:to-[#9f6d0f] text-white font-bold text-xs shadow-lg shadow-[#c59324]/20 transition-all cursor-pointer text-center"
-                >
-                  Partner With Us
-                </button>
-              </div>
+            {/* Column 3: Quick Navigation (lg:col-span-2) */}
+            <div className="lg:col-span-2 space-y-3">
+              <span className="text-[10px] font-bold text-[#dfad36] uppercase tracking-widest block">
+                Quick Navigation
+              </span>
+
+              <nav className="flex flex-col space-y-2 text-xs text-slate-300 pt-1">
+                <Link href="/" className="hover:text-[#dfad36] transition-colors">Home</Link>
+                <Link href="/about" className="hover:text-[#dfad36] transition-colors">About Us</Link>
+                <Link href="/products" className="hover:text-[#dfad36] transition-colors">Products & Formulations</Link>
+                <Link href="/quality" className="hover:text-[#dfad36] transition-colors">Quality & Compliance</Link>
+                <Link href="/contact" className="hover:text-[#dfad36] transition-colors">Contact Corporate Desk</Link>
+                <Link href="/login" className="font-bold text-[#dfad36] hover:text-white transition-colors pt-1">MR Portal Login</Link>
+              </nav>
+            </div>
+
+            {/* Column 4: Commercial Partnerships & Inquiries (lg:col-span-3) */}
+            <div className="lg:col-span-3 space-y-3.5">
+              <span className="text-[10px] font-bold text-[#dfad36] uppercase tracking-widest block">
+                Commercial Partnerships
+              </span>
+
+              <p className="text-xs text-slate-300 leading-relaxed pt-1">
+                For distributor appointments, institutional supplies, hospital tenders, and third-party manufacturing alliances:
+              </p>
+
+              <button
+                type="button"
+                onClick={() => {
+                  if (typeof onOpenEnquiryModal === 'function') {
+                    onOpenEnquiryModal();
+                  } else {
+                    const el = document.getElementById('contact');
+                    if (el) el.scrollIntoView({ behavior: 'smooth' });
+                  }
+                }}
+                className="w-full px-5 py-2.5 rounded-full bg-gradient-to-r from-[#c59324] via-[#d4a029] to-[#b8831b] hover:from-[#b8831b] hover:to-[#9f6d0f] text-white font-bold text-xs shadow-md shadow-[#c59324]/20 transition-all cursor-pointer text-center"
+              >
+                Partner With Us
+              </button>
 
               {/* Social Media & Follow */}
-              <div className="pt-4 border-t border-white/15 space-y-2">
-                <span className="text-xs text-[#dfad36] font-semibold block">Follow Ciplon Pharma</span>
+              <div className="pt-3 border-t border-white/10 space-y-2">
+                <span className="text-[11px] text-[#dfad36] font-semibold block uppercase tracking-wider">Follow Ciplon Pharma</span>
                 <div className="flex items-center gap-3">
                   <a
                     href="https://linkedin.com"

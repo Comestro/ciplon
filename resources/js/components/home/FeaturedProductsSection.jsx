@@ -108,17 +108,17 @@ export default function FeaturedProductsSection({ products = [], onOpenEnquiryMo
           </p>
         </div>
 
-        {/* Category Filter Pills (No Shadows) */}
-        <div className="flex items-center justify-center gap-2 overflow-x-auto pb-4 mb-10 no-scrollbar">
+        {/* Category Filter Pills (Flat & Clean, No Shadows) */}
+        <div className="flex items-center justify-center gap-2 overflow-x-auto pb-2 mb-10 no-scrollbar">
           {categoriesList.map((cat) => (
             <button
               key={cat}
               type="button"
               onClick={() => setSelectedFilter(cat)}
-              className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+              className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer whitespace-nowrap ${
                 selectedFilter === cat
-                  ? 'bg-[#0c2340] text-white border border-[#c59324] shadow-sm'
-                  : 'bg-slate-50 text-slate-600 hover:bg-amber-50/50 hover:text-[#c59324] border border-slate-200'
+                  ? 'bg-[#0c2340] text-white border border-[#0c2340]'
+                  : 'bg-white text-slate-600 hover:text-[#c59324] hover:border-[#c59324] border border-slate-200'
               }`}
             >
               {cat === 'ALL' ? 'All Formulations' : cat}
@@ -126,91 +126,97 @@ export default function FeaturedProductsSection({ products = [], onOpenEnquiryMo
           ))}
         </div>
 
-        {/* 3 Real Photorealistic Product Boxes (Seamless white background, zero artificial shadow) */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-12 max-w-5xl mx-auto items-end">
+        {/* Product Cards Grid: Simple, Flat & Elegant (No Shadows, Seamless White Presentation) */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 max-w-6xl mx-auto items-stretch">
           {displayedItems.map((item) => (
             <div
               key={item.id}
-              className="group flex flex-col items-center text-center transition-all duration-300"
+              className="bg-white rounded-2xl border border-slate-200 hover:border-[#c59324] transition-colors duration-200 flex flex-col justify-between group p-6"
             >
-              {/* Product 3D Carton Box Frame */}
-              <div className="relative w-full max-w-[280px] sm:max-w-[300px] h-[380px] sm:h-[420px] rounded-2xl flex items-center justify-center p-2 transition-transform duration-300 group-hover:-translate-y-2 cursor-pointer bg-white">
-                {/* 3D Photorealistic Box Image with NO artificial drop-shadow filter */}
-                <img
-                  src={item.image}
-                  alt={item.name}
-                  className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105"
-                />
+              <div>
+                {/* Top Subtle Tags */}
+                <div className="flex items-center justify-between gap-2 pb-3 border-b border-slate-100 text-xs">
+                  <span className="font-semibold text-[#c59324] uppercase tracking-wider text-[11px]">
+                    {item.category}
+                  </span>
+                  <span className="text-slate-500 font-medium text-[11px]">
+                    {item.dosageForm}
+                  </span>
+                </div>
 
-                {/* Subtle Hover Action Overlay */}
-                <div className="absolute inset-0 rounded-2xl bg-gradient-to-t from-slate-950/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-end justify-center pb-6 gap-2">
+                {/* Seamless White Product Visual (No gray box, blends naturally with image) */}
+                <div className="w-full h-56 sm:h-60 flex items-center justify-center p-3 my-3 bg-white">
+                  <img
+                    src={item.image}
+                    alt={item.name}
+                    className="max-h-full max-w-full object-contain transition-transform duration-300 group-hover:scale-105"
+                  />
+                </div>
+
+                {/* Product Name & Molecule */}
+                <div className="space-y-1">
                   <Link
                     href={`/products`}
-                    className="px-4 py-2 rounded-full bg-white text-slate-900 font-bold text-xs hover:bg-amber-50 transition-all flex items-center gap-1.5 shadow-md"
+                    className="text-lg sm:text-xl font-bold text-[#0c2340] group-hover:text-[#c59324] transition-colors block leading-tight tracking-tight"
                   >
-                    <Eye className="w-3.5 h-3.5 text-[#c59324]" />
-                    <span>Monograph</span>
+                    {item.name}
                   </Link>
 
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (typeof onOpenEnquiryModal === 'function') {
-                        onOpenEnquiryModal();
-                      }
-                    }}
-                    className="px-4 py-2 rounded-full bg-[#0c2340] text-white border border-[#c59324]/50 font-bold text-xs hover:bg-[#c59324] transition-all shadow-md cursor-pointer"
-                  >
-                    Enquire
-                  </button>
+                  <p className="text-xs font-medium text-slate-600 leading-snug">
+                    {item.generic}
+                  </p>
                 </div>
+
+                {/* Minimal Specifications Bar */}
+                <div className="flex items-center justify-between text-xs py-2 px-3 my-3 bg-slate-50 rounded-xl border border-slate-100">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-slate-400 font-medium text-[11px]">Strength:</span>
+                    <span className="font-semibold text-[#0c2340] text-[11px]">{item.strength}</span>
+                  </div>
+                  <div className="flex items-center gap-1 text-emerald-700 font-semibold text-[11px]">
+                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+                    <span>WHO-GMP</span>
+                  </div>
+                </div>
+
+                {/* Description */}
+                <p className="text-xs text-slate-500 leading-relaxed line-clamp-2">
+                  {item.description}
+                </p>
               </div>
 
-              {/* Product Label under the Box */}
-              <div className="mt-4 text-center space-y-1">
+              {/* Action Buttons: Clean & Elegant (No Shadows) */}
+              <div className="pt-4 mt-4 border-t border-slate-100 flex items-center gap-2.5">
                 <Link
-                  href="/products"
-                  className="text-lg sm:text-xl font-bold text-[#0c2340] hover:text-[#c59324] transition-colors block leading-tight cursor-pointer"
+                  href={`/products`}
+                  className="flex-1 py-2.5 rounded-xl border border-slate-200 hover:border-[#c59324] hover:text-[#c59324] text-slate-700 text-center font-semibold text-xs transition-colors bg-white"
                 >
-                  {item.name}
+                  Monograph
                 </Link>
 
-                <p className="text-xs text-slate-500 font-medium">
-                  {item.generic}
-                </p>
-
-                <div className="pt-2 flex items-center justify-center gap-2">
-                  <Link
-                    href="/products"
-                    className="px-3.5 py-1 rounded-full bg-white border border-slate-200 text-slate-600 hover:text-[#c59324] hover:border-[#c59324] text-[11px] font-semibold transition-all"
-                  >
-                    View Details
-                  </Link>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (typeof onOpenEnquiryModal === 'function') {
-                        onOpenEnquiryModal();
-                      }
-                    }}
-                    className="px-3.5 py-1 rounded-full bg-[#0c2340] hover:bg-[#c59324] text-white text-[11px] font-semibold transition-all cursor-pointer"
-                  >
-                    Enquire
-                  </button>
-                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (typeof onOpenEnquiryModal === 'function') {
+                      onOpenEnquiryModal();
+                    }
+                  }}
+                  className="flex-1 py-2.5 rounded-xl bg-[#0c2340] hover:bg-[#c59324] text-white text-center font-semibold text-xs transition-colors cursor-pointer"
+                >
+                  Enquire Supply
+                </button>
               </div>
             </div>
           ))}
         </div>
 
-        {/* Global CTA Bar */}
-        <div className="mt-14 sm:mt-16 text-center">
+        {/* Global CTA Bar: Flat, Simple & Elegant (No Shadows) */}
+        <div className="mt-12 sm:mt-14 text-center">
           <Link
             href="/products"
-            className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-[#0c2340] hover:bg-[#123055] text-white border border-[#c59324]/40 font-bold text-xs sm:text-sm tracking-wider uppercase transition-all hover:scale-105 shadow-md shadow-[#0c2340]/25 cursor-pointer"
+            className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl bg-[#0c2340] hover:bg-[#c59324] text-white font-semibold text-xs sm:text-sm tracking-wider uppercase transition-colors cursor-pointer"
           >
-            <span>EXPLORE ALL FINISHED FORMULATIONS</span>
+            <span>Explore All Formulations</span>
             <ArrowRight className="w-4 h-4 text-[#dfad36]" />
           </Link>
         </div>

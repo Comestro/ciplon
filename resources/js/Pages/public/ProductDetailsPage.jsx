@@ -127,7 +127,7 @@ export default function ProductDetailsPage({ product, relatedProducts: initialRe
               <div className="pt-2">
                 <Link
                   href="/products"
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-teal-700 text-white text-xs font-semibold hover:bg-teal-800 transition-colors cursor-pointer"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#0c2340] hover:bg-[#c59324] text-white text-xs font-semibold transition-colors cursor-pointer"
                 >
                   <ArrowLeft className="w-4 h-4" />
                   <span>Return to Products Catalog</span>
@@ -142,16 +142,16 @@ export default function ProductDetailsPage({ product, relatedProducts: initialRe
 
   return (
     <PublicLayout categories={categories}>
-      <div className="bg-white pt-2 pb-12 min-h-screen">
+      <div className="bg-white pt-2 pb-14 min-h-screen">
         <Container>
           {/* Breadcrumbs for desktop */}
-          <div className="hidden md:flex items-center text-xs text-slate-500 mb-2">
+          <div className="hidden md:flex items-center text-xs text-slate-500 mb-3">
             <nav className="flex items-center gap-1.5 font-medium flex-wrap">
-              <Link href="/" className="hover:text-teal-700 transition-colors">
+              <Link href="/" className="hover:text-[#c59324] transition-colors">
                 Home
               </Link>
               <ChevronRight className="w-3.5 h-3.5 text-slate-300 shrink-0" />
-              <Link href="/products" className="hover:text-teal-700 transition-colors">
+              <Link href="/products" className="hover:text-[#c59324] transition-colors">
                 Products Catalog
               </Link>
               {categoryName && (
@@ -163,7 +163,7 @@ export default function ProductDetailsPage({ product, relatedProducts: initialRe
               {brandName && (
                 <>
                   <ChevronRight className="w-3.5 h-3.5 text-slate-300 shrink-0" />
-                  <span className="text-slate-900 font-semibold truncate max-w-[220px]">
+                  <span className="text-[#0c2340] font-bold truncate max-w-[220px]">
                     {brandName}
                   </span>
                 </>
@@ -178,7 +178,7 @@ export default function ProductDetailsPage({ product, relatedProducts: initialRe
             <div className="lg:col-span-5 space-y-2.5">
               {/* Main Image Stage Container */}
               <div
-                className="bg-slate-50/70 rounded-2xl relative aspect-[4/3] overflow-hidden group"
+                className="bg-slate-50/70 rounded-2xl relative aspect-[4/3] overflow-hidden group border border-slate-200/80 p-3 flex items-center justify-center"
                 onMouseEnter={() => setIsImageHovered(true)}
                 onMouseLeave={() => setIsImageHovered(false)}
               >
@@ -186,12 +186,12 @@ export default function ProductDetailsPage({ product, relatedProducts: initialRe
                 {/* Floating Badges */}
                 <div className="absolute top-2.5 left-2.5 z-10 flex flex-wrap items-center gap-1 max-w-[70%]">
                   {dosageForm && (
-                    <span className="px-2.5 py-0.5 rounded-full text-[10px] sm:text-[11px] font-bold uppercase tracking-wider bg-teal-700 text-white">
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] sm:text-[11px] font-bold uppercase tracking-wider bg-[#0c2340] text-white shadow-xs">
                       {dosageForm}
                     </span>
                   )}
                   {prescriptionType && (
-                    <span className="px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider bg-white/90 text-slate-700">
+                    <span className="px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider bg-white/95 text-slate-700 border border-slate-200 shadow-xs">
                       {prescriptionType}
                     </span>
                   )}
@@ -201,11 +201,11 @@ export default function ProductDetailsPage({ product, relatedProducts: initialRe
                 <button
                   type="button"
                   onClick={handleShare}
-                  className="absolute top-2.5 right-2.5 z-10 p-2 rounded-full bg-white/90 hover:bg-white text-slate-500 hover:text-teal-700 transition-colors cursor-pointer"
+                  className="absolute top-2.5 right-2.5 z-10 p-2 rounded-full bg-white/90 hover:bg-white text-slate-500 hover:text-[#c59324] transition-colors cursor-pointer border border-slate-200 shadow-xs"
                   title="Share Formulation"
                   aria-label="Share Formulation"
                 >
-                  {copiedLink ? <Check className="w-4 h-4 text-teal-600" /> : <Share2 className="w-4 h-4" />}
+                  {copiedLink ? <Check className="w-4 h-4 text-[#c59324]" /> : <Share2 className="w-4 h-4" />}
                 </button>
 
                 {/* Primary Image Display */}
@@ -220,29 +220,29 @@ export default function ProductDetailsPage({ product, relatedProducts: initialRe
                   />
                 ) : (
                   <div className="w-full h-full flex flex-col items-center justify-center text-center p-6 space-y-2">
-                    <div className="w-12 h-12 rounded-xl bg-teal-50 text-teal-700 flex items-center justify-center">
-                      <Pill className="w-6 h-6 stroke-[1.5]" />
+                    <div className="w-14 h-14 rounded-2xl bg-amber-50 text-[#c59324] border border-amber-200/60 flex items-center justify-center">
+                      <Pill className="w-7 h-7 stroke-[1.8]" />
                     </div>
-                    <span className="text-xs font-medium text-slate-400">Pharmaceutical Formulation</span>
+                    <span className="text-xs font-semibold text-slate-500">Finished Formulation</span>
                   </div>
                 )}
               </div>
 
               {/* Thumbnail Selector Strip */}
               {images.length > 1 && (
-                <div className="flex items-center gap-2 overflow-x-auto py-0.5 no-scrollbar">
+                <div className="flex items-center gap-2 overflow-x-auto py-1 no-scrollbar">
                   {images.map((imgUrl, idx) => (
                     <button
                       key={idx}
                       type="button"
                       onClick={() => setSelectedImageIndex(idx)}
-                      className={`w-12 h-12 sm:w-13 sm:h-13 rounded-xl p-1 transition-all cursor-pointer overflow-hidden shrink-0 ${
+                      className={`w-14 h-14 rounded-xl p-1 transition-all cursor-pointer overflow-hidden shrink-0 ${
                         selectedImageIndex === idx
-                          ? 'border-2 border-teal-600 bg-white'
+                          ? 'border-2 border-[#c59324] bg-white shadow-xs'
                           : 'border border-slate-200/80 bg-slate-50 hover:bg-white'
                       }`}
                     >
-                      <img src={imgUrl} alt="" className="w-full h-full object-cover rounded-lg" />
+                      <img src={imgUrl} alt="" className="w-full h-full object-contain rounded-lg" />
                     </button>
                   ))}
                 </div>
@@ -250,11 +250,11 @@ export default function ProductDetailsPage({ product, relatedProducts: initialRe
             </div>
 
             {/* Right Column: Identity & Formulation Specs */}
-            <div className="lg:col-span-7 space-y-4">
+            <div className="lg:col-span-7 space-y-5">
               <div>
-                <div className="flex items-center gap-2 flex-wrap mb-1">
+                <div className="flex items-center gap-2 flex-wrap mb-1.5">
                   {categoryName && (
-                    <span className="text-[11px] font-bold uppercase tracking-wider text-teal-700">
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-[#c59324] bg-amber-50 px-2.5 py-0.5 rounded-full border border-amber-200/60">
                       {categoryName}
                     </span>
                   )}
@@ -268,30 +268,30 @@ export default function ProductDetailsPage({ product, relatedProducts: initialRe
                   )}
                 </div>
 
-                <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight leading-tight">
+                <h1 className="text-2xl sm:text-3xl font-bold text-[#0c2340] tracking-tight leading-tight">
                   {brandName}
                 </h1>
 
                 {genericName && (
-                  <p className="text-sm font-medium text-slate-600 mt-1">
+                  <p className="text-sm font-semibold text-slate-600 mt-1">
                     {genericName}
                   </p>
                 )}
               </div>
 
               {/* Quick Specs Grid */}
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 py-3 border-y border-slate-100">
-                <div className="bg-slate-50/70 rounded-xl p-2.5">
-                  <span className="text-[10px] uppercase font-semibold text-slate-400 block">Dosage Form</span>
-                  <span className="text-xs font-bold text-slate-800">{dosageForm}</span>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 py-3 border-y border-slate-100">
+                <div className="bg-slate-50 rounded-xl p-2.5 border border-slate-100">
+                  <span className="text-[10px] uppercase font-bold text-slate-400 block tracking-wider">Dosage Form</span>
+                  <span className="text-xs font-bold text-[#0c2340]">{dosageForm}</span>
                 </div>
-                <div className="bg-slate-50/70 rounded-xl p-2.5">
-                  <span className="text-[10px] uppercase font-semibold text-slate-400 block">Strength</span>
-                  <span className="text-xs font-bold text-slate-800">{strength}</span>
+                <div className="bg-slate-50 rounded-xl p-2.5 border border-slate-100">
+                  <span className="text-[10px] uppercase font-bold text-slate-400 block tracking-wider">Strength</span>
+                  <span className="text-xs font-bold text-[#0c2340]">{strength}</span>
                 </div>
-                <div className="bg-slate-50/70 rounded-xl p-2.5 col-span-2 sm:col-span-1">
-                  <span className="text-[10px] uppercase font-semibold text-slate-400 block">Prescription</span>
-                  <span className="text-xs font-bold text-slate-800">{prescriptionType}</span>
+                <div className="bg-slate-50 rounded-xl p-2.5 col-span-2 sm:col-span-1 border border-slate-100">
+                  <span className="text-[10px] uppercase font-bold text-slate-400 block tracking-wider">Prescription</span>
+                  <span className="text-xs font-bold text-[#0c2340]">{prescriptionType}</span>
                 </div>
               </div>
 
@@ -301,16 +301,16 @@ export default function ProductDetailsPage({ product, relatedProducts: initialRe
                   variant="primary"
                   size="md"
                   onClick={() => setIsEnquiryOpen(true)}
-                  className="bg-teal-700 hover:bg-teal-800 text-white font-semibold text-xs sm:text-sm py-2.5 px-5 rounded-xl shadow-xs"
+                  className="bg-[#0c2340] hover:bg-[#c59324] text-white font-bold text-xs sm:text-sm py-2.5 px-6 rounded-xl shadow-md transition-colors cursor-pointer"
                 >
                   Request Technical Dossier / Quote
                 </Button>
                 <button
                   type="button"
                   onClick={handleShare}
-                  className="inline-flex items-center gap-1.5 px-3 py-2.5 rounded-xl border border-slate-200 text-xs font-medium text-slate-600 hover:bg-slate-50 transition-colors cursor-pointer"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-600 hover:text-[#c59324] hover:border-[#c59324] transition-colors cursor-pointer"
                 >
-                  {copiedLink ? <Check className="w-3.5 h-3.5 text-teal-600" /> : <Share2 className="w-3.5 h-3.5" />}
+                  {copiedLink ? <Check className="w-3.5 h-3.5 text-[#c59324]" /> : <Share2 className="w-3.5 h-3.5" />}
                   <span>{copiedLink ? 'Link Copied' : 'Share'}</span>
                 </button>
               </div>
@@ -318,14 +318,14 @@ export default function ProductDetailsPage({ product, relatedProducts: initialRe
               {/* Active Compositions */}
               {compositions.length > 0 && (
                 <div className="pt-2">
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900 mb-2">
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-[#0c2340] mb-2">
                     Active Pharmaceutical Ingredients (API)
                   </h3>
-                  <div className="border border-slate-100 rounded-xl overflow-hidden divide-y divide-slate-100">
+                  <div className="border border-slate-100 rounded-xl overflow-hidden divide-y divide-slate-100 bg-white">
                     {compositions.map((comp, idx) => (
                       <div key={idx} className="flex items-center justify-between px-3.5 py-2 text-xs">
                         <span className="font-semibold text-slate-800">{comp.ingredient_name || comp.ingredientName}</span>
-                        <span className="font-mono text-teal-700 font-semibold">{comp.strength} {comp.unit || 'mg'}</span>
+                        <span className="font-mono text-[#c59324] font-bold">{comp.strength} {comp.unit || 'mg'}</span>
                       </div>
                     ))}
                   </div>
@@ -346,8 +346,8 @@ export default function ProductDetailsPage({ product, relatedProducts: initialRe
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {indications && (
                 <div className="bg-slate-50/70 rounded-2xl p-4 border border-slate-100">
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-teal-800 mb-1.5 flex items-center gap-1.5">
-                    <Activity className="w-3.5 h-3.5 text-teal-600" />
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-[#0c2340] mb-1.5 flex items-center gap-1.5">
+                    <Activity className="w-3.5 h-3.5 text-[#c59324]" />
                     <span>Indications</span>
                   </h4>
                   <p className="text-xs text-slate-600 leading-relaxed">{indications}</p>
@@ -356,8 +356,8 @@ export default function ProductDetailsPage({ product, relatedProducts: initialRe
 
               {directions && (
                 <div className="bg-slate-50/70 rounded-2xl p-4 border border-slate-100">
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-teal-800 mb-1.5 flex items-center gap-1.5">
-                    <Clock className="w-3.5 h-3.5 text-teal-600" />
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-[#0c2340] mb-1.5 flex items-center gap-1.5">
+                    <Clock className="w-3.5 h-3.5 text-[#c59324]" />
                     <span>Dosage & Administration</span>
                   </h4>
                   <p className="text-xs text-slate-600 leading-relaxed">{directions}</p>
@@ -366,8 +366,8 @@ export default function ProductDetailsPage({ product, relatedProducts: initialRe
 
               {precautions && (
                 <div className="bg-slate-50/70 rounded-2xl p-4 border border-slate-100">
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-teal-800 mb-1.5 flex items-center gap-1.5">
-                    <AlertCircle className="w-3.5 h-3.5 text-teal-600" />
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-[#0c2340] mb-1.5 flex items-center gap-1.5">
+                    <AlertCircle className="w-3.5 h-3.5 text-[#c59324]" />
                     <span>Precautions & Warnings</span>
                   </h4>
                   <p className="text-xs text-slate-600 leading-relaxed">{precautions}</p>
@@ -376,8 +376,8 @@ export default function ProductDetailsPage({ product, relatedProducts: initialRe
 
               {storage && (
                 <div className="bg-slate-50/70 rounded-2xl p-4 border border-slate-100">
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-teal-800 mb-1.5 flex items-center gap-1.5">
-                    <Thermometer className="w-3.5 h-3.5 text-teal-600" />
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-[#0c2340] mb-1.5 flex items-center gap-1.5">
+                    <Thermometer className="w-3.5 h-3.5 text-[#c59324]" />
                     <span>Storage Requirements</span>
                   </h4>
                   <p className="text-xs text-slate-600 leading-relaxed">{storage}</p>
@@ -390,17 +390,17 @@ export default function ProductDetailsPage({ product, relatedProducts: initialRe
           {relatedProducts.length > 0 && (
             <div className="border-t border-slate-100 pt-8 mt-8">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-base font-bold text-slate-900">Related Formulations</h3>
+                <h3 className="text-base font-bold text-[#0c2340]">Related Formulations</h3>
                 <Link
                   href="/products"
-                  className="text-xs font-semibold text-teal-700 hover:text-teal-800 inline-flex items-center gap-1"
+                  className="text-xs font-semibold text-[#c59324] hover:text-[#9f6d0f] inline-flex items-center gap-1"
                 >
                   <span>View All</span>
                   <ChevronRight className="w-3.5 h-3.5" />
                 </Link>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-5">
                 {relatedProducts.map((p) => {
                   const rBrand = p.brand_name || p.brandName;
                   const rGeneric = p.generic_name || p.genericName;
@@ -413,22 +413,22 @@ export default function ProductDetailsPage({ product, relatedProducts: initialRe
                     <Link
                       key={p.id || rCode}
                       href={`/products/${p.id || rCode}`}
-                      className="bg-slate-50/70 hover:bg-slate-100/70 rounded-xl p-3 transition-colors group flex flex-col justify-between"
+                      className="bg-white hover:border-[#c59324]/60 border border-slate-200/90 rounded-2xl p-4 transition-all duration-300 hover:shadow-lg group flex flex-col justify-between"
                     >
-                      <div className="space-y-2">
+                      <div className="space-y-2.5">
                         {/* Thumbnail & Badges */}
-                        <div className="h-24 rounded-lg bg-white flex items-center justify-center relative overflow-hidden">
+                        <div className="h-28 rounded-xl bg-slate-50 flex items-center justify-center relative overflow-hidden p-2">
                           {rImage ? (
                             <img
                               src={rImage}
                               alt={rBrand}
-                              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                              className="max-h-full max-w-full object-contain transition-transform duration-300 group-hover:scale-105"
                             />
                           ) : (
-                            <Pill className="w-6 h-6 text-teal-600/40" />
+                            <Pill className="w-7 h-7 text-[#c59324]" />
                           )}
                           {rForm && (
-                            <span className="absolute top-2 left-2 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-teal-700 text-white">
+                            <span className="absolute top-2 left-2 px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-[#0c2340] text-white">
                               {rForm}
                             </span>
                           )}
@@ -437,9 +437,9 @@ export default function ProductDetailsPage({ product, relatedProducts: initialRe
                         <div className="space-y-0.5">
                           <div className="flex items-center justify-between text-[10px] font-mono text-slate-400">
                             <span>{rCode}</span>
-                            <span className="text-teal-700 font-semibold">{rStrength}</span>
+                            <span className="text-[#c59324] font-bold">{rStrength}</span>
                           </div>
-                          <h4 className="text-xs sm:text-sm font-bold text-slate-900 group-hover:text-teal-800 transition-colors line-clamp-1">
+                          <h4 className="text-xs sm:text-sm font-bold text-[#0c2340] group-hover:text-[#c59324] transition-colors line-clamp-1">
                             {rBrand}
                           </h4>
                           {rGeneric && (
@@ -450,7 +450,7 @@ export default function ProductDetailsPage({ product, relatedProducts: initialRe
                         </div>
                       </div>
 
-                      <div className="pt-2 mt-2 border-t border-slate-200/50 flex items-center justify-between text-xs font-semibold text-teal-800">
+                      <div className="pt-2.5 mt-2.5 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-[#c59324]">
                         <span>View Specifications</span>
                         <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
                       </div>
@@ -462,12 +462,12 @@ export default function ProductDetailsPage({ product, relatedProducts: initialRe
           )}
 
           {/* Floating Mobile Bottom Action Strip (Visible only on mobile devices) */}
-          <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-100 px-4 py-2 flex items-center justify-between gap-3">
+          <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 px-4 py-2.5 flex items-center justify-between gap-3 shadow-lg">
             <div className="min-w-0 flex-1">
-              <span className="text-xs font-bold text-slate-900 block truncate">
+              <span className="text-xs font-bold text-[#0c2340] block truncate">
                 {brandName}
               </span>
-              <span className="text-[10px] text-teal-800 font-semibold block truncate">
+              <span className="text-[10px] text-[#c59324] font-semibold block truncate">
                 {strength} • {dosageForm}
               </span>
             </div>
@@ -475,7 +475,7 @@ export default function ProductDetailsPage({ product, relatedProducts: initialRe
             <Button
               variant="primary"
               onClick={() => setIsEnquiryOpen(true)}
-              className="shrink-0 bg-teal-700 hover:bg-teal-800 text-white font-semibold text-xs py-2 px-4 rounded-xl"
+              className="shrink-0 bg-[#0c2340] hover:bg-[#c59324] text-white font-bold text-xs py-2 px-4 rounded-xl cursor-pointer"
             >
               Inquire Now
             </Button>

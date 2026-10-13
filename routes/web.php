@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\StaffController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\CompanyPageController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\MR\MRDashboardController;
 use App\Http\Controllers\MR\MRDoctorController;
@@ -18,6 +19,9 @@ use Illuminate\Support\Facades\Storage;
 
 // Public Routes
 Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/about', [CompanyPageController::class, 'about'])->name('about');
+Route::get('/contact', [CompanyPageController::class, 'contact'])->name('contact');
+Route::get('/quality', [CompanyPageController::class, 'quality'])->name('quality');
 Route::get('/products', [ProductCatalogController::class, 'index'])->name('products.index');
 Route::get('/products/{product}', [ProductCatalogController::class, 'show'])->name('products.show');
 Route::post('/products/{product}/enquiry', [ProductCatalogController::class, 'storeEnquiry'])->name('products.enquiry');
