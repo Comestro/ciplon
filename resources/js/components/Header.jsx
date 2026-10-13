@@ -76,16 +76,16 @@ export default function Header({ companyData, onOpenEnquiryModal }) {
     .trim() || 'CIPLON';
 
   return (
-    <header className="sticky top-0 z-50 w-full transition-all duration-300 shadow-xs">
+    <header className="sticky top-0 z-50 w-full transition-all duration-300">
       {/* Main Navigation Bar */}
       <nav
-        className={`bg-white/95 backdrop-blur-md transition-all duration-200 ${
-          isScrolled ? 'border-b border-slate-200/90 py-2.5 shadow-sm' : 'border-b border-slate-200 py-3 sm:py-4'
+        className={`bg-white transition-all duration-200 ${
+          isScrolled ? 'border-b border-slate-200 py-2.5' : 'border-b border-slate-200 py-3 sm:py-4'
         }`}
       >
         <Container size="wide">
           <div className="flex items-center justify-between gap-4 xl:gap-8">
-            {/* Intas-Style Oval Capsule Logo - Significantly enlarged for crisp readability */}
+            {/* Intas-Style Oval Capsule Logo - Seamless and Crisp */}
             <Link
               href="/"
               onClick={() => {
@@ -99,7 +99,7 @@ export default function Header({ companyData, onOpenEnquiryModal }) {
               <img
                 src={logoUrl || '/images/ciplon_logo.png'}
                 alt="Ciplon Pharma Private Limited"
-                className="h-12 sm:h-14 md:h-16 lg:h-17 xl:h-18 w-auto max-w-[260px] sm:max-w-[320px] lg:max-w-[360px] object-contain transition-all drop-shadow-xs"
+                className="h-12 sm:h-14 md:h-16 lg:h-17 xl:h-18 w-auto max-w-[260px] sm:max-w-[320px] lg:max-w-[360px] object-contain transition-all"
                 onError={(e) => {
                   e.currentTarget.src = '/images/ciplon_logo.png';
                 }}
@@ -108,6 +108,16 @@ export default function Header({ companyData, onOpenEnquiryModal }) {
 
             {/* Desktop Navigation Links (Clean Semibold Poppins Font, Wide Dropdowns, Responsive Spacing) */}
             <nav className="hidden lg:flex items-center gap-3 xl:gap-5 2xl:gap-6 text-xs xl:text-[13px] font-semibold tracking-wide text-slate-700 whitespace-nowrap">
+              {/* HOME */}
+              <Link
+                href="/"
+                className={`hover:text-[#c59324] transition-colors uppercase whitespace-nowrap ${
+                  currentPath === '/' ? 'text-[#c59324]' : ''
+                }`}
+              >
+                HOME
+              </Link>
+
               {/* ABOUT US with dropdown */}
               <div className="relative group/menu py-2">
                 <Link

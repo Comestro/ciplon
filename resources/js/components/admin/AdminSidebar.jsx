@@ -96,6 +96,17 @@ export default function AdminSidebar({ isOpen, onClose }) {
       ],
     },
     {
+      title: 'Commercial Desk',
+      items: [
+        {
+          name: 'Commercial Inquiries',
+          path: '/admin/enquiries',
+          icon: Mail,
+          active: isParentActive('/admin/enquiries'),
+        },
+      ],
+    },
+    {
       title: 'Preferences',
       items: [
         {

@@ -36,7 +36,7 @@ export default function Footer({ companyData, categories = [], onOpenEnquiryModa
               </span>
 
               {/* Logo Card */}
-              <div className="bg-white p-3 rounded-2xl inline-block shadow-md">
+              <div className="bg-white p-2.5 rounded-2xl inline-block border border-white/20">
                 <img
                   src={logoUrl}
                   alt="Ciplon Pharma Private Limited"
