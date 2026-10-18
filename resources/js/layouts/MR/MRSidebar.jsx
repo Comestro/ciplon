@@ -40,10 +40,15 @@ export default function MRSidebar({ isOpen, onClose }) {
       active: currentPath === '/mr/doctors' || currentPath.startsWith('/mr/doctors'), 
       enabled: true 
     },
-    { label: 'Visits', href: '/mr/visits', icon: MapPin, active: currentPath === '/mr/visits' || currentPath.startsWith('/mr/visits'), enabled: true },
+    { 
+      label: 'Visits & Daily Planner', 
+      href: '/mr/visits', 
+      icon: CalendarClock, 
+      active: currentPath === '/mr/visits' || currentPath.startsWith('/mr/visits') || currentPath === '/mr/schedule', 
+      enabled: true 
+    },
     { label: 'Products', href: '/mr/products', icon: Pill, active: currentPath === '/mr/products' || currentPath.startsWith('/mr/products'), enabled: true },
     { label: 'Samples', href: '#', icon: Gift, enabled: false },
-    { label: 'Follow-ups', href: '#', icon: CalendarClock, enabled: false },
     { label: 'Targets', href: '#', icon: Target, enabled: false },
     { label: 'Performance', href: '#', icon: TrendingUp, enabled: false },
     { label: 'Daily Reports', href: '#', icon: FileText, enabled: false },

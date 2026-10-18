@@ -4,6 +4,8 @@ namespace App\Http\Controllers\MR;
 
 use App\Http\Controllers\Controller;
 use App\Models\Doctor;
+use App\Models\MRSchedule;
+use App\Models\Product;
 use App\Models\Visit;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
@@ -14,14 +16,111 @@ use Inertia\Response;
 class MRVisitController extends Controller
 {
     /**
-     * Render the MR Visits page.
+     * Render the unified MR Visits & Daily Planner page.
      */
     public function show(Request $request): Response
     {
+        $userId = $request->user()->id;
+        $today = Carbon::today()->toDateString();
+
+        $tab = $request->query('tab', 'today'); // today, upcoming, history, all
+        $actionFilter = $request->query('action_type', 'all'); // all, visit, call
+        $statusFilter = $request->query('status', 'all'); // all, pending, completed, missed
+        $search = trim($request->query('search', ''));
+        $activeView = $request->query('view', 'planner'); // 'planner' or 'detailing'
+
+        $query = MRSchedule::where('user_id', $userId)
+            ->with(['doctor:id,name,specialization,clinic_hospital_name,phone,city,tier,visiting_hours']);
+
+        // Tab Filter
+        if ($tab === 'today') {
+            $query->whereDate('scheduled_date', $today);
+        } elseif ($tab === 'upcoming') {
+            $query->whereDate('scheduled_date', '>', $today);
+        } elseif ($tab === 'history') {
+            $query->whereDate('scheduled_date', '<', $today);
+        }
+
+        // Action Filter
+        if ($actionFilter !== 'all') {
+            $query->where('action_type', $actionFilter);
+        }
+
+        // Status Filter
+        if ($statusFilter !== 'all') {
+            $query->where('status', $statusFilter);
+        }
+
+        // Search Filter
+        if ($search !== '') {
+            $query->where(function ($q) use ($search) {
+                $q->where('purpose', 'like', "%{$search}%")
+                  ->orWhere('custom_contact_name', 'like', "%{$search}%")
+                  ->orWhere('notes', 'like', "%{$search}%")
+                  ->orWhereHas('doctor', function ($dq) use ($search) {
+                      $dq->where('name', 'like', "%{$search}%")
+                         ->orWhere('clinic_hospital_name', 'like', "%{$search}%")
+                         ->orWhere('specialization', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        $schedules = $query->orderByRaw("CASE WHEN status = 'pending' THEN 1 ELSE 2 END")
+            ->orderBy('scheduled_date', $tab === 'history' ? 'desc' : 'asc')
+            ->orderBy('scheduled_time', 'asc')
+            ->get();
+
+        // Calculate Today's Performance Metrics
+        $todayAll = MRSchedule::where('user_id', $userId)
+            ->whereDate('scheduled_date', $today)
+            ->get();
+
+        $todayTotal = $todayAll->count();
+        $todayCompleted = $todayAll->where('status', 'completed')->count();
+        $todayPending = $todayAll->where('status', 'pending')->count();
+        $todayVisits = $todayAll->where('action_type', 'visit')->count();
+        $todayCalls = $todayAll->where('action_type', 'call')->count();
+
+        $metrics = [
+            'today_total' => $todayTotal,
+            'today_completed' => $todayCompleted,
+            'today_pending' => $todayPending,
+            'today_visits' => $todayVisits,
+            'today_calls' => $todayCalls,
+            'completion_rate' => $todayTotal > 0 ? (int) round(($todayCompleted / $todayTotal) * 100) : 0,
+            'upcoming_count' => MRSchedule::where('user_id', $userId)->whereDate('scheduled_date', '>', $today)->count(),
+        ];
+
+        // Active Doctors List
+        $doctors = Doctor::where('user_id', $userId)
+            ->where('status', 'active')
+            ->select('id', 'name', 'specialization', 'clinic_hospital_name', 'phone', 'visiting_hours', 'tier')
+            ->orderBy('name')
+            ->get();
+
+        // Active Products List
+        $products = Product::where('status', 'active')
+            ->select('id', 'brand_name', 'dosage_form')
+            ->orderBy('brand_name')
+            ->get();
+
         return Inertia::render('mr/Visits', [
+            'schedules' => $schedules,
+            'metrics' => $metrics,
+            'doctors' => $doctors,
+            'products' => $products,
+            'todayDate' => $today,
+            'activeView' => $activeView,
+            'filters' => [
+                'tab' => $tab,
+                'action_type' => $actionFilter,
+                'status' => $statusFilter,
+                'search' => $search,
+                'view' => $activeView,
+            ],
             'initialFilters' => [
                 'status' => $request->query('status', 'all'),
-                'date' => $request->query('date', 'today'),
+                'date' => $request->query('date', 'all'),
                 'doctor_id' => $request->query('doctor_id', 'all'),
             ],
         ]);
@@ -54,7 +153,6 @@ class MRVisitController extends Controller
 
         $visits = $query->get();
 
-        // Calculate metadata for MR using database queries for reliability
         $today = Carbon::today()->toDateString();
         $totalAll = Visit::forUser($userId)->count();
         $todayTotal = Visit::forUser($userId)->whereDate('visit_date', $today)->count();
@@ -102,9 +200,7 @@ class MRVisitController extends Controller
 
         $validated['status'] = $validated['status'] ?? 'scheduled';
 
-        // Ensure doctor belongs to authenticated MR
         $doctor = Doctor::forUser($request->user()->id)->findOrFail($validated['doctor_id']);
-
         $validated['user_id'] = $request->user()->id;
 
         $visit = Visit::create($validated);

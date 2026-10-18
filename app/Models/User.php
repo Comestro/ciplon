@@ -52,4 +52,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Visit::class, 'user_id');
     }
+
+    public function mrSchedules(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(MRSchedule::class);
+    }
 }

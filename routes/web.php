@@ -15,6 +15,7 @@ use App\Http\Controllers\MR\MRDashboardController;
 use App\Http\Controllers\MR\MRDoctorController;
 use App\Http\Controllers\MR\MRProductController;
 use App\Http\Controllers\MR\MRVisitController;
+use App\Http\Controllers\MR\MRScheduleController;
 use App\Http\Controllers\ProductCatalogController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
@@ -111,4 +112,11 @@ Route::middleware(['auth', 'mr'])->prefix('mr')->name('mr.')->group(function () 
     Route::get('/doctors/{id}/edit', [MRDoctorController::class, 'edit'])->name('doctors.edit');
     Route::get('/visits', [MRVisitController::class, 'show'])->name('visits');
     Route::get('/products', [MRProductController::class, 'show'])->name('products');
+
+        // Calls & Visits Planner / Scheduler
+        Route::get('/schedule', fn () => redirect('/mr/visits?view=planner'))->name('schedule');
+        Route::get('/follow-ups', fn () => redirect()->route('mr.schedule'))->name('followups');
+        Route::post('/schedule', [MRScheduleController::class, 'store'])->name('schedule.store');
+        Route::match(['put', 'patch', 'post'], '/schedule/{schedule}/status', [MRScheduleController::class, 'updateStatus'])->name('schedule.status');
+        Route::delete('/schedule/{schedule}', [MRScheduleController::class, 'destroy'])->name('schedule.destroy');
 });
