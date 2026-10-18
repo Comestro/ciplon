@@ -1,4 +1,19 @@
-import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
+
+// Helper to render icon for dynamic cards
+const renderDynamicIcon = (iconName, className = 'w-4 h-4') => {
+  switch (iconName) {
+    case 'stethoscope': return <Stethoscope className={className} />;
+    case 'heart-pulse': return <HeartPulse className={className} />;
+    case 'clock': return <Clock className={className} />;
+    case 'alert-circle': return <AlertCircle className={className} />;
+    case 'package': return <Package className={className} />;
+    case 'shield-check': return <ShieldCheck className={className} />;
+    case 'sparkles': return <Sparkles className={className} />;
+    default: return <CheckCircle2 className={className} />;
+  }
+};
+import { useState, useEffect, useMemo } from 'react';
 import { Link } from '@inertiajs/react';
 import axios from 'axios';
 import {
@@ -27,7 +42,15 @@ import {
   Check,
   Stethoscope,
   ExternalLink,
-  Package
+  Package,
+  Sun,
+  Moon,
+  Clock,
+  Zap,
+  Award,
+  HeartPulse,
+  Droplets,
+  CheckCheck
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import MRLayout from '../../layouts/MR/MRLayout';
@@ -48,6 +71,8 @@ export default function Products({ initialFilters = {} }) {
   const [detailProduct, setDetailProduct] = useState(null);
   const [presentationMode, setPresentationMode] = useState(false);
   const [activeSlide, setActiveSlide] = useState(0);
+  const [deckTheme, setDeckTheme] = useState('light');
+  const [fitMode, setFitMode] = useState('full'); // 'full' or 'contain' // 'light' (matches Ciplon theme) | 'dark'
 
   // Fetch products from API
   const fetchProducts = async () => {
@@ -87,13 +112,26 @@ export default function Products({ initialFilters = {} }) {
   };
 
   // Close E-Detailing Mode
+
+  // Native browser fullscreen toggle helper
+  const handleToggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen?.().catch(() => {});
+    } else {
+      document.exitFullscreen?.().catch(() => {});
+    }
+  };
+
   const handleClosePresentation = () => {
     setPresentationMode(false);
   };
 
-  // Next / Prev slide handlers
+  // Pure image-based carousel slides uploaded by admin
+  const carouselSlides = detailProduct?.slides && detailProduct.slides.length > 0 ? detailProduct.slides : [];
+  const totalSlideCount = carouselSlides.length;
+
   const handleNextSlide = () => {
-    if (activeSlide < 3) {
+    if (activeSlide < totalSlideCount - 1) {
       setActiveSlide((prev) => prev + 1);
     }
   };
@@ -118,11 +156,11 @@ export default function Products({ initialFilters = {} }) {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [presentationMode, activeSlide]);
+  }, [presentationMode, activeSlide, totalSlideCount]);
 
   return (
     <MRLayout title="Products & Digital Detailing Aids">
-      <div className="space-y-5 max-w-7xl mx-auto pb-10">
+      <div className="space-y-5 max-w-7xl mx-auto pb-10 font-sans">
 
         {/* Top Header Card */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
@@ -561,308 +599,137 @@ export default function Products({ initialFilters = {} }) {
         </div>
       )}
 
-      {/* FULL-SCREEN E-DETAILING INTERACTIVE VISUAL AID PRESENTATION DECK */}
-      {presentationMode && detailProduct && (
-        <div className="fixed inset-0 z-50 bg-slate-950 text-white flex flex-col justify-between overflow-hidden animate-in fade-in duration-200">
-          
-          {/* Top Presentation Bar */}
-          <div className="h-14 px-6 bg-slate-900/90 border-b border-slate-800/80 flex items-center justify-between backdrop-blur-md">
-            <div className="flex items-center gap-3">
-              <div className="w-7 h-7 rounded-lg bg-teal-500/20 text-teal-400 flex items-center justify-center">
-                <Activity className="w-4 h-4" />
-              </div>
-              <div>
-                <span className="text-sm font-bold text-white tracking-tight">{detailProduct.brand_name}</span>
-                <span className="text-xs text-slate-400 ml-2 font-normal hidden sm:inline">
-                  — Ciplon Visual Aid Presentation
-                </span>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3">
-              {/* Slide Counter */}
-              <div className="text-xs font-semibold text-slate-400 bg-slate-800 px-3 py-1 rounded-full border border-slate-700">
-                Slide <span className="text-teal-400 font-bold">{activeSlide + 1}</span> of 4
-              </div>
-
-              {/* Close / Exit Button */}
-              <button
-                type="button"
-                onClick={handleClosePresentation}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 text-xs font-semibold transition-colors cursor-pointer"
-              >
-                <X className="w-4 h-4" />
-                <span>Exit Deck</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Progress Bar */}
-          <div className="h-1 bg-slate-800 w-full">
-            <div
-              className="h-full bg-gradient-to-r from-teal-500 to-emerald-400 transition-all duration-300 ease-out"
-              style={{ width: `${((activeSlide + 1) / 4) * 100}%` }}
-            />
-          </div>
-
-          {/* Central Presentation Stage */}
-          <div className="flex-1 flex items-center justify-center p-6 md:p-12 overflow-y-auto">
-            <div className="max-w-5xl w-full">
-
-              {/* SLIDE 1: Molecule Profile & Brand Hero */}
-              {activeSlide === 0 && (
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center animate-in fade-in zoom-in-95 duration-200">
-                  <div className="lg:col-span-5 flex flex-col items-center justify-center">
-                    <div className="w-64 h-64 md:w-80 md:h-80 rounded-3xl bg-gradient-to-br from-slate-900 to-slate-800 border border-slate-700/80 p-6 flex items-center justify-center shadow-2xl relative overflow-hidden group">
-                      <div className="absolute inset-0 bg-teal-500/10 blur-2xl rounded-full" />
-                      {detailProduct.primary_image?.file_path || detailProduct.images?.[0]?.file_path ? (
-                        <img
-                          src={detailProduct.primary_image?.file_path || detailProduct.images?.[0]?.file_path}
-                          alt={detailProduct.brand_name}
-                          className="w-full h-full object-contain relative z-10 drop-shadow-2xl"
-                        />
-                      ) : (
-                        <Pill className="w-28 h-28 text-teal-400 relative z-10" />
-                      )}
-                    </div>
-                    <span className="mt-3 text-xs text-slate-400 font-semibold tracking-wider uppercase">
-                      {detailProduct.dosage_form} • {detailProduct.strength}
-                    </span>
-                  </div>
-
-                  <div className="lg:col-span-7 space-y-5">
-                    <div>
-                      <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-teal-500/10 text-teal-400 border border-teal-500/20">
-                        {detailProduct.category?.name || 'Therapeutic Core'}
-                      </span>
-                      <h1 className="text-3xl md:text-5xl font-black text-white tracking-tight mt-3">
-                        {detailProduct.brand_name}
-                      </h1>
-                      <h3 className="text-base md:text-lg text-slate-300 font-medium mt-1">
-                        {detailProduct.generic_name}
-                      </h3>
-                    </div>
-
-                    <p className="text-sm md:text-base text-slate-300 leading-relaxed">
-                      {detailProduct.short_description || detailProduct.description}
-                    </p>
-
-                    {/* APIs Box */}
-                    {detailProduct.compositions && detailProduct.compositions.length > 0 && (
-                      <div className="bg-slate-900/90 rounded-2xl p-4 border border-slate-800 space-y-2.5">
-                        <span className="text-xs font-bold text-teal-400 uppercase tracking-wider block">
-                          Formulation Composition
-                        </span>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                          {detailProduct.compositions.map((c) => (
-                            <div key={c.id} className="bg-slate-800/80 rounded-xl p-2.5 border border-slate-700/60">
-                              <span className="block text-xs font-semibold text-white">{c.ingredient_name}</span>
-                              <span className="block text-[11px] text-teal-400 font-mono mt-0.5">
-                                {c.strength} {c.unit}
-                              </span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {/* SLIDE 2: Clinical Indications & Target Patients */}
-              {activeSlide === 1 && (
-                <div className="space-y-8 animate-in fade-in zoom-in-95 duration-200">
-                  <div className="text-center max-w-2xl mx-auto space-y-2">
-                    <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-teal-500/10 text-teal-400 border border-teal-500/20">
-                      Slide 2 • Clinical Indications
-                    </span>
-                    <h2 className="text-2xl md:text-4xl font-extrabold text-white tracking-tight">
-                      Therapeutic Spectrum & Indications
-                    </h2>
-                    <p className="text-xs md:text-sm text-slate-400">
-                      Prescription profiling and targeted clinical conditions for {detailProduct.brand_name}
-                    </p>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="bg-slate-900/90 rounded-3xl p-6 md:p-8 border border-slate-800 space-y-4 shadow-xl">
-                      <div className="w-10 h-10 rounded-xl bg-teal-500/10 text-teal-400 flex items-center justify-center">
-                        <Stethoscope className="w-5 h-5" />
-                      </div>
-                      <h3 className="text-lg font-bold text-white">Target Patient Symptoms</h3>
-                      <p className="text-sm text-slate-300 leading-relaxed">
-                        {detailProduct.indications || 'Broad spectrum symptom management tailored for clinical OPD and hospital care.'}
-                      </p>
-                    </div>
-
-                    <div className="bg-slate-900/90 rounded-3xl p-6 md:p-8 border border-slate-800 space-y-4 shadow-xl">
-                      <div className="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center">
-                        <CheckCircle2 className="w-5 h-5" />
-                      </div>
-                      <h3 className="text-lg font-bold text-white">Clinical Efficacy Highlights</h3>
-                      <ul className="text-sm text-slate-300 space-y-2.5">
-                        <li className="flex items-start gap-2">
-                          <Check className="w-4 h-4 text-teal-400 shrink-0 mt-0.5" />
-                          <span>Rapid onset of pharmacological relief with sustained therapeutic bioavailability</span>
-                        </li>
-                        <li className="flex items-start gap-2">
-                          <Check className="w-4 h-4 text-teal-400 shrink-0 mt-0.5" />
-                          <span>High gastrointestinal tolerability reducing treatment abandonment</span>
-                        </li>
-                        <li className="flex items-start gap-2">
-                          <Check className="w-4 h-4 text-teal-400 shrink-0 mt-0.5" />
-                          <span>Suitable for standard outpatient prescribing across diverse demographics</span>
-                        </li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* SLIDE 3: Dosage Guidelines & Safety Profile */}
-              {activeSlide === 2 && (
-                <div className="space-y-8 animate-in fade-in zoom-in-95 duration-200">
-                  <div className="text-center max-w-2xl mx-auto space-y-2">
-                    <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-teal-500/10 text-teal-400 border border-teal-500/20">
-                      Slide 3 • Administration & Safety
-                    </span>
-                    <h2 className="text-2xl md:text-4xl font-extrabold text-white tracking-tight">
-                      Dosage Protocol & Tolerability
-                    </h2>
-                    <p className="text-xs md:text-sm text-slate-400">
-                      Recommended clinical administration regimen and safety profile
-                    </p>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-                    <div className="bg-slate-900/90 rounded-3xl p-6 border border-slate-800 space-y-3 shadow-xl">
-                      <div className="w-9 h-9 rounded-xl bg-teal-500/10 text-teal-400 flex items-center justify-center">
-                        <Clock className="w-4 h-4" />
-                      </div>
-                      <h4 className="text-sm font-bold text-white">Recommended Dosage</h4>
-                      <p className="text-xs text-slate-300 leading-relaxed">
-                        {detailProduct.directions || 'As advised by the physician. Typically administered once or twice daily after meals.'}
-                      </p>
-                    </div>
-
-                    <div className="bg-slate-900/90 rounded-3xl p-6 border border-slate-800 space-y-3 shadow-xl">
-                      <div className="w-9 h-9 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center">
-                        <ShieldCheck className="w-4 h-4" />
-                      </div>
-                      <h4 className="text-sm font-bold text-white">Safety & Precautions</h4>
-                      <p className="text-xs text-slate-300 leading-relaxed">
-                        {detailProduct.precautions || 'Contraindicated in documented hypersensitivity to active ingredients.'}
-                      </p>
-                    </div>
-
-                    <div className="bg-slate-900/90 rounded-3xl p-6 border border-slate-800 space-y-3 shadow-xl">
-                      <div className="w-9 h-9 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center">
-                        <Package className="w-4 h-4" />
-                      </div>
-                      <h4 className="text-sm font-bold text-white">Storage & Packaging</h4>
-                      <p className="text-xs text-slate-300 leading-relaxed">
-                        {detailProduct.storage || 'Store below 25°C in a dry place. Protect from moisture and direct light.'}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* SLIDE 4: The Ciplon Clinical Advantage (Summary) */}
-              {activeSlide === 3 && (
-                <div className="space-y-8 animate-in fade-in zoom-in-95 duration-200 text-center max-w-3xl mx-auto">
-                  <div className="space-y-2">
-                    <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-teal-500/10 text-teal-400 border border-teal-500/20">
-                      Slide 4 • Competitive Edge
-                    </span>
-                    <h2 className="text-3xl md:text-5xl font-black text-white tracking-tight">
-                      Why Prescribe {detailProduct.brand_name}?
-                    </h2>
-                    <p className="text-sm text-slate-300">
-                      Key differentiators engineered for therapeutic excellence and high patient compliance
-                    </p>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-left">
-                    {[
-                      { title: 'GMP Certified Formulation', desc: 'Manufactured under WHO-GMP cleanrooms with validated purity profiles.' },
-                      { title: 'Optimized Bioavailability', desc: 'Superior molecular micronization ensuring rapid intestinal uptake.' },
-                      { title: 'Moisture Barrier Packaging', desc: 'Alu-Alu blister protection safeguarding stability across all climatic zones.' },
-                      { title: 'Affordable Patient Pricing', desc: 'Ensures uninterrupted therapy completion and sustained prescription adherence.' }
-                    ].map((item, idx) => (
-                      <div key={idx} className="bg-slate-900/90 rounded-2xl p-5 border border-slate-800 space-y-1.5">
-                        <div className="flex items-center gap-2">
-                          <CheckCircle2 className="w-4 h-4 text-teal-400 shrink-0" />
-                          <h4 className="text-sm font-bold text-white">{item.title}</h4>
-                        </div>
-                        <p className="text-xs text-slate-400 pl-6 leading-relaxed">{item.desc}</p>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="pt-4 flex items-center justify-center gap-3">
-                    <Link
-                      href="/mr/visits"
-                      className="px-6 py-2.5 rounded-xl bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold text-xs shadow-lg transition-colors cursor-pointer inline-flex items-center gap-2"
-                    >
-                      <Calendar className="w-4 h-4" />
-                      <span>Log Visit Detailing This Molecule</span>
-                    </Link>
-                  </div>
-                </div>
-              )}
-
-            </div>
-          </div>
-
-          {/* Bottom Presentation Deck Navigation Toolbar */}
-          <div className="h-20 px-6 bg-slate-900/90 border-t border-slate-800/80 flex items-center justify-between backdrop-blur-md">
-            
-            {/* Prev Button */}
+      {/* PURE IMMERSIVE FULL-SCREEN VISUAL AID CAROUSEL (NO HEADER / NO TASKBAR) */}
+      {presentationMode && detailProduct && typeof document !== 'undefined' && createPortal(
+        <div
+          className="fixed inset-0 z-[999999] w-screen h-screen bg-black select-none overflow-hidden flex items-center justify-center animate-in fade-in duration-200"
+          tabIndex={0}
+        >
+          {/* Top-Right: Floating Minimal Controls (Fullscreen & Close) */}
+          <div className="absolute top-4 right-4 z-50 flex items-center gap-2">
             <button
               type="button"
-              onClick={handlePrevSlide}
-              disabled={activeSlide === 0}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-700 bg-slate-800 hover:bg-slate-700 disabled:opacity-30 disabled:cursor-not-allowed text-xs font-semibold text-white transition-colors cursor-pointer"
+              onClick={handleToggleFullscreen}
+              className="w-10 h-10 rounded-full bg-black/60 hover:bg-black/90 text-white/80 hover:text-white backdrop-blur-md border border-white/20 flex items-center justify-center transition-all cursor-pointer shadow-2xl active:scale-95"
+              title="Toggle Fullscreen"
             >
-              <ChevronLeft className="w-4 h-4" />
-              <span>Previous</span>
+              <Maximize2 className="w-4 h-4" />
             </button>
 
-            {/* Slide Navigation Pills */}
-            <div className="flex items-center gap-2">
-              {['1. Molecule Intro', '2. Indications', '3. Dosage & Safety', '4. Ciplon Advantage'].map((title, idx) => (
+            <button
+              type="button"
+              onClick={handleClosePresentation}
+              className="w-10 h-10 rounded-full bg-black/60 hover:bg-rose-600 text-white/80 hover:text-white backdrop-blur-md border border-white/20 flex items-center justify-center transition-all cursor-pointer shadow-2xl active:scale-95"
+              title="Exit Presentation (Esc)"
+            >
+              <X className="w-5 h-5 stroke-[2.5]" />
+            </button>
+          </div>
+
+          {/* Top-Left: Floating Slide Counter Badge */}
+          {totalSlideCount > 0 && (
+            <div className="absolute top-4 left-4 z-50 pointer-events-none">
+              <div className="px-3.5 py-1.5 rounded-full bg-black/65 backdrop-blur-md border border-white/20 text-white text-xs font-bold shadow-2xl flex items-center gap-2">
+                <span className="text-teal-400">{activeSlide + 1} / {totalSlideCount}</span>
+                <span className="text-white/40">•</span>
+                <span className="text-slate-200 max-w-xs truncate">{detailProduct.brand_name}</span>
+              </div>
+            </div>
+          )}
+
+          {/* Main Immersive Slide Image Stage - 100% Full Width & Height */}
+          <div
+            className="w-full h-full flex items-center justify-center relative cursor-default"
+            onClick={(e) => {
+              // Click right half for next slide, click left half for previous slide
+              const rect = e.currentTarget.getBoundingClientRect();
+              const clickX = e.clientX - rect.left;
+              if (clickX > rect.width * 0.6) {
+                handleNextSlide();
+              } else if (clickX < rect.width * 0.4) {
+                handlePrevSlide();
+              }
+            }}
+          >
+            {totalSlideCount === 0 ? (
+              <div className="text-center text-white space-y-3 p-8 max-w-md bg-slate-900/90 rounded-3xl border border-white/10 shadow-2xl">
+                <ImageIcon className="w-12 h-12 text-teal-400 mx-auto" />
+                <h3 className="text-lg font-bold text-white">No Slide Images Uploaded</h3>
+                <p className="text-xs text-slate-400">
+                  Please upload slide images in Admin &gt; Visual Aid Carousels.
+                </p>
+                <button
+                  type="button"
+                  onClick={handleClosePresentation}
+                  className="px-5 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold transition-colors cursor-pointer"
+                >
+                  Close
+                </button>
+              </div>
+            ) : (
+              <img
+                key={activeSlide}
+                src={carouselSlides[activeSlide]?.image_path}
+                alt={carouselSlides[activeSlide]?.title || `Slide ${activeSlide + 1}`}
+                className="w-full h-full object-contain select-none transition-all duration-150 animate-in fade-in"
+              />
+            )}
+          </div>
+
+          {/* Left Floating Chevron (Previous) */}
+          {activeSlide > 0 && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                handlePrevSlide();
+              }}
+              className="absolute left-4 top-1/2 -translate-y-1/2 z-40 w-14 h-14 rounded-full bg-black/60 hover:bg-teal-600 text-white/80 hover:text-white backdrop-blur-md border border-white/20 flex items-center justify-center transition-all hover:scale-110 active:scale-95 cursor-pointer shadow-2xl group"
+              title="Previous Slide (← Left Arrow)"
+            >
+              <ChevronLeft className="w-8 h-8 stroke-[2.5] group-hover:-translate-x-0.5 transition-transform" />
+            </button>
+          )}
+
+          {/* Right Floating Chevron (Next) */}
+          {activeSlide < totalSlideCount - 1 && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleNextSlide();
+              }}
+              className="absolute right-4 top-1/2 -translate-y-1/2 z-40 w-14 h-14 rounded-full bg-black/60 hover:bg-teal-600 text-white/80 hover:text-white backdrop-blur-md border border-white/20 flex items-center justify-center transition-all hover:scale-110 active:scale-95 cursor-pointer shadow-2xl group"
+              title="Next Slide (→ Right Arrow or Space)"
+            >
+              <ChevronRight className="w-8 h-8 stroke-[2.5] group-hover:translate-x-0.5 transition-transform" />
+            </button>
+          )}
+
+          {/* Minimal Bottom Subtle Dots Indicator */}
+          {totalSlideCount > 1 && (
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-40 px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-md border border-white/15 flex items-center gap-1.5 shadow-2xl">
+              {carouselSlides.map((_, idx) => (
                 <button
                   key={idx}
                   type="button"
-                  onClick={() => setActiveSlide(idx)}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setActiveSlide(idx);
+                  }}
+                  className={`transition-all rounded-full cursor-pointer ${
                     activeSlide === idx
-                      ? 'bg-teal-500 text-slate-950 shadow-md font-bold'
-                      : 'bg-slate-800/80 text-slate-400 hover:text-white border border-slate-700/60'
+                      ? 'w-6 h-2 bg-teal-400'
+                      : 'w-2 h-2 bg-white/40 hover:bg-white/80'
                   }`}
-                >
-                  {title}
-                </button>
+                  title={`Jump to Slide ${idx + 1}`}
+                />
               ))}
             </div>
-
-            {/* Next Button */}
-            <button
-              type="button"
-              onClick={handleNextSlide}
-              disabled={activeSlide === 3}
-              className="flex items-center gap-2 px-5 py-2 rounded-xl bg-teal-600 hover:bg-teal-500 disabled:opacity-30 disabled:cursor-not-allowed text-xs font-bold text-white transition-colors shadow-xs cursor-pointer"
-            >
-              <span>Next Slide</span>
-              <ChevronRight className="w-4 h-4" />
-            </button>
-
-          </div>
-
-        </div>
+          )}
+        </div>,
+        document.body
       )}
-
     </MRLayout>
   );
 }

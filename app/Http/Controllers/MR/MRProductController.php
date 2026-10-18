@@ -38,6 +38,8 @@ class MRProductController extends Controller
                 'compositions:id,product_id,ingredient_name,strength,unit',
                 'primaryImage',
                 'images',
+                'slides' => fn ($q) => $q->where('is_active', true)->orderBy('sort_order'),
+                'slides' => fn ($q) => $q->where('is_active', true)->orderBy('sort_order'),
             ]);
 
         // Filter by Category
@@ -119,6 +121,7 @@ class MRProductController extends Controller
                 'category',
                 'compositions',
                 'images',
+                'slides' => fn ($q) => $q->where('is_active', true)->orderBy('sort_order'),
             ])
             ->findOrFail($id);
 
