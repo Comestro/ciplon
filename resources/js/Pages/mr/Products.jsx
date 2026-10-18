@@ -17,6 +17,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { Link } from '@inertiajs/react';
 import axios from 'axios';
 import {
+  Image as ImageIcon,
   Pill,
   Search,
   Filter,
@@ -403,22 +404,12 @@ export default function Products({ initialFilters = {} }) {
                   </div>
 
                   {/* Actions Strip */}
-                  <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
-                    <button
-                      type="button"
-                      onClick={() => setDetailProduct(p)}
-                      className="px-3 py-1.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer"
-                      title="View Prescribing Guide"
-                    >
-                      <Info className="w-3.5 h-3.5 text-slate-400" />
-                      <span>Guide</span>
-                    </button>
-
+                  <div className="pt-3 border-t border-slate-100">
                     <button
                       type="button"
                       onClick={() => handleOpenPresentation(p, 0)}
-                      className="px-3.5 py-1.5 rounded-xl bg-teal-700 hover:bg-teal-800 text-white text-xs font-semibold shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer"
-                      title="Open Interactive Visual Aid for Doctor Presentation"
+                      className="w-full py-2.5 px-4 rounded-xl bg-teal-700 hover:bg-teal-800 text-white text-xs font-bold shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer"
+                      title="Open Interactive Visual Aid Carousel"
                     >
                       <Play className="w-3.5 h-3.5 fill-current" />
                       <span>Present Visual Aid</span>
@@ -469,21 +460,15 @@ export default function Products({ initialFilters = {} }) {
                           )}
                         </div>
                       </td>
-                      <td className="py-3 px-4 text-right space-x-1.5">
-                        <button
-                          type="button"
-                          onClick={() => setDetailProduct(p)}
-                          className="px-2.5 py-1 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-semibold cursor-pointer"
-                        >
-                          Guide
-                        </button>
+                      <td className="py-3 px-4 text-right">
                         <button
                           type="button"
                           onClick={() => handleOpenPresentation(p, 0)}
-                          className="px-3 py-1 rounded-lg bg-teal-700 hover:bg-teal-800 text-white text-xs font-semibold shadow-xs cursor-pointer inline-flex items-center gap-1"
+                          className="px-3.5 py-1.5 rounded-lg bg-teal-700 hover:bg-teal-800 text-white text-xs font-bold shadow-xs cursor-pointer inline-flex items-center gap-1.5"
+                          title="Open Interactive Visual Aid Carousel"
                         >
-                          <Play className="w-3 h-3 fill-current" />
-                          <span>Present</span>
+                          <Play className="w-3.5 h-3.5 fill-current" />
+                          <span>Present Visual Aid</span>
                         </button>
                       </td>
                     </tr>
@@ -495,109 +480,6 @@ export default function Products({ initialFilters = {} }) {
         )}
 
       </div>
-
-      {/* Slide-out Prescribing Guide Drawer */}
-      {detailProduct && !presentationMode && (
-        <div className="fixed inset-0 z-50 flex items-center justify-end bg-slate-900/40 backdrop-blur-xs animate-in fade-in duration-150">
-          <div className="bg-white h-full w-full max-w-lg shadow-2xl p-6 overflow-y-auto space-y-5 animate-in slide-in-from-right duration-200">
-            <div className="flex items-start justify-between border-b border-slate-100 pb-4">
-              <div>
-                <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-teal-50 text-teal-800 border border-teal-200">
-                  {detailProduct.category?.name || 'Therapeutic Portfolio'}
-                </span>
-                <h2 className="text-lg font-bold text-slate-900 mt-1">{detailProduct.brand_name}</h2>
-                <p className="text-xs text-slate-500 font-medium">{detailProduct.generic_name}</p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setDetailProduct(null)}
-                className="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 cursor-pointer"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            {/* Compositions Card */}
-            {detailProduct.compositions && detailProduct.compositions.length > 0 && (
-              <div className="bg-slate-50 rounded-xl p-4 border border-slate-200/80 space-y-2">
-                <h4 className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                  <Pill className="w-3.5 h-3.5 text-teal-700" />
-                  <span>Active Pharmaceutical Ingredients (API)</span>
-                </h4>
-                <div className="divide-y divide-slate-200/60 text-xs">
-                  {detailProduct.compositions.map((c) => (
-                    <div key={c.id} className="py-1.5 flex items-center justify-between">
-                      <span className="font-semibold text-slate-800">{c.ingredient_name}</span>
-                      <span className="font-bold text-teal-800 bg-white px-2 py-0.5 rounded border border-slate-200 text-[11px]">
-                        {c.strength} {c.unit}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Indications & Therapeutic Usage */}
-            {detailProduct.indications && (
-              <div className="space-y-1.5">
-                <h4 className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                  <Stethoscope className="w-3.5 h-3.5 text-teal-700" />
-                  <span>Therapeutic Indications</span>
-                </h4>
-                <p className="text-xs text-slate-600 bg-teal-50/40 p-3 rounded-xl border border-teal-100 leading-relaxed">
-                  {detailProduct.indications}
-                </p>
-              </div>
-            )}
-
-            {/* Dosage & Administration */}
-            {detailProduct.directions && (
-              <div className="space-y-1.5">
-                <h4 className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                  <Clock className="w-3.5 h-3.5 text-teal-700" />
-                  <span>Dosage & Directions for Use</span>
-                </h4>
-                <p className="text-xs text-slate-600 p-3 rounded-xl bg-slate-50 border border-slate-200 leading-relaxed">
-                  {detailProduct.directions}
-                </p>
-              </div>
-            )}
-
-            {/* Precautions */}
-            {detailProduct.precautions && (
-              <div className="space-y-1.5">
-                <h4 className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                  <AlertCircle className="w-3.5 h-3.5 text-amber-600" />
-                  <span>Precautions & Contraindications</span>
-                </h4>
-                <p className="text-xs text-slate-600 p-3 rounded-xl bg-amber-50/50 border border-amber-200/60 leading-relaxed">
-                  {detailProduct.precautions}
-                </p>
-              </div>
-            )}
-
-            {/* Storage */}
-            {detailProduct.storage && (
-              <div className="text-xs text-slate-500 pt-2 border-t border-slate-100">
-                <span className="font-semibold text-slate-700">Storage Guidelines: </span>
-                {detailProduct.storage}
-              </div>
-            )}
-
-            {/* Bottom Launch Button */}
-            <div className="pt-4 border-t border-slate-200 flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => handleOpenPresentation(detailProduct, 0)}
-                className="flex-1 py-2.5 rounded-xl bg-teal-700 hover:bg-teal-800 text-white font-semibold text-xs shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer"
-              >
-                <Play className="w-4 h-4 fill-current" />
-                <span>Launch Visual Aid Presentation</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* PURE IMMERSIVE FULL-SCREEN VISUAL AID CAROUSEL (NO HEADER / NO TASKBAR) */}
       {presentationMode && detailProduct && typeof document !== 'undefined' && createPortal(

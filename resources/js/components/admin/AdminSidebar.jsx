@@ -60,12 +60,7 @@ export default function AdminSidebar({ isOpen, onClose }) {
           icon: PlusCircle,
           active: currentPath === '/admin/products/add' || currentPath === '/admin/products/create',
         },
-        {
-          name: 'Visual Aid Carousels',
-          path: '/admin/carousels',
-          icon: Layers,
-          active: currentPath === '/admin/carousels' || currentPath.includes('/slides'),
-        },
+
       ],
     },
     {

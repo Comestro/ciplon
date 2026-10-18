@@ -71,7 +71,6 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::patch('/products/{product}/status', [ProductController::class, 'updateStatus'])->name('products.status');
 
     // Visual Aid Product Slides
-    Route::get('/carousels', [ProductSlideController::class, 'carouselIndex'])->name('carousels.index');
     Route::get('/products/{product}/slides', [ProductSlideController::class, 'index'])->name('products.slides.index');
     Route::post('/products/{product}/slides', [ProductSlideController::class, 'store'])->name('products.slides.store');
     Route::post('/products/{product}/slides/{slide}', [ProductSlideController::class, 'update'])->name('products.slides.update');

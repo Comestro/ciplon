@@ -22,7 +22,8 @@ class ProductController extends Controller
     public function index(Request $request): Response
     {
         $query = Product::query()
-            ->with(['category:id,name,slug', 'primaryImage', 'images'])
+            ->with(['category:id,name,slug', 'primaryImage',
+            'slides' => fn ($q) => $q->orderBy('sort_order'), 'images'])
             ->withCount('compositions');
 
         if ($request->filled('search')) {

@@ -14,39 +14,6 @@ use Inertia\Response;
 class ProductSlideController extends Controller
 {
     /**
-     * Display dedicated visual aid carousels hub for all products.
-     */
-    public function carouselIndex(Request $request): Response
-    {
-        $query = Product::query()
-            ->with([
-                'category:id,name,slug',
-                'primaryImage',
-                'slides' => fn ($q) => $q->orderBy('sort_order')->orderBy('id'),
-            ])
-            ->withCount('slides');
-
-        if ($request->filled('search')) {
-            $search = trim($request->query('search'));
-            $query->where(function ($q) use ($search) {
-                $q->where('brand_name', 'like', "%{$search}%")
-                  ->orWhere('generic_name', 'like', "%{$search}%")
-                  ->orWhere('dosage_form', 'like', "%{$search}%");
-            });
-        }
-
-        $products = $query->orderBy('brand_name')->paginate(12)->withQueryString();
-
-        return Inertia::render('admin/product/CarouselsHub', [
-            'products' => $products,
-            'filters' => [
-                'search' => $request->query('search', ''),
-            ],
-        ]);
-    }
-
-
-    /**
      * Display the visual aid slides carousel manager for a product.
      */
     public function index(Product $product): Response
