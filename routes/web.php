@@ -33,7 +33,7 @@ Route::post('/enquiry', [ProductCatalogController::class, 'storeEnquiry'])->name
 // Authentication Routes
 Route::middleware('guest')->group(function () {
     Route::get('/login', [LoginController::class, 'create'])->name('login');
-    Route::get('/admin/login', fn () => redirect()->route('login'));
+    Route::get('/admin/login', fn() => redirect()->route('login'));
     Route::post('/login', [LoginController::class, 'store'])->name('login.store');
 });
 
@@ -49,7 +49,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
     // Categories
     Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');
-    Route::get('/category', fn () => redirect()->route('admin.categories.index'));
+    Route::get('/category', fn() => redirect()->route('admin.categories.index'));
     Route::get('/categories/create', [CategoryController::class, 'create'])->name('categories.create');
     Route::get('/category/add', [CategoryController::class, 'create']);
     Route::post('/categories', [CategoryController::class, 'store'])->name('categories.store');
@@ -97,7 +97,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
 // Storage Asset Fallback
 Route::get('/storage/{path}', function (string $path) {
-    if (! Storage::disk('public')->exists($path)) {
+    if (!Storage::disk('public')->exists($path)) {
         abort(404);
     }
 
@@ -113,10 +113,10 @@ Route::middleware(['auth', 'mr'])->prefix('mr')->name('mr.')->group(function () 
     Route::get('/visits', [MRVisitController::class, 'show'])->name('visits');
     Route::get('/products', [MRProductController::class, 'show'])->name('products');
 
-        // Calls & Visits Planner / Scheduler
-        Route::get('/schedule', fn () => redirect('/mr/visits?view=planner'))->name('schedule');
-        Route::get('/follow-ups', fn () => redirect()->route('mr.schedule'))->name('followups');
-        Route::post('/schedule', [MRScheduleController::class, 'store'])->name('schedule.store');
-        Route::match(['put', 'patch', 'post'], '/schedule/{schedule}/status', [MRScheduleController::class, 'updateStatus'])->name('schedule.status');
-        Route::delete('/schedule/{schedule}', [MRScheduleController::class, 'destroy'])->name('schedule.destroy');
+    // Calls & Visits Planner / Scheduler
+    Route::get('/schedule', fn() => redirect('/mr/visits?view=planner'))->name('schedule');
+    Route::get('/follow-ups', fn() => redirect()->route('mr.schedule'))->name('followups');
+    Route::post('/schedule', [MRScheduleController::class, 'store'])->name('schedule.store');
+    Route::match(['put', 'patch', 'post'], '/schedule/{schedule}/status', [MRScheduleController::class, 'updateStatus'])->name('schedule.status');
+    Route::delete('/schedule/{schedule}', [MRScheduleController::class, 'destroy'])->name('schedule.destroy');
 });
