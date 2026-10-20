@@ -42,6 +42,16 @@ export default function AdminSidebar({ isOpen, onClose }) {
   const isCurrent = (path) => currentPath === path;
   const isParentActive = (prefix) => currentPath.startsWith(prefix);
 
+  const userRoles = authUser?.roles || [];
+  const userPermissions = authUser?.permissions || [];
+  const isSuperAdmin = authUser?.role === 'admin' || userRoles.includes('super_admin');
+
+  const hasPerm = (perm) => {
+    if (isSuperAdmin) return true;
+    if (!perm) return true;
+    return userPermissions.includes(perm);
+  };
+
   const navigationSections = [
     {
       title: 'Workspace',
@@ -56,24 +66,28 @@ export default function AdminSidebar({ isOpen, onClose }) {
           name: 'Field Operations & Map',
           path: '/admin/tracking',
           icon: MapPin,
+          permission: 'dcr.view',
           active: isParentActive('/admin/tracking'),
         },
         {
           name: 'Product Formulations',
           path: '/admin/products',
           icon: Package,
+          permission: 'products.view',
           active: isParentActive('/admin/product') && !currentPath.includes('/add') && !currentPath.includes('/create'),
         },
         {
           name: 'Add Formulation',
           path: '/admin/products/add',
           icon: PlusCircle,
+          permission: 'products.create',
           active: currentPath === '/admin/products/add' || currentPath === '/admin/products/create',
         },
         {
           name: 'Categories',
           path: '/admin/category',
           icon: FolderTree,
+          permission: 'categories.view',
           active: currentPath === '/admin/category' || currentPath === '/admin/categories',
         },
       ],
@@ -206,18 +220,21 @@ export default function AdminSidebar({ isOpen, onClose }) {
           name: 'Staff & Team',
           path: '/admin/staff',
           icon: Users,
+          permission: 'staff.view',
           active: isParentActive('/admin/staff'),
         },
         {
           name: 'Roles & Permissions',
           path: '/admin/roles',
           icon: Shield,
+          permission: 'roles.view',
           active: isParentActive('/admin/roles'),
         },
         {
           name: 'Company Settings',
           path: '/admin/settings',
           icon: Settings,
+          permission: 'settings.view',
           active: isParentActive('/admin/settings'),
         },
       ],
@@ -297,9 +314,10 @@ export default function AdminSidebar({ isOpen, onClose }) {
         {/* Navigation Sections */}
         <div className="flex-1 overflow-y-auto px-3 py-1 space-y-4">
           {navigationSections.map((section) => {
-            const filteredItems = section.items.filter((item) =>
-              item.name.toLowerCase().includes(searchQuery.toLowerCase())
-            );
+            const filteredItems = section.items.filter((item) => {
+              if (item.permission && !hasPerm(item.permission)) return false;
+              return item.name.toLowerCase().includes(searchQuery.toLowerCase());
+            });
 
             if (filteredItems.length === 0) return null;
 
