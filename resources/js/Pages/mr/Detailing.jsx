@@ -1,0 +1,819 @@
+import { useState, useEffect, useRef } from 'react';
+import { Link } from '@inertiajs/react';
+import {
+  Play,
+  GripVertical,
+  ArrowUp,
+  ArrowDown,
+  RotateCcw,
+  CheckCircle2,
+  ShieldCheck,
+  Factory,
+  ChevronLeft,
+  ChevronRight,
+  Maximize,
+  Minimize,
+  X,
+  Stethoscope,
+  Clock,
+  FlaskConical,
+  Award,
+  Calendar
+} from 'lucide-react';
+import MRLayout from '../../layouts/MR/MRLayout';
+import toast from 'react-hot-toast';
+
+export default function Detailing({ products = [], doctors = [], company = {} }) {
+  // Setup State
+  const [selectedDoctorId, setSelectedDoctorId] = useState('');
+  const [orderedProducts, setOrderedProducts] = useState([]);
+  const [selectedProductIds, setSelectedProductIds] = useState(new Set());
+  const [categoryFilter, setCategoryFilter] = useState('all');
+
+  // Drag and drop state
+  const [draggedIndex, setDraggedIndex] = useState(null);
+  const [dragOverIndex, setDragOverIndex] = useState(null);
+
+  // Slideshow Presentation State
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  // Touch Swipe Gesture Tracking
+  const touchStartX = useRef(0);
+  const touchStartY = useRef(0);
+  const touchDeltaX = useRef(0);
+
+  // Initialize ordered products from database props
+  useEffect(() => {
+    if (products && products.length > 0) {
+      setOrderedProducts(products);
+      setSelectedProductIds(new Set(products.map((p) => p.id)));
+    }
+  }, [products]);
+
+  // Selected Doctor details
+  const selectedDoctor = doctors.find((d) => String(d.id) === String(selectedDoctorId));
+
+  // Products included in the presentation based on selection
+  const includedProducts = orderedProducts.filter((p) => selectedProductIds.has(p.id));
+
+  // Slides:
+  // Slide 0: Company Logo & Brand Intro
+  // Slide 1: Manufacturing & Quality Standards
+  // Slide 2 ... N+1: Product Slides (arranged order)
+  // Final Slide: Recap
+  const slides = [
+    { type: 'brand_intro', id: 'slide-brand' },
+    { type: 'manufacturing_competitors', id: 'slide-mfg' },
+    ...includedProducts.map((p) => ({ type: 'product', id: `prod-${p.id}`, data: p })),
+    { type: 'recap', id: 'slide-recap' },
+  ];
+
+  const totalSlides = slides.length;
+
+  // Toggle individual product selection
+  const handleToggleProduct = (id) => {
+    setSelectedProductIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        if (next.size === 1) {
+          toast.error('Keep at least one product selected.');
+          return prev;
+        }
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  };
+
+  // Move product up/down
+  const handleMoveProduct = (index, direction) => {
+    const targetIndex = index + direction;
+    if (targetIndex < 0 || targetIndex >= orderedProducts.length) return;
+
+    setOrderedProducts((prev) => {
+      const next = [...prev];
+      const temp = next[index];
+      next[index] = next[targetIndex];
+      next[targetIndex] = temp;
+      return next;
+    });
+  };
+
+  // Drag and Drop Handlers
+  const handleDragStart = (e, index) => {
+    setDraggedIndex(index);
+    e.dataTransfer.effectAllowed = 'move';
+    if (e.target) {
+      e.target.style.opacity = '0.5';
+    }
+  };
+
+  const handleDragEnd = (e) => {
+    if (e.target) {
+      e.target.style.opacity = '1';
+    }
+    setDraggedIndex(null);
+    setDragOverIndex(null);
+  };
+
+  const handleDragOver = (e, index) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    if (dragOverIndex !== index) {
+      setDragOverIndex(index);
+    }
+  };
+
+  const handleDrop = (e, targetIndex) => {
+    e.preventDefault();
+    if (draggedIndex === null || draggedIndex === targetIndex) return;
+
+    setOrderedProducts((prev) => {
+      const next = [...prev];
+      const draggedItem = next.splice(draggedIndex, 1)[0];
+      next.splice(targetIndex, 0, draggedItem);
+      return next;
+    });
+
+    setDraggedIndex(null);
+    setDragOverIndex(null);
+    toast.success('Slide order updated');
+  };
+
+  // Reset to original database order
+  const handleResetOrder = () => {
+    setOrderedProducts([...products]);
+    setSelectedProductIds(new Set(products.map((p) => p.id)));
+    toast.success('Restored default order');
+  };
+
+  // Launch Presentation
+  const handleStartPresentation = () => {
+    if (includedProducts.length === 0) {
+      toast.error('Select at least one product.');
+      return;
+    }
+    setCurrentSlideIndex(0);
+    setIsPlaying(true);
+  };
+
+  // Exit Presentation
+  const handleExitPresentation = () => {
+    if (document.fullscreenElement) {
+      document.exitFullscreen().catch(() => {});
+    }
+    setIsPlaying(false);
+  };
+
+  // Toggle Fullscreen
+  const handleToggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().then(() => setIsFullscreen(true)).catch(() => {});
+    } else {
+      document.exitFullscreen().then(() => setIsFullscreen(false)).catch(() => {});
+    }
+  };
+
+  // Slide Navigation
+  const goToNextSlide = () => {
+    if (currentSlideIndex < totalSlides - 1) {
+      setCurrentSlideIndex((prev) => prev + 1);
+    }
+  };
+
+  const goToPrevSlide = () => {
+    if (currentSlideIndex > 0) {
+      setCurrentSlideIndex((prev) => prev - 1);
+    }
+  };
+
+  // Keyboard navigation
+  useEffect(() => {
+    if (!isPlaying) return;
+
+    const handleKeyDown = (e) => {
+      if (e.key === 'ArrowRight' || e.key === 'Space') {
+        goToNextSlide();
+      } else if (e.key === 'ArrowLeft') {
+        goToPrevSlide();
+      } else if (e.key === 'Escape') {
+        handleExitPresentation();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isPlaying, currentSlideIndex, totalSlides]);
+
+  // Touch Swipe Gesture Detection for Mobile / Tablet
+  const handleTouchStart = (e) => {
+    if (!isPlaying) return;
+    touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
+    touchDeltaX.current = 0;
+  };
+
+  const handleTouchMove = (e) => {
+    if (!isPlaying) return;
+    const currentX = e.touches[0].clientX;
+    touchDeltaX.current = currentX - touchStartX.current;
+  };
+
+  const handleTouchEnd = () => {
+    if (!isPlaying) return;
+    const threshold = 40;
+    if (touchDeltaX.current < -threshold) {
+      goToNextSlide();
+    } else if (touchDeltaX.current > threshold) {
+      goToPrevSlide();
+    }
+    touchDeltaX.current = 0;
+  };
+
+  // Categories list
+  const categoriesList = ['all', ...new Set(products.map((p) => p.category?.name).filter(Boolean))];
+
+  const filteredOrderedProducts = orderedProducts.filter((product) => {
+    if (categoryFilter === 'all') return true;
+    return product.category?.name === categoryFilter;
+  });
+
+  const logoUrl = company?.logo_url || company?.logo || '/images/ciplon_logo.png';
+
+  return (
+    <MRLayout title="Doctor Slide Show">
+      <div className="space-y-4 pb-12">
+
+        {/* 1. TOP BAR: Simple, Flat, No Shadow */}
+        <div className="bg-white rounded-xl border border-slate-200 p-4">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <h1 className="text-xl font-bold text-slate-900">
+                Doctor Slide Show
+              </h1>
+              <p className="text-xs text-slate-500">
+                Sort medicines for doctor, then start presentation.
+              </p>
+            </div>
+
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
+              <select
+                value={selectedDoctorId}
+                onChange={(e) => setSelectedDoctorId(e.target.value)}
+                className="py-2 px-3 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-800 font-medium focus:outline-none cursor-pointer"
+              >
+                <option value="">General Physician</option>
+                {doctors.map((doc) => (
+                  <option key={doc.id} value={doc.id}>
+                    {doc.name} {doc.specialization ? `(${doc.specialization})` : ''}
+                  </option>
+                ))}
+              </select>
+
+              <button
+                type="button"
+                onClick={handleStartPresentation}
+                className="inline-flex items-center justify-center gap-2 px-5 py-2 rounded-lg bg-[#0c2340] hover:bg-[#123055] text-white font-semibold text-xs transition-colors cursor-pointer"
+              >
+                <Play className="w-3.5 h-3.5 fill-white text-white" />
+                <span>Start Slideshow ({totalSlides} Slides)</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* 2. COMPACT OPENING SLIDES INDICATOR: Flat, Minimal Text */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
+          <div className="bg-white rounded-lg border border-slate-200 px-3.5 py-2.5 flex items-center justify-between">
+            <div className="flex items-center gap-2.5">
+              <span className="w-6 h-6 rounded bg-slate-100 text-slate-700 font-bold text-xs flex items-center justify-center">
+                1
+              </span>
+              <span className="font-semibold text-slate-800">Slide 1: Brand Logo &amp; Heritage</span>
+            </div>
+            <img
+              src={logoUrl}
+              alt="Ciplon Logo"
+              className="h-5 w-auto object-contain opacity-80"
+              onError={(e) => {
+                e.currentTarget.src = '/images/ciplon_logo.png';
+              }}
+            />
+          </div>
+
+          <div className="bg-white rounded-lg border border-slate-200 px-3.5 py-2.5 flex items-center justify-between">
+            <div className="flex items-center gap-2.5">
+              <span className="w-6 h-6 rounded bg-slate-100 text-slate-700 font-bold text-xs flex items-center justify-center">
+                2
+              </span>
+              <span className="font-semibold text-slate-800">Slide 2: WHO-GMP Manufacturing</span>
+            </div>
+            <Factory className="w-4 h-4 text-slate-400" />
+          </div>
+        </div>
+
+        {/* 3. MEDICINE SLIDES HEADER & FILTER */}
+        <div className="flex items-center justify-between pt-1">
+          <div className="text-xs font-semibold text-slate-700">
+            Medicine Slides ({includedProducts.length} selected)
+          </div>
+
+          <div className="flex items-center gap-2 text-xs">
+            {categoriesList.length > 2 && (
+              <select
+                value={categoryFilter}
+                onChange={(e) => setCategoryFilter(e.target.value)}
+                className="py-1 px-2.5 bg-white border border-slate-200 rounded-lg text-slate-700 focus:outline-none cursor-pointer"
+              >
+                {categoriesList.map((cat) => (
+                  <option key={cat} value={cat}>
+                    {cat === 'all' ? 'All Categories' : cat}
+                  </option>
+                ))}
+              </select>
+            )}
+
+            <button
+              type="button"
+              onClick={handleResetOrder}
+              className="inline-flex items-center gap-1 px-2 py-1 rounded-lg border border-slate-200 bg-white text-slate-600 hover:text-slate-900 cursor-pointer"
+              title="Reset order"
+            >
+              <RotateCcw className="w-3 h-3" />
+              <span>Reset</span>
+            </button>
+          </div>
+        </div>
+
+        {/* 4. PRODUCT CARDS: Simple, Flat, No Shadows, Clean Text */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+          {filteredOrderedProducts.map((product) => {
+            const actualIndex = orderedProducts.findIndex((p) => p.id === product.id);
+            const isIncluded = selectedProductIds.has(product.id);
+            const slideNumber = actualIndex + 3; // #1 is brand, #2 is mfg
+            const isBeingDragged = draggedIndex === actualIndex;
+            const isDragTarget = dragOverIndex === actualIndex;
+
+            const imageUrl =
+              product.primary_image?.file_path ||
+              product.primary_image?.url ||
+              product.images?.[0]?.file_path ||
+              product.images?.[0]?.url ||
+              '/images/box_globucel_sc.jpg';
+
+            return (
+              <div
+                key={product.id}
+                draggable
+                onDragStart={(e) => handleDragStart(e, actualIndex)}
+                onDragEnd={handleDragEnd}
+                onDragOver={(e) => handleDragOver(e, actualIndex)}
+                onDrop={(e) => handleDrop(e, actualIndex)}
+                className={`rounded-xl bg-white border p-3 select-none transition-colors ${
+                  isBeingDragged
+                    ? 'opacity-40 border-dashed border-slate-400'
+                    : isDragTarget
+                    ? 'border-slate-800 bg-slate-50'
+                    : isIncluded
+                    ? 'border-slate-200 hover:border-slate-300'
+                    : 'border-slate-200 bg-slate-50/70 opacity-50'
+                }`}
+              >
+                {/* Header: Slide Number + Move Arrows + Drag handle */}
+                <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+                  <span className="w-6 h-6 rounded bg-slate-100 text-slate-800 font-bold text-xs flex items-center justify-center">
+                    {slideNumber}
+                  </span>
+
+                  <div className="flex items-center gap-1 text-slate-400">
+                    <button
+                      type="button"
+                      onClick={() => handleMoveProduct(actualIndex, -1)}
+                      disabled={actualIndex === 0}
+                      className="p-1 rounded hover:text-slate-800 disabled:opacity-20 cursor-pointer"
+                      title="Move up"
+                    >
+                      <ArrowUp className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleMoveProduct(actualIndex, 1)}
+                      disabled={actualIndex === orderedProducts.length - 1}
+                      className="p-1 rounded hover:text-slate-800 disabled:opacity-20 cursor-pointer"
+                      title="Move down"
+                    >
+                      <ArrowDown className="w-3.5 h-3.5" />
+                    </button>
+                    <span className="cursor-grab hover:text-slate-800 px-0.5">
+                      <GripVertical className="w-3.5 h-3.5" />
+                    </span>
+                  </div>
+                </div>
+
+                {/* Body: Product Image + Brand & Salt (Clean, Simple) */}
+                <div className="py-2.5 flex items-center gap-3">
+                  <div className="w-14 h-14 rounded-lg bg-slate-50 border border-slate-100 p-1 flex items-center justify-center shrink-0">
+                    <img
+                      src={imageUrl}
+                      alt={product.brand_name}
+                      className="max-h-full max-w-full object-contain"
+                      onError={(e) => {
+                        e.currentTarget.src = '/images/box_globucel_sc.jpg';
+                      }}
+                    />
+                  </div>
+
+                  <div className="flex-1 min-w-0">
+                    <h4 className="text-sm font-bold text-slate-900 truncate">
+                      {product.brand_name}
+                    </h4>
+                    <p className="text-xs text-slate-500 truncate mt-0.5" title={product.generic_name}>
+                      {product.generic_name}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Footer: Checkbox only */}
+                <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
+                  <label className="flex items-center gap-2 cursor-pointer text-xs text-slate-600">
+                    <input
+                      type="checkbox"
+                      checked={isIncluded}
+                      onChange={() => handleToggleProduct(product.id)}
+                      className="w-3.5 h-3.5 rounded text-slate-900 focus:ring-0 cursor-pointer"
+                    />
+                    <span>{isIncluded ? 'Included' : 'Skip'}</span>
+                  </label>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+      </div>
+
+      {/* ===================================================================== */}
+      {/* FULLSCREEN PRESENTATION MODE (WHITE BACKGROUND, NO SHADOW, MINIMAL)  */}
+      {/* ===================================================================== */}
+      {isPlaying && (
+        <div
+          className="fixed inset-0 z-50 bg-white text-slate-900 flex flex-col select-none overflow-hidden"
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        >
+          {/* Top Bar: Clean, Flat, Border Only */}
+          <div className="h-13 px-4 sm:px-6 border-b border-slate-200 flex items-center justify-between shrink-0 bg-white">
+            <div className="flex items-center gap-3">
+              <span className="px-2 py-0.5 rounded bg-slate-100 text-slate-800 font-mono font-bold text-xs border border-slate-200">
+                {currentSlideIndex + 1} / {totalSlides}
+              </span>
+              <span className="text-xs text-slate-600 hidden sm:inline font-medium">
+                {selectedDoctor ? `Dr. ${selectedDoctor.name}` : 'Doctor Detailing'}
+              </span>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={handleToggleFullscreen}
+                className="p-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 cursor-pointer"
+                title="Fullscreen"
+              >
+                {isFullscreen ? <Minimize className="w-4 h-4" /> : <Maximize className="w-4 h-4" />}
+              </button>
+
+              <button
+                type="button"
+                onClick={handleExitPresentation}
+                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-50 text-xs font-semibold cursor-pointer"
+              >
+                <X className="w-3.5 h-3.5" />
+                <span>Exit</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Simple Progress line */}
+          <div className="h-0.5 bg-slate-100 w-full relative shrink-0">
+            <div
+              className="h-full bg-slate-800 transition-all duration-200"
+              style={{ width: `${((currentSlideIndex + 1) / totalSlides) * 100}%` }}
+            />
+          </div>
+
+          {/* SLIDE CANVAS: Full Screen Width, Spacious, Complete Details */}
+          <div className="flex-1 overflow-y-auto p-4 sm:p-8 lg:p-12 flex items-center justify-center">
+            <div className="w-full max-w-6xl">
+
+              {/* ------------------------------------------------------------- */}
+              {/* SLIDE 1: COMPANY LOGO & BRAND (Full Screen Presentation)      */}
+              {/* ------------------------------------------------------------- */}
+              {slides[currentSlideIndex].type === 'brand_intro' && (
+                <div className="border border-slate-200 rounded-3xl p-8 sm:p-14 text-center space-y-6 max-w-4xl mx-auto">
+                  {/* Company Logo First (Large, Crisp) */}
+                  <div className="flex items-center justify-center pt-2">
+                    <img
+                      src={logoUrl}
+                      alt={company?.name || 'Ciplon Pharma'}
+                      className="h-24 sm:h-36 w-auto object-contain"
+                      onError={(e) => {
+                        e.currentTarget.src = '/images/ciplon_logo.png';
+                      }}
+                    />
+                  </div>
+
+                  <div className="space-y-2 max-w-2xl mx-auto">
+                    <h1 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight">
+                      {company?.name || 'Ciplon Pharma Private Limited'}
+                    </h1>
+                    <p className="text-base sm:text-lg font-bold text-slate-700">
+                      Science Into Smiles
+                    </p>
+                    <p className="text-sm text-slate-600 leading-relaxed pt-1">
+                      Dedicated to precision pharmaceutical formulations, certified chemical purity, and trusted healthcare partnerships across India.
+                    </p>
+                  </div>
+
+                  {/* 3 Spacious Flat Trust Badges */}
+                  <div className="grid grid-cols-3 gap-4 max-w-2xl mx-auto pt-4">
+                    <div className="p-4 rounded-2xl border border-slate-200 bg-slate-50 text-center">
+                      <span className="text-base sm:text-xl font-bold text-slate-900 block">ISO 9001:2015</span>
+                      <span className="text-xs text-slate-500 block mt-0.5">Certified QMS</span>
+                    </div>
+
+                    <div className="p-4 rounded-2xl border border-slate-200 bg-slate-50 text-center">
+                      <span className="text-base sm:text-xl font-bold text-slate-900 block">WHO-GMP</span>
+                      <span className="text-xs text-slate-500 block mt-0.5">Cleanrooms</span>
+                    </div>
+
+                    <div className="p-4 rounded-2xl border border-slate-200 bg-slate-50 text-center">
+                      <span className="text-base sm:text-xl font-bold text-slate-900 block">FSSAI</span>
+                      <span className="text-xs text-slate-500 block mt-0.5">Lic. 10426340000172</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* ------------------------------------------------------------- */}
+              {/* SLIDE 2: MANUFACTURING (Full Screen Width 4 Clean Points)     */}
+              {/* ------------------------------------------------------------- */}
+              {slides[currentSlideIndex].type === 'manufacturing_competitors' && (
+                <div className="border border-slate-200 rounded-3xl p-8 sm:p-12 space-y-8">
+                  <div className="text-center space-y-2 max-w-2xl mx-auto">
+                    <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-slate-100 text-slate-700 border border-slate-200 inline-block">
+                      Manufacturing Excellence
+                    </span>
+                    <h2 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">
+                      Why Prescribe Ciplon Formulations?
+                    </h2>
+                    <p className="text-sm text-slate-600">
+                      Manufactured at Walpar Wellness WHO-GMP Certified Facility (Gandhinagar)
+                    </p>
+                  </div>
+
+                  {/* 4 Spacious Cards */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-2">
+                    <div className="p-5 rounded-2xl border border-slate-200 bg-slate-50 space-y-2">
+                      <div className="w-10 h-10 rounded-xl bg-slate-100 text-slate-800 flex items-center justify-center font-bold">
+                        <FlaskConical className="w-5 h-5" />
+                      </div>
+                      <h4 className="text-base font-bold text-slate-900">Higher Bioavailability</h4>
+                      <p className="text-xs text-slate-600 leading-relaxed">
+                        Micronized active particles ensure rapid dissolution, absorption, and quicker clinical onset.
+                      </p>
+                    </div>
+
+                    <div className="p-5 rounded-2xl border border-slate-200 bg-slate-50 space-y-2">
+                      <div className="w-10 h-10 rounded-xl bg-slate-100 text-slate-800 flex items-center justify-center font-bold">
+                        <ShieldCheck className="w-5 h-5" />
+                      </div>
+                      <h4 className="text-base font-bold text-slate-900">100% HPLC Purity</h4>
+                      <p className="text-xs text-slate-600 leading-relaxed">
+                        Every commercial batch is tested via liquid chromatography for exact potency without impurities.
+                      </p>
+                    </div>
+
+                    <div className="p-5 rounded-2xl border border-slate-200 bg-slate-50 space-y-2">
+                      <div className="w-10 h-10 rounded-xl bg-slate-100 text-slate-800 flex items-center justify-center font-bold">
+                        <Factory className="w-5 h-5" />
+                      </div>
+                      <h4 className="text-base font-bold text-slate-900">Alu-Alu Moisture Seal</h4>
+                      <p className="text-xs text-slate-600 leading-relaxed">
+                        Tropical Zone IVb packaging preserves complete stability in high humidity and heat.
+                      </p>
+                    </div>
+
+                    <div className="p-5 rounded-2xl border border-slate-200 bg-slate-50 space-y-2">
+                      <div className="w-10 h-10 rounded-xl bg-slate-100 text-slate-800 flex items-center justify-center font-bold">
+                        <Award className="w-5 h-5" />
+                      </div>
+                      <h4 className="text-base font-bold text-slate-900">Patient Adherence</h4>
+                      <p className="text-xs text-slate-600 leading-relaxed">
+                        Affordably priced so chronic and acute patients complete their entire prescribed therapy.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* ------------------------------------------------------------- */}
+              {/* SLIDE 3...N: PRODUCT SLIDE (Full Screen, Large Image & Text)   */}
+              {/* ------------------------------------------------------------- */}
+              {slides[currentSlideIndex].type === 'product' && (
+                (() => {
+                  const prod = slides[currentSlideIndex].data;
+                  const imageUrl =
+                    prod.primary_image?.file_path ||
+                    prod.primary_image?.url ||
+                    prod.images?.[0]?.file_path ||
+                    prod.images?.[0]?.url ||
+                    '/images/box_globucel_sc.jpg';
+
+                  return (
+                    <div className="border border-slate-200 rounded-3xl p-6 sm:p-10 lg:p-12">
+                      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+
+                        {/* Large Product Pack Image Column */}
+                        <div className="lg:col-span-5 flex flex-col items-center justify-center">
+                          <div className="w-full h-72 sm:h-96 lg:h-[420px] rounded-2xl border border-slate-200 p-6 flex items-center justify-center bg-slate-50/80">
+                            <img
+                              src={imageUrl}
+                              alt={prod.brand_name}
+                              className="max-h-full max-w-full object-contain"
+                              onError={(e) => {
+                                e.currentTarget.src = '/images/box_globucel_sc.jpg';
+                              }}
+                            />
+                          </div>
+
+                          <div className="mt-3 flex items-center gap-2">
+                            <span className="px-3 py-1 rounded-full text-xs font-bold uppercase bg-slate-100 text-slate-700 border border-slate-200">
+                              {prod.dosage_form || 'Medicine'}
+                            </span>
+                            {prod.packaging_type && (
+                              <span className="px-3 py-1 rounded-full text-xs font-semibold text-slate-600 bg-slate-100 border border-slate-200">
+                                {prod.packaging_type}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Full Product Details Column */}
+                        <div className="lg:col-span-7 space-y-5">
+                          <div>
+                            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">
+                              {prod.category?.name || 'Therapeutic Formulation'}
+                            </span>
+                            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-slate-900 tracking-tight leading-tight">
+                              {prod.brand_name}
+                            </h1>
+                          </div>
+
+                          {/* Full Molecule / Active Salt Box */}
+                          <div className="p-4 sm:p-5 rounded-2xl border border-slate-200 bg-slate-50/90">
+                            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 block mb-1">
+                              Active Molecule / Generic Salt:
+                            </span>
+                            <p className="text-lg sm:text-2xl font-bold text-slate-900 leading-snug">
+                              {prod.generic_name}
+                            </p>
+                          </div>
+
+                          {/* Full Clinical Indications & Dosage (No Truncation) */}
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div className="p-4 rounded-xl border border-slate-200 bg-slate-50 space-y-1.5">
+                              <span className="text-xs font-bold uppercase tracking-wider text-slate-700 block">
+                                Clinical Indications
+                              </span>
+                              <p className="text-sm text-slate-700 leading-relaxed">
+                                {prod.indications || 'Targeted clinical therapeutic prescription.'}
+                              </p>
+                            </div>
+
+                            <div className="p-4 rounded-xl border border-slate-200 bg-slate-50 space-y-1.5">
+                              <span className="text-xs font-bold uppercase tracking-wider text-slate-700 block">
+                                Recommended Dosage
+                              </span>
+                              <p className="text-sm text-slate-700 leading-relaxed">
+                                {prod.directions || 'As advised by the consulting physician.'}
+                              </p>
+                            </div>
+                          </div>
+
+                          {/* Active Formulation Composition Strengths if available */}
+                          {prod.compositions && prod.compositions.length > 0 && (
+                            <div className="pt-1 space-y-2">
+                              <span className="text-xs font-bold uppercase tracking-wider text-slate-500 block">
+                                Active Composition Strength:
+                              </span>
+                              <div className="flex flex-wrap gap-2">
+                                {prod.compositions.map((comp) => (
+                                  <span
+                                    key={comp.id}
+                                    className="px-3 py-1.5 rounded-lg bg-slate-100 text-xs font-semibold text-slate-800 border border-slate-200"
+                                  >
+                                    {comp.ingredient_name}: <strong className="font-mono text-slate-950 font-bold">{comp.strength} {comp.unit}</strong>
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                        </div>
+
+                      </div>
+                    </div>
+                  );
+                })()
+              )}
+
+              {/* ------------------------------------------------------------- */}
+              {/* SLIDE CLOSING: RECAP (Full Width, Clean)                      */}
+              {/* ------------------------------------------------------------- */}
+              {slides[currentSlideIndex].type === 'recap' && (
+                <div className="border border-slate-200 rounded-3xl p-8 sm:p-14 text-center space-y-6 max-w-3xl mx-auto">
+                  <div className="w-14 h-14 rounded-full border border-slate-200 bg-slate-50 flex items-center justify-center mx-auto text-slate-800">
+                    <CheckCircle2 className="w-7 h-7" />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <h2 className="text-2xl sm:text-4xl font-bold text-slate-900">
+                      Thank You{selectedDoctor ? `, Dr. ${selectedDoctor.name}` : ''}
+                    </h2>
+                    <p className="text-sm text-slate-500">
+                      Formulation detailing session completed.
+                    </p>
+                  </div>
+
+                  {/* Medicines pills */}
+                  <div className="flex flex-wrap justify-center gap-2 max-h-40 overflow-y-auto pt-2">
+                    {includedProducts.map((p) => (
+                      <span
+                        key={p.id}
+                        className="px-3 py-1.5 rounded-lg border border-slate-200 bg-slate-50 text-xs text-slate-800 font-semibold"
+                      >
+                        {p.brand_name}
+                      </span>
+                    ))}
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-4">
+                    <Link
+                      href="/mr/visits"
+                      className="px-5 py-2.5 rounded-xl bg-[#0c2340] hover:bg-[#123055] text-white font-semibold text-xs transition-colors cursor-pointer"
+                    >
+                      Log Field Visit &amp; Samples
+                    </Link>
+
+                    <button
+                      type="button"
+                      onClick={() => setCurrentSlideIndex(0)}
+                      className="px-5 py-2.5 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 text-xs font-semibold cursor-pointer"
+                    >
+                      Restart Slideshow
+                    </button>
+                  </div>
+                </div>
+              )}
+
+            </div>
+          </div>
+
+          {/* Bottom Bar: Flat, Simple Previous / Next Buttons */}
+          <div className="h-14 px-4 sm:px-6 border-t border-slate-200 flex items-center justify-between shrink-0 bg-white">
+            <button
+              type="button"
+              onClick={goToPrevSlide}
+              disabled={currentSlideIndex === 0}
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-50 disabled:opacity-30 disabled:pointer-events-none text-xs font-semibold cursor-pointer"
+            >
+              <ChevronLeft className="w-4 h-4" />
+              <span>Previous</span>
+            </button>
+
+            <span className="text-[11px] text-slate-400">
+              Swipe or tap Next &rarr;
+            </span>
+
+            <button
+              type="button"
+              onClick={goToNextSlide}
+              disabled={currentSlideIndex === totalSlides - 1}
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-[#0c2340] hover:bg-[#123055] text-white disabled:opacity-30 disabled:pointer-events-none text-xs font-semibold cursor-pointer"
+            >
+              <span>Next</span>
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+
+        </div>
+      )}
+
+    </MRLayout>
+  );
+}

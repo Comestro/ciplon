@@ -193,6 +193,15 @@ export default function Products({ initialFilters = {} }) {
             </button>
 
             <Link
+              href="/mr/detailing"
+              className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs transition-colors shadow-xs cursor-pointer"
+              title="Launch Doctor E-Detailing Interactive Slide Show"
+            >
+              <Presentation className="w-4 h-4 stroke-[2.2]" />
+              <span>Doctor E-Detailing</span>
+            </Link>
+
+            <Link
               href="/mr/visits"
               className="flex items-center gap-2 px-4 py-2 rounded-xl bg-teal-700 hover:bg-teal-800 text-white font-semibold text-xs transition-colors shadow-xs cursor-pointer"
             >

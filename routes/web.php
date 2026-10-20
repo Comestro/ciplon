@@ -12,6 +12,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\CompanyPageController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\MR\MRDashboardController;
+use App\Http\Controllers\MR\MRDetailingController;
 use App\Http\Controllers\MR\MRDoctorController;
 use App\Http\Controllers\MR\MRProductController;
 use App\Http\Controllers\MR\MRVisitController;
@@ -119,4 +120,5 @@ Route::middleware(['auth', 'mr'])->prefix('mr')->name('mr.')->group(function () 
     Route::post('/schedule', [MRScheduleController::class, 'store'])->name('schedule.store');
     Route::match(['put', 'patch', 'post'], '/schedule/{schedule}/status', [MRScheduleController::class, 'updateStatus'])->name('schedule.status');
     Route::delete('/schedule/{schedule}', [MRScheduleController::class, 'destroy'])->name('schedule.destroy');
+    Route::get('/detailing', [MRDetailingController::class, 'show'])->name('detailing');
 });

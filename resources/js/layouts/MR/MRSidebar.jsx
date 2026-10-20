@@ -4,6 +4,7 @@ import {
   UserCheck, 
   MapPin, 
   Pill, 
+  Presentation,
   Gift, 
   CalendarClock, 
   Target, 
@@ -32,6 +33,14 @@ export default function MRSidebar({ isOpen, onClose }) {
       icon: LayoutDashboard, 
       active: currentPath === '/mr/dashboard', 
       enabled: true 
+    },
+    { 
+      label: 'Doctor E-Detailing', 
+      href: '/mr/detailing', 
+      icon: Presentation, 
+      active: currentPath === '/mr/detailing' || currentPath.startsWith('/mr/detailing'), 
+      enabled: true,
+      highlight: true
     },
     { 
       label: 'Doctors', 
@@ -120,6 +129,11 @@ export default function MRSidebar({ isOpen, onClose }) {
                 >
                   <Icon className={`w-4 h-4 ${item.active ? 'text-teal-700 stroke-[2.2]' : 'text-slate-400'}`} />
                   <span className="flex-1 truncate">{item.label}</span>
+                  {item.highlight && (
+                    <span className="text-[9px] font-bold uppercase tracking-wider bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded-full border border-amber-200">
+                      Slides
+                    </span>
+                  )}
                 </Link>
               );
             }

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { usePage } from '@inertiajs/react';
+import { usePage, Link } from '@inertiajs/react';
 import { 
   Users, 
   CheckCircle2, 
@@ -12,7 +12,8 @@ import {
   Building2,
   Calendar,
   Activity,
-  Award
+  Award,
+  Presentation
 } from 'lucide-react';
 import MRLayout from '../../layouts/MR/MRLayout';
 import api from '../../services/api';
@@ -88,16 +89,26 @@ export default function Dashboard() {
             </p>
           </div>
 
-          <button
-            type="button"
-            onClick={fetchDashboardData}
-            disabled={loading}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 rounded-lg transition-colors cursor-pointer self-start sm:self-auto shadow-xs disabled:opacity-50"
-            title="Refresh dashboard metrics"
-          >
-            <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
-            <span>Refresh Data</span>
-          </button>
+          <div className="flex items-center gap-2.5 self-start sm:self-auto flex-wrap">
+            <Link
+              href="/mr/detailing"
+              className="inline-flex items-center gap-2 px-4 py-2 text-xs font-bold text-white bg-[#0c2340] hover:bg-slate-800 border border-[#c59324]/40 rounded-xl transition-all shadow-xs cursor-pointer"
+            >
+              <Presentation className="w-4 h-4 text-[#dfad36]" />
+              <span>Doctor E-Detailing</span>
+            </Link>
+
+            <button
+              type="button"
+              onClick={fetchDashboardData}
+              disabled={loading}
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 rounded-lg transition-colors cursor-pointer shadow-xs disabled:opacity-50"
+              title="Refresh dashboard metrics"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
+              <span>Refresh Data</span>
+            </button>
+          </div>
         </div>
 
         {/* Error State */}
