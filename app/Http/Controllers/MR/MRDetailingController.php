@@ -33,13 +33,9 @@ class MRDetailingController extends Controller
             ->orderBy('brand_name', 'asc')
             ->get();
 
-        // Fetch doctors assigned to this MR
+        // Fetch doctors strictly assigned to this MR
         $doctors = Doctor::query()
-            ->where(function ($q) use ($userId) {
-                $q->where('user_id', $userId)
-                    ->orWhere('assigned_mr_id', $userId)
-                    ->orWhereNull('assigned_mr_id');
-            })
+            ->where('user_id', $userId)
             ->where('status', 'active')
             ->orderBy('name', 'asc')
             ->get(['id', 'name', 'specialization', 'clinic_hospital_name', 'city']);
