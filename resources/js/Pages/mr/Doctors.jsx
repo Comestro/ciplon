@@ -124,17 +124,17 @@ export default function Doctors({ initialFilters = {} }) {
       <div className="space-y-5 max-w-7xl mx-auto">
         
         {/* Top Header & Action */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-slate-200/80">
           <div>
-            <div className="flex items-center gap-2.5">
-              <h1 className="text-xl font-bold text-slate-900 tracking-tight">Doctor Directory</h1>
+            <div className="flex items-center gap-2">
+              <h1 className="text-xl sm:text-2xl font-semibold text-slate-800 tracking-tight">Doctor Directory</h1>
               {meta?.total !== undefined && (
-                <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-teal-50 text-teal-800 border border-teal-200">
+                <span className="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-slate-100 text-slate-700 border border-slate-200">
                   {meta.total} Doctors
                 </span>
               )}
             </div>
-            <p className="text-xs text-slate-500 mt-1">
+            <p className="text-xs text-slate-500 font-normal mt-0.5">
               Healthcare professionals mapped to your field territory & visit schedules
             </p>
           </div>
@@ -144,85 +144,92 @@ export default function Doctors({ initialFilters = {} }) {
               type="button"
               onClick={fetchDoctors}
               disabled={loading}
-              className="p-2 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-600 transition-colors cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200/80 bg-white hover:bg-slate-50 text-slate-700 text-xs font-medium transition-colors cursor-pointer"
               title="Refresh directory"
             >
-              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin text-teal-700' : ''}`} />
+              <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin text-slate-900' : 'text-slate-500'}`} />
+              <span>Refresh</span>
             </button>
 
-            <Link href="/mr/doctors/create" className="flex items-center gap-2 px-4 py-2 rounded-xl bg-teal-700 hover:bg-teal-800 text-white font-semibold text-xs transition-colors shadow-xs cursor-pointer"><Plus className="w-4 h-4 stroke-[2.5]" /><span>Add Doctor</span></Link>
+            <Link
+              href="/mr/doctors/create"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-medium text-xs transition-colors cursor-pointer"
+            >
+              <Plus className="w-3.5 h-3.5 stroke-[2]" />
+              <span>Add Doctor</span>
+            </Link>
           </div>
         </div>
 
         {/* Metrics Overview Strip */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-          <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-xs">
+          <div className="bg-white p-5 rounded-2xl border border-slate-200/80 space-y-1">
             <div className="flex items-center justify-between">
               <span className="text-xs font-medium text-slate-500">Total Directory</span>
-              <div className="w-7 h-7 rounded-lg bg-teal-50 text-teal-700 flex items-center justify-center">
-                <UserCheck className="w-4 h-4" />
+              <div className="w-7 h-7 rounded-lg bg-slate-100 text-slate-700 flex items-center justify-center">
+                <UserCheck className="w-3.5 h-3.5" />
               </div>
             </div>
-            <div className="text-2xl font-black text-slate-900 mt-2">
+            <div className="text-2xl font-semibold text-slate-800">
               {meta ? meta.total : '—'}
             </div>
-            <span className="text-[11px] text-teal-700 font-medium">
+            <p className="text-[11px] text-slate-400 font-normal">
               {meta?.active_count ?? 0} active in territory
-            </span>
+            </p>
           </div>
 
-          <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-xs">
+          <div className="bg-white p-5 rounded-2xl border border-slate-200/80 space-y-1">
             <div className="flex items-center justify-between">
               <span className="text-xs font-medium text-slate-500">Core KOLs</span>
-              <div className="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center">
-                <Sparkles className="w-4 h-4" />
+              <div className="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-100 flex items-center justify-center">
+                <Sparkles className="w-3.5 h-3.5" />
               </div>
             </div>
-            <div className="text-2xl font-black text-slate-900 mt-2">
+            <div className="text-2xl font-semibold text-emerald-700">
               {meta ? meta.core_count : '—'}
             </div>
-            <span className="text-[11px] text-emerald-700 font-medium">Top priority prescribers</span>
+            <p className="text-[11px] text-emerald-600 font-medium">Top priority prescribers</p>
           </div>
 
-          <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-xs">
+          <div className="bg-white p-5 rounded-2xl border border-slate-200/80 space-y-1">
             <div className="flex items-center justify-between">
               <span className="text-xs font-medium text-slate-500">Monthly Call Target</span>
-              <div className="w-7 h-7 rounded-lg bg-indigo-50 text-indigo-700 flex items-center justify-center">
-                <Target className="w-4 h-4" />
+              <div className="w-7 h-7 rounded-lg bg-violet-50 text-violet-700 border border-violet-100 flex items-center justify-center">
+                <Target className="w-3.5 h-3.5" />
               </div>
             </div>
-            <div className="text-2xl font-black text-slate-900 mt-2">
+            <div className="text-2xl font-semibold text-violet-700">
               {meta ? meta.total_monthly_target_visits : '—'}
             </div>
-            <span className="text-[11px] text-indigo-700 font-medium">Scheduled field visits</span>
+            <p className="text-[11px] text-slate-400 font-normal">Scheduled field visits</p>
           </div>
 
-          <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-xs">
+          <div className="bg-white p-5 rounded-2xl border border-slate-200/80 space-y-1">
             <div className="flex items-center justify-between">
               <span className="text-xs font-medium text-slate-500">Field Zones</span>
-              <div className="w-7 h-7 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center">
-                <MapPin className="w-4 h-4" />
+              <div className="w-7 h-7 rounded-lg bg-amber-50 text-amber-700 border border-amber-100 flex items-center justify-center">
+                <MapPin className="w-3.5 h-3.5" />
               </div>
             </div>
-            <div className="text-2xl font-black text-slate-900 mt-2">
+            <div className="text-2xl font-semibold text-amber-700">
               {meta ? (meta.territories?.length || 0) : '—'}
             </div>
-            <span className="text-[11px] text-amber-700 font-medium">Assigned territories</span>
+            <p className="text-[11px] text-slate-400 font-normal">Assigned territories</p>
           </div>
         </div>
 
         {/* Filter & Search Bar */}
-        <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs space-y-3">
+        <div className="bg-white p-4 rounded-2xl border border-slate-200/80 space-y-3">
           <div className="flex flex-col md:flex-row items-stretch md:items-center gap-2.5">
             {/* Search Input */}
             <div className="relative flex-1">
-              <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
               <input
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search by doctor name, clinic, territory, or phone..."
-                className="w-full pl-9 pr-8 py-2 bg-slate-50 border border-slate-200 focus:border-teal-600 focus:bg-white rounded-xl text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-600/10 transition-all"
+                className="w-full pl-9 pr-8 py-2 bg-slate-50 border border-slate-200/80 focus:border-slate-900 focus:bg-white rounded-xl text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-900 transition-all"
               />
               {search && (
                 <button
@@ -240,7 +247,7 @@ export default function Doctors({ initialFilters = {} }) {
               <select
                 value={specialization}
                 onChange={(e) => setSpecialization(e.target.value)}
-                className="w-full py-2 px-3 bg-slate-50 border border-slate-200 focus:border-teal-600 focus:bg-white rounded-xl text-xs text-slate-700 focus:outline-none cursor-pointer"
+                className="w-full py-2 px-3 bg-slate-50 border border-slate-200/80 focus:border-slate-900 focus:bg-white rounded-xl text-xs text-slate-700 focus:outline-none focus:ring-1 focus:ring-slate-900 cursor-pointer"
               >
                 <option value="all">All Specialties</option>
                 {SPECIALTY_OPTIONS.map((spec) => (
@@ -254,7 +261,7 @@ export default function Doctors({ initialFilters = {} }) {
               <select
                 value={tier}
                 onChange={(e) => setTier(e.target.value)}
-                className="w-full py-2 px-3 bg-slate-50 border border-slate-200 focus:border-teal-600 focus:bg-white rounded-xl text-xs text-slate-700 focus:outline-none cursor-pointer"
+                className="w-full py-2 px-3 bg-slate-50 border border-slate-200/80 focus:border-slate-900 focus:bg-white rounded-xl text-xs text-slate-700 focus:outline-none focus:ring-1 focus:ring-slate-900 cursor-pointer"
               >
                 <option value="all">All Tiers</option>
                 <option value="core">Core KOL</option>
@@ -265,12 +272,12 @@ export default function Doctors({ initialFilters = {} }) {
             </div>
 
             {/* View Mode Toggle */}
-            <div className="flex items-center gap-1 border border-slate-200 rounded-xl p-0.5 bg-slate-50 self-end md:self-auto">
+            <div className="flex items-center gap-1 border border-slate-200/80 rounded-xl p-0.5 bg-slate-50 self-end md:self-auto">
               <button
                 type="button"
                 onClick={() => setViewMode('grid')}
                 className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
-                  viewMode === 'grid' ? 'bg-white text-teal-700 shadow-xs' : 'text-slate-500 hover:text-slate-800'
+                  viewMode === 'grid' ? 'bg-white text-slate-900 font-semibold shadow-2xs' : 'text-slate-400 hover:text-slate-700'
                 }`}
                 title="Card grid view"
               >
@@ -280,7 +287,7 @@ export default function Doctors({ initialFilters = {} }) {
                 type="button"
                 onClick={() => setViewMode('table')}
                 className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
-                  viewMode === 'table' ? 'bg-white text-teal-700 shadow-xs' : 'text-slate-500 hover:text-slate-800'
+                  viewMode === 'table' ? 'bg-white text-slate-900 font-semibold shadow-2xs' : 'text-slate-400 hover:text-slate-700'
                 }`}
                 title="Table view"
               >
@@ -294,19 +301,19 @@ export default function Doctors({ initialFilters = {} }) {
             <div className="flex items-center gap-2 pt-1 text-[11px] text-slate-500 flex-wrap">
               <span>Active filters:</span>
               {search && (
-                <span className="inline-flex items-center gap-1 bg-teal-50 text-teal-800 px-2 py-0.5 rounded-md font-medium border border-teal-200">
+                <span className="inline-flex items-center gap-1 bg-slate-100 text-slate-700 px-2 py-0.5 rounded-md font-medium border border-slate-200">
                   Search: "{search}"
                   <X className="w-3 h-3 cursor-pointer" onClick={() => setSearch('')} />
                 </span>
               )}
               {specialization !== 'all' && (
-                <span className="inline-flex items-center gap-1 bg-teal-50 text-teal-800 px-2 py-0.5 rounded-md font-medium border border-teal-200">
+                <span className="inline-flex items-center gap-1 bg-slate-100 text-slate-700 px-2 py-0.5 rounded-md font-medium border border-slate-200">
                   {specialization}
                   <X className="w-3 h-3 cursor-pointer" onClick={() => setSpecialization('all')} />
                 </span>
               )}
               {tier !== 'all' && (
-                <span className="inline-flex items-center gap-1 bg-teal-50 text-teal-800 px-2 py-0.5 rounded-md font-medium border border-teal-200">
+                <span className="inline-flex items-center gap-1 bg-slate-100 text-slate-700 px-2 py-0.5 rounded-md font-medium border border-slate-200">
                   Tier: {TIER_CONFIG[tier]?.label || tier}
                   <X className="w-3 h-3 cursor-pointer" onClick={() => setTier('all')} />
                 </span>
@@ -314,7 +321,7 @@ export default function Doctors({ initialFilters = {} }) {
               <button
                 type="button"
                 onClick={handleResetFilters}
-                className="text-teal-700 hover:underline font-semibold ml-1 cursor-pointer"
+                className="text-slate-700 hover:text-slate-900 hover:underline font-semibold ml-1 cursor-pointer"
               >
                 Clear all
               </button>
@@ -354,7 +361,7 @@ export default function Doctors({ initialFilters = {} }) {
           </div>
         ) : doctors.length === 0 ? (
           <div className="bg-white rounded-2xl border border-slate-200/80 p-12 text-center space-y-3">
-            <div className="w-14 h-14 rounded-2xl bg-teal-50 text-teal-700 flex items-center justify-center mx-auto">
+            <div className="w-14 h-14 rounded-2xl bg-slate-100 text-slate-700 flex items-center justify-center mx-auto">
               <Stethoscope className="w-7 h-7 stroke-[1.8]" />
             </div>
             <h3 className="text-base font-bold text-slate-800">No Doctors Found</h3>
@@ -372,7 +379,7 @@ export default function Doctors({ initialFilters = {} }) {
                 Clear Filters
               </button>
             ) : (
-              <Link href="/mr/doctors/create" className="px-4 py-2 rounded-xl bg-teal-700 hover:bg-teal-800 text-white text-xs font-semibold transition-colors cursor-pointer">+ Add First Doctor</Link>
+              <Link href="/mr/doctors/create" className="px-3.5 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-medium transition-colors cursor-pointer">+ Add First Doctor</Link>
             )}
           </div>
         ) : viewMode === 'grid' ? (
@@ -383,28 +390,28 @@ export default function Doctors({ initialFilters = {} }) {
               return (
                 <div
                   key={doc.id}
-                  className="bg-white rounded-2xl border border-slate-200/80 hover:border-teal-300 hover:shadow-md transition-all duration-200 flex flex-col overflow-hidden group"
+                  className="bg-white rounded-2xl border border-slate-200/80 hover:border-slate-300 transition-colors flex flex-col overflow-hidden group"
                 >
                   {/* Card Header */}
                   <div className="p-5 pb-3 space-y-3 flex-1">
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex items-center gap-3 min-w-0">
                         {/* Avatar Initials */}
-                        <div className="w-11 h-11 rounded-xl bg-teal-700 text-white font-bold text-sm flex items-center justify-center shrink-0 shadow-xs">
+                        <div className="w-10 h-10 rounded-xl bg-slate-900 text-white font-semibold text-xs flex items-center justify-center shrink-0">
                           {doc.name.replace('Dr. ', '').charAt(0)}
                         </div>
                         <div className="min-w-0 flex-1">
-                          <h3 className="text-sm font-bold text-slate-900 truncate leading-tight group-hover:text-teal-800 transition-colors">
+                          <h3 className="text-sm font-semibold text-slate-800 truncate leading-tight">
                             {doc.name}
                           </h3>
                           {doc.qualification && (
-                            <p className="text-[11px] text-slate-500 truncate mt-0.5">{doc.qualification}</p>
+                            <p className="text-[11px] text-slate-400 truncate mt-0.5">{doc.qualification}</p>
                           )}
                         </div>
                       </div>
 
                       {/* Tier Badge */}
-                      <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider shrink-0 border ${tierInfo.bg} ${tierInfo.text} ${tierInfo.border}`}>
+                      <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[10px] font-semibold uppercase tracking-wider shrink-0 border ${tierInfo.bg} ${tierInfo.text} ${tierInfo.border}`}>
                         <span className={`w-1.5 h-1.5 rounded-full ${tierInfo.dot}`} />
                         {tierInfo.label}
                       </span>
@@ -412,12 +419,12 @@ export default function Doctors({ initialFilters = {} }) {
 
                     {/* Specialization & Calls Target */}
                     <div className="flex items-center gap-2 pt-1 flex-wrap">
-                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700">
-                        <Stethoscope className="w-3.5 h-3.5 text-teal-700" />
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 text-slate-700">
+                        <Stethoscope className="w-3.5 h-3.5 text-slate-500" />
                         {doc.specialization}
                       </span>
-                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold bg-teal-50/80 text-teal-800">
-                        <Target className="w-3.5 h-3.5 text-teal-600" />
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 text-slate-700">
+                        <Target className="w-3.5 h-3.5 text-violet-600" />
                         {doc.target_frequency_per_month} calls / mo
                       </span>
                     </div>
@@ -426,14 +433,14 @@ export default function Doctors({ initialFilters = {} }) {
                     <div className="space-y-1.5 pt-2 text-xs text-slate-600 border-t border-slate-100">
                       <div className="flex items-start gap-2">
                         <Building2 className="w-3.5 h-3.5 text-slate-400 shrink-0 mt-0.5" />
-                        <span className="font-medium text-slate-800 line-clamp-1">{doc.clinic_hospital_name}</span>
+                        <span className="font-medium text-slate-700 line-clamp-1">{doc.clinic_hospital_name}</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                        <span className="truncate">{doc.territory}{doc.city ? `, ${doc.city}` : ''}</span>
+                        <span className="truncate text-slate-500">{doc.territory}{doc.city ? `, ${doc.city}` : ''}</span>
                       </div>
                       {doc.visiting_hours && (
-                        <div className="flex items-center gap-2 text-[11px] text-slate-500">
+                        <div className="flex items-center gap-2 text-[11px] text-slate-400 font-normal">
                           <Clock className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                           <span className="truncate">{doc.visiting_hours} ({doc.visiting_days || 'Daily'})</span>
                         </div>
@@ -447,10 +454,10 @@ export default function Doctors({ initialFilters = {} }) {
                       {doc.phone && (
                         <a
                           href={`tel:${doc.phone.replace(/\s+/g, '')}`}
-                          className="flex items-center gap-1.5 text-teal-800 hover:text-teal-900 font-semibold"
+                          className="flex items-center gap-1.5 text-slate-700 hover:text-slate-900 font-medium"
                           title="Click to call"
                         >
-                          <Phone className="w-3.5 h-3.5" />
+                          <Phone className="w-3.5 h-3.5 text-sky-600" />
                           <span>{doc.phone}</span>
                         </a>
                       )}
@@ -460,12 +467,12 @@ export default function Doctors({ initialFilters = {} }) {
                       <button
                         type="button"
                         onClick={() => setProfileDoctor(doc)}
-                        className="p-1.5 rounded-lg text-slate-500 hover:text-teal-700 hover:bg-white transition-colors cursor-pointer"
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-white transition-colors cursor-pointer"
                         title="View Full Profile"
                       >
                         <Eye className="w-4 h-4" />
                       </button>
-                      <Link href={`/mr/doctors/${doc.id}/edit`} className="p-1.5 rounded-lg text-slate-500 hover:text-teal-700 hover:bg-white transition-colors cursor-pointer" title="Edit Doctor Details"><Edit2 className="w-4 h-4" /></Link>
+                      <Link href={`/mr/doctors/${doc.id}/edit`} className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-white transition-colors cursor-pointer" title="Edit Doctor Details"><Edit2 className="w-4 h-4" /></Link>
                       <button
                         type="button"
                         onClick={() => setDeleteDoctorId(doc.id)}
@@ -500,7 +507,7 @@ export default function Doctors({ initialFilters = {} }) {
                   {doctors.map((doc) => {
                     const tierInfo = TIER_CONFIG[doc.tier] || TIER_CONFIG.class_a;
                     return (
-                      <tr key={doc.id} className="hover:bg-teal-50/30 transition-colors">
+                      <tr key={doc.id} className="hover:bg-slate-50/60 transition-colors">
                         <td className="py-3.5 px-4 font-bold text-slate-900">
                           <div>{doc.name}</div>
                           {doc.qualification && <div className="text-[10px] text-slate-500 font-normal">{doc.qualification}</div>}
@@ -518,7 +525,7 @@ export default function Doctors({ initialFilters = {} }) {
                             {tierInfo.label}
                           </span>
                         </td>
-                        <td className="py-3.5 px-4 font-semibold text-teal-800">
+                        <td className="py-3.5 px-4 font-semibold text-slate-800">
                           {doc.target_frequency_per_month} / mo
                         </td>
                         <td className="py-3.5 px-4">
@@ -530,12 +537,12 @@ export default function Doctors({ initialFilters = {} }) {
                             <button
                               type="button"
                               onClick={() => setProfileDoctor(doc)}
-                              className="p-1 text-slate-400 hover:text-teal-700 transition-colors cursor-pointer"
+                              className="p-1 text-slate-400 hover:text-slate-900 transition-colors cursor-pointer"
                               title="View"
                             >
                               <Eye className="w-4 h-4" />
                             </button>
-                            <Link href={`/mr/doctors/${doc.id}/edit`} className="p-1 text-slate-400 hover:text-teal-700 transition-colors cursor-pointer" title="Edit"><Edit2 className="w-4 h-4" /></Link>
+                            <Link href={`/mr/doctors/${doc.id}/edit`} className="p-1 text-slate-400 hover:text-slate-900 transition-colors cursor-pointer" title="Edit"><Edit2 className="w-4 h-4" /></Link>
                             <button
                               type="button"
                               onClick={() => setDeleteDoctorId(doc.id)}
@@ -563,7 +570,7 @@ export default function Doctors({ initialFilters = {} }) {
           <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 space-y-4">
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-xl bg-teal-700 text-white font-bold text-base flex items-center justify-center shadow-xs">
+                <div className="w-12 h-12 rounded-xl bg-slate-900 text-white font-bold text-base flex items-center justify-center shadow-xs">
                   {profileDoctor.name.replace('Dr. ', '').charAt(0)}
                 </div>
                 <div>
@@ -583,7 +590,7 @@ export default function Doctors({ initialFilters = {} }) {
             <div className="bg-slate-50 p-3.5 rounded-xl space-y-2 text-xs">
               <div className="flex items-center justify-between">
                 <span className="text-slate-500">Tier / Classification:</span>
-                <span className="font-bold text-teal-800 capitalize">{profileDoctor.tier.replace('_', ' ')}</span>
+                <span className="font-bold text-slate-800 capitalize">{profileDoctor.tier.replace('_', ' ')}</span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-slate-500">Target Field Calls:</span>
@@ -606,8 +613,8 @@ export default function Doctors({ initialFilters = {} }) {
             </div>
 
             {profileDoctor.notes && (
-              <div className="p-3 bg-teal-50/50 rounded-xl border border-teal-100 text-xs">
-                <span className="font-bold text-teal-900 block mb-0.5">Detailing & Prescribing Notes:</span>
+              <div className="p-3 bg-slate-50 rounded-xl border border-slate-200/80 text-xs">
+                <span className="font-bold text-slate-900 block mb-0.5">Detailing & Prescribing Notes:</span>
                 <p className="text-slate-600">{profileDoctor.notes}</p>
               </div>
             )}
@@ -615,13 +622,13 @@ export default function Doctors({ initialFilters = {} }) {
             <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
               <a
                 href={`tel:${profileDoctor.phone.replace(/\s+/g, '')}`}
-                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-teal-700 hover:bg-teal-800 text-white text-xs font-semibold transition-colors"
+                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-medium transition-colors"
               >
                 <Phone className="w-3.5 h-3.5" />
                 <span>Call Doctor</span>
               </a>
 
-              <Link href={`/mr/doctors/${profileDoctor.id}/edit`} className="px-4 py-2 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-semibold transition-colors cursor-pointer">Edit Profile</Link>
+              <Link href={`/mr/doctors/${profileDoctor.id}/edit`} className="px-4 py-2 rounded-xl border border-slate-200/80 hover:bg-slate-50 text-slate-700 text-xs font-medium transition-colors cursor-pointer">Edit Profile</Link>
             </div>
           </div>
         </div>
