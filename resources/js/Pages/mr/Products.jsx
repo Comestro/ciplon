@@ -158,7 +158,7 @@ export default function Products({ initialFilters = {} }) {
                 Product Portfolio & E-Detailing
               </h1>
               {meta?.total !== undefined && (
-                <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-teal-50 text-teal-800 border border-teal-200">
+                <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-800 border border-slate-200/80">
                   {meta.total} Formulations
                 </span>
               )}
@@ -173,26 +173,26 @@ export default function Products({ initialFilters = {} }) {
               type="button"
               onClick={fetchProducts}
               disabled={loading}
-              className="p-2 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-600 transition-colors cursor-pointer"
+              className="p-2 rounded-xl border border-slate-200/80 hover:bg-slate-50 text-slate-600 transition-colors cursor-pointer"
               title="Refresh products catalog"
             >
-              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin text-teal-700' : ''}`} />
+              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin text-slate-900' : ''}`} />
             </button>
 
             <Link
               href="/mr/detailing"
-              className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs transition-colors shadow-xs cursor-pointer"
+              className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold text-xs border border-slate-200/80 transition-colors cursor-pointer"
               title="Launch Doctor E-Detailing Interactive Slide Show"
             >
-              <Presentation className="w-4 h-4 stroke-[2.2]" />
+              <Presentation className="w-4 h-4 stroke-[2]" />
               <span>Doctor E-Detailing</span>
             </Link>
 
             <Link
               href="/mr/visits"
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-teal-700 hover:bg-teal-800 text-white font-semibold text-xs transition-colors shadow-xs cursor-pointer"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-medium text-xs transition-colors shadow-xs cursor-pointer"
             >
-              <Calendar className="w-4 h-4 stroke-[2.2]" />
+              <Calendar className="w-4 h-4 stroke-[2]" />
               <span>Field Visits</span>
             </Link>
           </div>
@@ -209,7 +209,7 @@ export default function Products({ initialFilters = {} }) {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search by brand name, generic molecule, indication, or composition..."
-                className="w-full pl-9 pr-8 py-2 bg-slate-50 border border-slate-200 focus:border-teal-600 focus:bg-white rounded-xl text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-600/10 transition-all"
+                className="w-full pl-9 pr-8 py-2 bg-slate-50/50 border border-slate-200/80 focus:border-slate-900 focus:bg-white rounded-xl text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-900 transition-all"
               />
               {search && (
                 <button
@@ -227,7 +227,7 @@ export default function Products({ initialFilters = {} }) {
               <select
                 value={categoryFilter}
                 onChange={(e) => setCategoryFilter(e.target.value)}
-                className="w-full py-2 px-3 bg-slate-50 border border-slate-200 focus:border-teal-600 focus:bg-white rounded-xl text-xs text-slate-700 focus:outline-none cursor-pointer"
+                className="w-full py-2 px-3 bg-slate-50/50 border border-slate-200/80 focus:border-slate-900 focus:bg-white rounded-xl text-xs text-slate-700 focus:outline-none cursor-pointer"
               >
                 <option value="all">All Therapeutic Segments</option>
                 {meta?.categories?.map((cat) => (
@@ -243,7 +243,7 @@ export default function Products({ initialFilters = {} }) {
               <select
                 value={dosageFilter}
                 onChange={(e) => setDosageFilter(e.target.value)}
-                className="w-full py-2 px-3 bg-slate-50 border border-slate-200 focus:border-teal-600 focus:bg-white rounded-xl text-xs text-slate-700 focus:outline-none cursor-pointer"
+                className="w-full py-2 px-3 bg-slate-50/50 border border-slate-200/80 focus:border-slate-900 focus:bg-white rounded-xl text-xs text-slate-700 focus:outline-none cursor-pointer"
               >
                 <option value="all">All Dosage Forms</option>
                 {meta?.dosage_forms?.map((form) => (
@@ -258,7 +258,7 @@ export default function Products({ initialFilters = {} }) {
                 type="button"
                 onClick={() => setViewMode('grid')}
                 className={`p-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
-                  viewMode === 'grid' ? 'bg-white text-teal-800 shadow-xs' : 'text-slate-500 hover:text-slate-900'
+                  viewMode === 'grid' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-500 hover:text-slate-900'
                 }`}
                 title="Grid presentation cards"
               >
@@ -268,7 +268,7 @@ export default function Products({ initialFilters = {} }) {
                 type="button"
                 onClick={() => setViewMode('list')}
                 className={`p-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
-                  viewMode === 'list' ? 'bg-white text-teal-800 shadow-xs' : 'text-slate-500 hover:text-slate-900'
+                  viewMode === 'list' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-500 hover:text-slate-900'
                 }`}
                 title="List view"
               >
@@ -304,10 +304,10 @@ export default function Products({ initialFilters = {} }) {
           </div>
         ) : products.length === 0 ? (
           <div className="bg-white rounded-2xl border border-slate-200/80 p-12 text-center space-y-3 shadow-xs">
-            <div className="w-14 h-14 rounded-2xl bg-teal-50 text-teal-700 flex items-center justify-center mx-auto">
+            <div className="w-14 h-14 rounded-2xl bg-slate-100 text-slate-700 flex items-center justify-center mx-auto">
               <Pill className="w-7 h-7 stroke-[1.8]" />
             </div>
-            <h3 className="text-base font-bold text-slate-800">No Formulations Found</h3>
+            <h3 className="text-base font-bold text-slate-900">No Formulations Found</h3>
             <p className="text-xs text-slate-500 max-w-sm mx-auto">
               No products match your current search query or therapeutic category filters.
             </p>
@@ -318,7 +318,7 @@ export default function Products({ initialFilters = {} }) {
                 setCategoryFilter('all');
                 setDosageFilter('all');
               }}
-              className="px-4 py-2 rounded-xl bg-teal-700 hover:bg-teal-800 text-white text-xs font-semibold transition-colors cursor-pointer"
+              className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-medium transition-colors cursor-pointer"
             >
               Clear All Filters
             </button>
@@ -331,12 +331,12 @@ export default function Products({ initialFilters = {} }) {
               return (
                 <div
                   key={p.id}
-                  className="bg-white rounded-2xl border border-slate-200/80 hover:border-teal-400 hover:shadow-sm transition-all p-5 flex flex-col justify-between gap-4 group"
+                  className="bg-white rounded-2xl border border-slate-200/80 hover:border-slate-300 hover:shadow-xs transition-all p-5 flex flex-col justify-between gap-4 group"
                 >
                   <div className="space-y-3">
                     {/* Header: Packshot & Badges */}
                     <div className="flex items-start gap-3.5">
-                      <div className="w-20 h-20 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center p-2 shrink-0 overflow-hidden group-hover:scale-105 transition-transform">
+                      <div className="w-20 h-20 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center p-2 shrink-0 overflow-hidden group-hover:scale-102 transition-transform">
                         {primaryImg ? (
                           <img
                             src={primaryImg}
@@ -344,7 +344,7 @@ export default function Products({ initialFilters = {} }) {
                             className="w-full h-full object-contain"
                           />
                         ) : (
-                          <Pill className="w-8 h-8 text-teal-700" />
+                          <Pill className="w-8 h-8 text-slate-400" />
                         )}
                       </div>
 
@@ -355,22 +355,22 @@ export default function Products({ initialFilters = {} }) {
                               {p.category.name}
                             </span>
                           )}
-                          <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold ${
+                          <span className={`px-2 py-0.5 rounded-md text-[10px] font-semibold ${
                             p.prescription_type === 'Rx Only'
-                              ? 'bg-purple-50 text-purple-700 border border-purple-200'
-                              : 'bg-blue-50 text-blue-700 border border-blue-200'
+                              ? 'bg-slate-100 text-slate-800 border border-slate-200/80'
+                              : 'bg-slate-50 text-slate-600 border border-slate-200/60'
                           }`}>
                             {p.prescription_type || 'Rx'}
                           </span>
                         </div>
 
-                        <h3 className="text-sm font-bold text-slate-900 group-hover:text-teal-800 transition-colors truncate">
+                        <h3 className="text-sm font-bold text-slate-900 group-hover:text-slate-700 transition-colors truncate">
                           {p.brand_name}
                         </h3>
                         <p className="text-[11px] text-slate-500 font-medium line-clamp-1">
                           {p.generic_name}
                         </p>
-                        <div className="text-[10px] text-teal-800 font-semibold mt-0.5">
+                        <div className="text-[10px] text-slate-600 font-medium mt-0.5">
                           {p.dosage_form} • {p.strength}
                         </div>
                       </div>
@@ -382,7 +382,7 @@ export default function Products({ initialFilters = {} }) {
                         {p.compositions.map((c) => (
                           <span
                             key={c.id}
-                            className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-medium bg-teal-50 text-teal-800 border border-teal-200/60"
+                            className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-medium bg-slate-50 text-slate-700 border border-slate-200/60"
                           >
                             {c.ingredient_name} ({c.strength} {c.unit})
                           </span>
@@ -404,7 +404,7 @@ export default function Products({ initialFilters = {} }) {
                     <button
                       type="button"
                       onClick={() => handleOpenPresentation(p, 0)}
-                      className="w-full py-2.5 px-4 rounded-xl bg-teal-700 hover:bg-teal-800 text-white text-xs font-bold shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer"
+                      className="w-full py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-medium shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer"
                       title="Open Interactive Visual Aid Carousel"
                     >
                       <Play className="w-3.5 h-3.5 fill-current" />
@@ -431,13 +431,13 @@ export default function Products({ initialFilters = {} }) {
                 </thead>
                 <tbody className="divide-y divide-slate-100 text-xs">
                   {products.map((p) => (
-                    <tr key={p.id} className="hover:bg-teal-50/20 transition-colors">
+                    <tr key={p.id} className="hover:bg-slate-50/60 transition-colors">
                       <td className="py-3 px-4">
                         <div className="font-bold text-slate-900">{p.brand_name}</div>
                         <div className="text-[11px] text-slate-500">{p.generic_name}</div>
                       </td>
                       <td className="py-3 px-4">
-                        <span className="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-slate-100 text-slate-700">
+                        <span className="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-slate-100 text-slate-700 border border-slate-200/60">
                           {p.category?.name || 'General'}
                         </span>
                       </td>
@@ -447,7 +447,7 @@ export default function Products({ initialFilters = {} }) {
                       <td className="py-3 px-4">
                         <div className="flex flex-wrap gap-1 max-w-xs">
                           {p.compositions?.slice(0, 2).map((c) => (
-                            <span key={c.id} className="text-[10px] bg-teal-50 text-teal-800 px-1.5 py-0.5 rounded font-medium">
+                            <span key={c.id} className="text-[10px] bg-slate-100 text-slate-700 px-1.5 py-0.5 rounded font-medium border border-slate-200/60">
                               {c.ingredient_name}
                             </span>
                           ))}
@@ -460,7 +460,7 @@ export default function Products({ initialFilters = {} }) {
                         <button
                           type="button"
                           onClick={() => handleOpenPresentation(p, 0)}
-                          className="px-3.5 py-1.5 rounded-lg bg-teal-700 hover:bg-teal-800 text-white text-xs font-bold shadow-xs cursor-pointer inline-flex items-center gap-1.5"
+                          className="px-3.5 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-medium shadow-xs cursor-pointer inline-flex items-center gap-1.5"
                           title="Open Interactive Visual Aid Carousel"
                         >
                           <Play className="w-3.5 h-3.5 fill-current" />
@@ -507,10 +507,10 @@ export default function Products({ initialFilters = {} }) {
           {/* Top-Left: Floating Slide Counter Badge */}
           {totalSlideCount > 0 && (
             <div className="absolute top-4 left-4 z-50 pointer-events-none">
-              <div className="px-3.5 py-1.5 rounded-full bg-black/65 backdrop-blur-md border border-white/20 text-white text-xs font-bold shadow-2xl flex items-center gap-2">
-                <span className="text-teal-400">{activeSlide + 1} / {totalSlideCount}</span>
+              <div className="px-3.5 py-1.5 rounded-full bg-black/65 backdrop-blur-md border border-white/20 text-white text-xs font-medium shadow-2xl flex items-center gap-2">
+                <span className="text-white font-semibold">{activeSlide + 1} / {totalSlideCount}</span>
                 <span className="text-white/40">•</span>
-                <span className="text-slate-200 max-w-xs truncate">{detailProduct.brand_name}</span>
+                <span className="text-slate-300 max-w-xs truncate">{detailProduct.brand_name}</span>
               </div>
             </div>
           )}
@@ -531,7 +531,7 @@ export default function Products({ initialFilters = {} }) {
           >
             {totalSlideCount === 0 ? (
               <div className="text-center text-white space-y-3 p-8 max-w-md bg-slate-900/90 rounded-3xl border border-white/10 shadow-2xl">
-                <ImageIcon className="w-12 h-12 text-teal-400 mx-auto" />
+                <ImageIcon className="w-12 h-12 text-slate-400 mx-auto" />
                 <h3 className="text-lg font-bold text-white">No Slide Images Uploaded</h3>
                 <p className="text-xs text-slate-400">
                   Please upload slide images in Admin &gt; Visual Aid Carousels.
@@ -539,7 +539,7 @@ export default function Products({ initialFilters = {} }) {
                 <button
                   type="button"
                   onClick={handleClosePresentation}
-                  className="px-5 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold transition-colors cursor-pointer"
+                  className="px-5 py-2 rounded-xl bg-white hover:bg-slate-100 text-slate-900 text-xs font-semibold transition-colors cursor-pointer"
                 >
                   Close
                 </button>
@@ -562,10 +562,10 @@ export default function Products({ initialFilters = {} }) {
                 e.stopPropagation();
                 handlePrevSlide();
               }}
-              className="absolute left-4 top-1/2 -translate-y-1/2 z-40 w-14 h-14 rounded-full bg-black/60 hover:bg-teal-600 text-white/80 hover:text-white backdrop-blur-md border border-white/20 flex items-center justify-center transition-all hover:scale-110 active:scale-95 cursor-pointer shadow-2xl group"
+              className="absolute left-4 top-1/2 -translate-y-1/2 z-40 w-14 h-14 rounded-full bg-black/60 hover:bg-white/20 text-white/80 hover:text-white backdrop-blur-md border border-white/20 flex items-center justify-center transition-all hover:scale-105 active:scale-95 cursor-pointer shadow-2xl group"
               title="Previous Slide (← Left Arrow)"
             >
-              <ChevronLeft className="w-8 h-8 stroke-[2.5] group-hover:-translate-x-0.5 transition-transform" />
+              <ChevronLeft className="w-8 h-8 stroke-[2.2] group-hover:-translate-x-0.5 transition-transform" />
             </button>
           )}
 
@@ -577,10 +577,10 @@ export default function Products({ initialFilters = {} }) {
                 e.stopPropagation();
                 handleNextSlide();
               }}
-              className="absolute right-4 top-1/2 -translate-y-1/2 z-40 w-14 h-14 rounded-full bg-black/60 hover:bg-teal-600 text-white/80 hover:text-white backdrop-blur-md border border-white/20 flex items-center justify-center transition-all hover:scale-110 active:scale-95 cursor-pointer shadow-2xl group"
+              className="absolute right-4 top-1/2 -translate-y-1/2 z-40 w-14 h-14 rounded-full bg-black/60 hover:bg-white/20 text-white/80 hover:text-white backdrop-blur-md border border-white/20 flex items-center justify-center transition-all hover:scale-105 active:scale-95 cursor-pointer shadow-2xl group"
               title="Next Slide (→ Right Arrow or Space)"
             >
-              <ChevronRight className="w-8 h-8 stroke-[2.5] group-hover:translate-x-0.5 transition-transform" />
+              <ChevronRight className="w-8 h-8 stroke-[2.2] group-hover:translate-x-0.5 transition-transform" />
             </button>
           )}
 
@@ -597,7 +597,7 @@ export default function Products({ initialFilters = {} }) {
                   }}
                   className={`transition-all rounded-full cursor-pointer ${
                     activeSlide === idx
-                      ? 'w-6 h-2 bg-teal-400'
+                      ? 'w-6 h-2 bg-white'
                       : 'w-2 h-2 bg-white/40 hover:bg-white/80'
                   }`}
                   title={`Jump to Slide ${idx + 1}`}
