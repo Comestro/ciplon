@@ -264,7 +264,7 @@ export default function Detailing({ products = [], doctors = [], company = {} })
               <select
                 value={selectedDoctorId}
                 onChange={(e) => setSelectedDoctorId(e.target.value)}
-                className="py-2 px-3 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-800 font-medium focus:outline-none cursor-pointer"
+                className="py-2 px-3 bg-slate-50/50 border border-slate-200/80 rounded-xl text-xs text-slate-800 font-medium focus:outline-none focus:ring-1 focus:ring-slate-900 cursor-pointer"
               >
                 <option value="">General Physician</option>
                 {doctors.map((doc) => (
@@ -277,7 +277,7 @@ export default function Detailing({ products = [], doctors = [], company = {} })
               <button
                 type="button"
                 onClick={handleStartPresentation}
-                className="inline-flex items-center justify-center gap-2 px-5 py-2 rounded-lg bg-[#0c2340] hover:bg-[#123055] text-white font-semibold text-xs transition-colors cursor-pointer"
+                className="inline-flex items-center justify-center gap-2 px-5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-medium text-xs shadow-xs transition-colors cursor-pointer"
               >
                 <Play className="w-3.5 h-3.5 fill-white text-white" />
                 <span>Start Slideshow ({totalSlides} Slides)</span>
@@ -759,7 +759,7 @@ export default function Detailing({ products = [], doctors = [], company = {} })
                   <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-4">
                     <Link
                       href="/mr/visits"
-                      className="px-5 py-2.5 rounded-xl bg-[#0c2340] hover:bg-[#123055] text-white font-semibold text-xs transition-colors cursor-pointer"
+                      className="px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-medium text-xs transition-colors cursor-pointer shadow-xs"
                     >
                       Log Field Visit &amp; Samples
                     </Link>
@@ -767,7 +767,7 @@ export default function Detailing({ products = [], doctors = [], company = {} })
                     <button
                       type="button"
                       onClick={() => setCurrentSlideIndex(0)}
-                      className="px-5 py-2.5 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 text-xs font-semibold cursor-pointer"
+                      className="px-5 py-2.5 rounded-xl border border-slate-200/80 text-slate-700 hover:bg-slate-50 text-xs font-medium cursor-pointer"
                     >
                       Restart Slideshow
                     </button>
@@ -784,7 +784,7 @@ export default function Detailing({ products = [], doctors = [], company = {} })
               type="button"
               onClick={goToPrevSlide}
               disabled={currentSlideIndex === 0}
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-50 disabled:opacity-30 disabled:pointer-events-none text-xs font-semibold cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border border-slate-200/80 text-slate-700 hover:bg-slate-50 disabled:opacity-30 disabled:pointer-events-none text-xs font-medium cursor-pointer"
             >
               <ChevronLeft className="w-4 h-4" />
               <span>Previous</span>
@@ -798,7 +798,7 @@ export default function Detailing({ products = [], doctors = [], company = {} })
               type="button"
               onClick={goToNextSlide}
               disabled={currentSlideIndex === totalSlides - 1}
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-[#0c2340] hover:bg-[#123055] text-white disabled:opacity-30 disabled:pointer-events-none text-xs font-semibold cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white disabled:opacity-30 disabled:pointer-events-none text-xs font-medium cursor-pointer shadow-xs"
             >
               <span>Next</span>
               <ChevronRight className="w-4 h-4" />
