@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Doctor;
 use App\Models\MRLocation;
 use App\Models\Setting;
+use App\Models\User;
 use App\Models\Visit;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
@@ -15,16 +16,33 @@ use Inertia\Response;
 
 class MRDashboardController extends Controller
 {
-    // Render the MR Dashboard Inertia view.
-    public function show(): Response
+    // Render the MR Dashboard Inertia view with full initial data
+    public function show(Request $request): Response
     {
-        return Inertia::render('mr/Dashboard');
+        $dashboardData = $this->buildDashboardData($request->user());
+
+        return Inertia::render('mr/Dashboard', [
+            'initialData' => $dashboardData,
+        ]);
     }
 
     // API: Return dashboard statistics and activity feeds for the authenticated MR.
     public function index(Request $request): JsonResponse
     {
-        $userId = $request->user()->id;
+        $dashboardData = $this->buildDashboardData($request->user());
+
+        return response()->json([
+            'success' => true,
+            'data' => $dashboardData,
+        ]);
+    }
+
+    /**
+     * Build comprehensive dashboard dataset strictly for the authenticated MR.
+     */
+    private function buildDashboardData(User $user): array
+    {
+        $userId = $user->id;
         $today = Carbon::today()->toDateString();
 
         // 1. Doctor Metrics
@@ -32,8 +50,12 @@ class MRDashboardController extends Controller
         $totalDoctors = $activeDoctors->count();
         $targetVisits = (int) $activeDoctors->sum('target_frequency_per_month');
 
-        // 2. Visit Metrics via direct SQL queries
-        $todayVisitsRecords = Visit::forUser($userId)->whereDate('visit_date', $today)->with('doctor:id,name,clinic_hospital_name,specialization')->get();
+        // 2. Visit Metrics via direct queries
+        $todayVisitsRecords = Visit::forUser($userId)
+            ->whereDate('visit_date', $today)
+            ->with('doctor:id,name,clinic_hospital_name,specialization')
+            ->get();
+
         $completedToday = $todayVisitsRecords->where('status', 'completed')->count();
         $pendingToday = $todayVisitsRecords->where('status', 'scheduled')->count();
         $totalToday = $todayVisitsRecords->count();
@@ -164,7 +186,7 @@ class MRDashboardController extends Controller
             array_unshift($polylineRoute, [(float) $latestLoc->longitude, (float) $latestLoc->latitude]);
         }
 
-        $dashboardData = [
+        return [
             'mapbox' => $mapbox,
             'doctor_stops' => [
                 'visited' => $visitedStops,
@@ -174,7 +196,7 @@ class MRDashboardController extends Controller
                 'mr_live_location' => $latestLoc ? [
                     'lat' => (float) $latestLoc->latitude,
                     'lng' => (float) $latestLoc->longitude,
-                    'user_name' => $request->user()->name,
+                    'user_name' => $user->name,
                     'last_synced' => $latestLoc->last_synced_at->diffForHumans(),
                 ] : null,
                 'visited_count' => count($visitedStops),
@@ -205,10 +227,5 @@ class MRDashboardController extends Controller
             'upcoming_followups' => $upcomingFollowups,
             'recent_activities' => $recentActivities,
         ];
-
-        return response()->json([
-            'success' => true,
-            'data' => $dashboardData,
-        ]);
     }
 }
