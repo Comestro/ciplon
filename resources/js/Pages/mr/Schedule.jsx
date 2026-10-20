@@ -290,19 +290,19 @@ export default function Schedule({
         {/* Today's Completion & Metrics Bar */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           {/* Main Completion Gauge */}
-          <div className="md:col-span-2 bg-gradient-to-br from-teal-900 via-teal-800 to-slate-900 text-white p-5 rounded-2xl shadow-sm relative overflow-hidden flex flex-col justify-between">
+          <div className="md:col-span-2 bg-slate-900 text-white p-5 rounded-2xl border border-slate-800 relative overflow-hidden flex flex-col justify-between">
             <div className="relative z-10">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-medium text-teal-200 uppercase tracking-wider flex items-center gap-1.5">
-                  <TrendingUp className="w-3.5 h-3.5" /> Today's Execution Rate
+                <span className="text-xs font-medium text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                  <TrendingUp className="w-3.5 h-3.5 text-emerald-400" /> Today's Execution Rate
                 </span>
-                <span className="text-xs font-bold bg-teal-500/20 text-teal-200 px-2 py-0.5 rounded-full border border-teal-400/30">
+                <span className="text-xs font-semibold bg-emerald-500/20 text-emerald-300 px-2.5 py-0.5 rounded-full border border-emerald-500/30">
                   {metrics.today_completed || 0} of {metrics.today_total || 0} Done
                 </span>
               </div>
               <div className="flex items-baseline gap-2">
                 <span className="text-3xl font-extrabold tracking-tight">{metrics.completion_rate || 0}%</span>
-                <span className="text-xs text-teal-200/80 font-normal">
+                <span className="text-xs text-slate-400 font-normal">
                   {metrics.today_pending > 0 
                     ? `${metrics.today_pending} action${metrics.today_pending > 1 ? 's' : ''} remaining today`
                     : (metrics.today_total > 0 ? 'All scheduled items completed! Great work!' : 'No items scheduled for today yet')}
@@ -312,9 +312,9 @@ export default function Schedule({
 
             {/* Progress bar */}
             <div className="relative z-10 mt-4">
-              <div className="w-full h-2.5 bg-white/15 rounded-full overflow-hidden p-0.5">
+              <div className="w-full h-2.5 bg-slate-800 rounded-full overflow-hidden p-0.5 border border-slate-700">
                 <div 
-                  className="h-full bg-gradient-to-r from-teal-300 to-emerald-400 rounded-full transition-all duration-500"
+                  className="h-full bg-emerald-500 rounded-full transition-all duration-500"
                   style={{ width: `${Math.min(100, Math.max(metrics.completion_rate || 0, metrics.today_total === 0 ? 0 : 5))}%` }}
                 />
               </div>

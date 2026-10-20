@@ -206,7 +206,7 @@ export default function MRSidebar({ isOpen, onClose }) {
             href="/mr/dashboard"
             className="flex items-center gap-2.5 px-2 py-1.5 rounded-xl hover:bg-slate-200/60 transition-colors group cursor-pointer"
           >
-            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-violet-600 via-indigo-600 to-purple-700 text-white flex items-center justify-center font-semibold text-xs">
+            <div className="w-7 h-7 rounded-lg bg-slate-900 text-white flex items-center justify-center font-semibold text-xs">
               MR
             </div>
             <div className="flex items-center gap-1.5">
@@ -300,7 +300,7 @@ export default function MRSidebar({ isOpen, onClose }) {
         <div className="p-3 border-t border-slate-100 bg-white">
           <div className="p-2 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-between gap-2">
             <div className="flex items-center gap-2 min-w-0">
-              <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-violet-600 to-indigo-600 text-white font-semibold text-xs flex items-center justify-center shrink-0">
+              <div className="w-7 h-7 rounded-full bg-slate-900 text-white font-semibold text-xs flex items-center justify-center shrink-0">
                 {userName.charAt(0).toUpperCase()}
               </div>
               <div className="min-w-0 flex-1">

@@ -224,7 +224,7 @@ export default function DoctorMovementMap({
         <div class="relative flex items-center justify-center">
           <span class="absolute w-9 h-9 rounded-full bg-violet-500/25 animate-ping"></span>
           <span class="absolute w-6 h-6 rounded-full bg-violet-500/40"></span>
-          <div class="relative w-6 h-6 rounded-lg bg-gradient-to-br from-violet-600 via-indigo-600 to-purple-700 text-white flex items-center justify-center border-2 border-white text-[10px] font-semibold">
+          <div class="relative w-6 h-6 rounded-lg bg-slate-900 text-white flex items-center justify-center border-2 border-white text-[10px] font-semibold">
             MR
           </div>
         </div>

@@ -174,7 +174,7 @@ export default function MRHeader({ onToggleSidebar, title = 'MR Dashboard' }) {
             onClick={() => setDropdownOpen(!dropdownOpen)}
             className="flex items-center gap-2 p-1 pl-1.5 pr-2 rounded-xl hover:bg-slate-100 transition-colors cursor-pointer text-left border border-slate-200/60"
           >
-            <div className="w-6 h-6 rounded-lg bg-gradient-to-tr from-violet-600 to-indigo-600 text-white flex items-center justify-center text-[11px] font-semibold">
+            <div className="w-6 h-6 rounded-lg bg-slate-900 text-white flex items-center justify-center text-[11px] font-semibold">
               {userName.charAt(0).toUpperCase()}
             </div>
 
