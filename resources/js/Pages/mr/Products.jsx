@@ -1,19 +1,5 @@
-import { createPortal } from 'react-dom';
-
-// Helper to render icon for dynamic cards
-const renderDynamicIcon = (iconName, className = 'w-4 h-4') => {
-  switch (iconName) {
-    case 'stethoscope': return <Stethoscope className={className} />;
-    case 'heart-pulse': return <HeartPulse className={className} />;
-    case 'clock': return <Clock className={className} />;
-    case 'alert-circle': return <AlertCircle className={className} />;
-    case 'package': return <Package className={className} />;
-    case 'shield-check': return <ShieldCheck className={className} />;
-    case 'sparkles': return <Sparkles className={className} />;
-    default: return <CheckCircle2 className={className} />;
-  }
-};
 import { useState, useEffect, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import { Link } from '@inertiajs/react';
 import axios from 'axios';
 import {
@@ -51,7 +37,8 @@ import {
   Award,
   HeartPulse,
   Droplets,
-  CheckCheck
+  CheckCheck,
+  Presentation
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import MRLayout from '../../layouts/MR/MRLayout';
