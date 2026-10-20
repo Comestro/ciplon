@@ -15,7 +15,19 @@ import {
   Search,
   ChevronDown,
   Bell,
-  Presentation
+  Presentation,
+  MapPin,
+  Globe,
+  Receipt,
+  Calendar,
+  TrendingUp,
+  Target,
+  Film,
+  Sliders,
+  Handshake,
+  Percent,
+  UserCheck,
+  FileText
 } from 'lucide-react';
 
 export default function AdminSidebar({ isOpen, onClose }) {
@@ -41,6 +53,12 @@ export default function AdminSidebar({ isOpen, onClose }) {
           active: currentPath === '/admin' || currentPath === '/admin/dashboard',
         },
         {
+          name: 'Field Operations & Map',
+          path: '/admin/tracking',
+          icon: MapPin,
+          active: isParentActive('/admin/tracking'),
+        },
+        {
           name: 'Product Formulations',
           path: '/admin/products',
           icon: Package,
@@ -57,6 +75,121 @@ export default function AdminSidebar({ isOpen, onClose }) {
           path: '/admin/category',
           icon: FolderTree,
           active: currentPath === '/admin/category' || currentPath === '/admin/categories',
+        },
+      ],
+    },
+    {
+      title: 'Employee & Field',
+      items: [
+        {
+          name: 'Employee Assign',
+          path: '/mrconnect/employee-assign',
+          icon: Users,
+          active: isParentActive('/mrconnect/employee-assign'),
+        },
+        {
+          name: 'Tour Plan',
+          path: '/mrconnect/tour-plan',
+          icon: Globe,
+          active: isParentActive('/mrconnect/tour-plan'),
+        },
+        {
+          name: 'Field Expenses',
+          path: '/mrconnect/field-expenses',
+          icon: Receipt,
+          active: isParentActive('/mrconnect/field-expenses'),
+        },
+        {
+          name: 'Leave',
+          path: '/mrconnect/leave',
+          icon: Calendar,
+          active: isParentActive('/mrconnect/leave'),
+        },
+      ],
+    },
+    {
+      title: 'Sales & Targets',
+      items: [
+        {
+          name: 'Primary Sales',
+          path: '/mrconnect/primary-sales',
+          icon: TrendingUp,
+          active: isParentActive('/mrconnect/primary-sales'),
+        },
+        {
+          name: 'POB Order',
+          path: '/mrconnect/pob-order',
+          icon: Package,
+          active: isParentActive('/mrconnect/pob-order'),
+        },
+        {
+          name: 'Set Target',
+          path: '/mrconnect/set-target',
+          icon: Target,
+          active: isParentActive('/mrconnect/set-target'),
+        },
+      ],
+    },
+    {
+      title: 'Media & Alert',
+      items: [
+        {
+          name: 'E-Detailing',
+          path: '/mr/detailing',
+          icon: Presentation,
+          active: isParentActive('/mr/detailing'),
+        },
+        {
+          name: 'Video Library',
+          path: '/mrconnect/video-library',
+          icon: Film,
+          active: isParentActive('/mrconnect/video-library'),
+        },
+        {
+          name: 'Slider',
+          path: '/mrconnect/slider',
+          icon: Sliders,
+          active: isParentActive('/mrconnect/slider'),
+        },
+        {
+          name: 'Notice / Announcement',
+          path: '/mrconnect/notice',
+          icon: Bell,
+          active: isParentActive('/mrconnect/notice'),
+        },
+      ],
+    },
+    {
+      title: 'Sponsorship & Schemes',
+      items: [
+        {
+          name: 'Sponsor',
+          path: '/mrconnect/sponsor',
+          icon: Handshake,
+          active: isParentActive('/mrconnect/sponsor'),
+        },
+        {
+          name: 'Scheme',
+          path: '/mrconnect/scheme',
+          icon: Percent,
+          active: isParentActive('/mrconnect/scheme'),
+        },
+      ],
+    },
+    {
+      title: 'HR & Reports',
+      items: [
+        {
+          name: 'HR Directory',
+          path: '/mrconnect/hr-section',
+          icon: UserCheck,
+          active: isParentActive('/mrconnect/hr-section'),
+        },
+        {
+          name: 'All Reports',
+          path: '/mrconnect/all-reports',
+          icon: FileText,
+          active: isParentActive('/mrconnect/all-reports'),
         },
       ],
     },

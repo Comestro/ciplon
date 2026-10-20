@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -43,18 +45,33 @@ class User extends Authenticatable
         return $this->hasRole(['super_admin', 'admin']) || $this->role === 'admin';
     }
 
-    public function doctors(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function doctors(): HasMany
     {
         return $this->hasMany(Doctor::class, 'user_id');
     }
 
-    public function visits(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function visits(): HasMany
     {
         return $this->hasMany(Visit::class, 'user_id');
     }
 
-    public function mrSchedules(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function mrSchedules(): HasMany
     {
         return $this->hasMany(MRSchedule::class);
+    }
+
+    public function locations(): HasMany
+    {
+        return $this->hasMany(MRLocation::class);
+    }
+
+    public function latestLocation(): HasOne
+    {
+        return $this->hasOne(MRLocation::class)->latestOfMany('last_synced_at');
+    }
+
+    public function tourPlans(): HasMany
+    {
+        return $this->hasMany(TourPlan::class);
     }
 }

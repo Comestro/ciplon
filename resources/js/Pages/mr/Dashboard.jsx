@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import MRLayout from '../../layouts/MR/MRLayout';
 import api from '../../services/api';
+import DoctorMovementMap from '../../components/maps/DoctorMovementMap';
 
 export default function Dashboard() {
   const { props } = usePage();
@@ -375,7 +376,19 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* 5. Today's Appointments & Follow-ups */}
+        {/* 5. Doctor Movement Map (Mapbox Route Tracking) */}
+        {dashboardData?.doctor_stops && (
+          <div className="space-y-3">
+            <DoctorMovementMap
+              mapboxConfig={dashboardData.mapbox || {}}
+              doctorStops={dashboardData.doctor_stops}
+              activeMR={null}
+              height="380px"
+            />
+          </div>
+        )}
+
+        {/* 6. Today's Appointments & Follow-ups */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
           {/* Today's Visits */}
           <div className="bg-white rounded-2xl border border-slate-200/80 p-5">

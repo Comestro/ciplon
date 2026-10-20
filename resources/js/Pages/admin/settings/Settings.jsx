@@ -13,7 +13,11 @@ import {
   CheckCircle2, 
   Loader2, 
   FileText,
-  ImageIcon
+  ImageIcon,
+  Navigation,
+  Layers,
+  Crosshair,
+  Key
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import AdminLayout from '../../../layouts/AdminLayout';
@@ -49,6 +53,12 @@ export default function Settings({ grouped = {}, settings: initialSettings = {} 
     website_url: initialSettings.website_url || '',
     linkedin_url: initialSettings.linkedin_url || '',
     twitter_url: initialSettings.twitter_url || '',
+    mapbox_token: initialSettings.mapbox_token || '',
+    mapbox_style: initialSettings.mapbox_style || 'mapbox://styles/mapbox/streets-v12',
+    mapbox_default_lat: initialSettings.mapbox_default_lat || '8.1833',
+    mapbox_default_lng: initialSettings.mapbox_default_lng || '77.4119',
+    mapbox_default_zoom: initialSettings.mapbox_default_zoom || '13',
+    mapbox_tracking_interval: initialSettings.mapbox_tracking_interval || '30',
     ...initialSettings,
     who_gmp_certified: Boolean(initialSettings.who_gmp_certified),
   });
@@ -121,6 +131,7 @@ export default function Settings({ grouped = {}, settings: initialSettings = {} 
     { id: 'contact', label: 'Contact & Hours', icon: PhoneCall },
     { id: 'location', label: 'Locations & Plants', icon: MapPin },
     { id: 'social', label: 'Web & Social', icon: Globe },
+    { id: 'mapbox', label: 'Mapbox SDK & Field Map', icon: Navigation },
   ];
 
   return (
@@ -597,6 +608,164 @@ export default function Settings({ grouped = {}, settings: initialSettings = {} 
                   placeholder="https://x.com/ciplon_pharma"
                   className="w-full px-3.5 py-2 bg-slate-50/50 border border-slate-200 rounded-lg text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all"
                 />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Mapbox SDK & Field Tracking Configuration */}
+        {(activeTab === 'all' || activeTab === 'mapbox') && (
+          <div className="bg-white rounded-xl border border-slate-200 p-6 sm:p-7 space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-700 flex items-center justify-center font-bold text-xs">
+                  <Navigation className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-slate-900">Mapbox SDK & Field Map Configuration</h3>
+                  <p className="text-xs text-slate-500">Configure Mapbox GL vector mapping engine for MR live tracking & route animation.</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                {settings.mapbox_token ? (
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200/60">
+                    <CheckCircle2 className="w-3.5 h-3.5" />
+                    Mapbox Token Configured
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium bg-amber-50 text-amber-700 border border-amber-200/60">
+                    Standard Mapbox Vector Tiles Active
+                  </span>
+                )}
+              </div>
+            </div>
+
+            <div className="bg-slate-50/60 border border-slate-200/70 rounded-lg p-3.5 text-xs text-slate-600 space-y-1">
+              <p className="font-semibold text-slate-800">💡 Mapbox Integration Instructions</p>
+              <p>The Doctor Movement Map and MR live GPS locator uses Mapbox GL SDK. Enter your Mapbox Public Token (starts with <code className="text-indigo-600 bg-white px-1 py-0.5 rounded border border-slate-200">pk.eyJ1...</code>) below. If left empty, high-definition street tiles and route vectors remain fully functional.</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div className="md:col-span-2">
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                  Mapbox Public Access Token (SDK Key)
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                    <Key className="w-3.5 h-3.5" />
+                  </div>
+                  <input
+                    type="text"
+                    value={settings.mapbox_token}
+                    onChange={(e) => handleChange('mapbox_token', e.target.value)}
+                    placeholder="pk.eyJ1IjoieW91ci11c2VybmFtZSIsImEiOiJjb..."
+                    className="w-full pl-9 pr-3.5 py-2 bg-slate-50/50 border border-slate-200 rounded-lg text-xs font-mono text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
+                  />
+                </div>
+                <p className="mt-1 text-[11px] text-slate-400">
+                  You can get your free token from <a href="https://account.mapbox.com/access-tokens/" target="_blank" rel="noreferrer" className="text-indigo-600 hover:underline">mapbox.com/account/access-tokens</a>.
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                  Default Map Style
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                    <Layers className="w-3.5 h-3.5" />
+                  </div>
+                  <select
+                    value={settings.mapbox_style}
+                    onChange={(e) => handleChange('mapbox_style', e.target.value)}
+                    className="w-full pl-9 pr-3.5 py-2 bg-slate-50/50 border border-slate-200 rounded-lg text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all cursor-pointer"
+                  >
+                    <option value="mapbox://styles/mapbox/streets-v12">Mapbox Streets (Recommended)</option>
+                    <option value="mapbox://styles/mapbox/navigation-day-v1">Mapbox Navigation Day</option>
+                    <option value="mapbox://styles/mapbox/light-v11">Mapbox Light Clean</option>
+                    <option value="mapbox://styles/mapbox/outdoors-v12">Mapbox Outdoors Topo</option>
+                    <option value="mapbox://styles/mapbox/dark-v11">Mapbox Dark Mode</option>
+                    <option value="mapbox://styles/mapbox/satellite-streets-v12">Mapbox Satellite Hybrid</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                  MR Live GPS Broadcast Interval (seconds)
+                </label>
+                <input
+                  type="number"
+                  min="5"
+                  max="300"
+                  value={settings.mapbox_tracking_interval}
+                  onChange={(e) => handleChange('mapbox_tracking_interval', e.target.value)}
+                  placeholder="30"
+                  className="w-full px-3.5 py-2 bg-slate-50/50 border border-slate-200 rounded-lg text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
+                />
+              </div>
+
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="block text-xs font-semibold text-slate-700">
+                    Default Center Latitude
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      handleChange('mapbox_default_lat', '8.1833');
+                      handleChange('mapbox_default_lng', '77.4119');
+                    }}
+                    className="text-[11px] text-indigo-600 hover:text-indigo-800 font-medium cursor-pointer"
+                  >
+                    Preset: Nagercoil (TN)
+                  </button>
+                </div>
+                <input
+                  type="text"
+                  value={settings.mapbox_default_lat}
+                  onChange={(e) => handleChange('mapbox_default_lat', e.target.value)}
+                  placeholder="8.1833"
+                  className="w-full px-3.5 py-2 bg-slate-50/50 border border-slate-200 rounded-lg text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                  Default Center Longitude
+                </label>
+                <input
+                  type="text"
+                  value={settings.mapbox_default_lng}
+                  onChange={(e) => handleChange('mapbox_default_lng', e.target.value)}
+                  placeholder="77.4119"
+                  className="w-full px-3.5 py-2 bg-slate-50/50 border border-slate-200 rounded-lg text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                  Default Map Zoom Level (1 - 18)
+                </label>
+                <input
+                  type="number"
+                  min="1"
+                  max="18"
+                  value={settings.mapbox_default_zoom}
+                  onChange={(e) => handleChange('mapbox_default_zoom', e.target.value)}
+                  placeholder="13"
+                  className="w-full px-3.5 py-2 bg-slate-50/50 border border-slate-200 rounded-lg text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
+                />
+              </div>
+
+              <div className="flex items-end">
+                <a
+                  href="/admin/tracking"
+                  className="w-full inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 transition-colors"
+                >
+                  <Crosshair className="w-3.5 h-3.5" />
+                  Open Live Field Tracking Map
+                </a>
               </div>
             </div>
           </div>

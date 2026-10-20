@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link, usePage } from '@inertiajs/react';
-import { Menu, Bell, User, LogOut, ExternalLink, ChevronDown, Sparkles } from 'lucide-react';
+import { Menu, Bell, User, LogOut, ExternalLink, ChevronDown, Sparkles, Navigation, CheckCircle2, Loader2, AlertCircle } from 'lucide-react';
+import toast from 'react-hot-toast';
+import api from '../../services/api';
 
 export default function MRHeader({ onToggleSidebar, title = 'MR Dashboard' }) {
   const { props } = usePage();
@@ -9,7 +11,80 @@ export default function MRHeader({ onToggleSidebar, title = 'MR Dashboard' }) {
   const userEmail = authUser.email || 'mr@ciplon.com';
 
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [gpsStatus, setGpsStatus] = useState('idle'); // idle, syncing, active, error
+  const [lastAccuracy, setLastAccuracy] = useState(null);
   const dropdownRef = useRef(null);
+
+  // Function to capture and broadcast real-time GPS location
+  const syncLiveLocation = async (manual = false) => {
+    if (!navigator.geolocation) {
+      if (manual) toast.error('Geolocation is not supported by your browser.');
+      setGpsStatus('error');
+      return;
+    }
+
+    setGpsStatus('syncing');
+
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        try {
+          const lat = pos.coords.latitude;
+          const lng = pos.coords.longitude;
+          const acc = Math.round(pos.coords.accuracy);
+          const spd = pos.coords.speed || 0;
+
+          let batteryLevel = 85;
+          let batteryStatus = 'discharging';
+          if ('getBattery' in navigator) {
+            try {
+              const b = await navigator.getBattery();
+              batteryLevel = Math.round(b.level * 100);
+              batteryStatus = b.charging ? 'charging' : 'discharging';
+            } catch (e) {
+              // Ignore battery error
+            }
+          }
+
+          await api.post('/api/v1/mr/location', {
+            latitude: lat,
+            longitude: lng,
+            accuracy: acc,
+            speed: spd,
+            battery_level: batteryLevel,
+            battery_status: batteryStatus,
+            current_activity: spd > 3 ? 'travelling' : 'in_field',
+          });
+
+          setGpsStatus('active');
+          setLastAccuracy(acc);
+          if (manual) toast.success(`GPS Location Synced (~${acc}m accuracy)`);
+        } catch (err) {
+          setGpsStatus('error');
+          if (manual) toast.error('Failed to sync GPS with admin.');
+        }
+      },
+      (err) => {
+        setGpsStatus('error');
+        if (manual) {
+          if (err.code === 1) toast.error('Location permission denied. Please allow location in browser.');
+          else toast.error('Unable to retrieve GPS position.');
+        }
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+    );
+  };
+
+  useEffect(() => {
+    // Initial sync
+    syncLiveLocation(false);
+
+    // Periodic sync every 45 seconds
+    const interval = setInterval(() => {
+      syncLiveLocation(false);
+    }, 45000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -42,7 +117,40 @@ export default function MRHeader({ onToggleSidebar, title = 'MR Dashboard' }) {
       </div>
 
       {/* Right Section */}
-      <div className="flex items-center gap-2.5">
+      <div className="flex items-center gap-2 sm:gap-2.5">
+        {/* Live GPS Broadcast Pill */}
+        <button
+          type="button"
+          onClick={() => syncLiveLocation(true)}
+          title="Click to sync current GPS coordinates with admin"
+          className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-[11px] font-medium transition-all cursor-pointer ${
+            gpsStatus === 'active'
+              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200/60 hover:bg-emerald-100'
+              : gpsStatus === 'syncing'
+              ? 'bg-sky-50 text-sky-700 border border-sky-200/60'
+              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+          }`}
+        >
+          {gpsStatus === 'syncing' ? (
+            <Loader2 className="w-3 h-3 animate-spin text-sky-600" />
+          ) : gpsStatus === 'active' ? (
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+            </span>
+          ) : (
+            <Navigation className="w-3 h-3 text-slate-500" />
+          )}
+          <span className="hidden md:inline">
+            {gpsStatus === 'active'
+              ? `GPS Live (~${lastAccuracy || 10}m)`
+              : gpsStatus === 'syncing'
+              ? 'Syncing GPS...'
+              : 'Sync GPS'}
+          </span>
+          <span className="md:hidden">GPS</span>
+        </button>
+
         <Link
           href="/mr/detailing"
           className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium bg-violet-50 text-violet-700 hover:bg-violet-100 border border-violet-200/60 transition-colors"

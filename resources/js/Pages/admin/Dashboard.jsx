@@ -13,7 +13,9 @@ import {
   Presentation,
   ShieldCheck,
   CheckCircle2,
-  Play
+  Play,
+  MapPin,
+  Navigation
 } from 'lucide-react';
 import AdminLayout from '../../layouts/AdminLayout';
 
@@ -118,9 +120,28 @@ export default function Dashboard({ stats = {}, recentProducts = [], recentEnqui
             </Link>
           </div>
 
-          {/* 3 Quick Action Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            {/* Card 1: Add Formulation */}
+          {/* Quick Action Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+            {/* Card 1: Field Operations & Live Tracking */}
+            <Link
+              href="/admin/tracking"
+              className="group p-3.5 rounded-2xl bg-white border border-sky-200 hover:border-sky-400 transition-colors flex items-center gap-3 cursor-pointer"
+            >
+              <div className="w-9 h-9 rounded-xl bg-sky-50 text-sky-600 border border-sky-100 flex items-center justify-center shrink-0 group-hover:bg-sky-600 group-hover:text-white transition-colors">
+                <Navigation className="w-4 h-4" />
+              </div>
+              <div className="min-w-0">
+                <span className="text-xs font-semibold text-slate-800 group-hover:text-sky-700 transition-colors block truncate">
+                  Field Operations
+                </span>
+                <span className="text-[10px] text-emerald-600 font-medium flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                  Live GPS Map
+                </span>
+              </div>
+            </Link>
+
+            {/* Card 2: Add Formulation */}
             <Link
               href="/admin/products/add"
               className="group p-3.5 rounded-2xl bg-white border border-slate-200 hover:border-violet-400 transition-colors flex items-center gap-3 cursor-pointer"
@@ -133,7 +154,7 @@ export default function Dashboard({ stats = {}, recentProducts = [], recentEnqui
               </span>
             </Link>
 
-            {/* Card 2: Visual Aids */}
+            {/* Card 3: Visual Aids */}
             <Link
               href="/admin/products"
               className="group p-3.5 rounded-2xl bg-white border border-slate-200 hover:border-purple-400 transition-colors flex items-center gap-3 cursor-pointer"
@@ -146,7 +167,7 @@ export default function Dashboard({ stats = {}, recentProducts = [], recentEnqui
               </span>
             </Link>
 
-            {/* Card 3: Inquiries */}
+            {/* Card 4: Inquiries */}
             <Link
               href="/admin/enquiries"
               className="group p-3.5 rounded-2xl bg-white border border-slate-200 hover:border-amber-400 transition-colors flex items-center gap-3 cursor-pointer"

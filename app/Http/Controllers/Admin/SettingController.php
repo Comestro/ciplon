@@ -129,6 +129,9 @@ class SettingController extends Controller
         if (str_contains($key, 'url') || str_contains($key, 'linkedin') || str_contains($key, 'twitter') || str_contains($key, 'facebook')) {
             return 'social';
         }
+        if (str_starts_with($key, 'mapbox') || str_contains($key, 'map_')) {
+            return 'mapbox';
+        }
 
         return 'general';
     }
@@ -142,7 +145,7 @@ class SettingController extends Controller
         if (is_array($val)) {
             return 'json';
         }
-        if (is_int($val)) {
+        if (is_int($val) || (is_string($val) && ctype_digit($val) && strlen($val) < 10 && ! str_starts_with($val, '0'))) {
             return 'integer';
         }
 

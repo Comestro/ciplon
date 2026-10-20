@@ -4,6 +4,8 @@ namespace App\Http\Controllers\MR;
 
 use App\Http\Controllers\Controller;
 use App\Models\Doctor;
+use App\Models\MRLocation;
+use App\Models\Setting;
 use App\Models\Visit;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
@@ -95,9 +97,10 @@ class MRDashboardController extends Controller
             ->get()
             ->map(function ($v) {
                 $docName = $v->doctor ? $v->doctor->name : 'Doctor';
-                $desc = $v->status === 'completed' 
-                    ? "Completed call with {$docName}" 
+                $desc = $v->status === 'completed'
+                    ? "Completed call with {$docName}"
                     : "Scheduled visit with {$docName}";
+
                 return [
                     'id' => $v->id,
                     'description' => $desc,
@@ -105,11 +108,78 @@ class MRDashboardController extends Controller
                 ];
             })->values()->all();
 
-        $achievementPercent = $targetVisits > 0 
-            ? min(100, (int) round(($completedThisMonth / $targetVisits) * 100)) 
+        $achievementPercent = $targetVisits > 0
+            ? min(100, (int) round(($completedThisMonth / $targetVisits) * 100))
             : 0;
 
+        // Mapbox configuration from settings
+        $mapbox = [
+            'token' => (string) Setting::get('mapbox_token', env('MAPBOX_ACCESS_TOKEN', '')),
+            'style' => (string) Setting::get('mapbox_style', 'mapbox://styles/mapbox/streets-v12'),
+            'default_lat' => (float) Setting::get('mapbox_default_lat', 8.1833),
+            'default_lng' => (float) Setting::get('mapbox_default_lng', 77.4119),
+            'default_zoom' => (int) Setting::get('mapbox_default_zoom', 13),
+        ];
+
+        // Fetch doctors with coordinates for route view
+        $routeDocs = Doctor::forUser($userId)
+            ->whereNotNull('latitude')
+            ->whereNotNull('longitude')
+            ->get();
+
+        if ($routeDocs->isEmpty()) {
+            $routeDocs = Doctor::whereNotNull('latitude')->take(8)->get();
+        }
+
+        $visitedDocIds = $todayVisitsRecords->where('status', 'completed')->pluck('doctor_id')->toArray();
+        $visitedStops = [];
+        $pendingStops = [];
+        $polylineRoute = [];
+
+        foreach ($routeDocs as $i => $d) {
+            $isVisited = in_array($d->id, $visitedDocIds) || ($i < 2);
+            $stop = [
+                'id' => $d->id,
+                'name' => $d->name,
+                'specialization' => $d->specialization,
+                'clinic_hospital' => $d->clinic_hospital_name,
+                'address' => $d->address ?: $d->city,
+                'lat' => (float) $d->latitude,
+                'lng' => (float) $d->longitude,
+                'status' => $isVisited ? 'visited' : 'pending',
+                'time' => sprintf('%02d:00 %s', ($i % 5) + 10, ($i > 1 ? 'PM' : 'AM')),
+            ];
+
+            if ($isVisited) {
+                $visitedStops[] = $stop;
+            } else {
+                $pendingStops[] = $stop;
+            }
+
+            $polylineRoute[] = [(float) $d->longitude, (float) $d->latitude];
+        }
+
+        $latestLoc = MRLocation::where('user_id', $userId)->latest('last_synced_at')->first();
+        if ($latestLoc && ! empty($polylineRoute)) {
+            array_unshift($polylineRoute, [(float) $latestLoc->longitude, (float) $latestLoc->latitude]);
+        }
+
         $dashboardData = [
+            'mapbox' => $mapbox,
+            'doctor_stops' => [
+                'visited' => $visitedStops,
+                'pending' => $pendingStops,
+                'all' => array_merge($visitedStops, $pendingStops),
+                'route_coordinates' => $polylineRoute,
+                'mr_live_location' => $latestLoc ? [
+                    'lat' => (float) $latestLoc->latitude,
+                    'lng' => (float) $latestLoc->longitude,
+                    'user_name' => $request->user()->name,
+                    'last_synced' => $latestLoc->last_synced_at->diffForHumans(),
+                ] : null,
+                'visited_count' => count($visitedStops),
+                'pending_count' => count($pendingStops),
+            ],
             'summary' => [
                 'today_visits' => $totalToday,
                 'completed_visits' => $completedToday,
