@@ -587,10 +587,20 @@ class MRConnectController extends Controller
 
     /**
      * 13. HR SECTION
+     * MR only sees their own employee profile and official HR desk coordinates.
+     * Admin sees all employees.
      */
-    public function hrSection(): Response
+    public function hrSection(Request $request): Response
     {
-        $employees = User::all()->map(function ($u, $idx) {
+        $user = $request->user();
+        $isAdmin = $user->isAdmin();
+
+        $query = User::query();
+        if (! $isAdmin) {
+            $query->where('id', $user->id);
+        }
+
+        $employees = $query->get()->map(function ($u) {
             return [
                 'id' => $u->id,
                 'name' => $u->name,
@@ -605,6 +615,7 @@ class MRConnectController extends Controller
 
         return Inertia::render('mrconnect/HRSection', [
             'employees' => $employees,
+            'isAdmin' => $isAdmin,
         ]);
     }
 

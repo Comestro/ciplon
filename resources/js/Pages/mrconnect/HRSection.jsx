@@ -15,17 +15,19 @@ export default function HRSection({ employees = [] }) {
   const Layout = isAdmin ? AdminLayout : MRLayout;
 
   return (
-    <Layout title="HR Directory & Records">
+    <Layout title={isAdmin ? "HR Directory & Records" : "My HR & Employment Profile"}>
       <div className="space-y-6 pb-12 font-sans max-w-[1400px] mx-auto">
         
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-200/80">
           <div>
             <h2 className="text-xl sm:text-2xl font-semibold tracking-tight text-slate-800">
-              Human Resources Directory
+              {isAdmin ? "Human Resources Directory" : "My HR & Employment Profile"}
             </h2>
             <p className="text-xs text-slate-500 font-normal mt-0.5">
-              Official company personnel records, departments, and communication coordinates.
+              {isAdmin
+                ? "Official company personnel records, departments, and communication coordinates."
+                : "Your official company employment record, registration code, and department designation."}
             </p>
           </div>
         </div>
@@ -33,8 +35,12 @@ export default function HRSection({ employees = [] }) {
         {/* Directory Table */}
         <div className="bg-white rounded-2xl border border-slate-200/80 overflow-hidden">
           <div className="px-5 py-3.5 border-b border-slate-100 flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-slate-800">Employee Master</h3>
-            <span className="text-xs text-slate-400">{employees.length} employees</span>
+            <h3 className="text-sm font-semibold text-slate-800">
+              {isAdmin ? "Employee Master" : "Personal Employment Details"}
+            </h3>
+            <span className="text-xs text-slate-400">
+              {isAdmin ? `${employees.length} employees` : "Verified Official Record"}
+            </span>
           </div>
 
           <div className="overflow-x-auto">
