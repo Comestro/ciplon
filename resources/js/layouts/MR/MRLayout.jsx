@@ -24,7 +24,7 @@ export default function MRLayout({ children, title = 'MR Dashboard' }) {
   ];
 
   return (
-    <div className="min-h-screen bg-[#f8f9fc] flex antialiased text-slate-800">
+    <div className="min-h-screen bg-[#f8f9fc] flex antialiased text-slate-800 font-sans">
       <MRSidebar 
         isOpen={sidebarOpen} 
         onClose={() => setSidebarOpen(false)} 
@@ -49,13 +49,13 @@ export default function MRLayout({ children, title = 'MR Dashboard' }) {
             <Link
               key={item.label}
               href={item.href}
-              className={`flex flex-col items-center justify-center py-1 px-3 rounded-xl text-[10px] font-semibold transition-colors ${
+              className={`flex flex-col items-center justify-center py-1 px-3 rounded-xl text-[10px] font-medium transition-colors ${
                 item.active 
-                  ? 'text-violet-700 font-bold' 
+                  ? 'text-violet-700 font-semibold' 
                   : 'text-slate-400 hover:text-slate-700'
               }`}
             >
-              <Icon className={`w-5 h-5 mb-0.5 ${item.active ? 'text-violet-700 stroke-[2.3]' : 'text-slate-400'}`} />
+              <Icon className={`w-5 h-5 mb-0.5 ${item.active ? 'text-violet-700 stroke-[2]' : 'text-slate-400'}`} />
               <span>{item.label}</span>
             </Link>
           );

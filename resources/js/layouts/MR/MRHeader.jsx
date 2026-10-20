@@ -35,7 +35,7 @@ export default function MRHeader({ onToggleSidebar, title = 'MR Dashboard' }) {
         </button>
 
         <div className="flex items-center gap-2">
-          <h1 className="text-sm sm:text-base font-bold text-slate-900 tracking-tight truncate">
+          <h1 className="text-sm sm:text-base font-semibold text-slate-800 tracking-tight truncate">
             {title}
           </h1>
         </div>
@@ -45,7 +45,7 @@ export default function MRHeader({ onToggleSidebar, title = 'MR Dashboard' }) {
       <div className="flex items-center gap-2.5">
         <Link
           href="/mr/detailing"
-          className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-violet-50 text-violet-700 hover:bg-violet-100 border border-violet-200/60 transition-colors"
+          className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium bg-violet-50 text-violet-700 hover:bg-violet-100 border border-violet-200/60 transition-colors"
         >
           <Sparkles className="w-3.5 h-3.5" />
           <span>E-Detailing</span>
@@ -53,7 +53,7 @@ export default function MRHeader({ onToggleSidebar, title = 'MR Dashboard' }) {
 
         <Link
           href="/"
-          className="hidden md:inline-flex items-center gap-1 text-xs font-medium text-slate-500 hover:text-slate-900 px-2.5 py-1.5 rounded-lg hover:bg-slate-100 transition-colors"
+          className="hidden md:inline-flex items-center gap-1 text-xs font-normal text-slate-500 hover:text-slate-800 px-2.5 py-1.5 rounded-lg hover:bg-slate-100 transition-colors"
         >
           <span>Website</span>
           <ExternalLink className="w-3 h-3 text-slate-400" />
@@ -66,11 +66,11 @@ export default function MRHeader({ onToggleSidebar, title = 'MR Dashboard' }) {
             onClick={() => setDropdownOpen(!dropdownOpen)}
             className="flex items-center gap-2 p-1 pl-1.5 pr-2 rounded-xl hover:bg-slate-100 transition-colors cursor-pointer text-left border border-slate-200/60"
           >
-            <div className="w-6 h-6 rounded-lg bg-gradient-to-tr from-violet-600 to-indigo-600 text-white flex items-center justify-center text-[11px] font-bold">
+            <div className="w-6 h-6 rounded-lg bg-gradient-to-tr from-violet-600 to-indigo-600 text-white flex items-center justify-center text-[11px] font-semibold">
               {userName.charAt(0).toUpperCase()}
             </div>
 
-            <span className="hidden sm:inline-block text-xs font-bold text-slate-800 truncate max-w-[120px]">
+            <span className="hidden sm:inline-block text-xs font-medium text-slate-700 truncate max-w-[120px]">
               {userName}
             </span>
 
@@ -78,11 +78,11 @@ export default function MRHeader({ onToggleSidebar, title = 'MR Dashboard' }) {
           </button>
 
           {dropdownOpen && (
-            <div className="absolute right-0 mt-2 w-52 bg-white rounded-2xl border border-slate-200 shadow-xl py-1.5 z-50 text-xs">
+            <div className="absolute right-0 mt-2 w-52 bg-white rounded-2xl border border-slate-200 shadow-xl py-1.5 z-50 text-xs font-normal">
               <div className="px-3.5 py-2.5 border-b border-slate-100">
-                <span className="block font-bold text-slate-900 truncate">{userName}</span>
-                <span className="block text-[11px] text-slate-400 truncate">{userEmail}</span>
-                <span className="inline-block text-[10px] font-semibold text-violet-700 bg-violet-50 px-2 py-0.5 rounded-full mt-1.5">
+                <span className="block font-semibold text-slate-800 truncate">{userName}</span>
+                <span className="block text-[11px] text-slate-400 truncate font-light">{userEmail}</span>
+                <span className="inline-block text-[10px] font-medium text-violet-700 bg-violet-50 px-2 py-0.5 rounded-full mt-1.5">
                   Field Representative
                 </span>
               </div>

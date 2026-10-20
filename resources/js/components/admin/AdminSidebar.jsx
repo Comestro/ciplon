@@ -114,11 +114,11 @@ export default function AdminSidebar({ isOpen, onClose }) {
             href="/admin"
             className="flex items-center gap-2.5 px-2 py-1.5 rounded-xl hover:bg-slate-200/60 transition-colors group cursor-pointer"
           >
-            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-violet-600 via-indigo-600 to-purple-700 text-white flex items-center justify-center font-bold text-xs shadow-xs">
+            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-violet-600 via-indigo-600 to-purple-700 text-white flex items-center justify-center font-semibold text-xs">
               CA
             </div>
             <div className="flex items-center gap-1.5">
-              <span className="text-xs font-bold text-slate-900 tracking-tight">Ciplon Admin</span>
+              <span className="text-xs font-semibold text-slate-800 tracking-tight">Ciplon Admin</span>
               <ChevronDown className="w-3.5 h-3.5 text-slate-400 group-hover:text-slate-700 transition-colors" />
             </div>
           </Link>
@@ -153,9 +153,9 @@ export default function AdminSidebar({ isOpen, onClose }) {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search & commands"
-              className="w-full bg-slate-200/60 hover:bg-slate-200/80 focus:bg-white border border-transparent focus:border-slate-300 rounded-xl pl-8 pr-8 py-1.5 text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none transition-all"
+              className="w-full bg-slate-200/60 hover:bg-slate-200/80 focus:bg-white border border-transparent focus:border-slate-300 rounded-xl pl-8 pr-8 py-1.5 text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none transition-all font-normal"
             />
-            <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] font-mono text-slate-400 bg-white border border-slate-200 px-1 py-0.2 rounded shadow-2xs">
+            <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] font-mono text-slate-400 bg-white border border-slate-200 px-1 py-0.2 rounded">
               ⌘K
             </span>
           </div>
@@ -172,7 +172,7 @@ export default function AdminSidebar({ isOpen, onClose }) {
 
             return (
               <div key={section.title}>
-                <div className="px-2.5 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                <div className="px-2.5 pb-1.5 text-[10px] font-medium uppercase tracking-wider text-slate-400">
                   {section.title}
                 </div>
                 <div className="space-y-0.5">
@@ -187,13 +187,13 @@ export default function AdminSidebar({ isOpen, onClose }) {
                             onClose();
                           }
                         }}
-                        className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                        className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium transition-all cursor-pointer ${
                           item.active
-                            ? 'bg-slate-900 text-white shadow-xs'
+                            ? 'bg-slate-900 text-white font-medium'
                             : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/50'
                         }`}
                       >
-                        <Icon className={`w-4 h-4 ${item.active ? 'text-violet-400 stroke-[2.2]' : 'text-slate-400'}`} />
+                        <Icon className={`w-4 h-4 ${item.active ? 'text-violet-400 stroke-[2]' : 'text-slate-400'}`} />
                         <span className="flex-1 truncate">{item.name}</span>
                       </Link>
                     );
@@ -208,12 +208,12 @@ export default function AdminSidebar({ isOpen, onClose }) {
         <div className="p-3 border-t border-slate-100 bg-white">
           <div className="p-2 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-between gap-2">
             <div className="flex items-center gap-2 min-w-0">
-              <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-violet-600 to-indigo-600 text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-2xs">
+              <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-violet-600 to-indigo-600 text-white font-semibold text-xs flex items-center justify-center shrink-0">
                 {adminName.charAt(0).toUpperCase()}
               </div>
               <div className="min-w-0 flex-1">
-                <span className="block text-xs font-bold text-slate-900 truncate leading-tight">{adminName}</span>
-                <span className="block text-[10px] text-slate-400 font-medium truncate">System Admin</span>
+                <span className="block text-xs font-semibold text-slate-800 truncate leading-tight">{adminName}</span>
+                <span className="block text-[10px] text-slate-400 font-normal truncate">System Admin</span>
               </div>
             </div>
 

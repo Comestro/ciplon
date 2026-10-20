@@ -527,33 +527,30 @@ export default function Detailing({ products = [], doctors = [], company = {} })
                     />
                   </div>
 
-                  <div className="space-y-2 max-w-2xl mx-auto">
-                    <h1 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight">
+                  <div className="space-y-1.5 max-w-xl mx-auto">
+                    <h1 className="text-2xl sm:text-4xl font-semibold text-slate-800 tracking-tight">
                       {company?.name || 'Ciplon Pharma Private Limited'}
                     </h1>
-                    <p className="text-base sm:text-lg font-bold text-slate-700">
+                    <p className="text-sm font-medium text-slate-600">
                       Science Into Smiles
-                    </p>
-                    <p className="text-sm text-slate-600 leading-relaxed pt-1">
-                      Dedicated to precision pharmaceutical formulations, certified chemical purity, and trusted healthcare partnerships across India.
                     </p>
                   </div>
 
                   {/* 3 Spacious Flat Trust Badges */}
-                  <div className="grid grid-cols-3 gap-4 max-w-2xl mx-auto pt-4">
-                    <div className="p-4 rounded-2xl border border-slate-200 bg-slate-50 text-center">
-                      <span className="text-base sm:text-xl font-bold text-slate-900 block">ISO 9001:2015</span>
-                      <span className="text-xs text-slate-500 block mt-0.5">Certified QMS</span>
+                  <div className="grid grid-cols-3 gap-3.5 max-w-lg mx-auto pt-3">
+                    <div className="p-3.5 rounded-2xl border border-slate-200 bg-slate-50 text-center">
+                      <span className="text-sm sm:text-base font-semibold text-slate-800 block">ISO 9001:2015</span>
+                      <span className="text-[11px] text-slate-400 block mt-0.5">Certified QMS</span>
                     </div>
 
-                    <div className="p-4 rounded-2xl border border-slate-200 bg-slate-50 text-center">
-                      <span className="text-base sm:text-xl font-bold text-slate-900 block">WHO-GMP</span>
-                      <span className="text-xs text-slate-500 block mt-0.5">Cleanrooms</span>
+                    <div className="p-3.5 rounded-2xl border border-slate-200 bg-slate-50 text-center">
+                      <span className="text-sm sm:text-base font-semibold text-slate-800 block">WHO-GMP</span>
+                      <span className="text-[11px] text-slate-400 block mt-0.5">Cleanrooms</span>
                     </div>
 
-                    <div className="p-4 rounded-2xl border border-slate-200 bg-slate-50 text-center">
-                      <span className="text-base sm:text-xl font-bold text-slate-900 block">FSSAI</span>
-                      <span className="text-xs text-slate-500 block mt-0.5">Lic. 10426340000172</span>
+                    <div className="p-3.5 rounded-2xl border border-slate-200 bg-slate-50 text-center">
+                      <span className="text-sm sm:text-base font-semibold text-slate-800 block">FSSAI</span>
+                      <span className="text-[11px] text-slate-400 block mt-0.5">Licensed</span>
                     </div>
                   </div>
                 </div>
@@ -563,58 +560,55 @@ export default function Detailing({ products = [], doctors = [], company = {} })
               {/* SLIDE 2: MANUFACTURING (Full Screen Width 4 Clean Points)     */}
               {/* ------------------------------------------------------------- */}
               {slides[currentSlideIndex].type === 'manufacturing_competitors' && (
-                <div className="border border-slate-200 rounded-3xl p-8 sm:p-12 space-y-8">
-                  <div className="text-center space-y-2 max-w-2xl mx-auto">
-                    <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-slate-100 text-slate-700 border border-slate-200 inline-block">
+                <div className="border border-slate-200 rounded-3xl p-6 sm:p-10 space-y-6">
+                  <div className="text-center space-y-1.5 max-w-xl mx-auto">
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-medium uppercase tracking-wider bg-slate-100 text-slate-600 border border-slate-200 inline-block">
                       Manufacturing Excellence
                     </span>
-                    <h2 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">
+                    <h2 className="text-xl sm:text-3xl font-semibold text-slate-800 tracking-tight">
                       Why Prescribe Ciplon Formulations?
                     </h2>
-                    <p className="text-sm text-slate-600">
-                      Manufactured at Walpar Wellness WHO-GMP Certified Facility (Gandhinagar)
-                    </p>
                   </div>
 
                   {/* 4 Spacious Cards */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-2">
-                    <div className="p-5 rounded-2xl border border-slate-200 bg-slate-50 space-y-2">
-                      <div className="w-10 h-10 rounded-xl bg-slate-100 text-slate-800 flex items-center justify-center font-bold">
-                        <FlaskConical className="w-5 h-5" />
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 pt-2">
+                    <div className="p-4 rounded-2xl border border-slate-200 bg-slate-50 space-y-1.5">
+                      <div className="w-8 h-8 rounded-lg bg-slate-100 text-slate-700 flex items-center justify-center font-semibold">
+                        <FlaskConical className="w-4 h-4" />
                       </div>
-                      <h4 className="text-base font-bold text-slate-900">Higher Bioavailability</h4>
-                      <p className="text-xs text-slate-600 leading-relaxed">
-                        Micronized active particles ensure rapid dissolution, absorption, and quicker clinical onset.
+                      <h4 className="text-sm font-semibold text-slate-800">Higher Bioavailability</h4>
+                      <p className="text-xs text-slate-500 font-light leading-relaxed">
+                        Micronized active particles ensure rapid dissolution and quicker clinical onset.
                       </p>
                     </div>
 
-                    <div className="p-5 rounded-2xl border border-slate-200 bg-slate-50 space-y-2">
-                      <div className="w-10 h-10 rounded-xl bg-slate-100 text-slate-800 flex items-center justify-center font-bold">
-                        <ShieldCheck className="w-5 h-5" />
+                    <div className="p-4 rounded-2xl border border-slate-200 bg-slate-50 space-y-1.5">
+                      <div className="w-8 h-8 rounded-lg bg-slate-100 text-slate-700 flex items-center justify-center font-semibold">
+                        <ShieldCheck className="w-4 h-4" />
                       </div>
-                      <h4 className="text-base font-bold text-slate-900">100% HPLC Purity</h4>
-                      <p className="text-xs text-slate-600 leading-relaxed">
-                        Every commercial batch is tested via liquid chromatography for exact potency without impurities.
+                      <h4 className="text-sm font-semibold text-slate-800">100% HPLC Purity</h4>
+                      <p className="text-xs text-slate-500 font-light leading-relaxed">
+                        Every commercial batch is liquid chromatography tested for exact potency.
                       </p>
                     </div>
 
-                    <div className="p-5 rounded-2xl border border-slate-200 bg-slate-50 space-y-2">
-                      <div className="w-10 h-10 rounded-xl bg-slate-100 text-slate-800 flex items-center justify-center font-bold">
-                        <Factory className="w-5 h-5" />
+                    <div className="p-4 rounded-2xl border border-slate-200 bg-slate-50 space-y-1.5">
+                      <div className="w-8 h-8 rounded-lg bg-slate-100 text-slate-700 flex items-center justify-center font-semibold">
+                        <Factory className="w-4 h-4" />
                       </div>
-                      <h4 className="text-base font-bold text-slate-900">Alu-Alu Moisture Seal</h4>
-                      <p className="text-xs text-slate-600 leading-relaxed">
-                        Tropical Zone IVb packaging preserves complete stability in high humidity and heat.
+                      <h4 className="text-sm font-semibold text-slate-800">Alu-Alu Moisture Seal</h4>
+                      <p className="text-xs text-slate-500 font-light leading-relaxed">
+                        Zone IVb blister packaging preserves complete stability against humidity.
                       </p>
                     </div>
 
-                    <div className="p-5 rounded-2xl border border-slate-200 bg-slate-50 space-y-2">
-                      <div className="w-10 h-10 rounded-xl bg-slate-100 text-slate-800 flex items-center justify-center font-bold">
-                        <Award className="w-5 h-5" />
+                    <div className="p-4 rounded-2xl border border-slate-200 bg-slate-50 space-y-1.5">
+                      <div className="w-8 h-8 rounded-lg bg-slate-100 text-slate-700 flex items-center justify-center font-semibold">
+                        <Award className="w-4 h-4" />
                       </div>
-                      <h4 className="text-base font-bold text-slate-900">Patient Adherence</h4>
-                      <p className="text-xs text-slate-600 leading-relaxed">
-                        Affordably priced so chronic and acute patients complete their entire prescribed therapy.
+                      <h4 className="text-sm font-semibold text-slate-800">Patient Adherence</h4>
+                      <p className="text-xs text-slate-500 font-light leading-relaxed">
+                        Affordably priced so patients complete their entire prescribed therapy.
                       </p>
                     </div>
                   </div>
@@ -663,61 +657,61 @@ export default function Detailing({ products = [], doctors = [], company = {} })
                           </div>
                         </div>
 
-                        {/* Full Product Details Column */}
-                        <div className="lg:col-span-7 space-y-5">
+                        {/* Product Details Column */}
+                        <div className="lg:col-span-7 space-y-4">
                           <div>
-                            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">
+                            <span className="text-[11px] font-medium text-slate-400 uppercase tracking-wider block mb-1">
                               {prod.category?.name || 'Therapeutic Formulation'}
                             </span>
-                            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-slate-900 tracking-tight leading-tight">
+                            <h1 className="text-2xl sm:text-4xl font-semibold text-slate-800 tracking-tight leading-tight">
                               {prod.brand_name}
                             </h1>
                           </div>
 
-                          {/* Full Molecule / Active Salt Box */}
-                          <div className="p-4 sm:p-5 rounded-2xl border border-slate-200 bg-slate-50/90">
-                            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 block mb-1">
-                              Active Molecule / Generic Salt:
+                          {/* Molecule / Active Salt Box */}
+                          <div className="p-3.5 sm:p-4 rounded-xl border border-slate-200 bg-slate-50">
+                            <span className="text-[10px] font-medium uppercase tracking-wider text-slate-400 block mb-0.5">
+                              Active Molecule / Generic Salt
                             </span>
-                            <p className="text-lg sm:text-2xl font-bold text-slate-900 leading-snug">
+                            <p className="text-base sm:text-lg font-medium text-slate-800 leading-snug">
                               {prod.generic_name}
                             </p>
                           </div>
 
-                          {/* Full Clinical Indications & Dosage (No Truncation) */}
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div className="p-4 rounded-xl border border-slate-200 bg-slate-50 space-y-1.5">
-                              <span className="text-xs font-bold uppercase tracking-wider text-slate-700 block">
-                                Clinical Indications
+                          {/* Clinical Indications & Dosage */}
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div className="p-3.5 rounded-xl border border-slate-200 bg-slate-50 space-y-1">
+                              <span className="text-[11px] font-medium uppercase tracking-wider text-slate-500 block">
+                                Indications
                               </span>
-                              <p className="text-sm text-slate-700 leading-relaxed">
-                                {prod.indications || 'Targeted clinical therapeutic prescription.'}
+                              <p className="text-xs text-slate-600 font-light leading-relaxed">
+                                {prod.indications || 'Targeted therapeutic prescription.'}
                               </p>
                             </div>
 
-                            <div className="p-4 rounded-xl border border-slate-200 bg-slate-50 space-y-1.5">
-                              <span className="text-xs font-bold uppercase tracking-wider text-slate-700 block">
-                                Recommended Dosage
+                            <div className="p-3.5 rounded-xl border border-slate-200 bg-slate-50 space-y-1">
+                              <span className="text-[11px] font-medium uppercase tracking-wider text-slate-500 block">
+                                Dosage
                               </span>
-                              <p className="text-sm text-slate-700 leading-relaxed">
-                                {prod.directions || 'As advised by the consulting physician.'}
+                              <p className="text-xs text-slate-600 font-light leading-relaxed">
+                                {prod.directions || 'As advised by physician.'}
                               </p>
                             </div>
                           </div>
 
-                          {/* Active Formulation Composition Strengths if available */}
+                          {/* Active Compositions */}
                           {prod.compositions && prod.compositions.length > 0 && (
-                            <div className="pt-1 space-y-2">
-                              <span className="text-xs font-bold uppercase tracking-wider text-slate-500 block">
-                                Active Composition Strength:
+                            <div className="pt-1 space-y-1.5">
+                              <span className="text-[10px] font-medium uppercase tracking-wider text-slate-400 block">
+                                Active Strength
                               </span>
                               <div className="flex flex-wrap gap-2">
                                 {prod.compositions.map((comp) => (
                                   <span
                                     key={comp.id}
-                                    className="px-3 py-1.5 rounded-lg bg-slate-100 text-xs font-semibold text-slate-800 border border-slate-200"
+                                    className="px-2.5 py-1 rounded-lg bg-slate-100 text-xs font-normal text-slate-700 border border-slate-200"
                                   >
-                                    {comp.ingredient_name}: <strong className="font-mono text-slate-950 font-bold">{comp.strength} {comp.unit}</strong>
+                                    {comp.ingredient_name}: <span className="font-mono text-slate-900 font-medium">{comp.strength} {comp.unit}</span>
                                   </span>
                                 ))}
                               </div>

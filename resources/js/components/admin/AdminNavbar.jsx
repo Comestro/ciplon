@@ -81,13 +81,13 @@ export default function AdminNavbar({ onToggleSidebar }) {
                 {navContext.parent.label}
               </Link>
               <span className="hidden sm:inline text-slate-300">/</span>
-              <h1 className="text-sm sm:text-base font-bold text-slate-900 tracking-tight truncate">
+              <h1 className="text-sm sm:text-base font-semibold text-slate-800 tracking-tight truncate">
                 {navContext.title}
               </h1>
             </div>
           </div>
         ) : (
-          <h1 className="text-sm sm:text-base font-bold text-slate-900 tracking-tight truncate">
+          <h1 className="text-sm sm:text-base font-semibold text-slate-800 tracking-tight truncate">
             {navContext.title}
           </h1>
         )}
@@ -96,7 +96,7 @@ export default function AdminNavbar({ onToggleSidebar }) {
       <div className="flex items-center gap-2.5">
         <Link
           href="/"
-          className="hidden sm:inline-flex items-center gap-1 text-xs font-medium text-slate-500 hover:text-slate-900 px-2.5 py-1.5 rounded-lg hover:bg-slate-100 transition-colors"
+          className="hidden sm:inline-flex items-center gap-1 text-xs font-normal text-slate-500 hover:text-slate-800 px-2.5 py-1.5 rounded-lg hover:bg-slate-100 transition-colors"
         >
           <span>Live Site</span>
           <ExternalLink className="w-3 h-3 text-slate-400" />
@@ -104,10 +104,10 @@ export default function AdminNavbar({ onToggleSidebar }) {
 
         {/* Admin Profile Pill */}
         <div className="flex items-center gap-2 p-1 pl-1.5 pr-2 rounded-xl bg-slate-50 border border-slate-200/80">
-          <div className="w-6 h-6 rounded-lg bg-gradient-to-tr from-violet-600 to-indigo-600 text-white flex items-center justify-center text-[11px] font-bold">
+          <div className="w-6 h-6 rounded-lg bg-gradient-to-tr from-violet-600 to-indigo-600 text-white flex items-center justify-center text-[11px] font-semibold">
             {adminName.charAt(0).toUpperCase()}
           </div>
-          <span className="text-xs font-bold text-slate-800 truncate max-w-[120px]">
+          <span className="text-xs font-medium text-slate-700 truncate max-w-[120px]">
             {adminName}
           </span>
         </div>

@@ -152,86 +152,64 @@ export default function Dashboard() {
     <MRLayout title="MR Dashboard">
       <div className="space-y-8 pb-12 font-sans">
 
-        {/* 1. SpaceWork Header & Quick Action Template Cards */}
+        {/* 1. Header & Quick Action Template Cards */}
         <div className="space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div>
-              <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">
-                Recents
-              </h2>
-              <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
-                Doctor visual aid decks, daily call planning, and performance metrics.
-              </p>
-            </div>
+          <div className="flex items-center justify-between gap-4">
+            <h2 className="text-xl sm:text-2xl font-semibold tracking-tight text-slate-800">
+              Recents
+            </h2>
 
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={fetchDashboardData}
-                disabled={loading}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 rounded-xl transition-colors cursor-pointer shadow-2xs disabled:opacity-50"
-                title="Refresh metrics"
-              >
-                <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin text-violet-600' : ''}`} />
-                <span>Refresh</span>
-              </button>
-            </div>
+            <button
+              type="button"
+              onClick={fetchDashboardData}
+              disabled={loading}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 rounded-xl transition-colors cursor-pointer disabled:opacity-50"
+              title="Refresh"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin text-violet-600' : ''}`} />
+              <span>Refresh</span>
+            </button>
           </div>
 
-          {/* 3 Quick Action Cards (SpaceWork Inspired) */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
+          {/* 3 Quick Action Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             {/* Action 1: Start New Presentation */}
             <Link
               href="/mr/detailing"
-              className="group p-4 rounded-2xl bg-white border border-slate-200/90 hover:border-violet-400 hover:shadow-xs transition-all flex items-center gap-3.5 cursor-pointer"
+              className="group p-3.5 rounded-2xl bg-white border border-slate-200 hover:border-violet-400 transition-colors flex items-center gap-3 cursor-pointer"
             >
-              <div className="w-10 h-10 rounded-xl bg-violet-50 text-violet-600 border border-violet-100 flex items-center justify-center shrink-0 group-hover:scale-105 group-hover:bg-violet-600 group-hover:text-white transition-all">
-                <Plus className="w-5 h-5 stroke-[2.5]" />
+              <div className="w-9 h-9 rounded-xl bg-violet-50 text-violet-600 border border-violet-100 flex items-center justify-center shrink-0 group-hover:bg-violet-600 group-hover:text-white transition-colors">
+                <Plus className="w-4 h-4 stroke-[2]" />
               </div>
-              <div className="min-w-0 flex-1">
-                <h4 className="text-xs font-bold text-slate-900 group-hover:text-violet-700 transition-colors truncate">
-                  Start new presentation
-                </h4>
-                <p className="text-[11px] text-slate-500 truncate mt-0.5">
-                  Choose from 17+ formulation slides
-                </p>
-              </div>
+              <span className="text-xs font-medium text-slate-800 group-hover:text-violet-700 transition-colors truncate">
+                Start Presentation
+              </span>
             </Link>
 
             {/* Action 2: Doctor Detailing Mode */}
             <Link
               href="/mr/detailing"
-              className="group p-4 rounded-2xl bg-white border border-slate-200/90 hover:border-purple-400 hover:shadow-xs transition-all flex items-center gap-3.5 cursor-pointer"
+              className="group p-3.5 rounded-2xl bg-white border border-slate-200 hover:border-purple-400 transition-colors flex items-center gap-3 cursor-pointer"
             >
-              <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 border border-purple-100 flex items-center justify-center shrink-0 group-hover:scale-105 group-hover:bg-purple-600 group-hover:text-white transition-all">
-                <Sparkles className="w-5 h-5" />
+              <div className="w-9 h-9 rounded-xl bg-purple-50 text-purple-600 border border-purple-100 flex items-center justify-center shrink-0 group-hover:bg-purple-600 group-hover:text-white transition-colors">
+                <Sparkles className="w-4 h-4" />
               </div>
-              <div className="min-w-0 flex-1">
-                <h4 className="text-xs font-bold text-slate-900 group-hover:text-purple-700 transition-colors truncate">
-                  Quick Doctor E-Detailing
-                </h4>
-                <p className="text-[11px] text-slate-500 truncate mt-0.5">
-                  Launch interactive touch slide show
-                </p>
-              </div>
+              <span className="text-xs font-medium text-slate-800 group-hover:text-purple-700 transition-colors truncate">
+                Doctor E-Detailing
+              </span>
             </Link>
 
             {/* Action 3: Schedule Visit */}
             <Link
               href="/mr/visits"
-              className="group p-4 rounded-2xl bg-white border border-slate-200/90 hover:border-amber-400 hover:shadow-xs transition-all flex items-center gap-3.5 cursor-pointer"
+              className="group p-3.5 rounded-2xl bg-white border border-slate-200 hover:border-amber-400 transition-colors flex items-center gap-3 cursor-pointer"
             >
-              <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 border border-amber-100 flex items-center justify-center shrink-0 group-hover:scale-105 group-hover:bg-amber-600 group-hover:text-white transition-all">
-                <Calendar className="w-5 h-5" />
+              <div className="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 border border-amber-100 flex items-center justify-center shrink-0 group-hover:bg-amber-600 group-hover:text-white transition-colors">
+                <Calendar className="w-4 h-4" />
               </div>
-              <div className="min-w-0 flex-1">
-                <h4 className="text-xs font-bold text-slate-900 group-hover:text-amber-700 transition-colors truncate">
-                  Schedule Doctor Visit
-                </h4>
-                <p className="text-[11px] text-slate-500 truncate mt-0.5">
-                  Add appointment to daily call planner
-                </p>
-              </div>
+              <span className="text-xs font-medium text-slate-800 group-hover:text-amber-700 transition-colors truncate">
+                Schedule Visit
+              </span>
             </Link>
           </div>
         </div>
@@ -241,10 +219,10 @@ export default function Dashboard() {
           <button
             type="button"
             onClick={() => setActiveFilter('all')}
-            className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+            className={`px-3 py-1 rounded-lg text-xs transition-colors cursor-pointer ${
               activeFilter === 'all'
-                ? 'bg-white text-slate-900 shadow-2xs font-bold'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-white text-slate-900 font-semibold'
+                : 'text-slate-600 hover:text-slate-900 font-normal'
             }`}
           >
             All Decks
@@ -252,10 +230,10 @@ export default function Dashboard() {
           <button
             type="button"
             onClick={() => setActiveFilter('priority')}
-            className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+            className={`px-3 py-1 rounded-lg text-xs transition-colors cursor-pointer ${
               activeFilter === 'priority'
-                ? 'bg-white text-slate-900 shadow-2xs font-bold'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-white text-slate-900 font-semibold'
+                : 'text-slate-600 hover:text-slate-900 font-normal'
             }`}
           >
             Core Formulations
@@ -263,44 +241,44 @@ export default function Dashboard() {
           <button
             type="button"
             onClick={() => setActiveFilter('today')}
-            className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+            className={`px-3 py-1 rounded-lg text-xs transition-colors cursor-pointer ${
               activeFilter === 'today'
-                ? 'bg-white text-slate-900 shadow-2xs font-bold'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-white text-slate-900 font-semibold'
+                : 'text-slate-600 hover:text-slate-900 font-normal'
             }`}
           >
             Today's Visits ({summary.today_visits})
           </button>
         </div>
 
-        {/* 3. SpaceWork 16:9 Presentation Cards Grid */}
+        {/* 3. Presentation Cards Grid (Clean Flat Minimal) */}
         <div className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {presentationDecks.map((deck) => (
               <Link
                 key={deck.id}
                 href="/mr/detailing"
-                className="group flex flex-col space-y-2.5 cursor-pointer select-none"
+                className="group flex flex-col space-y-2 cursor-pointer select-none"
               >
-                {/* 16:9 Aspect Visual Card Thumbnail */}
-                <div className={`relative aspect-[16/10] w-full rounded-2xl bg-gradient-to-br ${deck.bgGradient} p-5 overflow-hidden shadow-xs group-hover:shadow-md group-hover:scale-[1.015] transition-all duration-200 flex flex-col justify-between border border-white/10`}>
+                {/* Visual Card Thumbnail (Zero Shadow) */}
+                <div className={`relative aspect-[16/10] w-full rounded-2xl bg-gradient-to-br ${deck.bgGradient} p-4 sm:p-5 overflow-hidden flex flex-col justify-between border border-white/10`}>
                   
                   {/* Card Top Label */}
                   <div className="flex items-center justify-between z-10">
-                    <span className="text-[10px] font-bold tracking-widest uppercase text-white/80">
-                      CIPLON
+                    <span className="text-[10px] font-medium tracking-wider uppercase text-white/80">
+                      Ciplon
                     </span>
-                    <span className="px-2 py-0.5 rounded-full text-[9px] font-bold bg-white/20 text-white backdrop-blur-xs">
+                    <span className="px-2 py-0.5 rounded-full text-[9px] font-medium bg-white/20 text-white backdrop-blur-xs">
                       {deck.slidesCount}
                     </span>
                   </div>
 
-                  {/* 3D Product Pack Image / Logo Asset */}
-                  <div className="absolute right-3 -bottom-2 w-32 h-32 sm:w-36 sm:h-36 flex items-center justify-center opacity-90 group-hover:scale-105 group-hover:rotate-1 transition-transform duration-300">
+                  {/* 3D Product Pack Image / Logo Asset (No Drop Shadow) */}
+                  <div className="absolute right-3 -bottom-2 w-28 h-28 sm:w-32 sm:h-32 flex items-center justify-center opacity-90 group-hover:scale-105 transition-transform duration-200">
                     <img
                       src={deck.image}
                       alt={deck.title}
-                      className={`max-h-full max-w-full ${deck.isLogo ? 'object-contain brightness-0 invert drop-shadow-md' : 'object-contain drop-shadow-xl'}`}
+                      className={`max-h-full max-w-full ${deck.isLogo ? 'object-contain brightness-0 invert' : 'object-contain'}`}
                       onError={(e) => {
                         e.currentTarget.src = '/images/box_globucel_sc.jpg';
                       }}
@@ -309,138 +287,123 @@ export default function Dashboard() {
 
                   {/* Card Title on Artwork */}
                   <div className="z-10 max-w-[65%]">
-                    <h3 className="text-lg sm:text-xl font-black text-white leading-tight tracking-tight drop-shadow-xs">
+                    <h3 className="text-base sm:text-lg font-semibold text-white leading-snug tracking-tight">
                       {deck.title}
                     </h3>
-                    <p className="text-[11px] text-white/80 font-medium truncate mt-0.5">
-                      {deck.tag}
-                    </p>
                   </div>
 
-                  {/* Hover Play Button Overlay */}
-                  <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                    <div className="w-11 h-11 rounded-full bg-white text-slate-900 shadow-xl flex items-center justify-center transform scale-75 group-hover:scale-100 transition-transform">
-                      <Play className="w-5 h-5 fill-slate-900 ml-0.5" />
+                  {/* Hover Play Button Overlay (No Shadow) */}
+                  <div className="absolute inset-0 bg-black/15 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <div className="w-10 h-10 rounded-full bg-white text-slate-900 border border-slate-200 flex items-center justify-center transform scale-90 group-hover:scale-100 transition-transform">
+                      <Play className="w-4 h-4 fill-slate-900 ml-0.5" />
                     </div>
                   </div>
                 </div>
 
-                {/* Subtitle Under Thumbnail (Exact SpaceWork Style) */}
-                <div className="px-0.5">
-                  <h4 className="text-sm font-bold text-slate-900 group-hover:text-violet-700 transition-colors truncate">
+                {/* Subtitle Under Thumbnail */}
+                <div className="px-0.5 flex items-center justify-between gap-2">
+                  <h4 className="text-xs font-medium text-slate-800 group-hover:text-violet-700 transition-colors truncate">
                     {deck.title}
                   </h4>
-                  <div className="flex items-center gap-1.5 text-xs text-slate-400 mt-0.5">
-                    <span className={`font-semibold ${deck.categoryColor}`}>
-                      In {deck.category}
-                    </span>
-                    <span>&bull;</span>
-                    <span>{deck.updated}</span>
-                  </div>
+                  <span className={`text-[11px] font-medium shrink-0 ${deck.categoryColor}`}>
+                    {deck.category}
+                  </span>
                 </div>
               </Link>
             ))}
           </div>
         </div>
 
-        {/* 4. Operational Metrics Summary (4 Cards) */}
-        <div className="space-y-4 pt-4 border-t border-slate-200/80">
-          <div className="flex items-center justify-between">
-            <h3 className="text-base font-bold text-slate-900">
-              Daily Field Execution
-            </h3>
-            <span className="text-xs text-slate-500">Live operational sync</span>
-          </div>
+        {/* 4. Operational Metrics Summary (Clean Flat) */}
+        <div className="space-y-3 pt-3 border-t border-slate-200/80">
+          <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+            Daily Execution
+          </h3>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
             {/* Metric 1 */}
-            <div className="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-2xs">
+            <div className="bg-white rounded-xl border border-slate-200/80 p-4">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold text-slate-500">Today's Visits</span>
-                <span className="w-8 h-8 rounded-xl bg-violet-50 text-violet-700 flex items-center justify-center">
-                  <Users className="w-4 h-4" />
+                <span className="text-xs font-medium text-slate-500">Today</span>
+                <span className="w-7 h-7 rounded-lg bg-violet-50 text-violet-700 flex items-center justify-center">
+                  <Users className="w-3.5 h-3.5" />
                 </span>
               </div>
-              <div className="mt-3">
-                <span className="text-2xl font-bold text-slate-900">{summary.today_visits}</span>
-                <span className="text-[11px] text-slate-400 block mt-0.5">Assigned appointments</span>
+              <div className="mt-2">
+                <span className="text-2xl font-semibold text-slate-800">{summary.today_visits}</span>
               </div>
             </div>
 
             {/* Metric 2 */}
-            <div className="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-2xs">
+            <div className="bg-white rounded-xl border border-slate-200/80 p-4">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold text-slate-500">Completed Calls</span>
-                <span className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center">
-                  <CheckCircle2 className="w-4 h-4" />
+                <span className="text-xs font-medium text-slate-500">Completed</span>
+                <span className="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center">
+                  <CheckCircle2 className="w-3.5 h-3.5" />
                 </span>
               </div>
-              <div className="mt-3">
-                <span className="text-2xl font-bold text-emerald-700">{summary.completed_visits}</span>
-                <span className="text-[11px] text-slate-400 block mt-0.5">DCR reports submitted</span>
+              <div className="mt-2">
+                <span className="text-2xl font-semibold text-emerald-700">{summary.completed_visits}</span>
               </div>
             </div>
 
             {/* Metric 3 */}
-            <div className="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-2xs">
+            <div className="bg-white rounded-xl border border-slate-200/80 p-4">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold text-slate-500">Pending Visits</span>
-                <span className="w-8 h-8 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center">
-                  <Clock className="w-4 h-4" />
+                <span className="text-xs font-medium text-slate-500">Pending</span>
+                <span className="w-7 h-7 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center">
+                  <Clock className="w-3.5 h-3.5" />
                 </span>
               </div>
-              <div className="mt-3">
-                <span className="text-2xl font-bold text-amber-700">{summary.pending_visits}</span>
-                <span className="text-[11px] text-slate-400 block mt-0.5">Remaining for today</span>
+              <div className="mt-2">
+                <span className="text-2xl font-semibold text-amber-700">{summary.pending_visits}</span>
               </div>
             </div>
 
             {/* Metric 4 */}
-            <div className="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-2xs">
+            <div className="bg-white rounded-xl border border-slate-200/80 p-4">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold text-slate-500">Target Achievement</span>
-                <span className="w-8 h-8 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center">
-                  <Award className="w-4 h-4" />
+                <span className="text-xs font-medium text-slate-500">Achievement</span>
+                <span className="w-7 h-7 rounded-lg bg-blue-50 text-blue-700 flex items-center justify-center">
+                  <Award className="w-3.5 h-3.5" />
                 </span>
               </div>
-              <div className="mt-3">
-                <span className="text-2xl font-bold text-blue-700">{performance.achievement}%</span>
-                <span className="text-[11px] text-slate-400 block mt-0.5">Monthly coverage index</span>
+              <div className="mt-2">
+                <span className="text-2xl font-semibold text-blue-700">{performance.achievement}%</span>
               </div>
             </div>
           </div>
         </div>
 
         {/* 5. Today's Appointments & Follow-ups */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
           {/* Today's Visits */}
-          <div className="bg-white rounded-2xl border border-slate-200/80 p-5 sm:p-6 shadow-2xs">
+          <div className="bg-white rounded-2xl border border-slate-200/80 p-5">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-              <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                <Clock className="w-4 h-4 text-violet-600" />
-                <span>Today's Doctor Visits</span>
+              <h3 className="text-xs font-semibold text-slate-800 flex items-center gap-2">
+                <Clock className="w-3.5 h-3.5 text-violet-600" />
+                <span>Today's Visits</span>
               </h3>
-              <Link href="/mr/visits" className="text-xs font-semibold text-violet-600 hover:text-violet-800">
-                View Planner &rarr;
+              <Link href="/mr/visits" className="text-xs font-medium text-violet-600 hover:text-violet-800">
+                Planner &rarr;
               </Link>
             </div>
 
-            <div className="mt-4">
+            <div className="mt-3">
               {todayVisits.length === 0 ? (
-                <div className="py-8 text-center text-slate-400">
-                  <Building2 className="w-8 h-8 mx-auto mb-2 opacity-30 text-slate-400" />
-                  <p className="text-xs">No visits scheduled for today.</p>
+                <div className="py-6 text-center text-slate-400 font-light">
+                  <p className="text-xs">No visits scheduled today.</p>
                 </div>
               ) : (
                 <div className="divide-y divide-slate-100">
                   {todayVisits.map((visit, idx) => (
                     <div key={idx} className="py-2.5 flex items-center justify-between text-xs">
                       <div>
-                        <strong className="block text-slate-900">{visit.doctor}</strong>
-                        <span className="text-slate-500 text-[11px]">{visit.hospital}</span>
+                        <span className="block font-medium text-slate-800">{visit.doctor}</span>
+                        <span className="text-slate-400 font-light text-[11px]">{visit.hospital}</span>
                       </div>
                       <div className="text-right">
-                        <span className="font-semibold text-slate-700 block">{visit.time}</span>
+                        <span className="font-medium text-slate-700 block">{visit.time}</span>
                         <span className="text-[10px] text-violet-700 bg-violet-50 px-2 py-0.5 rounded-full font-medium">
                           {visit.status}
                         </span>
@@ -453,31 +416,30 @@ export default function Dashboard() {
           </div>
 
           {/* Follow-ups */}
-          <div className="bg-white rounded-2xl border border-slate-200/80 p-5 sm:p-6 shadow-2xs">
+          <div className="bg-white rounded-2xl border border-slate-200/80 p-5">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-              <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                <CalendarClock className="w-4 h-4 text-violet-600" />
-                <span>Upcoming Follow-ups</span>
+              <h3 className="text-xs font-semibold text-slate-800 flex items-center gap-2">
+                <CalendarClock className="w-3.5 h-3.5 text-violet-600" />
+                <span>Follow-ups</span>
               </h3>
-              <span className="text-xs text-slate-400">{upcomingFollowups.length} queued</span>
+              <span className="text-xs text-slate-400 font-light">{upcomingFollowups.length} queued</span>
             </div>
 
-            <div className="mt-4">
+            <div className="mt-3">
               {upcomingFollowups.length === 0 ? (
-                <div className="py-8 text-center text-slate-400">
-                  <Calendar className="w-8 h-8 mx-auto mb-2 opacity-30 text-slate-400" />
-                  <p className="text-xs">No upcoming follow-ups scheduled.</p>
+                <div className="py-6 text-center text-slate-400 font-light">
+                  <p className="text-xs">No follow-ups scheduled.</p>
                 </div>
               ) : (
                 <div className="divide-y divide-slate-100">
                   {upcomingFollowups.map((item, idx) => (
                     <div key={idx} className="py-2.5 flex items-center justify-between text-xs">
                       <div>
-                        <strong className="block text-slate-900">{item.doctor}</strong>
-                        <span className="text-slate-500 text-[11px]">{item.purpose}</span>
+                        <span className="block font-medium text-slate-800">{item.doctor}</span>
+                        <span className="text-slate-400 font-light text-[11px]">{item.purpose}</span>
                       </div>
                       <div className="text-right">
-                        <span className="text-slate-600 block text-[11px]">{item.date}</span>
+                        <span className="text-slate-500 font-light block text-[11px]">{item.date}</span>
                         <span className="text-[10px] text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full font-medium">
                           {item.status}
                         </span>
