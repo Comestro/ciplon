@@ -66,7 +66,7 @@ export default function EmployeeAssign({ representatives = [], isIndividualMR = 
             <div className="bg-white rounded-2xl border border-slate-200/80 p-6 space-y-6">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
                 <div className="flex items-center gap-4">
-                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-violet-600 to-indigo-600 text-white font-bold text-xl flex items-center justify-center shrink-0">
+                  <div className="w-14 h-14 rounded-2xl bg-slate-900 text-white font-bold text-xl flex items-center justify-center shrink-0">
                     {selfRep.name?.charAt(0) || 'M'}
                   </div>
                   <div>
