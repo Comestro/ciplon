@@ -125,7 +125,7 @@ Route::middleware(['auth', 'mr'])->prefix('mr')->name('mr.')->group(function () 
 
     // Calls & Visits Planner / Scheduler
     Route::get('/schedule', fn () => redirect('/mr/visits?view=planner'))->name('schedule');
-    Route::get('/follow-ups', fn () => redirect()->route('mr.schedule'))->name('followups');
+    Route::get('/follow-ups', fn () => redirect('/mr/visits?view=planner'))->name('followups');
     Route::post('/schedule', [MRScheduleController::class, 'store'])->name('schedule.store');
     Route::match(['put', 'patch', 'post'], '/schedule/{schedule}/status', [MRScheduleController::class, 'updateStatus'])->name('schedule.status');
     Route::delete('/schedule/{schedule}', [MRScheduleController::class, 'destroy'])->name('schedule.destroy');

@@ -55,13 +55,13 @@ class MRVisitController extends Controller
         if ($search !== '') {
             $query->where(function ($q) use ($search) {
                 $q->where('purpose', 'like', "%{$search}%")
-                  ->orWhere('custom_contact_name', 'like', "%{$search}%")
-                  ->orWhere('notes', 'like', "%{$search}%")
-                  ->orWhereHas('doctor', function ($dq) use ($search) {
-                      $dq->where('name', 'like', "%{$search}%")
-                         ->orWhere('clinic_hospital_name', 'like', "%{$search}%")
-                         ->orWhere('specialization', 'like', "%{$search}%");
-                  });
+                    ->orWhere('custom_contact_name', 'like', "%{$search}%")
+                    ->orWhere('notes', 'like', "%{$search}%")
+                    ->orWhereHas('doctor', function ($dq) use ($search) {
+                        $dq->where('name', 'like', "%{$search}%")
+                            ->orWhere('clinic_hospital_name', 'like', "%{$search}%")
+                            ->orWhere('specialization', 'like', "%{$search}%");
+                    });
             });
         }
 
@@ -143,8 +143,8 @@ class MRVisitController extends Controller
             $term = trim($request->query('search'));
             $query->whereHas('doctor', function ($q) use ($term) {
                 $q->where('name', 'like', "%{$term}%")
-                  ->orWhere('clinic_hospital_name', 'like', "%{$term}%")
-                  ->orWhere('specialization', 'like', "%{$term}%");
+                    ->orWhere('clinic_hospital_name', 'like', "%{$term}%")
+                    ->orWhere('specialization', 'like', "%{$term}%");
             });
         }
 

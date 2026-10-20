@@ -243,7 +243,6 @@ test('mr user cannot access or delete doctors belonging to another mr user', fun
     $this->assertDatabaseHas('doctors', ['id' => $doctorOfMr1->id]);
 });
 
-
 test('mr user can access create doctor page', function () {
     $mrUser = User::factory()->create(['role' => 'mr']);
     $mrUser->assignRole('mr');

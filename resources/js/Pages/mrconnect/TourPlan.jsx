@@ -21,10 +21,14 @@ export default function TourPlan({ tourPlans = [] }) {
   const isAdmin = props.auth?.user?.role === 'admin';
   const Layout = isAdmin ? AdminLayout : MRLayout;
 
+  const now = new Date();
+  const currentMonthName = now.toLocaleString('en-US', { month: 'long', year: 'numeric' });
+  const currentYear = now.getFullYear();
+
   const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState({
-    month: 'August 2026',
-    year: 2026,
+    month: currentMonthName,
+    year: currentYear,
     type: 'Monthly Tour Plan (MTP)',
     days_count: 24,
     planned_visits: 120,
@@ -78,7 +82,7 @@ export default function TourPlan({ tourPlans = [] }) {
               <button
                 type="button"
                 onClick={() => setShowModal(true)}
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-violet-600 hover:bg-violet-700 text-white font-medium text-xs transition-colors cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-medium text-xs transition-colors cursor-pointer shadow-xs"
               >
                 <Plus className="w-3.5 h-3.5" />
                 <span>Submit Tour Plan</span>
@@ -86,7 +90,7 @@ export default function TourPlan({ tourPlans = [] }) {
             ) : (
               <Link
                 href="/admin/tracking"
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-violet-600 hover:bg-violet-700 text-white font-medium text-xs transition-colors cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-medium text-xs transition-colors cursor-pointer shadow-xs"
               >
                 <MapPin className="w-3.5 h-3.5" />
                 <span>Live Tour Tracking Map</span>
@@ -302,7 +306,7 @@ export default function TourPlan({ tourPlans = [] }) {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-1.5 rounded-xl bg-violet-600 hover:bg-violet-700 text-white font-medium text-xs cursor-pointer"
+                  className="px-4 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-medium text-xs cursor-pointer shadow-xs"
                 >
                   Submit Plan
                 </button>

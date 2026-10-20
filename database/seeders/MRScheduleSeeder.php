@@ -2,19 +2,20 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
-use App\Models\User;
 use App\Models\Doctor;
 use App\Models\MRSchedule;
+use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Database\Seeder;
 
 class MRScheduleSeeder extends Seeder
 {
     public function run(): void
     {
         $mr = User::where('role', 'mr')->first();
-        if (!$mr) {
+        if (! $mr) {
             $this->command->error('No MR user found.');
+
             return;
         }
 
@@ -25,6 +26,7 @@ class MRScheduleSeeder extends Seeder
         $doctors = Doctor::where('user_id', $mr->id)->get();
         if ($doctors->count() < 4) {
             $this->command->error('Not enough doctors.');
+
             return;
         }
 
@@ -127,13 +129,13 @@ class MRScheduleSeeder extends Seeder
                 'status' => 'completed',
                 'completed_at' => Carbon::yesterday()->setTime(16, 30),
                 'outcome_note' => 'Handed over samples & clinical visual aid shown. Dr agreed to recommend.',
-            ]
+            ],
         ];
 
         foreach ($items as $data) {
             MRSchedule::create($data);
         }
 
-        $this->command->info('Seeded ' . count($items) . ' MR schedules.');
+        $this->command->info('Seeded '.count($items).' MR schedules.');
     }
 }

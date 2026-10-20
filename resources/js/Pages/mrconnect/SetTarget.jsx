@@ -107,11 +107,11 @@ export default function SetTarget({ targets = [], summary = {} }) {
                         <td className="py-3 px-4 text-right font-semibold text-emerald-600">
                           ₹{Number(tgt.achieved_amount).toLocaleString()}
                         </td>
-                        <td className="py-3 px-4 text-center font-bold text-violet-700">
+                        <td className="py-3 px-4 text-center font-bold text-slate-900">
                           <div className="inline-flex items-center gap-1.5">
                             <span className="text-xs">{pct}%</span>
                             <div className="w-16 bg-slate-100 h-1.5 rounded-full overflow-hidden hidden sm:block">
-                              <div className="bg-violet-600 h-full rounded-full" style={{ width: `${Math.min(100, pct)}%` }}></div>
+                              <div className="bg-slate-900 h-full rounded-full" style={{ width: `${Math.min(100, pct)}%` }}></div>
                             </div>
                           </div>
                         </td>

@@ -53,13 +53,13 @@ class MRScheduleController extends Controller
         if ($search !== '') {
             $query->where(function ($q) use ($search) {
                 $q->where('purpose', 'like', "%{$search}%")
-                  ->orWhere('custom_contact_name', 'like', "%{$search}%")
-                  ->orWhere('notes', 'like', "%{$search}%")
-                  ->orWhereHas('doctor', function ($dq) use ($search) {
-                      $dq->where('name', 'like', "%{$search}%")
-                         ->orWhere('clinic_hospital_name', 'like', "%{$search}%")
-                         ->orWhere('specialization', 'like', "%{$search}%");
-                  });
+                    ->orWhere('custom_contact_name', 'like', "%{$search}%")
+                    ->orWhere('notes', 'like', "%{$search}%")
+                    ->orWhereHas('doctor', function ($dq) use ($search) {
+                        $dq->where('name', 'like', "%{$search}%")
+                            ->orWhere('clinic_hospital_name', 'like', "%{$search}%")
+                            ->orWhere('specialization', 'like', "%{$search}%");
+                    });
             });
         }
 
@@ -195,8 +195,8 @@ class MRScheduleController extends Controller
         $schedule->update($updates);
 
         $actionWord = $schedule->action_type === 'call' ? 'Call' : 'Visit';
-        $statusMsg = $validated['status'] === 'completed' 
-            ? "Marked {$actionWord} as completed." 
+        $statusMsg = $validated['status'] === 'completed'
+            ? "Marked {$actionWord} as completed."
             : "Status updated to {$validated['status']}.";
 
         return redirect()->back()->with('success', $statusMsg);

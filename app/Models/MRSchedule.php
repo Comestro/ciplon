@@ -55,8 +55,9 @@ class MRSchedule extends Model
     public function getContactDisplayNameAttribute(): string
     {
         if ($this->doctor) {
-            return 'Dr. ' . $this->doctor->name;
+            return 'Dr. '.$this->doctor->name;
         }
+
         return $this->custom_contact_name ?: 'Contact';
     }
 }

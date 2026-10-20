@@ -71,15 +71,14 @@ class MRTrackingController extends Controller
             'tracking_interval' => (int) Setting::get('mapbox_tracking_interval', 30),
         ];
 
-        // Fetch doctors with coordinates
-        $docs = Doctor::where('user_id', $userId)
+        // Fetch doctors assigned to this MR with valid coordinates
+        $docs = Doctor::where(function ($q) use ($userId) {
+            $q->where('user_id', $userId)
+                ->orWhere('assigned_mr_id', $userId);
+        })
             ->whereNotNull('latitude')
             ->whereNotNull('longitude')
             ->get();
-
-        if ($docs->isEmpty()) {
-            $docs = Doctor::whereNotNull('latitude')->take(8)->get();
-        }
 
         $visitedIds = Visit::forUser($userId)
             ->whereDate('visit_date', $today)
@@ -87,7 +86,7 @@ class MRTrackingController extends Controller
             ->toArray();
 
         $stops = $docs->map(function ($doc, $i) use ($visitedIds) {
-            $isVisited = in_array($doc->id, $visitedIds) || ($i < 3);
+            $isVisited = in_array($doc->id, $visitedIds, true);
 
             return [
                 'id' => $doc->id,

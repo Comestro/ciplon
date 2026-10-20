@@ -32,7 +32,7 @@ export default function Slider({ slides = [] }) {
 
           <Link
             href="/mr/detailing"
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-violet-600 hover:bg-violet-700 text-white font-medium text-xs transition-colors cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-medium text-xs transition-colors cursor-pointer shadow-xs"
           >
             <Presentation className="w-3.5 h-3.5" />
             <span>Open E-Detailing Deck</span>

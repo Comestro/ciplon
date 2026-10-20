@@ -23,7 +23,7 @@ class ProductController extends Controller
     {
         $query = Product::query()
             ->with(['category:id,name,slug', 'primaryImage',
-            'slides' => fn ($q) => $q->orderBy('sort_order'), 'images'])
+                'slides' => fn ($q) => $q->orderBy('sort_order'), 'images'])
             ->withCount('compositions');
 
         if ($request->filled('search')) {

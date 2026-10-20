@@ -1,10 +1,10 @@
 <?php
 
-use App\Models\User;
 use App\Models\Doctor;
 use App\Models\MRSchedule;
-use Spatie\Permission\Models\Role;
+use App\Models\User;
 use Carbon\Carbon;
+use Spatie\Permission\Models\Role;
 
 beforeEach(function () {
     Role::firstOrCreate(['name' => 'mr']);

@@ -42,8 +42,8 @@ export default function VideoLibrary({ videos = [] }) {
                     alt={vid.title}
                     className="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-300"
                   />
-                  <div className="absolute inset-0 bg-slate-950/30 flex items-center justify-center">
-                    <div className="w-12 h-12 rounded-full bg-white/90 text-slate-900 flex items-center justify-center shadow-lg group-hover:bg-violet-600 group-hover:text-white transition-colors">
+                  <div className="absolute inset-0 bg-slate-955/30 flex items-center justify-center">
+                    <div className="w-12 h-12 rounded-full bg-white/90 text-slate-900 flex items-center justify-center shadow-lg group-hover:bg-slate-900 group-hover:text-white transition-colors">
                       <Play className="w-5 h-5 ml-0.5" />
                     </div>
                   </div>
@@ -53,7 +53,7 @@ export default function VideoLibrary({ videos = [] }) {
                 </div>
 
                 <div className="p-4 space-y-2">
-                  <span className="text-[10px] font-semibold text-violet-700 bg-violet-50 px-2 py-0.5 rounded">
+                  <span className="text-[10px] font-semibold text-slate-700 bg-slate-100 border border-slate-200/60 px-2 py-0.5 rounded-md">
                     {vid.category}
                   </span>
                   <h3 className="text-sm font-semibold text-slate-800 line-clamp-2">

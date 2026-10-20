@@ -64,12 +64,12 @@ class MRProductController extends Controller
             $term = trim($request->query('search'));
             $query->where(function ($q) use ($term) {
                 $q->where('brand_name', 'like', "%{$term}%")
-                  ->orWhere('generic_name', 'like', "%{$term}%")
-                  ->orWhere('product_code', 'like', "%{$term}%")
-                  ->orWhere('indications', 'like', "%{$term}%")
-                  ->orWhereHas('compositions', function ($cq) use ($term) {
-                      $cq->where('ingredient_name', 'like', "%{$term}%");
-                  });
+                    ->orWhere('generic_name', 'like', "%{$term}%")
+                    ->orWhere('product_code', 'like', "%{$term}%")
+                    ->orWhere('indications', 'like', "%{$term}%")
+                    ->orWhereHas('compositions', function ($cq) use ($term) {
+                        $cq->where('ingredient_name', 'like', "%{$term}%");
+                    });
             });
         }
 

@@ -39,7 +39,7 @@ class MRConnectController extends Controller
                 'role_title' => $u->role === 'mr' ? 'Medical Representative' : 'ABM',
                 'headquarters' => 'Nagercoil Hub #'.(($u->id % 4) + 1),
                 'territory' => 'Kanyakumari / Tamil Nadu',
-                'assigned_doctors_count' => Doctor::where('user_id', $u->id)->count() ?: 18,
+                'assigned_doctors_count' => (int) Doctor::where('user_id', $u->id)->count(),
                 'reporting_manager' => 'Kesavan T (Area Business Manager)',
                 'joining_date' => '01/04/2024',
                 'status' => 'active',
@@ -324,10 +324,21 @@ class MRConnectController extends Controller
 
         $query = DB::table('primary_sales');
         if (! $isAdmin) {
-            $query->where(function ($q) {
-                $q->where('territory', 'like', '%Kanyakumari%')
-                    ->orWhere('territory', 'like', '%Nagercoil%');
-            });
+            $mrTerritories = Doctor::where('user_id', $user->id)
+                ->whereNotNull('territory')
+                ->pluck('territory')
+                ->filter()
+                ->unique()
+                ->values()
+                ->all();
+
+            if (! empty($mrTerritories)) {
+                $query->where(function ($q) use ($mrTerritories) {
+                    foreach ($mrTerritories as $territory) {
+                        $q->orWhere('territory', 'like', "%{$territory}%");
+                    }
+                });
+            }
         }
 
         $sales = $query->orderByDesc('invoice_date')->get();
@@ -588,7 +599,7 @@ class MRConnectController extends Controller
                 'emp_id' => 'EMP-'.(1000 + $u->id),
                 'department' => $u->role === 'admin' ? 'Executive Management' : 'Field Sales & Marketing',
                 'status' => 'active',
-                'contact' => '+91 984'.rand(1000000, 9999999),
+                'contact' => '+91 9840'.sprintf('%06d', ($u->id * 13579) % 1000000),
             ];
         });
 

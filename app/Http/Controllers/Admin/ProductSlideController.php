@@ -58,9 +58,9 @@ class ProductSlideController extends Controller
 
         foreach ($files as $idx => $file) {
             $stored = $file->store('product-slides', 'public');
-            $imagePath = '/storage/' . $stored;
+            $imagePath = '/storage/'.$stored;
             $order = $currentMax + $idx + 1;
-            $title = $request->input('title') ?: ('Slide ' . $order);
+            $title = $request->input('title') ?: ('Slide '.$order);
 
             $product->slides()->create([
                 'title' => $title,
@@ -70,7 +70,7 @@ class ProductSlideController extends Controller
             ]);
         }
 
-        return redirect()->back()->with('success', count($files) . ' slide image(s) added to carousel.');
+        return redirect()->back()->with('success', count($files).' slide image(s) added to carousel.');
     }
 
     /**
@@ -96,7 +96,7 @@ class ProductSlideController extends Controller
                 Storage::disk('public')->delete($relative);
             }
             $stored = $request->file('image')->store('product-slides', 'public');
-            $imagePath = '/storage/' . $stored;
+            $imagePath = '/storage/'.$stored;
         }
 
         $slide->update([
