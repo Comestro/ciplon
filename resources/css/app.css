@@ -7,7 +7,9 @@
 
 @theme {
   --font-serif: 'Poppins', system-ui, -apple-system, sans-serif;
-  --font-sans: 'Poppins', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-sans: 'Plus Jakarta Sans', 'Poppins', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-dashboard: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-poppins: 'Poppins', system-ui, -apple-system, sans-serif;
 
   --color-navy-950: #07172b;
   --color-navy-900: #0c2340;
@@ -24,15 +26,16 @@
 @layer base {
   html {
     scroll-behavior: smooth;
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Plus Jakarta Sans', 'Poppins', sans-serif;
   }
 
   body {
     background-color: #ffffff;
     color: #0c2340;
-    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-family: 'Plus Jakarta Sans', 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    letter-spacing: -0.011em;
   }
 }
 

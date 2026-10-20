@@ -1,14 +1,12 @@
-// AdminLayout component providing sidebar shell and main content canvas
 import { useState } from 'react';
 import AdminSidebar from '../components/admin/AdminSidebar';
 import AdminNavbar from '../components/admin/AdminNavbar';
 
 export default function AdminLayout({ children }) {
-  // Mobile sidebar visibility state
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-slate-50 flex antialiased text-slate-800">
+    <div className="min-h-screen bg-[#f8f9fc] flex antialiased text-slate-800">
       <AdminSidebar
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
