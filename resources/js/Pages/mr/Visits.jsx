@@ -400,18 +400,20 @@ export default function Visits({
       <div className="space-y-6">
 
         {/* Unified Top Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-200/80">
           <div>
-            <div className="flex items-center gap-2 text-xs font-semibold text-teal-700 uppercase tracking-wider mb-1">
-              <CalendarClock className="w-4 h-4" />
-              <span>MR Field Operations</span>
-              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-teal-50 text-teal-800 border border-teal-200/60">
+            <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">
+              <CalendarClock className="w-4 h-4 text-slate-700" />
+              <span>Field Operations</span>
+              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-100 text-slate-700 border border-slate-200">
                 {todayDate ? new Date(todayDate).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }) : 'Today'}
               </span>
             </div>
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900">Visits & Daily Planner</h1>
-            <p className="text-xs text-slate-500 mt-0.5">
-              Plan today's calls & clinic visits, mark completions on the road, and record detailed product detailing & samples.
+            <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-slate-800">
+              Visits & Daily Planner
+            </h1>
+            <p className="text-xs text-slate-500 font-normal mt-0.5">
+              Plan scheduled calls and clinic visits, check off completed interactions, and record product detailing logs.
             </p>
           </div>
 
@@ -421,18 +423,18 @@ export default function Visits({
               <button
                 type="button"
                 onClick={() => setIsScheduleModalOpen(true)}
-                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-teal-700 hover:bg-teal-800 text-white text-xs font-semibold shadow-xs hover:shadow-sm transition-all cursor-pointer"
+                className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-medium transition-colors cursor-pointer"
               >
-                <Plus className="w-4 h-4 stroke-[2.2]" />
+                <Plus className="w-4 h-4 stroke-[2]" />
                 <span>Schedule Call or Visit</span>
               </button>
             ) : (
               <button
                 type="button"
                 onClick={() => openDetailingModal()}
-                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-teal-700 hover:bg-teal-800 text-white text-xs font-semibold shadow-xs hover:shadow-sm transition-all cursor-pointer"
+                className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-medium transition-colors cursor-pointer"
               >
-                <Plus className="w-4 h-4 stroke-[2.2]" />
+                <Plus className="w-4 h-4 stroke-[2]" />
                 <span>Log Detailing & Samples</span>
               </button>
             )}
@@ -440,21 +442,21 @@ export default function Visits({
         </div>
 
         {/* Top-Level Segmented Mode Switcher */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-2.5 rounded-2xl border border-slate-200/80 shadow-xs">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-2 rounded-2xl border border-slate-200/80">
           <div className="flex items-center gap-1.5 p-1 bg-slate-100 rounded-xl w-full sm:w-auto">
             <button
               type="button"
               onClick={() => setActiveView('planner')}
-              className={`flex items-center justify-center gap-2 px-5 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+              className={`flex items-center justify-center gap-2 px-4 py-1.5 rounded-lg text-xs font-medium transition-colors cursor-pointer ${
                 activeView === 'planner'
-                  ? 'bg-white text-slate-900 shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-white text-slate-900 font-semibold shadow-2xs'
+                  : 'text-slate-600 hover:text-slate-900 font-normal'
               }`}
             >
-              <CalendarClock className={`w-4 h-4 ${activeView === 'planner' ? 'text-teal-700 stroke-[2.2]' : 'text-slate-400'}`} />
+              <CalendarClock className={`w-3.5 h-3.5 ${activeView === 'planner' ? 'text-slate-900 stroke-[2]' : 'text-slate-400'}`} />
               <span>Daily Calls & Planner</span>
-              <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
-                activeView === 'planner' ? 'bg-teal-100 text-teal-800' : 'bg-slate-200 text-slate-600'
+              <span className={`text-[10px] px-1.5 py-0.2 rounded-md font-semibold ${
+                activeView === 'planner' ? 'bg-slate-100 text-slate-800' : 'bg-slate-200/70 text-slate-600'
               }`}>
                 {metrics.today_total || 0} Today
               </span>
@@ -463,28 +465,28 @@ export default function Visits({
             <button
               type="button"
               onClick={() => setActiveView('detailing')}
-              className={`flex items-center justify-center gap-2 px-5 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+              className={`flex items-center justify-center gap-2 px-4 py-1.5 rounded-lg text-xs font-medium transition-colors cursor-pointer ${
                 activeView === 'detailing'
-                  ? 'bg-white text-slate-900 shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-white text-slate-900 font-semibold shadow-2xs'
+                  : 'text-slate-600 hover:text-slate-900 font-normal'
               }`}
             >
-              <Stethoscope className={`w-4 h-4 ${activeView === 'detailing' ? 'text-teal-700 stroke-[2.2]' : 'text-slate-400'}`} />
+              <Stethoscope className={`w-3.5 h-3.5 ${activeView === 'detailing' ? 'text-slate-900 stroke-[2]' : 'text-slate-400'}`} />
               <span>Detailing & Sample Logs</span>
-              <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
-                activeView === 'detailing' ? 'bg-teal-100 text-teal-800' : 'bg-slate-200 text-slate-600'
+              <span className={`text-[10px] px-1.5 py-0.2 rounded-md font-semibold ${
+                activeView === 'detailing' ? 'bg-slate-100 text-slate-800' : 'bg-slate-200/70 text-slate-600'
               }`}>
                 DCR Logs
               </span>
             </button>
           </div>
 
-          <div className="text-[11px] text-slate-500 px-2 flex items-center gap-1">
-            <Sparkles className="w-3.5 h-3.5 text-teal-600 shrink-0" />
+          <div className="text-[11px] text-slate-400 px-2 flex items-center gap-1.5">
+            <Sparkles className="w-3.5 h-3.5 text-slate-400 shrink-0" />
             <span>
               {activeView === 'planner' 
-                ? 'Check off calls & visits as you complete them on the field' 
-                : 'Permanent clinical records of drugs detailed & samples distributed'}
+                ? 'Check off calls & visits as you complete them on the road' 
+                : 'Clinical detailing history and physician sample disbursements'}
             </span>
           </div>
         </div>
@@ -531,44 +533,44 @@ export default function Visits({
               </div>
 
               {/* Planned Visits Card */}
-              <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs flex items-center justify-between">
+              <div className="bg-white p-5 rounded-2xl border border-slate-200/80 flex items-center justify-between">
                 <div>
-                  <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider block">
+                  <span className="text-xs font-medium text-slate-500 block">
                     Clinic Visits Planned
                   </span>
-                  <span className="text-2xl font-bold text-slate-900 mt-1 block">
+                  <span className="text-2xl font-semibold text-slate-800 mt-1 block">
                     {metrics.today_visits || 0}
                   </span>
-                  <span className="text-[11px] text-teal-700 font-medium flex items-center gap-1 mt-0.5">
-                    <MapPin className="w-3 h-3" /> In-Person Detailing
+                  <span className="text-[11px] text-slate-400 font-normal flex items-center gap-1 mt-0.5">
+                    <MapPin className="w-3 h-3 text-slate-400" /> In-person clinic visits
                   </span>
                 </div>
-                <div className="w-11 h-11 rounded-xl bg-teal-50 text-teal-700 flex items-center justify-center shrink-0">
-                  <Stethoscope className="w-5 h-5 stroke-[2]" />
+                <div className="w-9 h-9 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center shrink-0">
+                  <Stethoscope className="w-4 h-4 stroke-[2]" />
                 </div>
               </div>
 
               {/* Planned Calls Card */}
-              <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs flex items-center justify-between">
+              <div className="bg-white p-5 rounded-2xl border border-slate-200/80 flex items-center justify-between">
                 <div>
-                  <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider block">
+                  <span className="text-xs font-medium text-slate-500 block">
                     Phone Calls Planned
                   </span>
-                  <span className="text-2xl font-bold text-slate-900 mt-1 block">
+                  <span className="text-2xl font-semibold text-slate-800 mt-1 block">
                     {metrics.today_calls || 0}
                   </span>
-                  <span className="text-[11px] text-sky-700 font-medium flex items-center gap-1 mt-0.5">
-                    <PhoneCall className="w-3 h-3" /> Telephonic Follow-ups
+                  <span className="text-[11px] text-slate-400 font-normal flex items-center gap-1 mt-0.5">
+                    <PhoneCall className="w-3 h-3 text-slate-400" /> Telephonic reminders
                   </span>
                 </div>
-                <div className="w-11 h-11 rounded-xl bg-sky-50 text-sky-700 flex items-center justify-center shrink-0">
-                  <Phone className="w-5 h-5 stroke-[2]" />
+                <div className="w-9 h-9 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center shrink-0">
+                  <Phone className="w-4 h-4 stroke-[2]" />
                 </div>
               </div>
             </div>
 
             {/* Sub-Tabs & Filter Bar */}
-            <div className="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-xs space-y-3">
+            <div className="bg-white rounded-2xl border border-slate-200/80 p-4 space-y-3">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
                 
                 {/* View Sub-Tabs */}
@@ -576,15 +578,15 @@ export default function Visits({
                   <button
                     type="button"
                     onClick={() => handlePlannerTabChange('today')}
-                    className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer whitespace-nowrap ${
+                    className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors cursor-pointer whitespace-nowrap ${
                       plannerTab === 'today'
-                        ? 'bg-white text-slate-900 shadow-xs'
+                        ? 'bg-white text-slate-900 font-semibold shadow-2xs'
                         : 'text-slate-600 hover:text-slate-900'
                     }`}
                   >
                     <span>Today's Agenda</span>
-                    <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
-                      plannerTab === 'today' ? 'bg-teal-100 text-teal-800' : 'bg-slate-200 text-slate-600'
+                    <span className={`text-[10px] px-1.5 py-0.2 rounded-md font-semibold ${
+                      plannerTab === 'today' ? 'bg-slate-100 text-slate-900' : 'bg-slate-200/70 text-slate-600'
                     }`}>
                       {metrics.today_total || 0}
                     </span>
@@ -593,15 +595,15 @@ export default function Visits({
                   <button
                     type="button"
                     onClick={() => handlePlannerTabChange('upcoming')}
-                    className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer whitespace-nowrap ${
+                    className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors cursor-pointer whitespace-nowrap ${
                       plannerTab === 'upcoming'
-                        ? 'bg-white text-slate-900 shadow-xs'
+                        ? 'bg-white text-slate-900 font-semibold shadow-2xs'
                         : 'text-slate-600 hover:text-slate-900'
                     }`}
                   >
                     <span>Upcoming</span>
-                    <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
-                      plannerTab === 'upcoming' ? 'bg-teal-100 text-teal-800' : 'bg-slate-200 text-slate-600'
+                    <span className={`text-[10px] px-1.5 py-0.2 rounded-md font-semibold ${
+                      plannerTab === 'upcoming' ? 'bg-slate-100 text-slate-900' : 'bg-slate-200/70 text-slate-600'
                     }`}>
                       {metrics.upcoming_count || 0}
                     </span>
@@ -610,9 +612,9 @@ export default function Visits({
                   <button
                     type="button"
                     onClick={() => handlePlannerTabChange('history')}
-                    className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer whitespace-nowrap ${
+                    className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors cursor-pointer whitespace-nowrap ${
                       plannerTab === 'history'
-                        ? 'bg-white text-slate-900 shadow-xs'
+                        ? 'bg-white text-slate-900 font-semibold shadow-2xs'
                         : 'text-slate-600 hover:text-slate-900'
                     }`}
                   >
@@ -622,9 +624,9 @@ export default function Visits({
                   <button
                     type="button"
                     onClick={() => handlePlannerTabChange('all')}
-                    className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer whitespace-nowrap ${
+                    className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors cursor-pointer whitespace-nowrap ${
                       plannerTab === 'all'
-                        ? 'bg-white text-slate-900 shadow-xs'
+                        ? 'bg-white text-slate-900 font-semibold shadow-2xs'
                         : 'text-slate-600 hover:text-slate-900'
                     }`}
                   >
@@ -634,13 +636,13 @@ export default function Visits({
 
                 {/* Instant Search Bar */}
                 <div className="relative w-full md:w-72">
-                  <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                   <input
                     type="text"
                     placeholder="Search doctor, clinic, purpose..."
                     value={plannerSearch}
                     onChange={(e) => setPlannerSearch(e.target.value)}
-                    className="w-full pl-9 pr-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-teal-600/20 focus:border-teal-700 transition-all"
+                    className="w-full pl-9 pr-3 py-1.5 text-xs bg-slate-50 border border-slate-200/80 rounded-xl focus:bg-white focus:outline-hidden focus:ring-1 focus:ring-slate-900 focus:border-slate-900 transition-all text-slate-800"
                   />
                   {plannerSearch && (
                     <button
@@ -656,15 +658,15 @@ export default function Visits({
 
               {/* Action & Status Filters */}
               <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-slate-100 text-xs">
-                <div className="flex items-center gap-2 overflow-x-auto">
-                  <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider shrink-0">
+                <div className="flex items-center gap-1.5 overflow-x-auto">
+                  <span className="text-[11px] font-medium text-slate-400 uppercase tracking-wider shrink-0">
                     Type:
                   </span>
                   <button
                     type="button"
                     onClick={() => setActionFilter('all')}
                     className={`px-2.5 py-1 rounded-lg text-xs font-medium cursor-pointer transition-colors ${
-                      actionFilter === 'all' ? 'bg-slate-900 text-white font-semibold' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                      actionFilter === 'all' ? 'bg-slate-900 text-white font-semibold' : 'bg-slate-100 text-slate-600 hover:bg-slate-200/70'
                     }`}
                   >
                     All Actions
@@ -673,30 +675,30 @@ export default function Visits({
                     type="button"
                     onClick={() => setActionFilter('visit')}
                     className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium cursor-pointer transition-colors ${
-                      actionFilter === 'visit' ? 'bg-teal-700 text-white font-semibold' : 'bg-teal-50 text-teal-800 hover:bg-teal-100'
+                      actionFilter === 'visit' ? 'bg-slate-900 text-white font-semibold' : 'bg-slate-100 text-slate-600 hover:bg-slate-200/70'
                     }`}
                   >
-                    <MapPin className="w-3 h-3" /> Visits Only
+                    <MapPin className="w-3 h-3 text-violet-600" /> Visits Only
                   </button>
                   <button
                     type="button"
                     onClick={() => setActionFilter('call')}
                     className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium cursor-pointer transition-colors ${
-                      actionFilter === 'call' ? 'bg-sky-700 text-white font-semibold' : 'bg-sky-50 text-sky-800 hover:bg-sky-100'
+                      actionFilter === 'call' ? 'bg-slate-900 text-white font-semibold' : 'bg-slate-100 text-slate-600 hover:bg-slate-200/70'
                     }`}
                   >
-                    <Phone className="w-3 h-3" /> Calls Only
+                    <Phone className="w-3 h-3 text-sky-600" /> Calls Only
                   </button>
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
+                  <span className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">
                     Status:
                   </span>
                   <select
                     value={statusFilter}
                     onChange={(e) => setStatusFilter(e.target.value)}
-                    className="bg-slate-50 border border-slate-200 text-slate-700 text-xs rounded-lg px-2.5 py-1 focus:outline-hidden focus:border-teal-700 cursor-pointer"
+                    className="bg-slate-50 border border-slate-200/80 text-slate-700 text-xs rounded-xl px-2.5 py-1 focus:outline-hidden focus:ring-1 focus:ring-slate-900 focus:border-slate-900 cursor-pointer"
                   >
                     <option value="all">All Status</option>
                     <option value="pending">Pending</option>
@@ -710,12 +712,12 @@ export default function Visits({
             {/* List of Scheduled Items */}
             <div className="space-y-3">
               {filteredSchedules.length === 0 ? (
-                <div className="bg-white rounded-2xl border border-slate-200/80 p-12 text-center shadow-xs">
-                  <div className="w-12 h-12 rounded-2xl bg-teal-50 text-teal-700 flex items-center justify-center mx-auto mb-3">
-                    <CalendarClock className="w-6 h-6 stroke-[1.8]" />
+                <div className="bg-white rounded-2xl border border-slate-200/80 p-12 text-center">
+                  <div className="w-10 h-10 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center mx-auto mb-3">
+                    <CalendarClock className="w-5 h-5 stroke-[1.8]" />
                   </div>
-                  <h3 className="text-base font-bold text-slate-900 mb-1">No Scheduled Items Found</h3>
-                  <p className="text-xs text-slate-500 max-w-sm mx-auto mb-4">
+                  <h3 className="text-sm font-semibold text-slate-800 mb-1">No Scheduled Items Found</h3>
+                  <p className="text-xs text-slate-400 max-w-sm mx-auto mb-4 font-normal">
                     {plannerSearch || actionFilter !== 'all' || statusFilter !== 'all'
                       ? 'No items match your active filters. Try clearing filters or searching for something else.'
                       : `You have no calls or visits planned in the '${plannerTab}' view.`}
@@ -723,9 +725,9 @@ export default function Visits({
                   <button
                     type="button"
                     onClick={() => setIsScheduleModalOpen(true)}
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-teal-700 text-white text-xs font-semibold hover:bg-teal-800 shadow-xs cursor-pointer"
+                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-slate-900 text-white text-xs font-medium hover:bg-slate-800 transition-colors cursor-pointer"
                   >
-                    <Plus className="w-3.5 h-3.5 stroke-[2.2]" />
+                    <Plus className="w-3.5 h-3.5 stroke-[2]" />
                     <span>Add Today's Call or Visit</span>
                   </button>
                 </div>
@@ -746,11 +748,11 @@ export default function Visits({
                   return (
                     <div 
                       key={item.id}
-                      className={`bg-white rounded-2xl border transition-all p-4.5 sm:p-5 shadow-xs hover:shadow-sm ${
+                      className={`bg-white rounded-2xl border transition-colors p-4 sm:p-5 ${
                         isCompleted 
-                          ? 'border-emerald-200/90 bg-emerald-50/15' 
+                          ? 'border-emerald-200 bg-emerald-50/20' 
                           : isMissed 
-                            ? 'border-rose-200/90 bg-rose-50/15'
+                            ? 'border-rose-200 bg-rose-50/20'
                             : 'border-slate-200/80 hover:border-slate-300'
                       }`}
                     >
@@ -758,39 +760,39 @@ export default function Visits({
                         
                         {/* Left Details */}
                         <div className="flex items-start gap-3.5 min-w-0 flex-1">
-                          <div className={`w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 shadow-xs ${
+                          <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
                             isCompleted
-                              ? 'bg-emerald-100 text-emerald-700'
+                              ? 'bg-emerald-50 text-emerald-700 border border-emerald-100'
                               : isCall
-                                ? 'bg-sky-100/80 text-sky-700'
-                                : 'bg-teal-100/80 text-teal-800'
+                                ? 'bg-sky-50 text-sky-700 border border-sky-100'
+                                : 'bg-slate-100 text-slate-700 border border-slate-200/60'
                           }`}>
                             {isCompleted ? (
-                              <CheckCheck className="w-5 h-5 stroke-[2.2]" />
+                              <CheckCheck className="w-4 h-4 stroke-[2]" />
                             ) : isCall ? (
-                              <PhoneCall className="w-5 h-5 stroke-[2.2]" />
+                              <PhoneCall className="w-4 h-4 stroke-[2]" />
                             ) : (
-                              <MapPin className="w-5 h-5 stroke-[2.2]" />
+                              <MapPin className="w-4 h-4 stroke-[2]" />
                             )}
                           </div>
 
                           <div className="min-w-0 flex-1">
                             <div className="flex flex-wrap items-center gap-2 mb-1">
-                              <span className={`text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full ${
+                              <span className={`text-[10px] uppercase font-semibold px-2 py-0.5 rounded-md ${
                                 isCall 
-                                  ? 'bg-sky-50 text-sky-800 border border-sky-200/70' 
-                                  : 'bg-teal-50 text-teal-800 border border-teal-200/70'
+                                  ? 'bg-sky-50 text-sky-700 border border-sky-100' 
+                                  : 'bg-slate-100 text-slate-700 border border-slate-200/70'
                               }`}>
                                 {isCall ? 'Phone Call' : 'Clinic Visit'}
                               </span>
 
                               {item.priority === 'high' && (
-                                <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200/60">
+                                <span className="text-[10px] uppercase font-semibold px-2 py-0.5 rounded-md bg-rose-50 text-rose-700 border border-rose-100">
                                   High Priority
                                 </span>
                               )}
 
-                              <span className="inline-flex items-center gap-1 text-[11px] text-slate-500 font-medium bg-slate-100 px-2 py-0.5 rounded-md">
+                              <span className="inline-flex items-center gap-1 text-[11px] text-slate-500 font-normal bg-slate-50 px-2 py-0.5 rounded-md border border-slate-100">
                                 <Clock className="w-3 h-3 text-slate-400" />
                                 <span>{item.scheduled_time || 'Anytime'}</span>
                                 {plannerTab !== 'today' && (
@@ -801,42 +803,42 @@ export default function Visits({
                               </span>
 
                               {isCompleted && (
-                                <span className="inline-flex items-center gap-1 text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300">
-                                  <Check className="w-3 h-3 stroke-[2.5]" /> Visited / Called
+                                <span className="inline-flex items-center gap-1 text-[10px] uppercase font-semibold px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-100">
+                                  <Check className="w-3 h-3 stroke-[2.5]" /> Completed
                                 </span>
                               )}
                               {isMissed && (
-                                <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-rose-100 text-rose-800">
+                                <span className="text-[10px] uppercase font-semibold px-2 py-0.5 rounded-md bg-rose-50 text-rose-700 border border-rose-100">
                                   Missed
                                 </span>
                               )}
                             </div>
 
                             <div className="flex items-center gap-2">
-                              <h4 className="text-sm font-bold text-slate-900 truncate">
+                              <h4 className="text-sm font-semibold text-slate-800 truncate">
                                 {displayName}
                               </h4>
                               {doctor?.tier && (
-                                <span className="text-[9px] uppercase font-extrabold px-1.5 py-0.2 bg-teal-50 text-teal-700 border border-teal-200 rounded">
+                                <span className="text-[9px] uppercase font-semibold px-1.5 py-0.2 bg-slate-100 text-slate-700 border border-slate-200 rounded">
                                   {doctor.tier}
                                 </span>
                               )}
                             </div>
-                            <p className="text-xs text-slate-500 truncate mt-0.5">
+                            <p className="text-xs text-slate-400 truncate mt-0.5 font-normal">
                               {subtitle}
                             </p>
 
                             {/* Purpose & Agenda */}
-                            <div className="mt-2 bg-slate-50/80 rounded-xl p-2.5 border border-slate-100/90 text-xs">
+                            <div className="mt-2.5 bg-slate-50 rounded-xl p-2.5 border border-slate-100 text-xs">
                               <div className="flex items-start gap-1.5">
-                                <FileText className="w-3.5 h-3.5 text-teal-700 shrink-0 mt-0.5" />
+                                <FileText className="w-3.5 h-3.5 text-slate-500 shrink-0 mt-0.5" />
                                 <div className="min-w-0 flex-1">
-                                  <span className="font-medium text-slate-800">Purpose: </span>
-                                  <span className="text-slate-600">{item.purpose}</span>
+                                  <span className="font-semibold text-slate-700">Purpose: </span>
+                                  <span className="text-slate-600 font-normal">{item.purpose}</span>
                                 </div>
                               </div>
                               {item.notes && (
-                                <p className="text-[11px] text-slate-500 mt-1 pl-5 italic">
+                                <p className="text-[11px] text-slate-400 mt-1 pl-5 italic">
                                   Note: {item.notes}
                                 </p>
                               )}
@@ -844,11 +846,11 @@ export default function Visits({
 
                             {/* Outcome note display */}
                             {isCompleted && item.outcome_note && (
-                              <div className="mt-2 bg-emerald-50/70 border border-emerald-200/60 rounded-xl p-2.5 text-xs text-emerald-950 flex items-start gap-2">
+                              <div className="mt-2 bg-emerald-50/80 border border-emerald-100 rounded-xl p-2.5 text-xs text-emerald-900 flex items-start gap-2">
                                 <MessageSquare className="w-3.5 h-3.5 text-emerald-700 shrink-0 mt-0.5" />
                                 <div>
-                                  <span className="font-bold text-emerald-900">Outcome: </span>
-                                  <span>{item.outcome_note}</span>
+                                  <span className="font-semibold text-emerald-900">Outcome: </span>
+                                  <span className="font-normal">{item.outcome_note}</span>
                                   {item.completed_at && (
                                     <span className="text-[10px] text-emerald-700 block mt-0.5">
                                       Logged at {new Date(item.completed_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -869,10 +871,10 @@ export default function Visits({
                               {phone && (
                                 <a
                                   href={`tel:${phone}`}
-                                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-sky-200 bg-sky-50 text-sky-800 hover:bg-sky-100 text-xs font-semibold transition-colors cursor-pointer"
+                                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200/80 bg-white text-slate-700 hover:bg-slate-50 text-xs font-medium transition-colors cursor-pointer"
                                   title={`Dial ${phone}`}
                                 >
-                                  <Phone className="w-3.5 h-3.5" />
+                                  <Phone className="w-3.5 h-3.5 text-sky-600" />
                                   <span>Call {phone}</span>
                                 </a>
                               )}
@@ -880,11 +882,9 @@ export default function Visits({
                               <button
                                 type="button"
                                 onClick={() => openOutcomeModal(item)}
-                                className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold text-white shadow-xs hover:shadow-sm transition-all cursor-pointer ${
-                                  isCall ? 'bg-sky-700 hover:bg-sky-800' : 'bg-teal-700 hover:bg-teal-800'
-                                }`}
+                                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-medium text-white bg-slate-900 hover:bg-slate-800 transition-colors cursor-pointer"
                               >
-                                <Check className="w-4 h-4 stroke-[2.5]" />
+                                <Check className="w-3.5 h-3.5 stroke-[2]" />
                                 <span>{isCall ? 'Mark as Called' : 'Mark as Visited'}</span>
                               </button>
 
@@ -917,11 +917,11 @@ export default function Visits({
                             <button
                               type="button"
                               onClick={() => openDetailingModal(String(doctor.id))}
-                              className="inline-flex items-center gap-1.5 text-xs font-semibold text-teal-700 hover:text-teal-900 bg-teal-50 hover:bg-teal-100/80 px-3 py-1.5 rounded-xl border border-teal-200/80 cursor-pointer mt-1"
+                              className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-700 hover:text-slate-900 bg-white hover:bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200/80 cursor-pointer mt-1 transition-colors"
                             >
-                              <Pill className="w-3.5 h-3.5" />
+                              <Pill className="w-3.5 h-3.5 text-slate-500" />
                               <span>Log Detailing & Samples</span>
-                              <ChevronRight className="w-3 h-3" />
+                              <ChevronRight className="w-3 h-3 text-slate-400" />
                             </button>
                           )}
 
@@ -981,7 +981,7 @@ export default function Visits({
                     placeholder="Search doctor, hospital, specialty..."
                     value={dcrSearch}
                     onChange={(e) => setDcrSearch(e.target.value)}
-                    className="w-full pl-9 pr-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-teal-600/20 focus:border-teal-700"
+                    className="w-full pl-9 pr-3 py-1.5 text-xs bg-slate-50 border border-slate-200/80 rounded-xl focus:bg-white focus:outline-hidden focus:ring-1 focus:ring-slate-900 focus:border-slate-900 text-slate-800"
                   />
                   {dcrSearch && (
                     <button
@@ -998,7 +998,7 @@ export default function Visits({
                   <select
                     value={dcrDateFilter}
                     onChange={(e) => setDcrDateFilter(e.target.value)}
-                    className="bg-slate-50 border border-slate-200 text-slate-700 text-xs rounded-lg px-2.5 py-1.5 focus:outline-hidden focus:border-teal-700 cursor-pointer"
+                    className="bg-slate-50 border border-slate-200/80 text-slate-700 text-xs rounded-xl px-2.5 py-1.5 focus:outline-hidden focus:ring-1 focus:ring-slate-900 focus:border-slate-900 cursor-pointer"
                   >
                     <option value="all">All Dates</option>
                     <option value="today">Today's Visits</option>
@@ -1009,7 +1009,7 @@ export default function Visits({
                   <select
                     value={dcrDoctorFilter}
                     onChange={(e) => setDcrDoctorFilter(e.target.value)}
-                    className="bg-slate-50 border border-slate-200 text-slate-700 text-xs rounded-lg px-2.5 py-1.5 focus:outline-hidden focus:border-teal-700 cursor-pointer max-w-[180px]"
+                    className="bg-slate-50 border border-slate-200/80 text-slate-700 text-xs rounded-xl px-2.5 py-1.5 focus:outline-hidden focus:ring-1 focus:ring-slate-900 focus:border-slate-900 cursor-pointer max-w-[180px]"
                   >
                     <option value="all">All Doctors</option>
                     {doctors.map(d => (
@@ -1020,7 +1020,7 @@ export default function Visits({
                   <select
                     value={dcrStatusFilter}
                     onChange={(e) => setDcrStatusFilter(e.target.value)}
-                    className="bg-slate-50 border border-slate-200 text-slate-700 text-xs rounded-lg px-2.5 py-1.5 focus:outline-hidden focus:border-teal-700 cursor-pointer"
+                    className="bg-slate-50 border border-slate-200/80 text-slate-700 text-xs rounded-xl px-2.5 py-1.5 focus:outline-hidden focus:ring-1 focus:ring-slate-900 focus:border-slate-900 cursor-pointer"
                   >
                     <option value="all">All Status</option>
                     <option value="completed">Completed Calls</option>
@@ -1033,24 +1033,24 @@ export default function Visits({
             {/* Detailing Logs List */}
             {visitsLoading ? (
               <div className="bg-white rounded-2xl border border-slate-200/80 p-12 text-center text-xs text-slate-500">
-                <RefreshCw className="w-6 h-6 animate-spin text-teal-700 mx-auto mb-2" />
+                <RefreshCw className="w-5 h-5 animate-spin text-slate-900 mx-auto mb-2" />
                 <span>Loading detailing records...</span>
               </div>
             ) : visits.length === 0 ? (
-              <div className="bg-white rounded-2xl border border-slate-200/80 p-12 text-center shadow-xs">
-                <div className="w-12 h-12 rounded-2xl bg-teal-50 text-teal-700 flex items-center justify-center mx-auto mb-3">
-                  <Stethoscope className="w-6 h-6 stroke-[1.8]" />
+              <div className="bg-white rounded-2xl border border-slate-200/80 p-12 text-center">
+                <div className="w-10 h-10 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center mx-auto mb-3">
+                  <Stethoscope className="w-5 h-5 stroke-[1.8]" />
                 </div>
-                <h3 className="text-base font-bold text-slate-900 mb-1">No Detailing Records Found</h3>
-                <p className="text-xs text-slate-500 max-w-sm mx-auto mb-4">
+                <h3 className="text-sm font-semibold text-slate-800 mb-1">No Detailing Records Found</h3>
+                <p className="text-xs text-slate-400 max-w-sm mx-auto mb-4 font-normal">
                   Log the drugs pitched, free sample strips handed over, and prescriber commitment for your doctor visits.
                 </p>
                 <button
                   type="button"
                   onClick={() => openDetailingModal()}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-teal-700 text-white text-xs font-semibold hover:bg-teal-800 shadow-xs cursor-pointer"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-slate-900 text-white text-xs font-medium hover:bg-slate-800 transition-colors cursor-pointer"
                 >
-                  <Plus className="w-3.5 h-3.5 stroke-[2.2]" />
+                  <Plus className="w-3.5 h-3.5 stroke-[2]" />
                   <span>Log Detailing & Samples</span>
                 </button>
               </div>
@@ -1062,27 +1062,27 @@ export default function Visits({
                   return (
                     <div 
                       key={v.id}
-                      className="bg-white rounded-2xl border border-slate-200/80 hover:border-slate-300 p-5 shadow-xs transition-all"
+                      className="bg-white rounded-2xl border border-slate-200/80 hover:border-slate-300 p-4 sm:p-5 transition-colors"
                     >
                       <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-4">
                         
                         {/* Doctor info & Detailing content */}
                         <div className="flex items-start gap-3.5 min-w-0 flex-1">
-                          <div className="w-11 h-11 rounded-2xl bg-teal-50 text-teal-800 flex items-center justify-center font-bold text-sm shrink-0 border border-teal-100">
+                          <div className="w-10 h-10 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center font-semibold text-xs shrink-0 border border-slate-200/60">
                             {doc?.name?.charAt(4) || 'D'}
                           </div>
 
                           <div className="min-w-0 flex-1">
                             <div className="flex flex-wrap items-center gap-2 mb-1">
-                              <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-teal-50 text-teal-800 border border-teal-200/70">
+                              <span className="text-[10px] uppercase font-semibold px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 border border-slate-200/70">
                                 {v.call_type?.replace('_', ' ')?.toUpperCase() || 'ROUTINE DETAILING'}
                               </span>
 
-                              <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+                              <span className="text-[10px] uppercase font-semibold px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-100">
                                 {v.status?.toUpperCase() || 'COMPLETED'}
                               </span>
 
-                              <span className="inline-flex items-center gap-1 text-[11px] text-slate-500 font-medium bg-slate-100 px-2 py-0.5 rounded-md">
+                              <span className="inline-flex items-center gap-1 text-[11px] text-slate-500 font-normal bg-slate-50 px-2 py-0.5 rounded-md border border-slate-100">
                                 <Calendar className="w-3 h-3 text-slate-400" />
                                 <span>{v.visit_date}</span>
                                 {v.visit_time && <span>• {v.visit_time}</span>}
@@ -1090,29 +1090,29 @@ export default function Visits({
                             </div>
 
                             <div className="flex items-center gap-2">
-                              <h4 className="text-sm font-bold text-slate-900 truncate">
+                              <h4 className="text-sm font-semibold text-slate-800 truncate">
                                 {doc?.name}
                               </h4>
                               {doc?.qualification && (
                                 <span className="text-[11px] text-slate-400">({doc.qualification})</span>
                               )}
                               {doc?.tier && (
-                                <span className="text-[9px] uppercase font-extrabold px-1.5 py-0.2 bg-teal-50 text-teal-700 border border-teal-200 rounded">
+                                <span className="text-[9px] uppercase font-semibold px-1.5 py-0.2 bg-slate-100 text-slate-700 border border-slate-200 rounded">
                                   {doc.tier}
                                 </span>
                               )}
                             </div>
-                            <p className="text-xs text-slate-500 truncate mt-0.5">
+                            <p className="text-xs text-slate-400 truncate mt-0.5 font-normal">
                               {doc?.clinic_hospital_name} • {doc?.specialization}
                             </p>
 
                             {/* Products Detailed Tags */}
                             {Array.isArray(v.products_detailed) && v.products_detailed.length > 0 && (
                               <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
-                                <span className="text-[11px] font-semibold text-slate-500">Molecules Detailed:</span>
+                                <span className="text-[11px] font-medium text-slate-400">Formulations Detailed:</span>
                                 {v.products_detailed.map((prod, idx) => (
-                                  <span key={idx} className="inline-flex items-center gap-1 text-[10px] font-bold bg-teal-50 text-teal-800 border border-teal-200/60 px-2 py-0.5 rounded-md">
-                                    <Pill className="w-2.5 h-2.5" />
+                                  <span key={idx} className="inline-flex items-center gap-1 text-[10px] font-medium bg-slate-100 text-slate-700 border border-slate-200/80 px-2 py-0.5 rounded-md">
+                                    <Pill className="w-2.5 h-2.5 text-slate-500" />
                                     <span>{prod}</span>
                                   </span>
                                 ))}
@@ -1123,8 +1123,8 @@ export default function Visits({
                             <div className="mt-2.5 grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
                               {feedbackObj && (
                                 <div className="bg-slate-50 p-2 rounded-xl border border-slate-100 flex items-center gap-2">
-                                  <span className="text-slate-500 font-medium">Doctor Response:</span>
-                                  <span className={`px-2 py-0.5 rounded-full font-bold text-[10px] ${feedbackObj.color}`}>
+                                  <span className="text-slate-400 font-normal">Physician Feedback:</span>
+                                  <span className={`px-2 py-0.5 rounded-md font-semibold text-[10px] ${feedbackObj.color}`}>
                                     {feedbackObj.label}
                                   </span>
                                 </div>
@@ -1132,22 +1132,22 @@ export default function Visits({
 
                               {v.samples_given && (
                                 <div className="bg-slate-50 p-2 rounded-xl border border-slate-100 flex items-center gap-2">
-                                  <Gift className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
-                                  <span className="text-slate-500 font-medium">Samples Provided:</span>
-                                  <span className="text-slate-800 font-semibold truncate">{v.samples_given}</span>
+                                  <Gift className="w-3.5 h-3.5 text-slate-600 shrink-0" />
+                                  <span className="text-slate-400 font-normal">Samples Provided:</span>
+                                  <span className="text-slate-700 font-medium truncate">{v.samples_given}</span>
                                 </div>
                               )}
                             </div>
 
                             {v.remarks && (
-                              <p className="text-[11px] text-slate-500 italic mt-2 bg-slate-50/60 p-2 rounded-xl border border-slate-100">
+                              <p className="text-[11px] text-slate-500 mt-2 bg-slate-50 p-2 rounded-xl border border-slate-100 font-normal">
                                 Remarks: {v.remarks}
                               </p>
                             )}
 
                             {v.next_visit_date && (
-                              <p className="text-[11px] text-teal-700 font-medium mt-1 flex items-center gap-1">
-                                <Calendar className="w-3 h-3" />
+                              <p className="text-[11px] text-slate-600 font-medium mt-1.5 flex items-center gap-1">
+                                <Calendar className="w-3 h-3 text-slate-400" />
                                 <span>Follow-up Planned: {new Date(v.next_visit_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
                               </p>
                             )}
@@ -1243,13 +1243,13 @@ export default function Visits({
                     <button
                       type="button"
                       onClick={() => setScheduleForm(prev => ({ ...prev, action_type: 'visit' }))}
-                      className={`flex items-center justify-center gap-2 p-3 rounded-2xl border text-xs font-bold transition-all cursor-pointer ${
+                      className={`flex items-center justify-center gap-2 p-3 rounded-2xl border text-xs font-semibold transition-colors cursor-pointer ${
                         scheduleForm.action_type === 'visit'
-                          ? 'bg-teal-50 border-teal-700 text-teal-800 shadow-xs ring-2 ring-teal-700/20'
-                          : 'border-slate-200 text-slate-600 hover:bg-slate-50'
+                          ? 'bg-slate-900 border-slate-900 text-white'
+                          : 'border-slate-200/80 text-slate-600 hover:bg-slate-50'
                       }`}
                     >
-                      <MapPin className="w-4 h-4 text-teal-700" />
+                      <MapPin className="w-4 h-4" />
                       <span>Clinic Visit</span>
                     </button>
                   </div>
@@ -1258,25 +1258,25 @@ export default function Visits({
                 {/* Whom to Visit/Call */}
                 <div className="bg-slate-50 p-3.5 rounded-2xl border border-slate-200/70 space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="font-bold text-slate-800">Whom to Visit or Call?</span>
-                    <div className="flex items-center gap-2 text-[11px]">
-                      <label className="flex items-center gap-1 cursor-pointer">
+                    <span className="font-semibold text-slate-800">Whom to Visit or Call?</span>
+                    <div className="flex items-center gap-3 text-[11px]">
+                      <label className="flex items-center gap-1.5 cursor-pointer">
                         <input
                           type="radio"
                           name="contact_mode"
                           checked={scheduleForm.contact_mode === 'doctor'}
                           onChange={() => setScheduleForm(prev => ({ ...prev, contact_mode: 'doctor' }))}
-                          className="text-teal-700 focus:ring-teal-700"
+                          className="text-slate-900 focus:ring-slate-900"
                         />
                         <span className="font-medium text-slate-700">Doctor</span>
                       </label>
-                      <label className="flex items-center gap-1 cursor-pointer">
+                      <label className="flex items-center gap-1.5 cursor-pointer">
                         <input
                           type="radio"
                           name="contact_mode"
                           checked={scheduleForm.contact_mode === 'custom'}
                           onChange={() => setScheduleForm(prev => ({ ...prev, contact_mode: 'custom' }))}
-                          className="text-teal-700 focus:ring-teal-700"
+                          className="text-slate-900 focus:ring-slate-900"
                         />
                         <span className="font-medium text-slate-700">Chemist / Other</span>
                       </label>
@@ -1288,7 +1288,7 @@ export default function Visits({
                       <select
                         value={scheduleForm.doctor_id}
                         onChange={(e) => setScheduleForm(prev => ({ ...prev, doctor_id: e.target.value }))}
-                        className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-teal-600/20 focus:border-teal-700 cursor-pointer"
+                        className="w-full bg-white border border-slate-200/80 rounded-xl px-3 py-2 text-xs focus:ring-1 focus:ring-slate-900 focus:border-slate-900 cursor-pointer"
                         required
                       >
                         <option value="">-- Select Doctor from Your List ({doctors.length} available) --</option>
@@ -1306,13 +1306,13 @@ export default function Visits({
                         placeholder="e.g. Apollo Pharmacy / City Medico"
                         value={scheduleForm.custom_contact_name}
                         onChange={(e) => setScheduleForm(prev => ({ ...prev, custom_contact_name: e.target.value }))}
-                        className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-teal-600/20 focus:border-teal-700"
+                        className="w-full bg-white border border-slate-200/80 rounded-xl px-3 py-2 text-xs focus:ring-1 focus:ring-slate-900 focus:border-slate-900"
                         required
                       />
                       <select
                         value={scheduleForm.contact_type}
                         onChange={(e) => setScheduleForm(prev => ({ ...prev, contact_type: e.target.value }))}
-                        className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-teal-600/20 focus:border-teal-700 cursor-pointer"
+                        className="w-full bg-white border border-slate-200/80 rounded-xl px-3 py-2 text-xs focus:ring-1 focus:ring-slate-900 focus:border-slate-900 cursor-pointer"
                       >
                         <option value="chemist">Chemist / Pharmacy</option>
                         <option value="hospital">Hospital Desk / Purchase</option>
@@ -1325,40 +1325,40 @@ export default function Visits({
                 {/* Date & Time */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block font-semibold text-slate-700 mb-1">Date</label>
+                    <label className="block font-medium text-slate-700 mb-1">Date</label>
                     <input
                       type="date"
                       value={scheduleForm.scheduled_date}
                       onChange={(e) => setScheduleForm(prev => ({ ...prev, scheduled_date: e.target.value }))}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-teal-600/20 focus:border-teal-700"
+                      className="w-full bg-slate-50 border border-slate-200/80 rounded-xl px-3 py-2 text-xs focus:ring-1 focus:ring-slate-900 focus:border-slate-900"
                       required
                     />
                   </div>
                   <div>
-                    <label className="block font-semibold text-slate-700 mb-1">Preferred Time Slot</label>
+                    <label className="block font-medium text-slate-700 mb-1">Preferred Time Slot</label>
                     <input
                       type="text"
                       placeholder="e.g. Morning OPD (10:30 AM)"
                       value={scheduleForm.scheduled_time}
                       onChange={(e) => setScheduleForm(prev => ({ ...prev, scheduled_time: e.target.value }))}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-teal-600/20 focus:border-teal-700"
+                      className="w-full bg-slate-50 border border-slate-200/80 rounded-xl px-3 py-2 text-xs focus:ring-1 focus:ring-slate-900 focus:border-slate-900"
                     />
                   </div>
                 </div>
 
                 {/* Priority */}
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Priority Level</label>
+                  <label className="block font-medium text-slate-700 mb-1">Priority Level</label>
                   <div className="flex items-center gap-2">
                     {['high', 'normal', 'low'].map(p => (
                       <button
                         key={p}
                         type="button"
                         onClick={() => setScheduleForm(prev => ({ ...prev, priority: p }))}
-                        className={`flex-1 py-1.5 rounded-xl border font-bold capitalize text-xs transition-all cursor-pointer ${
+                        className={`flex-1 py-1.5 rounded-xl border font-semibold capitalize text-xs transition-colors cursor-pointer ${
                           scheduleForm.priority === p 
-                            ? (p === 'high' ? 'bg-rose-50 border-rose-600 text-rose-700 ring-1 ring-rose-500' : 'bg-slate-900 border-slate-900 text-white')
-                            : 'border-slate-200 text-slate-600 hover:bg-slate-50'
+                            ? (p === 'high' ? 'bg-rose-50 border-rose-300 text-rose-700' : 'bg-slate-900 border-slate-900 text-white')
+                            : 'border-slate-200/80 text-slate-600 hover:bg-slate-50'
                         }`}
                       >
                         {p}
@@ -1370,7 +1370,7 @@ export default function Visits({
                 {/* Purpose & Molecule tag clickers */}
                 <div>
                   <div className="flex items-center justify-between mb-1">
-                    <label className="font-semibold text-slate-700">
+                    <label className="font-medium text-slate-700">
                       Detailing Purpose / Agenda <span className="text-rose-500">*</span>
                     </label>
                     <span className="text-[11px] text-slate-400">Click product to tag:</span>
@@ -1383,7 +1383,7 @@ export default function Visits({
                           key={prod.id}
                           type="button"
                           onClick={() => addProductToPurpose(prod.brand_name)}
-                          className="text-[10px] font-semibold bg-white hover:bg-teal-50 text-slate-700 hover:text-teal-800 border border-slate-200 px-2 py-0.5 rounded-md cursor-pointer transition-colors shadow-2xs"
+                          className="text-[10px] font-medium bg-white hover:bg-slate-100 text-slate-700 border border-slate-200/80 px-2 py-0.5 rounded-md cursor-pointer transition-colors"
                         >
                           + {prod.brand_name}
                         </button>
@@ -1393,23 +1393,23 @@ export default function Visits({
 
                   <textarea
                     rows="2"
-                    placeholder="e.g. Detailing Ciplox 500 & Rosucipl; follow up on prescription feedback..."
+                    placeholder="e.g. Detailing AmoxiClav 625 Duo; follow up on prescription feedback..."
                     value={scheduleForm.purpose}
                     onChange={(e) => setScheduleForm(prev => ({ ...prev, purpose: e.target.value }))}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs focus:ring-2 focus:ring-teal-600/20 focus:border-teal-700"
+                    className="w-full bg-slate-50 border border-slate-200/80 rounded-xl p-2.5 text-xs focus:ring-1 focus:ring-slate-900 focus:border-slate-900"
                     required
                   />
                 </div>
 
                 {/* Internal Notes */}
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Internal Notes (Optional)</label>
+                  <label className="block font-medium text-slate-700 mb-1">Internal Notes (Optional)</label>
                   <input
                     type="text"
                     placeholder="e.g. Doctor prefers evening OPD after 6 PM"
                     value={scheduleForm.notes}
                     onChange={(e) => setScheduleForm(prev => ({ ...prev, notes: e.target.value }))}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-teal-600/20 focus:border-teal-700"
+                    className="w-full bg-slate-50 border border-slate-200/80 rounded-xl px-3 py-2 text-xs focus:ring-1 focus:ring-slate-900 focus:border-slate-900"
                   />
                 </div>
 
@@ -1417,14 +1417,14 @@ export default function Visits({
                   <button
                     type="button"
                     onClick={() => setIsScheduleModalOpen(false)}
-                    className="px-4 py-2 rounded-xl text-slate-600 hover:bg-slate-100 font-semibold cursor-pointer"
+                    className="px-4 py-2 rounded-xl text-slate-600 hover:bg-slate-100 text-xs font-medium cursor-pointer"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={isPlannerSubmitting}
-                    className="px-5 py-2 rounded-xl bg-teal-700 hover:bg-teal-800 text-white font-bold shadow-xs transition-all cursor-pointer disabled:opacity-50"
+                    className="px-5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-medium transition-colors cursor-pointer disabled:opacity-50"
                   >
                     {isPlannerSubmitting ? 'Scheduling...' : 'Save to Schedule'}
                   </button>
@@ -1438,20 +1438,20 @@ export default function Visits({
         {/* MODAL 2: OUTCOME FEEDBACK DRAWER                                         */}
         {/* ========================================================================= */}
         {outcomeModalSchedule && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs">
             <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-xl border border-slate-100">
               <div className="flex items-center justify-between pb-3 border-b border-slate-100">
                 <div className="flex items-center gap-2.5">
-                  <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${
-                    outcomeModalSchedule.action_type === 'call' ? 'bg-sky-100 text-sky-700' : 'bg-teal-100 text-teal-800'
+                  <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${
+                    outcomeModalSchedule.action_type === 'call' ? 'bg-sky-50 text-sky-700' : 'bg-slate-100 text-slate-700'
                   }`}>
                     {outcomeModalSchedule.action_type === 'call' ? <PhoneCall className="w-4 h-4" /> : <CheckCircle2 className="w-4 h-4" />}
                   </div>
                   <div>
-                    <h3 className="text-base font-bold text-slate-900">
+                    <h3 className="text-sm font-semibold text-slate-800">
                       Mark as {outcomeModalSchedule.action_type === 'call' ? 'Called' : 'Visited'}
                     </h3>
-                    <p className="text-[11px] text-slate-500">
+                    <p className="text-[11px] text-slate-400">
                       {outcomeModalSchedule.doctor?.name || outcomeModalSchedule.custom_contact_name}
                     </p>
                   </div>
@@ -1467,7 +1467,7 @@ export default function Visits({
 
               <div className="space-y-4 pt-3 text-xs">
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1.5">
+                  <label className="block font-medium text-slate-700 mb-1.5">
                     Quick Outcome Presets (Tap to select)
                   </label>
                   <div className="space-y-1.5">
@@ -1478,7 +1478,7 @@ export default function Visits({
                         onClick={() => setOutcomeNote(outcome)}
                         className={`w-full text-left p-2 rounded-xl text-xs transition-colors border cursor-pointer ${
                           outcomeNote === outcome 
-                            ? 'bg-emerald-50 border-emerald-400 text-emerald-900 font-semibold' 
+                            ? 'bg-emerald-50 border-emerald-300 text-emerald-800 font-semibold' 
                             : 'bg-slate-50 border-slate-200/80 text-slate-700 hover:bg-slate-100'
                         }`}
                       >
@@ -1489,7 +1489,7 @@ export default function Visits({
                 </div>
 
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">
+                  <label className="block font-medium text-slate-700 mb-1">
                     Outcome Feedback / Discussion Notes
                   </label>
                   <textarea
@@ -1497,7 +1497,7 @@ export default function Visits({
                     placeholder="Add notes on doctor's feedback, prescription commitments, or follow-up needs..."
                     value={outcomeNote}
                     onChange={(e) => setOutcomeNote(e.target.value)}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs focus:ring-2 focus:ring-teal-600/20 focus:border-teal-700"
+                    className="w-full bg-slate-50 border border-slate-200/80 rounded-xl p-2.5 text-xs focus:ring-1 focus:ring-slate-900 focus:border-slate-900"
                   />
                 </div>
 
@@ -1505,7 +1505,7 @@ export default function Visits({
                   <button
                     type="button"
                     onClick={() => setOutcomeModalSchedule(null)}
-                    className="px-3.5 py-1.5 rounded-xl text-slate-600 hover:bg-slate-100 font-medium cursor-pointer"
+                    className="px-3.5 py-1.5 rounded-xl text-slate-600 hover:bg-slate-100 text-xs font-medium cursor-pointer"
                   >
                     Cancel
                   </button>
@@ -1513,9 +1513,9 @@ export default function Visits({
                     type="button"
                     disabled={isPlannerSubmitting}
                     onClick={() => handlePlannerStatusUpdate(outcomeModalSchedule.id, 'completed', outcomeNote)}
-                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold shadow-xs cursor-pointer disabled:opacity-50"
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-medium transition-colors cursor-pointer disabled:opacity-50"
                   >
-                    <Check className="w-4 h-4 stroke-[2.5]" />
+                    <Check className="w-4 h-4 stroke-[2]" />
                     <span>Confirm Completion</span>
                   </button>
                 </div>
@@ -1528,10 +1528,10 @@ export default function Visits({
         {/* MODAL 3: RESCHEDULE MODAL                                                 */}
         {/* ========================================================================= */}
         {rescheduleItem && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs">
             <div className="bg-white rounded-3xl max-w-sm w-full p-6 shadow-xl border border-slate-100">
               <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-                <h3 className="text-base font-bold text-slate-900">Reschedule Activity</h3>
+                <h3 className="text-sm font-semibold text-slate-800">Reschedule Activity</h3>
                 <button
                   type="button"
                   onClick={() => setRescheduleItem(null)}
@@ -1543,23 +1543,23 @@ export default function Visits({
 
               <form onSubmit={handleRescheduleSubmit} className="space-y-3 pt-3 text-xs">
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">New Date</label>
+                  <label className="block font-medium text-slate-700 mb-1">New Date</label>
                   <input
                     type="date"
                     value={rescheduleDate}
                     onChange={(e) => setRescheduleDate(e.target.value)}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-teal-600/20 focus:border-teal-700"
+                    className="w-full bg-slate-50 border border-slate-200/80 rounded-xl px-3 py-2 text-xs focus:ring-1 focus:ring-slate-900 focus:border-slate-900"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">New Time Slot</label>
+                  <label className="block font-medium text-slate-700 mb-1">New Time Slot</label>
                   <input
                     type="text"
                     value={rescheduleTime}
                     onChange={(e) => setRescheduleTime(e.target.value)}
                     placeholder="e.g. Tomorrow Evening OPD (06:00 PM)"
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-teal-600/20 focus:border-teal-700"
+                    className="w-full bg-slate-50 border border-slate-200/80 rounded-xl px-3 py-2 text-xs focus:ring-1 focus:ring-slate-900 focus:border-slate-900"
                   />
                 </div>
 
@@ -1567,14 +1567,14 @@ export default function Visits({
                   <button
                     type="button"
                     onClick={() => setRescheduleItem(null)}
-                    className="px-3 py-1.5 rounded-xl text-slate-600 hover:bg-slate-100 font-medium cursor-pointer"
+                    className="px-3.5 py-1.5 rounded-xl text-slate-600 hover:bg-slate-100 text-xs font-medium cursor-pointer"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={isPlannerSubmitting}
-                    className="px-4 py-1.5 rounded-xl bg-teal-700 hover:bg-teal-800 text-white font-bold cursor-pointer disabled:opacity-50"
+                    className="px-4 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-medium transition-colors cursor-pointer disabled:opacity-50"
                   >
                     Save Reschedule
                   </button>
@@ -1588,19 +1588,19 @@ export default function Visits({
         {/* MODAL 4: LOG DETAILING & SAMPLES MODAL (DCR)                              */}
         {/* ========================================================================= */}
         {detailModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs overflow-y-auto">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs overflow-y-auto">
             <div className="bg-white rounded-3xl max-w-xl w-full p-6 shadow-xl border border-slate-100 my-8">
               
               <div className="flex items-center justify-between pb-3 border-b border-slate-100">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-9 h-9 rounded-xl bg-teal-100 text-teal-800 flex items-center justify-center font-bold">
-                    <Pill className="w-5 h-5" />
+                  <div className="w-8 h-8 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center font-semibold">
+                    <Pill className="w-4 h-4" />
                   </div>
                   <div>
-                    <h3 className="text-base font-bold text-slate-900">
+                    <h3 className="text-sm font-semibold text-slate-800">
                       {editingVisit ? 'Edit Detailing Record' : 'Record In-Clinic Detailing & Samples'}
                     </h3>
-                    <p className="text-xs text-slate-500">Log molecules pitched, samples given, and prescriber response.</p>
+                    <p className="text-xs text-slate-400 font-normal">Log formulations pitched, samples given, and physician response.</p>
                   </div>
                 </div>
                 <button
@@ -1616,13 +1616,13 @@ export default function Visits({
                 
                 {/* Doctor Selection */}
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">
+                  <label className="block font-medium text-slate-700 mb-1">
                     Doctor Detailed <span className="text-rose-500">*</span>
                   </label>
                   <select
                     value={detailForm.doctor_id}
                     onChange={(e) => setDetailForm({ ...detailForm, doctor_id: e.target.value })}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-teal-600/20 focus:border-teal-700 cursor-pointer"
+                    className="w-full bg-slate-50 border border-slate-200/80 rounded-xl px-3 py-2 text-xs focus:ring-1 focus:ring-slate-900 focus:border-slate-900 cursor-pointer"
                     required
                   >
                     <option value="">-- Select Doctor --</option>
@@ -1637,30 +1637,30 @@ export default function Visits({
                 {/* Date & Time & Call Type */}
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                   <div>
-                    <label className="block font-semibold text-slate-700 mb-1">Visit Date</label>
+                    <label className="block font-medium text-slate-700 mb-1">Visit Date</label>
                     <input
                       type="date"
                       value={detailForm.visit_date}
                       onChange={(e) => setDetailForm({ ...detailForm, visit_date: e.target.value })}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-teal-600/20 focus:border-teal-700"
+                      className="w-full bg-slate-50 border border-slate-200/80 rounded-xl px-3 py-2 text-xs focus:ring-1 focus:ring-slate-900 focus:border-slate-900"
                       required
                     />
                   </div>
                   <div>
-                    <label className="block font-semibold text-slate-700 mb-1">Time</label>
+                    <label className="block font-medium text-slate-700 mb-1">Time</label>
                     <input
                       type="text"
                       value={detailForm.visit_time}
                       onChange={(e) => setDetailForm({ ...detailForm, visit_time: e.target.value })}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-teal-600/20 focus:border-teal-700"
+                      className="w-full bg-slate-50 border border-slate-200/80 rounded-xl px-3 py-2 text-xs focus:ring-1 focus:ring-slate-900 focus:border-slate-900"
                     />
                   </div>
                   <div>
-                    <label className="block font-semibold text-slate-700 mb-1">Call Type</label>
+                    <label className="block font-medium text-slate-700 mb-1">Call Type</label>
                     <select
                       value={detailForm.call_type}
                       onChange={(e) => setDetailForm({ ...detailForm, call_type: e.target.value })}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-2 text-xs focus:ring-2 focus:ring-teal-600/20 focus:border-teal-700 cursor-pointer"
+                      className="w-full bg-slate-50 border border-slate-200/80 rounded-xl px-2.5 py-2 text-xs focus:ring-1 focus:ring-slate-900 focus:border-slate-900 cursor-pointer"
                     >
                       {CALL_TYPES.map(ct => (
                         <option key={ct.value} value={ct.value}>{ct.label}</option>
@@ -1671,7 +1671,7 @@ export default function Visits({
 
                 {/* Products Detailed Multi-Select */}
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1.5">
+                  <label className="block font-medium text-slate-700 mb-1.5">
                     Molecules Detailed (Tap to toggle)
                   </label>
                   <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto p-2 bg-slate-50 rounded-xl border border-slate-200/80">
@@ -1682,10 +1682,10 @@ export default function Visits({
                           key={prod.id}
                           type="button"
                           onClick={() => toggleDetailProduct(prod.brand_name)}
-                          className={`px-2.5 py-1 rounded-lg text-xs font-semibold border transition-all cursor-pointer ${
+                          className={`px-2.5 py-1 rounded-lg text-xs font-medium border transition-colors cursor-pointer ${
                             selected 
-                              ? 'bg-teal-700 text-white border-teal-700 shadow-xs' 
-                              : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'
+                              ? 'bg-slate-900 text-white border-slate-900' 
+                              : 'bg-white text-slate-700 border-slate-200/80 hover:bg-slate-100'
                           }`}
                         >
                           {selected ? '✓ ' : '+ '}
@@ -1698,13 +1698,13 @@ export default function Visits({
 
                 {/* Doctor Prescribing Response / Feedback */}
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">
+                  <label className="block font-medium text-slate-700 mb-1">
                     Doctor Prescribing Response & Commitment <span className="text-rose-500">*</span>
                   </label>
                   <select
                     value={detailForm.doctor_feedback}
                     onChange={(e) => setDetailForm({ ...detailForm, doctor_feedback: e.target.value })}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-teal-600/20 focus:border-teal-700 cursor-pointer"
+                    className="w-full bg-slate-50 border border-slate-200/80 rounded-xl px-3 py-2 text-xs focus:ring-1 focus:ring-slate-900 focus:border-slate-900 cursor-pointer"
                     required
                   >
                     {FEEDBACK_OPTIONS.map(f => (
@@ -1715,37 +1715,37 @@ export default function Visits({
 
                 {/* Physician Samples & Inputs Given */}
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">
+                  <label className="block font-medium text-slate-700 mb-1">
                     Physician Samples & Promo Inputs Given
                   </label>
                   <input
                     type="text"
-                    placeholder="e.g. 10 strips Ciplox 500 + 1 Pen Stand + 5 Trial Kits"
+                    placeholder="e.g. 10 strips AmoxiClav 625 Duo + 1 Pen Stand + 5 Trial Kits"
                     value={detailForm.samples_given}
                     onChange={(e) => setDetailForm({ ...detailForm, samples_given: e.target.value })}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-teal-600/20 focus:border-teal-700"
+                    className="w-full bg-slate-50 border border-slate-200/80 rounded-xl px-3 py-2 text-xs focus:ring-1 focus:ring-slate-900 focus:border-slate-900"
                   />
                 </div>
 
                 {/* Next Visit Date & Remarks */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                   <div>
-                    <label className="block font-semibold text-slate-700 mb-1">Next Follow-up Date</label>
+                    <label className="block font-medium text-slate-700 mb-1">Next Follow-up Date</label>
                     <input
                       type="date"
                       value={detailForm.next_visit_date}
                       onChange={(e) => setDetailForm({ ...detailForm, next_visit_date: e.target.value })}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-teal-600/20 focus:border-teal-700"
+                      className="w-full bg-slate-50 border border-slate-200/80 rounded-xl px-3 py-2 text-xs focus:ring-1 focus:ring-slate-900 focus:border-slate-900"
                     />
                   </div>
                   <div>
-                    <label className="block font-semibold text-slate-700 mb-1">Remarks / Objections</label>
+                    <label className="block font-medium text-slate-700 mb-1">Remarks / Objections</label>
                     <input
                       type="text"
                       placeholder="e.g. Doctor requested efficacy reprint"
                       value={detailForm.remarks}
                       onChange={(e) => setDetailForm({ ...detailForm, remarks: e.target.value })}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-teal-600/20 focus:border-teal-700"
+                      className="w-full bg-slate-50 border border-slate-200/80 rounded-xl px-3 py-2 text-xs focus:ring-1 focus:ring-slate-900 focus:border-slate-900"
                     />
                   </div>
                 </div>
@@ -1755,14 +1755,14 @@ export default function Visits({
                   <button
                     type="button"
                     onClick={() => setDetailModalOpen(false)}
-                    className="px-4 py-2 rounded-xl text-slate-600 hover:bg-slate-100 font-semibold cursor-pointer"
+                    className="px-4 py-2 rounded-xl text-slate-600 hover:bg-slate-100 text-xs font-medium cursor-pointer"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={isDcrSubmitting}
-                    className="px-5 py-2 rounded-xl bg-teal-700 hover:bg-teal-800 text-white font-bold shadow-xs cursor-pointer disabled:opacity-50"
+                    className="px-5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-medium transition-colors cursor-pointer disabled:opacity-50"
                   >
                     {isDcrSubmitting ? 'Saving...' : 'Save Detailing Record'}
                   </button>
