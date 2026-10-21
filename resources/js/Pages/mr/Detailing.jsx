@@ -577,9 +577,13 @@ export default function Detailing({ products = [], doctors = [], company = {} })
 
                   {/* Certified Manufacturer Detail Box */}
                   <div className="bg-white rounded-2xl border border-slate-300/80 p-5 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
-                    <div className="flex items-start gap-3.5">
-                      <div className="w-12 h-12 rounded-xl bg-slate-900 text-white flex items-center justify-center shrink-0">
-                        <Factory className="w-6 h-6 stroke-[1.8]" />
+                    <div className="flex items-center gap-4">
+                      <div className="h-16 px-3 py-1.5 rounded-xl bg-white border border-slate-200/90 flex items-center justify-center shrink-0 shadow-xs">
+                        <img 
+                          src="/images/walpar_logo.png" 
+                          alt="Walpar Nutritions Limited Logo" 
+                          className="h-11 w-auto object-contain"
+                        />
                       </div>
                       <div className="space-y-1">
                         <div className="flex items-center gap-2 flex-wrap">

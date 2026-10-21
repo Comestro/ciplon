@@ -502,7 +502,7 @@ class MRConnectController extends Controller
         $slides = [
             [
                 'id' => 1,
-                'title' => 'Ciplon Corporate Heritage Slide #1',
+                'title' => 'Ciplon Corporate Heritage & Portfolio Overview',
                 'type' => 'Corporate Branding',
                 'image' => '/images/ciplon_logo.png',
                 'status' => 'active',
@@ -510,19 +510,27 @@ class MRConnectController extends Controller
             ],
             [
                 'id' => 2,
-                'title' => 'Factocel-IX High Potency Hematology Slide',
-                'type' => 'Product Promotional',
-                'image' => '/images/box_factocel_ix.jpg',
+                'title' => 'WHO-GMP Certified Facility — Walpar Wellness (Mfg. for Sun Pharma, Cipla, Alkem, Torrent)',
+                'type' => 'Facility & Quality Standards',
+                'image' => '/images/walpar_logo.png',
                 'status' => 'active',
                 'order' => 2,
             ],
             [
                 'id' => 3,
+                'title' => 'Factocel-IX High Potency Hematology Slide',
+                'type' => 'Product Promotional',
+                'image' => '/images/box_factocel_ix.jpg',
+                'status' => 'active',
+                'order' => 3,
+            ],
+            [
+                'id' => 4,
                 'title' => 'Globucel-SC Primary Immunodeficiency Slide',
                 'type' => 'Product Promotional',
                 'image' => '/images/box_globucel_sc.jpg',
                 'status' => 'active',
-                'order' => 3,
+                'order' => 4,
             ],
         ];
 
