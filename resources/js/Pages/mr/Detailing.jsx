@@ -60,12 +60,14 @@ export default function Detailing({ products = [], doctors = [], company = {} })
 
   // Slides:
   // Slide 0: Company Logo & Brand Intro
-  // Slide 1: Manufacturing & Quality Standards
-  // Slide 2 ... N+1: Product Slides (arranged order)
+  // Slide 1: Manufacturing Facility #1 (Walpar Wellness)
+  // Slide 2: Manufacturing Facility #2 (Pure & Cure Healthcare - Subsidiary of Akums)
+  // Slide 3 ... N+2: Product Slides (arranged order)
   // Final Slide: Recap
   const slides = [
     { type: 'brand_intro', id: 'slide-brand' },
     { type: 'manufacturing_competitors', id: 'slide-mfg' },
+    { type: 'manufacturing_akums', id: 'slide-mfg-akums' },
     ...includedProducts.map((p) => ({ type: 'product', id: `prod-${p.id}`, data: p })),
     { type: 'recap', id: 'slide-recap' },
   ];
@@ -287,7 +289,7 @@ export default function Detailing({ products = [], doctors = [], company = {} })
         </div>
 
         {/* 2. COMPACT OPENING SLIDES INDICATOR: Flat, Minimal Text */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs">
           <div className="bg-white rounded-lg border border-slate-200 px-3.5 py-2.5 flex items-center justify-between">
             <div className="flex items-center gap-2.5">
               <span className="w-6 h-6 rounded bg-slate-100 text-slate-700 font-bold text-xs flex items-center justify-center">
@@ -310,9 +312,27 @@ export default function Detailing({ products = [], doctors = [], company = {} })
               <span className="w-6 h-6 rounded bg-slate-100 text-slate-700 font-bold text-xs flex items-center justify-center">
                 2
               </span>
-              <span className="font-semibold text-slate-800">Slide 2: WHO-GMP Facility &amp; Top Brands Co-Manufacturing</span>
+              <span className="font-semibold text-slate-800">Slide 2: Walpar Wellness (WHO-GMP)</span>
             </div>
-            <Factory className="w-4 h-4 text-slate-400" />
+            <img
+              src="/images/walpar_logo.png"
+              alt="Walpar Logo"
+              className="h-5 w-auto object-contain"
+            />
+          </div>
+
+          <div className="bg-white rounded-lg border border-slate-200 px-3.5 py-2.5 flex items-center justify-between">
+            <div className="flex items-center gap-2.5">
+              <span className="w-6 h-6 rounded bg-slate-100 text-slate-700 font-bold text-xs flex items-center justify-center">
+                3
+              </span>
+              <span className="font-semibold text-slate-800">Slide 3: Pure &amp; Cure (Akums Drugs)</span>
+            </div>
+            <img
+              src="/images/akums_logo.png"
+              alt="Akums Logo"
+              className="h-5 w-auto object-contain"
+            />
           </div>
         </div>
 
@@ -354,7 +374,7 @@ export default function Detailing({ products = [], doctors = [], company = {} })
           {filteredOrderedProducts.map((product) => {
             const actualIndex = orderedProducts.findIndex((p) => p.id === product.id);
             const isIncluded = selectedProductIds.has(product.id);
-            const slideNumber = actualIndex + 3; // #1 is brand, #2 is mfg
+            const slideNumber = actualIndex + 4; // #1 is brand, #2 is Walpar, #3 is Pure & Cure (Akums)
             const isBeingDragged = draggedIndex === actualIndex;
             const isDragTarget = dragOverIndex === actualIndex;
 
@@ -700,7 +720,150 @@ export default function Detailing({ products = [], doctors = [], company = {} })
               )}
 
               {/* ------------------------------------------------------------- */}
-              {/* SLIDE 3...N: PRODUCT SLIDE (Full Screen, Large Image & Text)   */}
+              {/* SLIDE 3: MANUFACTURING PARTNER #2 - PURE & CURE (AKUMS GROUP) */}
+              {/* ------------------------------------------------------------- */}
+              {slides[currentSlideIndex].type === 'manufacturing_akums' && (
+                <div className="border border-slate-200 rounded-3xl p-6 sm:p-10 lg:p-12 space-y-7 max-w-5xl mx-auto">
+                  
+                  {/* Top Header */}
+                  <div className="text-center space-y-2 max-w-2xl mx-auto">
+                    <span className="px-3 py-1 rounded-full text-[11px] font-semibold uppercase tracking-wider bg-orange-50 text-orange-800 border border-orange-200 inline-block">
+                      Premier CDMO Manufacturing Backbone
+                    </span>
+                    <h2 className="text-2xl sm:text-4xl font-semibold text-slate-800 tracking-tight leading-tight">
+                      Manufactured By Pure &amp; Cure Healthcare
+                    </h2>
+                    <p className="text-xs sm:text-sm text-slate-500 font-normal leading-relaxed">
+                      A proud subsidiary of <strong>Akums Drugs &amp; Pharmaceuticals Ltd.</strong> — India's largest and most trusted pharmaceutical Contract Development and Manufacturing Organization.
+                    </p>
+                  </div>
+
+                  {/* Certified Manufacturer Detail Box with Akums Logo */}
+                  <div className="bg-white rounded-2xl border border-slate-300/80 p-5 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div className="flex items-center gap-4">
+                      <div className="h-16 px-4 py-2 rounded-xl bg-white border border-slate-200/90 flex items-center justify-center shrink-0 shadow-xs">
+                        <img 
+                          src="/images/akums_logo.png" 
+                          alt="Akums Drugs &amp; Pharmaceuticals Ltd. Logo" 
+                          className="h-10 w-auto object-contain"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                            Manufactured by
+                          </span>
+                          <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200">
+                            A Subsidiary of Akums Drugs &amp; Pharmaceuticals Ltd.
+                          </span>
+                        </div>
+                        <h3 className="text-base sm:text-lg font-bold text-slate-900">
+                          Pure &amp; Cure Healthcare Pvt. Ltd.
+                        </h3>
+                        <p className="text-xs text-slate-500 leading-relaxed max-w-2xl">
+                          Vill. Manakpur, P.O. Lodhimajra, Baddi-173 205, Distt.-Solan, (H.P.)
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="shrink-0 flex md:flex-col items-center md:items-end justify-between gap-1 border-t md:border-t-0 md:border-l border-slate-100 pt-3 md:pt-0 md:pl-5 text-right">
+                      <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Manufacturing Hub</span>
+                      <span className="text-xs font-bold text-slate-800">Baddi Pharma Zone (H.P.)</span>
+                      <span className="text-[11px] text-amber-600 font-semibold">12%+ India Pharma Production</span>
+                    </div>
+                  </div>
+
+                  {/* Co-Manufacturing Brands Banner */}
+                  <div className="bg-slate-50 rounded-2xl border border-slate-200/80 p-5 space-y-3">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200/60 pb-2.5">
+                      <div className="flex items-center gap-2">
+                        <ShieldCheck className="w-4 h-4 text-slate-700" />
+                        <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800">
+                          Parent Group Trust: Top Pharmaceutical Giants Produced By Akums
+                        </h4>
+                      </div>
+                      <span className="text-[11px] font-medium text-slate-600">
+                        Global CDMO Standards
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2.5">
+                      {[
+                        { name: 'Sun Pharma', tag: 'Specialty Formulations' },
+                        { name: 'Abbott', tag: 'Global Nutritional & GI' },
+                        { name: 'Cipla', tag: 'Critical Care' },
+                        { name: 'Dr. Reddy\'s', tag: 'Oncology & Chronic' },
+                        { name: 'Lupin', tag: 'Cardiovascular' },
+                        { name: 'Mankind', tag: 'Therapeutic Formulations' },
+                        { name: 'Glenmark', tag: 'Dermatology & Respiratory' },
+                      ].map((brand) => (
+                        <div
+                          key={brand.name}
+                          className="bg-white rounded-xl border border-slate-200 p-2.5 text-center space-y-0.5 shadow-2xs hover:border-slate-400 transition-colors"
+                        >
+                          <span className="text-xs font-bold text-slate-900 block truncate">
+                            {brand.name}
+                          </span>
+                          <span className="text-[10px] text-slate-500 font-medium block truncate">
+                            {brand.tag}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+
+                    <p className="text-[11px] text-slate-500 text-center font-normal pt-0.5">
+                      Manufactured under the identical stringent validation protocols and cGMP compliance trusted by multinational pharma leaders.
+                    </p>
+                  </div>
+
+                  {/* 4 Core Pillars for Akums / Pure & Cure Facility */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+                    <div className="p-4 rounded-2xl border border-slate-200 bg-white space-y-1.5 shadow-2xs">
+                      <div className="w-8 h-8 rounded-lg bg-slate-100 text-slate-700 flex items-center justify-center font-semibold">
+                        <Factory className="w-4 h-4" />
+                      </div>
+                      <h4 className="text-sm font-semibold text-slate-800">India's Largest CDMO</h4>
+                      <p className="text-xs text-slate-500 font-light leading-relaxed">
+                        Akums group operates world-scale facilities powering over 10-12% of India's domestic pharmaceutical supply.
+                      </p>
+                    </div>
+
+                    <div className="p-4 rounded-2xl border border-slate-200 bg-white space-y-1.5 shadow-2xs">
+                      <div className="w-8 h-8 rounded-lg bg-slate-100 text-slate-700 flex items-center justify-center font-semibold">
+                        <FlaskConical className="w-4 h-4" />
+                      </div>
+                      <h4 className="text-sm font-semibold text-slate-800">Baddi Formulation Plant</h4>
+                      <p className="text-xs text-slate-500 font-light leading-relaxed">
+                        Vill. Manakpur, Lodhimajra, Baddi facility engineered for precise dosage form uniformity.
+                      </p>
+                    </div>
+
+                    <div className="p-4 rounded-2xl border border-slate-200 bg-white space-y-1.5 shadow-2xs">
+                      <div className="w-8 h-8 rounded-lg bg-slate-100 text-slate-700 flex items-center justify-center font-semibold">
+                        <ShieldCheck className="w-4 h-4" />
+                      </div>
+                      <h4 className="text-sm font-semibold text-slate-800">Certified cGMP Controls</h4>
+                      <p className="text-xs text-slate-500 font-light leading-relaxed">
+                        Stringent multi-tier analytical verification from raw API intake to final blister hermetic seal.
+                      </p>
+                    </div>
+
+                    <div className="p-4 rounded-2xl border border-slate-200 bg-white space-y-1.5 shadow-2xs">
+                      <div className="w-8 h-8 rounded-lg bg-slate-100 text-slate-700 flex items-center justify-center font-semibold">
+                        <Award className="w-4 h-4" />
+                      </div>
+                      <h4 className="text-sm font-semibold text-slate-800">Physician Confidence</h4>
+                      <p className="text-xs text-slate-500 font-light leading-relaxed">
+                        Backed by premier manufacturing standards recognized across top hospitals and practicing clinicians nationwide.
+                      </p>
+                    </div>
+                  </div>
+
+                </div>
+              )}
+
+              {/* ------------------------------------------------------------- */}
+              {/* SLIDE 4...N: PRODUCT SLIDE (Full Screen, Large Image & Text)   */}
               {/* ------------------------------------------------------------- */}
               {slides[currentSlideIndex].type === 'product' && (
                 (() => {

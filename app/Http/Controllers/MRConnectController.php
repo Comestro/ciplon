@@ -518,19 +518,27 @@ class MRConnectController extends Controller
             ],
             [
                 'id' => 3,
-                'title' => 'Factocel-IX High Potency Hematology Slide',
-                'type' => 'Product Promotional',
-                'image' => '/images/box_factocel_ix.jpg',
+                'title' => 'Pure & Cure Healthcare (Subsidiary of Akums Drugs & Pharmaceuticals Ltd.) — Baddi Unit',
+                'type' => 'CDMO Manufacturing Partner',
+                'image' => '/images/akums_logo.png',
                 'status' => 'active',
                 'order' => 3,
             ],
             [
                 'id' => 4,
+                'title' => 'Factocel-IX High Potency Hematology Slide',
+                'type' => 'Product Promotional',
+                'image' => '/images/box_factocel_ix.jpg',
+                'status' => 'active',
+                'order' => 4,
+            ],
+            [
+                'id' => 5,
                 'title' => 'Globucel-SC Primary Immunodeficiency Slide',
                 'type' => 'Product Promotional',
                 'image' => '/images/box_globucel_sc.jpg',
                 'status' => 'active',
-                'order' => 4,
+                'order' => 5,
             ],
         ];
 
