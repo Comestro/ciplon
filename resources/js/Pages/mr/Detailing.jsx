@@ -531,46 +531,46 @@ export default function Detailing({ products = [], doctors = [], company = {} })
             <div className="w-full max-w-6xl">
 
               {/* ------------------------------------------------------------- */}
-              {/* SLIDE 1: COMPANY LOGO & BRAND (Full Screen Presentation)      */}
+              {/* SLIDE 1: COMPANY LOGO & BRAND (Minimal, Elegant, Big Logo)    */}
               {/* ------------------------------------------------------------- */}
               {slides[currentSlideIndex].type === 'brand_intro' && (
-                <div className="border border-slate-200 rounded-3xl p-8 sm:p-14 text-center space-y-6 max-w-4xl mx-auto">
-                  {/* Company Logo First (Large, Crisp) */}
-                  <div className="flex items-center justify-center pt-2">
+                <div className="py-6 sm:py-12 text-center space-y-8 max-w-4xl mx-auto">
+                  {/* Company Logo (Much Bigger, Crisp, Borderless) */}
+                  <div className="flex items-center justify-center">
                     <img
                       src={logoUrl}
                       alt={company?.name || 'Ciplon Pharma'}
-                      className="h-24 sm:h-36 w-auto object-contain"
+                      className="h-36 sm:h-52 w-auto object-contain"
                       onError={(e) => {
                         e.currentTarget.src = '/images/ciplon_logo.png';
                       }}
                     />
                   </div>
 
-                  <div className="space-y-1.5 max-w-xl mx-auto">
-                    <h1 className="text-2xl sm:text-4xl font-semibold text-slate-800 tracking-tight">
+                  <div className="space-y-2">
+                    <h1 className="text-3xl sm:text-5xl font-bold text-slate-900 tracking-tight">
                       {company?.name || 'Ciplon Pharma Private Limited'}
                     </h1>
-                    <p className="text-sm font-medium text-slate-600">
+                    <p className="text-base sm:text-lg font-medium text-slate-500 tracking-wide">
                       Science Into Smiles
                     </p>
                   </div>
 
-                  {/* 3 Spacious Flat Trust Badges */}
-                  <div className="grid grid-cols-3 gap-3.5 max-w-lg mx-auto pt-3">
-                    <div className="p-3.5 rounded-2xl border border-slate-200 bg-slate-50 text-center">
-                      <span className="text-sm sm:text-base font-semibold text-slate-800 block">ISO 9001:2015</span>
-                      <span className="text-[11px] text-slate-400 block mt-0.5">Certified QMS</span>
+                  {/* 3 Minimal, Elegant Pill Badges (No Heavy Borders/Shadows) */}
+                  <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+                    <div className="px-5 py-2.5 rounded-full bg-slate-50 border border-slate-200/80 text-center">
+                      <span className="text-xs sm:text-sm font-semibold text-slate-800">ISO 9001:2015</span>
+                      <span className="text-[11px] text-slate-500 ml-1.5 font-normal">Certified QMS</span>
                     </div>
 
-                    <div className="p-3.5 rounded-2xl border border-slate-200 bg-slate-50 text-center">
-                      <span className="text-sm sm:text-base font-semibold text-slate-800 block">WHO-GMP</span>
-                      <span className="text-[11px] text-slate-400 block mt-0.5">Cleanrooms</span>
+                    <div className="px-5 py-2.5 rounded-full bg-slate-50 border border-slate-200/80 text-center">
+                      <span className="text-xs sm:text-sm font-semibold text-slate-800">WHO-GMP</span>
+                      <span className="text-[11px] text-slate-500 ml-1.5 font-normal">Cleanrooms</span>
                     </div>
 
-                    <div className="p-3.5 rounded-2xl border border-slate-200 bg-slate-50 text-center">
-                      <span className="text-sm sm:text-base font-semibold text-slate-800 block">FSSAI</span>
-                      <span className="text-[11px] text-slate-400 block mt-0.5">Licensed</span>
+                    <div className="px-5 py-2.5 rounded-full bg-slate-50 border border-slate-200/80 text-center">
+                      <span className="text-xs sm:text-sm font-semibold text-slate-800">FSSAI</span>
+                      <span className="text-[11px] text-slate-500 ml-1.5 font-normal">Compliant</span>
                     </div>
                   </div>
                 </div>
@@ -580,47 +580,47 @@ export default function Detailing({ products = [], doctors = [], company = {} })
               {/* SLIDE 2: MANUFACTURING & TRUSTED BY TOP PHARMA BRANDS         */}
               {/* ------------------------------------------------------------- */}
               {slides[currentSlideIndex].type === 'manufacturing_competitors' && (
-                <div className="border border-slate-200 rounded-3xl p-6 sm:p-10 lg:p-12 space-y-8 max-w-6xl mx-auto">
+                <div className="py-4 sm:py-8 space-y-8 max-w-6xl mx-auto">
                   
                   {/* Top Header */}
                   <div className="text-center space-y-2 max-w-3xl mx-auto">
-                    <span className="px-3 py-1 rounded-full text-[11px] font-semibold uppercase tracking-wider bg-slate-100 text-slate-700 border border-slate-200 inline-block">
-                      Manufacturing Excellence &amp; Peer Comparison
+                    <span className="text-xs font-bold uppercase tracking-widest text-slate-400 block">
+                      WHO-GMP Certified Facility
                     </span>
-                    <h2 className="text-2xl sm:text-4xl font-semibold text-slate-800 tracking-tight leading-tight">
-                      Manufactured At WHO-GMP Certified State-Of-The-Art Facility
+                    <h2 className="text-2xl sm:text-4xl font-bold text-slate-900 tracking-tight leading-tight">
+                      Manufactured At World-Class Production Facility
                     </h2>
-                    <p className="text-xs sm:text-sm text-slate-500 font-normal leading-relaxed">
-                      Ciplon formulations are manufactured at the same high-standard facility trusted by India's top pharmaceutical giants.
+                    <p className="text-sm text-slate-500 font-normal leading-relaxed">
+                      Formulated under stringent international cleanroom controls at Gujarat's premier pharmaceutical manufacturing plant.
                     </p>
                   </div>
 
                   {/* 2-COLUMN HERO LAYOUT: Big Manufacturer Side + Top Brands Side */}
-                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch pt-2">
                     
-                    {/* Left Column: Big Manufacturer Logo & Address Card */}
-                    <div className="lg:col-span-5 bg-white rounded-2xl border border-slate-200 p-6 sm:p-7 flex flex-col justify-between shadow-2xs space-y-6">
-                      <div className="space-y-4">
+                    {/* Left Column: Big Manufacturer Logo & Address Card (Clean, Minimal, No heavy shadow) */}
+                    <div className="lg:col-span-5 bg-slate-50/70 rounded-2xl p-6 sm:p-8 flex flex-col justify-between space-y-6">
+                      <div className="space-y-5">
                         <div className="flex items-center justify-between">
                           <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
                             Manufacturer
                           </span>
-                          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                          <span className="px-3 py-1 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">
                             WHO-GMP &amp; ISO 9001:2015
                           </span>
                         </div>
 
-                        {/* BIG MANUFACTURER LOGO */}
-                        <div className="w-full h-32 sm:h-36 rounded-xl bg-white border border-slate-200/80 p-4 flex items-center justify-center">
+                        {/* EXTRA BIG MANUFACTURER LOGO */}
+                        <div className="w-full h-36 sm:h-44 rounded-xl bg-white p-6 flex items-center justify-center">
                           <img 
                             src="/images/walpar_logo.png" 
                             alt="Walpar Nutritions Limited Logo" 
-                            className="max-h-24 max-w-full object-contain"
+                            className="max-h-32 sm:max-h-36 max-w-full object-contain"
                           />
                         </div>
 
-                        <div className="space-y-1.5 pt-1">
-                          <h3 className="text-lg sm:text-xl font-bold text-slate-900 leading-snug">
+                        <div className="space-y-1 pt-1">
+                          <h3 className="text-xl sm:text-2xl font-bold text-slate-900 leading-snug">
                             WALPAR WELLNESS PVT. LTD.
                           </h3>
                           <p className="text-xs text-slate-500 leading-relaxed">
@@ -629,12 +629,12 @@ export default function Detailing({ products = [], doctors = [], company = {} })
                         </div>
                       </div>
 
-                      <div className="pt-4 border-t border-slate-100 grid grid-cols-2 gap-2 text-left">
-                        <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-100">
+                      <div className="pt-4 border-t border-slate-200/60 grid grid-cols-2 gap-3 text-left">
+                        <div className="p-3 rounded-xl bg-white">
                           <span className="text-[10px] uppercase font-semibold text-slate-400 block">Cleanrooms</span>
                           <span className="text-xs font-bold text-slate-800">Class 10,000</span>
                         </div>
-                        <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-100">
+                        <div className="p-3 rounded-xl bg-white">
                           <span className="text-[10px] uppercase font-semibold text-slate-400 block">Air Filtration</span>
                           <span className="text-xs font-bold text-emerald-700">HEPA Integrated</span>
                         </div>
@@ -642,96 +642,52 @@ export default function Detailing({ products = [], doctors = [], company = {} })
                     </div>
 
                     {/* Right Column: Companies & Brands Using This Same Manufacturer */}
-                    <div className="lg:col-span-7 bg-slate-50/70 rounded-2xl border border-slate-200 p-6 sm:p-7 flex flex-col justify-between space-y-5">
-                      <div className="space-y-2">
+                    <div className="lg:col-span-7 bg-slate-50/70 rounded-2xl p-6 sm:p-8 flex flex-col justify-between space-y-5">
+                      <div className="space-y-1.5">
                         <div className="flex items-center gap-2">
                           <ShieldCheck className="w-5 h-5 text-slate-700" />
-                          <h3 className="text-base sm:text-lg font-bold text-slate-900">
+                          <h3 className="text-lg sm:text-xl font-bold text-slate-900">
                             Leading Brands Made At The Same Facility
                           </h3>
                         </div>
                         <p className="text-xs text-slate-500 leading-relaxed">
-                          The same production lines, validated formulation protocols, and high-potency quality assurance trusted by top pharmaceutical leaders:
+                          The same production lines, validated formulation protocols, and high-potency quality assurance trusted by India's top pharma giants:
                         </p>
                       </div>
 
-                      {/* Brand Logo / Badges Grid */}
-                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                      {/* Brand Badges Grid (Clean, Flat, Borderless) */}
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
                         {[
-                          { name: 'Sun Pharma', sub: 'Specialty Formulations', color: 'border-amber-200 bg-white text-amber-900' },
-                          { name: 'Cipla', sub: 'Respiratory & Critical', color: 'border-blue-200 bg-white text-blue-900' },
-                          { name: 'Alkem Labs', sub: 'Anti-Infectives', color: 'border-indigo-200 bg-white text-indigo-900' },
-                          { name: 'Torrent Pharma', sub: 'Cardiovascular', color: 'border-teal-200 bg-white text-teal-900' },
-                          { name: 'Mankind', sub: 'Primary Care Formulations', color: 'border-purple-200 bg-white text-purple-900' },
-                          { name: 'Abbott', sub: 'Global Nutritional & GI', color: 'border-sky-200 bg-white text-sky-900' },
-                          { name: 'Intas Pharma', sub: 'Biologics & Specialty', color: 'border-rose-200 bg-white text-rose-900' },
-                          { name: 'Lupin', sub: 'Complex Formulations', color: 'border-emerald-200 bg-white text-emerald-900' },
-                          { name: 'Dr. Reddy\'s', sub: 'Therapeutic Formulations', color: 'border-slate-300 bg-white text-slate-900' },
+                          { name: 'Sun Pharma', sub: 'Specialty Formulations' },
+                          { name: 'Cipla', sub: 'Respiratory & Critical' },
+                          { name: 'Alkem Labs', sub: 'Anti-Infectives' },
+                          { name: 'Torrent Pharma', sub: 'Cardiovascular' },
+                          { name: 'Mankind', sub: 'Primary Care' },
+                          { name: 'Abbott', sub: 'Nutritional & GI' },
+                          { name: 'Intas Pharma', sub: 'Biologics & Specialty' },
+                          { name: 'Lupin', sub: 'Complex Formulations' },
+                          { name: 'Dr. Reddy\'s', sub: 'Therapeutic Lines' },
                         ].map((b) => (
                           <div 
                             key={b.name}
-                            className={`p-3 rounded-xl border ${b.color} shadow-2xs flex flex-col justify-between hover:border-slate-400 transition-colors`}
+                            className="p-3.5 rounded-xl bg-white flex flex-col justify-between"
                           >
-                            <span className="text-sm font-bold tracking-tight block">
+                            <span className="text-sm font-bold text-slate-900 block">
                               {b.name}
                             </span>
-                            <span className="text-[10px] text-slate-500 font-medium block mt-1">
+                            <span className="text-[10px] text-slate-500 font-medium block mt-0.5">
                               {b.sub}
                             </span>
                           </div>
                         ))}
                       </div>
 
-                      <div className="p-3 rounded-xl bg-white border border-slate-200/90 text-[11px] text-slate-600 flex items-center gap-2">
+                      <div className="p-3.5 rounded-xl bg-white text-xs text-slate-600 flex items-center gap-2.5">
                         <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                        <span>Ensures identical bioavailability, active dissolution rates, and therapy consistency for Ciplon medicines.</span>
+                        <span>Ensures identical active molecule assay, micronization stability, and bioequivalence profile.</span>
                       </div>
                     </div>
 
-                  </div>
-
-
-                  {/* 4 Core Quality Standard Pillars */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
-                    <div className="p-4 rounded-2xl border border-slate-200 bg-white space-y-1.5 shadow-2xs">
-                      <div className="w-8 h-8 rounded-lg bg-slate-100 text-slate-700 flex items-center justify-center font-semibold">
-                        <FlaskConical className="w-4 h-4" />
-                      </div>
-                      <h4 className="text-sm font-semibold text-slate-800">Higher Bioavailability</h4>
-                      <p className="text-xs text-slate-500 font-light leading-relaxed">
-                        Micronized active particles ensure rapid dissolution and quicker clinical onset.
-                      </p>
-                    </div>
-
-                    <div className="p-4 rounded-2xl border border-slate-200 bg-white space-y-1.5 shadow-2xs">
-                      <div className="w-8 h-8 rounded-lg bg-slate-100 text-slate-700 flex items-center justify-center font-semibold">
-                        <ShieldCheck className="w-4 h-4" />
-                      </div>
-                      <h4 className="text-sm font-semibold text-slate-800">100% HPLC Purity</h4>
-                      <p className="text-xs text-slate-500 font-light leading-relaxed">
-                        Every commercial batch is liquid chromatography tested for exact active potency.
-                      </p>
-                    </div>
-
-                    <div className="p-4 rounded-2xl border border-slate-200 bg-white space-y-1.5 shadow-2xs">
-                      <div className="w-8 h-8 rounded-lg bg-slate-100 text-slate-700 flex items-center justify-center font-semibold">
-                        <Factory className="w-4 h-4" />
-                      </div>
-                      <h4 className="text-sm font-semibold text-slate-800">Alu-Alu Moisture Seal</h4>
-                      <p className="text-xs text-slate-500 font-light leading-relaxed">
-                        Zone IVb blister packaging preserves complete formulation stability against tropical humidity.
-                      </p>
-                    </div>
-
-                    <div className="p-4 rounded-2xl border border-slate-200 bg-white space-y-1.5 shadow-2xs">
-                      <div className="w-8 h-8 rounded-lg bg-slate-100 text-slate-700 flex items-center justify-center font-semibold">
-                        <Award className="w-4 h-4" />
-                      </div>
-                      <h4 className="text-sm font-semibold text-slate-800">Patient Adherence</h4>
-                      <p className="text-xs text-slate-500 font-light leading-relaxed">
-                        Affordably priced so patients complete their entire prescribed therapy without default.
-                      </p>
-                    </div>
                   </div>
 
                 </div>
@@ -741,50 +697,50 @@ export default function Detailing({ products = [], doctors = [], company = {} })
               {/* SLIDE 3: MANUFACTURING PARTNER #2 - PURE & CURE (AKUMS GROUP) */}
               {/* ------------------------------------------------------------- */}
               {slides[currentSlideIndex].type === 'manufacturing_akums' && (
-                <div className="border border-slate-200 rounded-3xl p-6 sm:p-10 lg:p-12 space-y-8 max-w-6xl mx-auto">
+                <div className="py-4 sm:py-8 space-y-8 max-w-6xl mx-auto">
                   
                   {/* Top Header */}
                   <div className="text-center space-y-2 max-w-3xl mx-auto">
-                    <span className="px-3 py-1 rounded-full text-[11px] font-semibold uppercase tracking-wider bg-orange-50 text-orange-800 border border-orange-200 inline-block">
+                    <span className="text-xs font-bold uppercase tracking-widest text-slate-400 block">
                       Premier CDMO Manufacturing Backbone
                     </span>
-                    <h2 className="text-2xl sm:text-4xl font-semibold text-slate-800 tracking-tight leading-tight">
+                    <h2 className="text-2xl sm:text-4xl font-bold text-slate-900 tracking-tight leading-tight">
                       Manufactured By Pure &amp; Cure Healthcare Pvt. Ltd.
                     </h2>
-                    <p className="text-xs sm:text-sm text-slate-500 font-normal leading-relaxed">
-                      A subsidiary of <strong>Akums Drugs &amp; Pharmaceuticals Ltd.</strong> — India's largest, premier Contract Development and Manufacturing Organization.
+                    <p className="text-sm text-slate-500 font-normal leading-relaxed">
+                      A proud subsidiary of <strong>Akums Drugs &amp; Pharmaceuticals Ltd.</strong> — India's largest and most trusted pharmaceutical manufacturing organization.
                     </p>
                   </div>
 
                   {/* 2-COLUMN HERO LAYOUT: Big Akums Logo Side + Top Brands Side */}
-                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch pt-2">
                     
                     {/* Left Column: Big Manufacturer Logo & Address Card */}
-                    <div className="lg:col-span-5 bg-white rounded-2xl border border-slate-200 p-6 sm:p-7 flex flex-col justify-between shadow-2xs space-y-6">
-                      <div className="space-y-4">
+                    <div className="lg:col-span-5 bg-slate-50/70 rounded-2xl p-6 sm:p-8 flex flex-col justify-between space-y-6">
+                      <div className="space-y-5">
                         <div className="flex items-center justify-between">
                           <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
                             Manufacturer &amp; Parent Group
                           </span>
-                          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200">
+                          <span className="px-3 py-1 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800">
                             India's #1 CDMO
                           </span>
                         </div>
 
-                        {/* BIG AKUMS LOGO */}
-                        <div className="w-full h-32 sm:h-36 rounded-xl bg-white border border-slate-200/80 p-4 flex items-center justify-center">
+                        {/* EXTRA BIG AKUMS LOGO */}
+                        <div className="w-full h-36 sm:h-44 rounded-xl bg-white p-6 flex items-center justify-center">
                           <img 
                             src="/images/akums_logo.png" 
                             alt="Akums Drugs &amp; Pharmaceuticals Ltd. Logo" 
-                            className="max-h-24 max-w-full object-contain"
+                            className="max-h-32 sm:max-h-36 max-w-full object-contain"
                           />
                         </div>
 
-                        <div className="space-y-1.5 pt-1">
-                          <h3 className="text-lg sm:text-xl font-bold text-slate-900 leading-snug">
+                        <div className="space-y-1 pt-1">
+                          <h3 className="text-xl sm:text-2xl font-bold text-slate-900 leading-snug">
                             Pure &amp; Cure Healthcare Pvt. Ltd.
                           </h3>
-                          <span className="text-[11px] font-semibold text-amber-800 block">
+                          <span className="text-xs font-semibold text-amber-800 block">
                             (A subsidiary of Akums Drugs &amp; Pharmaceuticals Ltd.)
                           </span>
                           <p className="text-xs text-slate-500 leading-relaxed">
@@ -793,12 +749,12 @@ export default function Detailing({ products = [], doctors = [], company = {} })
                         </div>
                       </div>
 
-                      <div className="pt-4 border-t border-slate-100 grid grid-cols-2 gap-2 text-left">
-                        <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-100">
+                      <div className="pt-4 border-t border-slate-200/60 grid grid-cols-2 gap-3 text-left">
+                        <div className="p-3 rounded-xl bg-white">
                           <span className="text-[10px] uppercase font-semibold text-slate-400 block">Facility Hub</span>
                           <span className="text-xs font-bold text-slate-800">Baddi (H.P.)</span>
                         </div>
-                        <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-100">
+                        <div className="p-3 rounded-xl bg-white">
                           <span className="text-[10px] uppercase font-semibold text-slate-400 block">Market Share</span>
                           <span className="text-xs font-bold text-amber-700">12%+ India Supply</span>
                         </div>
@@ -806,11 +762,11 @@ export default function Detailing({ products = [], doctors = [], company = {} })
                     </div>
 
                     {/* Right Column: Companies & Brands Using Akums Group Facilities */}
-                    <div className="lg:col-span-7 bg-slate-50/70 rounded-2xl border border-slate-200 p-6 sm:p-7 flex flex-col justify-between space-y-5">
-                      <div className="space-y-2">
+                    <div className="lg:col-span-7 bg-slate-50/70 rounded-2xl p-6 sm:p-8 flex flex-col justify-between space-y-5">
+                      <div className="space-y-1.5">
                         <div className="flex items-center gap-2">
                           <ShieldCheck className="w-5 h-5 text-slate-700" />
-                          <h3 className="text-base sm:text-lg font-bold text-slate-900">
+                          <h3 className="text-lg sm:text-xl font-bold text-slate-900">
                             Major Pharma Giants Manufactured By Akums
                           </h3>
                         </div>
@@ -819,34 +775,34 @@ export default function Detailing({ products = [], doctors = [], company = {} })
                         </p>
                       </div>
 
-                      {/* Brand Logo / Badges Grid */}
-                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                      {/* Brand Badges Grid (Clean, Flat, Borderless) */}
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
                         {[
-                          { name: 'Sun Pharma', sub: 'Specialty Formulations', color: 'border-amber-200 bg-white text-amber-900' },
-                          { name: 'Abbott', sub: 'Global Nutritional & GI', color: 'border-sky-200 bg-white text-sky-900' },
-                          { name: 'Cipla', sub: 'Critical & Pulmonary Care', color: 'border-blue-200 bg-white text-blue-900' },
-                          { name: 'Dr. Reddy\'s', sub: 'Oncology & Therapeutic', color: 'border-slate-300 bg-white text-slate-900' },
-                          { name: 'Lupin', sub: 'Cardiovascular Formulations', color: 'border-emerald-200 bg-white text-emerald-900' },
-                          { name: 'Mankind', sub: 'Primary Therapeutic Care', color: 'border-purple-200 bg-white text-purple-900' },
-                          { name: 'Glenmark', sub: 'Dermatology & Respiratory', color: 'border-rose-200 bg-white text-rose-900' },
-                          { name: 'Torrent Pharma', sub: 'Neuro & Cardiac Lines', color: 'border-teal-200 bg-white text-teal-900' },
-                          { name: 'Alkem Labs', sub: 'Anti-Infective Regimens', color: 'border-indigo-200 bg-white text-indigo-900' },
+                          { name: 'Sun Pharma', sub: 'Specialty Formulations' },
+                          { name: 'Abbott', sub: 'Global Nutritional & GI' },
+                          { name: 'Cipla', sub: 'Critical & Pulmonary Care' },
+                          { name: 'Dr. Reddy\'s', sub: 'Oncology & Therapeutic' },
+                          { name: 'Lupin', sub: 'Cardiovascular Lines' },
+                          { name: 'Mankind', sub: 'Primary Therapeutic Care' },
+                          { name: 'Glenmark', sub: 'Dermatology & Respiratory' },
+                          { name: 'Torrent Pharma', sub: 'Neuro & Cardiac Lines' },
+                          { name: 'Alkem Labs', sub: 'Anti-Infective Regimens' },
                         ].map((b) => (
                           <div 
                             key={b.name}
-                            className={`p-3 rounded-xl border ${b.color} shadow-2xs flex flex-col justify-between hover:border-slate-400 transition-colors`}
+                            className="p-3.5 rounded-xl bg-white flex flex-col justify-between"
                           >
-                            <span className="text-sm font-bold tracking-tight block">
+                            <span className="text-sm font-bold text-slate-900 block">
                               {b.name}
                             </span>
-                            <span className="text-[10px] text-slate-500 font-medium block mt-1">
+                            <span className="text-[10px] text-slate-500 font-medium block mt-0.5">
                               {b.sub}
                             </span>
                           </div>
                         ))}
                       </div>
 
-                      <div className="p-3 rounded-xl bg-white border border-slate-200/90 text-[11px] text-slate-600 flex items-center gap-2">
+                      <div className="p-3.5 rounded-xl bg-white text-xs text-slate-600 flex items-center gap-2.5">
                         <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
                         <span>Ensures gold-standard clinical safety, rigorous chemical assays, and highest doctor trust for Ciplon medicines.</span>
                       </div>
@@ -854,54 +810,11 @@ export default function Detailing({ products = [], doctors = [], company = {} })
 
                   </div>
 
-                  {/* 4 Core Pillars for Akums / Pure & Cure Facility */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
-                    <div className="p-4 rounded-2xl border border-slate-200 bg-white space-y-1.5 shadow-2xs">
-                      <div className="w-8 h-8 rounded-lg bg-slate-100 text-slate-700 flex items-center justify-center font-semibold">
-                        <Factory className="w-4 h-4" />
-                      </div>
-                      <h4 className="text-sm font-semibold text-slate-800">India's Largest CDMO</h4>
-                      <p className="text-xs text-slate-500 font-light leading-relaxed">
-                        Akums group operates world-scale facilities powering over 10-12% of India's domestic pharmaceutical supply.
-                      </p>
-                    </div>
-
-                    <div className="p-4 rounded-2xl border border-slate-200 bg-white space-y-1.5 shadow-2xs">
-                      <div className="w-8 h-8 rounded-lg bg-slate-100 text-slate-700 flex items-center justify-center font-semibold">
-                        <FlaskConical className="w-4 h-4" />
-                      </div>
-                      <h4 className="text-sm font-semibold text-slate-800">Baddi Formulation Plant</h4>
-                      <p className="text-xs text-slate-500 font-light leading-relaxed">
-                        Vill. Manakpur, Lodhimajra, Baddi facility engineered for precise dosage form uniformity.
-                      </p>
-                    </div>
-
-                    <div className="p-4 rounded-2xl border border-slate-200 bg-white space-y-1.5 shadow-2xs">
-                      <div className="w-8 h-8 rounded-lg bg-slate-100 text-slate-700 flex items-center justify-center font-semibold">
-                        <ShieldCheck className="w-4 h-4" />
-                      </div>
-                      <h4 className="text-sm font-semibold text-slate-800">Certified cGMP Controls</h4>
-                      <p className="text-xs text-slate-500 font-light leading-relaxed">
-                        Stringent multi-tier analytical verification from raw API intake to final blister hermetic seal.
-                      </p>
-                    </div>
-
-                    <div className="p-4 rounded-2xl border border-slate-200 bg-white space-y-1.5 shadow-2xs">
-                      <div className="w-8 h-8 rounded-lg bg-slate-100 text-slate-700 flex items-center justify-center font-semibold">
-                        <Award className="w-4 h-4" />
-                      </div>
-                      <h4 className="text-sm font-semibold text-slate-800">Physician Confidence</h4>
-                      <p className="text-xs text-slate-500 font-light leading-relaxed">
-                        Backed by premier manufacturing standards recognized across top hospitals and practicing clinicians nationwide.
-                      </p>
-                    </div>
-                  </div>
-
                 </div>
               )}
 
               {/* ------------------------------------------------------------- */}
-              {/* SLIDE 4...N: PRODUCT SLIDE (Full Screen, Large Image & Text)   */}
+              {/* SLIDE 4...N: PRODUCT SLIDE (Minimal, Clean, Large Image & Text)*/}
               {/* ------------------------------------------------------------- */}
               {slides[currentSlideIndex].type === 'product' && (
                 (() => {
@@ -914,16 +827,16 @@ export default function Detailing({ products = [], doctors = [], company = {} })
                     '/images/ciplon_d.png';
 
                   return (
-                    <div className="border border-slate-200 rounded-3xl p-6 sm:p-10 lg:p-12">
+                    <div className="py-2 sm:py-6">
                       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-center">
 
-                        {/* LEFT COLUMN: EXTRA LARGE PRODUCT PACK IMAGE */}
-                        <div className="lg:col-span-6 flex flex-col items-center justify-center space-y-3">
-                          <div className="w-full h-80 sm:h-[420px] lg:h-[480px] rounded-3xl border border-slate-200/90 p-8 flex items-center justify-center bg-white shadow-xs">
+                        {/* LEFT COLUMN: EXTRA LARGE PRODUCT PACK IMAGE (Clean, Borderless, No shadow) */}
+                        <div className="lg:col-span-6 flex flex-col items-center justify-center space-y-4">
+                          <div className="w-full h-80 sm:h-[430px] lg:h-[490px] rounded-3xl bg-slate-50/60 p-6 sm:p-10 flex items-center justify-center">
                             <img
                               src={imageUrl}
                               alt={prod.brand_name}
-                              className="max-h-full max-w-full object-contain filter drop-shadow-md"
+                              className="max-h-full max-w-full object-contain"
                               onError={(e) => {
                                 e.currentTarget.src = '/images/ciplon_d.png';
                               }}
@@ -931,16 +844,16 @@ export default function Detailing({ products = [], doctors = [], company = {} })
                           </div>
 
                           <div className="flex items-center gap-2 flex-wrap justify-center">
-                            <span className="px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-slate-900 text-white shadow-2xs">
+                            <span className="px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-slate-900 text-white">
                               {prod.dosage_form || 'Formulation'}
                             </span>
                             {prod.packaging_type && (
-                              <span className="px-3.5 py-1 rounded-full text-xs font-semibold text-slate-700 bg-slate-100 border border-slate-200">
+                              <span className="px-4 py-1.5 rounded-full text-xs font-semibold text-slate-700 bg-slate-100">
                                 {prod.packaging_type}
                               </span>
                             )}
                             {prod.sku && (
-                              <span className="px-3 py-1 rounded-full text-[11px] font-mono font-medium text-slate-500 bg-slate-50 border border-slate-200">
+                              <span className="px-3.5 py-1.5 rounded-full text-[11px] font-mono font-medium text-slate-500 bg-slate-50">
                                 SKU: {prod.sku}
                               </span>
                             )}
@@ -950,7 +863,7 @@ export default function Detailing({ products = [], doctors = [], company = {} })
                         {/* RIGHT COLUMN: BRAND NAME, SALT & CLINICAL DETAILS */}
                         <div className="lg:col-span-6 space-y-5">
                           
-                          {/* 1. Category & BRAND NAME (Prominent) */}
+                          {/* 1. Category & BRAND NAME (Prominent, High-Impact) */}
                           <div className="space-y-1">
                             <span className="text-xs font-bold text-slate-400 uppercase tracking-widest block">
                               {prod.category?.name || 'Therapeutic Formulation'}
@@ -960,24 +873,24 @@ export default function Detailing({ products = [], doctors = [], company = {} })
                             </h1>
                           </div>
 
-                          {/* 2. GENERIC NAME / ACTIVE SALT (Large & Distinct) */}
-                          <div className="p-4 sm:p-5 rounded-2xl border-2 border-slate-800 bg-slate-50 shadow-2xs space-y-1">
+                          {/* 2. GENERIC NAME / ACTIVE SALT (Clean Minimal Highlight) */}
+                          <div className="p-4 sm:p-5 rounded-2xl bg-slate-50 space-y-1">
                             <div className="flex items-center justify-between">
-                              <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500">
+                              <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
                                 Active Generic Molecule / Salt Composition
                               </span>
                               <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800">
-                                Verified Assay
+                                Verified Potency
                               </span>
                             </div>
-                            <p className="text-lg sm:text-2xl font-bold text-slate-900 leading-snug">
+                            <p className="text-base sm:text-xl font-bold text-slate-900 leading-snug">
                               {prod.generic_name}
                             </p>
                           </div>
 
-                          {/* 3. Clinical Indications & Dosage (Side-by-Side) */}
+                          {/* 3. Clinical Indications & Dosage (Side-by-Side Clean Cards) */}
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                            <div className="p-4 rounded-xl border border-slate-200 bg-white space-y-1.5 shadow-2xs">
+                            <div className="p-4 rounded-2xl bg-slate-50 space-y-1">
                               <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 block">
                                 Therapeutic Indications
                               </span>
@@ -986,7 +899,7 @@ export default function Detailing({ products = [], doctors = [], company = {} })
                               </p>
                             </div>
 
-                            <div className="p-4 rounded-xl border border-slate-200 bg-white space-y-1.5 shadow-2xs">
+                            <div className="p-4 rounded-2xl bg-slate-50 space-y-1">
                               <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 block">
                                 Recommended Regimen
                               </span>
@@ -1006,7 +919,7 @@ export default function Detailing({ products = [], doctors = [], company = {} })
                                 {prod.compositions.map((comp) => (
                                   <span
                                     key={comp.id}
-                                    className="px-3 py-1.5 rounded-xl bg-slate-100 text-xs font-medium text-slate-800 border border-slate-200/80 shadow-2xs"
+                                    className="px-3.5 py-1.5 rounded-xl bg-slate-100 text-xs font-medium text-slate-800"
                                   >
                                     <span className="text-slate-500">{comp.ingredient_name}:</span>{' '}
                                     <span className="font-mono text-slate-900 font-bold">{comp.strength} {comp.unit}</span>
@@ -1025,29 +938,29 @@ export default function Detailing({ products = [], doctors = [], company = {} })
               )}
 
               {/* ------------------------------------------------------------- */}
-              {/* SLIDE CLOSING: RECAP (Full Width, Clean)                      */}
+              {/* SLIDE CLOSING: RECAP (Minimal, Elegant, Clean)                */}
               {/* ------------------------------------------------------------- */}
               {slides[currentSlideIndex].type === 'recap' && (
-                <div className="border border-slate-200 rounded-3xl p-8 sm:p-14 text-center space-y-6 max-w-3xl mx-auto">
-                  <div className="w-14 h-14 rounded-full border border-slate-200 bg-slate-50 flex items-center justify-center mx-auto text-slate-800">
-                    <CheckCircle2 className="w-7 h-7" />
+                <div className="py-8 sm:py-16 text-center space-y-8 max-w-3xl mx-auto">
+                  <div className="w-16 h-16 rounded-full bg-emerald-50 text-emerald-700 flex items-center justify-center mx-auto">
+                    <CheckCircle2 className="w-8 h-8 stroke-[2]" />
                   </div>
 
-                  <div className="space-y-1.5">
-                    <h2 className="text-2xl sm:text-4xl font-bold text-slate-900">
+                  <div className="space-y-2">
+                    <h2 className="text-3xl sm:text-5xl font-bold text-slate-900 tracking-tight">
                       Thank You{selectedDoctor ? `, Dr. ${selectedDoctor.name}` : ''}
                     </h2>
-                    <p className="text-sm text-slate-500">
-                      Formulation detailing session completed.
+                    <p className="text-base text-slate-500">
+                      Formulation detailing session successfully concluded.
                     </p>
                   </div>
 
                   {/* Medicines pills */}
-                  <div className="flex flex-wrap justify-center gap-2 max-h-40 overflow-y-auto pt-2">
+                  <div className="flex flex-wrap justify-center gap-2.5 pt-2">
                     {includedProducts.map((p) => (
                       <span
                         key={p.id}
-                        className="px-3 py-1.5 rounded-lg border border-slate-200 bg-slate-50 text-xs text-slate-800 font-semibold"
+                        className="px-4 py-2 rounded-full bg-slate-100 text-xs text-slate-800 font-semibold"
                       >
                         {p.brand_name}
                       </span>
@@ -1057,7 +970,7 @@ export default function Detailing({ products = [], doctors = [], company = {} })
                   <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-4">
                     <Link
                       href="/mr/visits"
-                      className="px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-medium text-xs transition-colors cursor-pointer shadow-xs"
+                      className="px-6 py-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-medium text-xs transition-colors cursor-pointer"
                     >
                       Log Field Visit &amp; Samples
                     </Link>
@@ -1065,7 +978,7 @@ export default function Detailing({ products = [], doctors = [], company = {} })
                     <button
                       type="button"
                       onClick={() => setCurrentSlideIndex(0)}
-                      className="px-5 py-2.5 rounded-xl border border-slate-200/80 text-slate-700 hover:bg-slate-50 text-xs font-medium cursor-pointer"
+                      className="px-6 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium cursor-pointer"
                     >
                       Restart Slideshow
                     </button>
