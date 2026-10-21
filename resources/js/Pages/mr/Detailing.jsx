@@ -383,7 +383,7 @@ export default function Detailing({ products = [], doctors = [], company = {} })
               product.primary_image?.url ||
               product.images?.[0]?.file_path ||
               product.images?.[0]?.url ||
-              '/images/box_globucel_sc.jpg';
+              '/images/ciplon_d.png';
 
             return (
               <div
@@ -442,7 +442,7 @@ export default function Detailing({ products = [], doctors = [], company = {} })
                       alt={product.brand_name}
                       className="max-h-full max-w-full object-contain"
                       onError={(e) => {
-                        e.currentTarget.src = '/images/box_globucel_sc.jpg';
+                        e.currentTarget.src = '/images/ciplon_d.png';
                       }}
                     />
                   </div>
@@ -911,7 +911,7 @@ export default function Detailing({ products = [], doctors = [], company = {} })
                     prod.primary_image?.url ||
                     prod.images?.[0]?.file_path ||
                     prod.images?.[0]?.url ||
-                    '/images/box_globucel_sc.jpg';
+                    '/images/ciplon_d.png';
 
                   return (
                     <div className="border border-slate-200 rounded-3xl p-6 sm:p-10 lg:p-12">
@@ -925,7 +925,7 @@ export default function Detailing({ products = [], doctors = [], company = {} })
                               alt={prod.brand_name}
                               className="max-h-full max-w-full object-contain filter drop-shadow-md"
                               onError={(e) => {
-                                e.currentTarget.src = '/images/box_globucel_sc.jpg';
+                                e.currentTarget.src = '/images/ciplon_d.png';
                               }}
                             />
                           </div>

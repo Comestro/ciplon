@@ -526,19 +526,27 @@ class MRConnectController extends Controller
             ],
             [
                 'id' => 4,
-                'title' => 'Factocel-IX High Potency Hematology Slide',
+                'title' => 'CIPLOMAX CD3 — Neurotrophic & Metabolic Tablet',
                 'type' => 'Product Promotional',
-                'image' => '/images/box_factocel_ix.jpg',
+                'image' => '/images/diplomax_cd3.jpg',
                 'status' => 'active',
                 'order' => 4,
             ],
             [
                 'id' => 5,
-                'title' => 'Globucel-SC Primary Immunodeficiency Slide',
+                'title' => 'DICLOTRYP-FORT — Proteolytic Anti-Inflammatory Tablets',
                 'type' => 'Product Promotional',
-                'image' => '/images/box_globucel_sc.jpg',
+                'image' => '/images/diclotryp_fort.png',
                 'status' => 'active',
                 'order' => 5,
+            ],
+            [
+                'id' => 6,
+                'title' => 'CIPLON-D — Esomeprazole & Domperidone SR Capsules',
+                'type' => 'Product Promotional',
+                'image' => '/images/ciplon_d.png',
+                'status' => 'active',
+                'order' => 6,
             ],
         ];
 
