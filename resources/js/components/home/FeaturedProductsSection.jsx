@@ -6,79 +6,35 @@ import Container from '../common/Container';
 export default function FeaturedProductsSection({ products = [], onOpenEnquiryModal }) {
   const [selectedFilter, setSelectedFilter] = useState('ALL');
 
-  // Photorealistic 3D pharmaceutical product cartons matching Intas showcase
-  const primaryFeaturedBoxes = [
-    {
-      id: 'globucel-sc',
-      name: 'Globucel-SC',
-      image: '/images/box_globucel_sc.jpg',
-      category: 'Plasma & Biologics',
-      generic: 'Human Normal Immunoglobulin IP 16.5%',
-      dosageForm: 'Subcutaneous Injectable',
-      strength: '5 g / 30.3 mL',
-      description: 'Ultra-purified human normal immunoglobulin solution indicated for primary immunodeficiency and autoimmune polyneuropathy.',
-    },
-    {
-      id: 'fibrogen-i',
-      name: 'Fibrogen-I',
-      image: '/images/box_fibrogen_i.jpg',
-      category: 'Plasma & Biologics',
-      generic: 'Human Fibrinogen EP 1g',
-      dosageForm: 'Lyophilized Infusion Vial',
-      strength: '1g Active Protein',
-      description: 'Sterile human fibrinogen concentrate for immediate therapeutic hemostasis and congenital fibrinogen deficiency management.',
-    },
-    {
-      id: 'factocel-ix',
-      name: 'Factocel-IX',
-      image: '/images/box_factocel_ix.jpg',
-      category: 'Plasma & Biologics',
-      generic: 'Human Coagulation Factor IX IP 600 IU',
-      dosageForm: 'Lyophilized Powder for Injection',
-      strength: '600 IU / 5 mL',
-      description: 'High-purity human coagulation factor IX concentrate for targeted prophylaxis and therapy in patients with Hemophilia B.',
-    },
-  ];
-
-  // Database products formatted for grid display if filtered
-  const dbFormattedItems = useMemo(() => {
+  // Database products formatted for grid display
+  const formattedItems = useMemo(() => {
     return (products || []).map((p, index) => {
-      // Pick fallback 3D packaging image if database product doesn't have custom image
-      const fallbackImages = [
-        '/images/box_globucel_sc.jpg',
-        '/images/box_fibrogen_i.jpg',
-        '/images/box_factocel_ix.jpg',
-        '/images/pharma_product_boxes.jpg',
-      ];
-      const imageUrl =
-        p.imageUrl ||
-        p.image_url ||
-        p.primaryImage?.url ||
-        p.primary_image?.url ||
-        fallbackImages[index % fallbackImages.length];
+      // Pick fallback or image path
+      const imagePath =
+        p.primary_image?.file_path
+          ? (p.primary_image.file_path.startsWith('/') ? p.primary_image.file_path : `/${p.primary_image.file_path}`)
+          : (p.primaryImage?.file_path
+              ? (p.primaryImage.file_path.startsWith('/') ? p.primaryImage.file_path : `/${p.primaryImage.file_path}`)
+              : (p.imageUrl || p.image_url || p.primary_image?.url || p.primaryImage?.url || '/images/pharma_product_boxes.jpg'));
 
       return {
         id: p.id || p.slug || index,
+        slug: p.slug || p.id,
         name: p.brand_name || p.name || 'Ciplon Formulation',
-        image: imageUrl,
-        category: p.category?.name || 'Oral Solids',
+        image: imagePath,
+        category: p.category?.name || 'Formulations',
         generic: p.generic_name || p.composition || 'Therapeutic formulation',
         dosageForm: p.dosage_form || 'Tablet / Capsule',
         strength: p.strength || 'Standard Dosage',
-        description: p.description || 'WHO-GMP validated finished formulation.',
+        description: p.short_description || p.description || 'WHO-GMP validated finished formulation.',
         isDatabase: true,
       };
     });
   }, [products]);
 
-  // Merge items
-  const allItems = useMemo(() => {
-    return [...primaryFeaturedBoxes, ...dbFormattedItems];
-  }, [dbFormattedItems]);
-
-  // Unique categories for pills
+  // Unique categories for pills derived strictly from products
   const categoriesList = useMemo(() => {
-    const set = new Set(['ALL', 'Plasma & Biologics']);
+    const set = new Set(['ALL']);
     (products || []).forEach((p) => {
       if (p.category?.name) set.add(p.category.name);
     });
@@ -88,11 +44,10 @@ export default function FeaturedProductsSection({ products = [], onOpenEnquiryMo
   // Display items based on category filter
   const displayedItems = useMemo(() => {
     if (selectedFilter === 'ALL') {
-      return primaryFeaturedBoxes;
+      return formattedItems;
     }
-    const filtered = allItems.filter((item) => item.category === selectedFilter);
-    return filtered.length > 0 ? filtered.slice(0, 3) : primaryFeaturedBoxes;
-  }, [allItems, selectedFilter]);
+    return formattedItems.filter((item) => item.category === selectedFilter);
+  }, [formattedItems, selectedFilter]);
 
   return (
     <section id="products" className="py-16 sm:py-24 bg-white border-b border-slate-100">
@@ -156,7 +111,7 @@ export default function FeaturedProductsSection({ products = [], onOpenEnquiryMo
                 {/* Product Name & Molecule */}
                 <div className="space-y-1">
                   <Link
-                    href={`/products`}
+                    href={`/products/${item.slug || item.id}`}
                     className="text-lg sm:text-xl font-bold text-[#0c2340] group-hover:text-[#c59324] transition-colors block leading-tight tracking-tight"
                   >
                     {item.name}
@@ -188,7 +143,7 @@ export default function FeaturedProductsSection({ products = [], onOpenEnquiryMo
               {/* Action Buttons: Clean & Elegant (No Shadows) */}
               <div className="pt-4 mt-4 border-t border-slate-100 flex items-center gap-2.5">
                 <Link
-                  href={`/products`}
+                  href={`/products/${item.slug || item.id}`}
                   className="flex-1 py-2.5 rounded-xl border border-slate-200 hover:border-[#c59324] hover:text-[#c59324] text-slate-700 text-center font-semibold text-xs transition-colors bg-white"
                 >
                   Monograph
