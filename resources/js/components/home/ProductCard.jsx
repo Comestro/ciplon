@@ -56,10 +56,10 @@ export default function ProductCard({ product }) {
   return (
     <Link
       href={`/products/${productId}`}
-      className="group bg-white rounded-2xl border border-slate-200 hover:border-[#c59324] transition-colors duration-200 flex flex-col justify-between overflow-hidden cursor-pointer"
+      className="group bg-white rounded-2xl border border-slate-200/90 hover:border-[#c59324] hover:shadow-lg hover:shadow-slate-200/50 transition-all duration-300 flex flex-col justify-between overflow-hidden cursor-pointer"
     >
       <div>
-        <div className="relative w-full h-48 sm:h-52 bg-white border-b border-slate-100 flex items-center justify-center p-3">
+        <div className="relative w-full h-52 sm:h-56 bg-gradient-to-b from-slate-50/50 via-white to-slate-50/30 border-b border-slate-100 flex items-center justify-center p-4">
           <span className="absolute top-3 left-3 z-10 inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[#0c2340] text-white">
             {dosageForm}
           </span>
@@ -76,7 +76,7 @@ export default function ProductCard({ product }) {
               alt={brandName}
               onError={() => setImgError(true)}
               loading="lazy"
-              className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-300"
+              className="max-h-full max-w-full object-contain filter drop-shadow-sm group-hover:scale-105 transition-transform duration-300"
             />
           ) : (
             <div className="w-full h-full flex flex-col items-center justify-center bg-slate-50/50 p-4">
@@ -97,11 +97,11 @@ export default function ProductCard({ product }) {
             {brandName}
           </h3>
           {genericName ? (
-            <p className="text-xs text-slate-600 font-medium line-clamp-2 mt-1 leading-relaxed">
+            <p className="text-xs text-slate-600 font-medium line-clamp-2 mt-1.5 leading-relaxed min-h-[2.5rem]">
               {genericName}
             </p>
           ) : (
-            <p className="text-xs text-slate-400 font-medium line-clamp-1 mt-1">
+            <p className="text-xs text-slate-400 font-medium line-clamp-1 mt-1.5">
               Clinical formulation monograph
             </p>
           )}
@@ -110,9 +110,9 @@ export default function ProductCard({ product }) {
 
       <div className="px-4 sm:px-5 pb-4 pt-0">
         <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
-          <span className="font-semibold text-slate-600 truncate flex items-center gap-1">
-            <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-            <span>WHO-GMP Validated</span>
+          <span className="font-semibold text-slate-600 truncate flex items-center gap-1.5">
+            <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+            <span className="text-[11px]">WHO-GMP Validated</span>
           </span>
           <span className="text-[#c59324] font-bold inline-flex items-center gap-1 group-hover:translate-x-1 transition-transform shrink-0">
             <span>Dossier</span>
