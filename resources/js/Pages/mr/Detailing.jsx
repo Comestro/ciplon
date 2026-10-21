@@ -310,7 +310,7 @@ export default function Detailing({ products = [], doctors = [], company = {} })
               <span className="w-6 h-6 rounded bg-slate-100 text-slate-700 font-bold text-xs flex items-center justify-center">
                 2
               </span>
-              <span className="font-semibold text-slate-800">Slide 2: WHO-GMP Manufacturing</span>
+              <span className="font-semibold text-slate-800">Slide 2: WHO-GMP Facility &amp; Top Brands Co-Manufacturing</span>
             </div>
             <Factory className="w-4 h-4 text-slate-400" />
           </div>
@@ -557,22 +557,70 @@ export default function Detailing({ products = [], doctors = [], company = {} })
               )}
 
               {/* ------------------------------------------------------------- */}
-              {/* SLIDE 2: MANUFACTURING (Full Screen Width 4 Clean Points)     */}
+              {/* SLIDE 2: MANUFACTURING & TRUSTED BY TOP PHARMA BRANDS         */}
               {/* ------------------------------------------------------------- */}
               {slides[currentSlideIndex].type === 'manufacturing_competitors' && (
-                <div className="border border-slate-200 rounded-3xl p-6 sm:p-10 space-y-6">
-                  <div className="text-center space-y-1.5 max-w-xl mx-auto">
-                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-medium uppercase tracking-wider bg-slate-100 text-slate-600 border border-slate-200 inline-block">
-                      Manufacturing Excellence
+                <div className="border border-slate-200 rounded-3xl p-6 sm:p-10 lg:p-12 space-y-8 max-w-5xl mx-auto">
+                  
+                  {/* Top Header */}
+                  <div className="text-center space-y-2 max-w-2xl mx-auto">
+                    <span className="px-3 py-1 rounded-full text-[11px] font-semibold uppercase tracking-wider bg-slate-100 text-slate-700 border border-slate-200 inline-block">
+                      World-Class Manufacturing Standards
                     </span>
-                    <h2 className="text-xl sm:text-3xl font-semibold text-slate-800 tracking-tight">
-                      Why Prescribe Ciplon Formulations?
+                    <h2 className="text-2xl sm:text-4xl font-semibold text-slate-800 tracking-tight leading-tight">
+                      Same Trusted Manufacturing Facility As India's Leading Pharma Giants
                     </h2>
+                    <p className="text-xs sm:text-sm text-slate-500 font-normal leading-relaxed">
+                      Ciplon formulations are manufactured in WHO-GMP &amp; ISO certified high-containment cleanroom facilities that also manufacture key formulations for India's most reputed pharmaceutical houses.
+                    </p>
                   </div>
 
-                  {/* 4 Spacious Cards */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 pt-2">
-                    <div className="p-4 rounded-2xl border border-slate-200 bg-slate-50 space-y-1.5">
+                  {/* Co-Manufacturing Brands Banner */}
+                  <div className="bg-slate-50 rounded-2xl border border-slate-200/80 p-5 sm:p-6 space-y-3.5">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200/60 pb-3">
+                      <div className="flex items-center gap-2">
+                        <Factory className="w-4 h-4 text-slate-700" />
+                        <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800">
+                          Brands Manufactured Under The Same Certified Production Facility
+                        </h4>
+                      </div>
+                      <span className="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                        WHO-GMP &amp; US-FDA Compliant Line
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2.5 pt-1">
+                      {[
+                        { name: 'Sun Pharma', tag: 'Specialty Formulations' },
+                        { name: 'Cipla', tag: 'Respiratory & Critical' },
+                        { name: 'Alkem Labs', tag: 'Anti-Infectives' },
+                        { name: 'Torrent Pharma', tag: 'Cardiovascular' },
+                        { name: 'Mankind', tag: 'Primary Care' },
+                        { name: 'Abbott', tag: 'Nutritional & GI' },
+                        { name: 'Intas Pharma', tag: 'Biologics & Plasma' },
+                      ].map((brand) => (
+                        <div
+                          key={brand.name}
+                          className="bg-white rounded-xl border border-slate-200 p-3 text-center space-y-1 shadow-2xs hover:border-slate-400 transition-colors"
+                        >
+                          <span className="text-xs font-bold text-slate-900 block truncate">
+                            {brand.name}
+                          </span>
+                          <span className="text-[10px] text-slate-500 font-medium block truncate">
+                            {brand.tag}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+
+                    <p className="text-[11px] text-slate-500 text-center font-normal pt-1">
+                      Ensuring identical active ingredient assay, micronization stability, and bioequivalence profile.
+                    </p>
+                  </div>
+
+                  {/* 4 Core Quality Standard Pillars */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+                    <div className="p-4 rounded-2xl border border-slate-200 bg-white space-y-1.5 shadow-2xs">
                       <div className="w-8 h-8 rounded-lg bg-slate-100 text-slate-700 flex items-center justify-center font-semibold">
                         <FlaskConical className="w-4 h-4" />
                       </div>
@@ -582,36 +630,37 @@ export default function Detailing({ products = [], doctors = [], company = {} })
                       </p>
                     </div>
 
-                    <div className="p-4 rounded-2xl border border-slate-200 bg-slate-50 space-y-1.5">
+                    <div className="p-4 rounded-2xl border border-slate-200 bg-white space-y-1.5 shadow-2xs">
                       <div className="w-8 h-8 rounded-lg bg-slate-100 text-slate-700 flex items-center justify-center font-semibold">
                         <ShieldCheck className="w-4 h-4" />
                       </div>
                       <h4 className="text-sm font-semibold text-slate-800">100% HPLC Purity</h4>
                       <p className="text-xs text-slate-500 font-light leading-relaxed">
-                        Every commercial batch is liquid chromatography tested for exact potency.
+                        Every commercial batch is liquid chromatography tested for exact active potency.
                       </p>
                     </div>
 
-                    <div className="p-4 rounded-2xl border border-slate-200 bg-slate-50 space-y-1.5">
+                    <div className="p-4 rounded-2xl border border-slate-200 bg-white space-y-1.5 shadow-2xs">
                       <div className="w-8 h-8 rounded-lg bg-slate-100 text-slate-700 flex items-center justify-center font-semibold">
                         <Factory className="w-4 h-4" />
                       </div>
                       <h4 className="text-sm font-semibold text-slate-800">Alu-Alu Moisture Seal</h4>
                       <p className="text-xs text-slate-500 font-light leading-relaxed">
-                        Zone IVb blister packaging preserves complete stability against humidity.
+                        Zone IVb blister packaging preserves complete formulation stability against tropical humidity.
                       </p>
                     </div>
 
-                    <div className="p-4 rounded-2xl border border-slate-200 bg-slate-50 space-y-1.5">
+                    <div className="p-4 rounded-2xl border border-slate-200 bg-white space-y-1.5 shadow-2xs">
                       <div className="w-8 h-8 rounded-lg bg-slate-100 text-slate-700 flex items-center justify-center font-semibold">
                         <Award className="w-4 h-4" />
                       </div>
                       <h4 className="text-sm font-semibold text-slate-800">Patient Adherence</h4>
                       <p className="text-xs text-slate-500 font-light leading-relaxed">
-                        Affordably priced so patients complete their entire prescribed therapy.
+                        Affordably priced so patients complete their entire prescribed therapy without default.
                       </p>
                     </div>
                   </div>
+
                 </div>
               )}
 
