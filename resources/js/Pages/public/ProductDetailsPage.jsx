@@ -51,17 +51,25 @@ export default function ProductDetailsPage({ product, relatedProducts: initialRe
   // Extract available product images from dynamic database records
   const images = useMemo(() => {
     const list = [];
-    if (product?.primary_image?.url) {
-      list.push(product.primary_image.url);
-    } else if (product?.primaryImage?.url) {
-      list.push(product.primaryImage.url);
+    const getSrc = (img) => {
+      if (!img) return null;
+      if (typeof img === 'string') return img;
+      if (img.file_path) {
+        return img.file_path.startsWith('/') ? img.file_path : `/${img.file_path}`;
+      }
+      return img.url || img.image_url || null;
+    };
+
+    const primarySrc = getSrc(product?.primary_image || product?.primaryImage);
+    if (primarySrc) {
+      list.push(primarySrc);
     }
 
     if (Array.isArray(product?.images)) {
       product.images.forEach((img) => {
-        const url = typeof img === 'object' && img?.url ? img.url : (typeof img === 'string' ? img : '');
-        if (url && !list.includes(url)) {
-          list.push(url);
+        const src = getSrc(img);
+        if (src && !list.includes(src)) {
+          list.push(src);
         }
       });
     }
