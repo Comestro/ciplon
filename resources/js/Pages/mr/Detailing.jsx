@@ -580,23 +580,9 @@ export default function Detailing({ products = [], doctors = [], company = {} })
               {/* SLIDE 2: MANUFACTURING & TRUSTED BY TOP PHARMA BRANDS         */}
               {/* ------------------------------------------------------------- */}
               {slides[currentSlideIndex].type === 'manufacturing_competitors' && (
-                <div className="py-4 sm:py-8 space-y-8 max-w-6xl mx-auto">
-                  
-                  {/* Top Header */}
-                  <div className="text-center space-y-2 max-w-3xl mx-auto">
-                    <span className="text-xs font-bold uppercase tracking-widest text-slate-400 block">
-                      WHO-GMP Certified Facility
-                    </span>
-                    <h2 className="text-2xl sm:text-4xl font-bold text-slate-900 tracking-tight leading-tight">
-                      Manufactured At World-Class Production Facility
-                    </h2>
-                    <p className="text-sm text-slate-500 font-normal leading-relaxed">
-                      Formulated under stringent international cleanroom controls at Gujarat's premier pharmaceutical manufacturing plant.
-                    </p>
-                  </div>
-
+                <div className="py-2 sm:py-6 max-w-6xl mx-auto">
                   {/* 2-COLUMN HERO LAYOUT: Big Manufacturer Side + Top Brands Side */}
-                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch pt-2">
+                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
                     
                     {/* Left Column: Big Manufacturer Logo & Address Card (Clean, Minimal, No heavy shadow) */}
                     <div className="lg:col-span-5 bg-slate-50/70 rounded-2xl p-6 sm:p-8 flex flex-col justify-between space-y-6">
@@ -697,23 +683,9 @@ export default function Detailing({ products = [], doctors = [], company = {} })
               {/* SLIDE 3: MANUFACTURING PARTNER #2 - PURE & CURE (AKUMS GROUP) */}
               {/* ------------------------------------------------------------- */}
               {slides[currentSlideIndex].type === 'manufacturing_akums' && (
-                <div className="py-4 sm:py-8 space-y-8 max-w-6xl mx-auto">
-                  
-                  {/* Top Header */}
-                  <div className="text-center space-y-2 max-w-3xl mx-auto">
-                    <span className="text-xs font-bold uppercase tracking-widest text-slate-400 block">
-                      Premier CDMO Manufacturing Backbone
-                    </span>
-                    <h2 className="text-2xl sm:text-4xl font-bold text-slate-900 tracking-tight leading-tight">
-                      Manufactured By Pure &amp; Cure Healthcare Pvt. Ltd.
-                    </h2>
-                    <p className="text-sm text-slate-500 font-normal leading-relaxed">
-                      A proud subsidiary of <strong>Akums Drugs &amp; Pharmaceuticals Ltd.</strong> — India's largest and most trusted pharmaceutical manufacturing organization.
-                    </p>
-                  </div>
-
+                <div className="py-2 sm:py-6 max-w-6xl mx-auto">
                   {/* 2-COLUMN HERO LAYOUT: Big Akums Logo Side + Top Brands Side */}
-                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch pt-2">
+                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
                     
                     {/* Left Column: Big Manufacturer Logo & Address Card */}
                     <div className="lg:col-span-5 bg-slate-50/70 rounded-2xl p-6 sm:p-8 flex flex-col justify-between space-y-6">
