@@ -560,7 +560,7 @@ export default function Detailing({ products = [], doctors = [], company = {} })
               {/* SLIDE 2: MANUFACTURING & TRUSTED BY TOP PHARMA BRANDS         */}
               {/* ------------------------------------------------------------- */}
               {slides[currentSlideIndex].type === 'manufacturing_competitors' && (
-                <div className="border border-slate-200 rounded-3xl p-6 sm:p-10 lg:p-12 space-y-8 max-w-5xl mx-auto">
+                <div className="border border-slate-200 rounded-3xl p-6 sm:p-10 lg:p-12 space-y-7 max-w-5xl mx-auto">
                   
                   {/* Top Header */}
                   <div className="text-center space-y-2 max-w-2xl mx-auto">
@@ -568,28 +568,59 @@ export default function Detailing({ products = [], doctors = [], company = {} })
                       World-Class Manufacturing Standards
                     </span>
                     <h2 className="text-2xl sm:text-4xl font-semibold text-slate-800 tracking-tight leading-tight">
-                      Same Trusted Manufacturing Facility As India's Leading Pharma Giants
+                      Manufactured At WHO-GMP Certified State-Of-The-Art Facility
                     </h2>
                     <p className="text-xs sm:text-sm text-slate-500 font-normal leading-relaxed">
-                      Ciplon formulations are manufactured in WHO-GMP &amp; ISO certified high-containment cleanroom facilities that also manufacture key formulations for India's most reputed pharmaceutical houses.
+                      Ciplon formulations are manufactured under stringent international cleanroom controls at Gujarat's premier pharmaceutical production plant.
                     </p>
                   </div>
 
+                  {/* Certified Manufacturer Detail Box */}
+                  <div className="bg-white rounded-2xl border border-slate-300/80 p-5 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div className="flex items-start gap-3.5">
+                      <div className="w-12 h-12 rounded-xl bg-slate-900 text-white flex items-center justify-center shrink-0">
+                        <Factory className="w-6 h-6 stroke-[1.8]" />
+                      </div>
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                            Mfg. in India by
+                          </span>
+                          <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                            WHO-GMP &amp; An ISO 9001:2015 Certified Company
+                          </span>
+                        </div>
+                        <h3 className="text-base sm:text-lg font-bold text-slate-900">
+                          WALPAR WELLNESS PVT. LTD.
+                        </h3>
+                        <p className="text-xs text-slate-500 leading-relaxed max-w-2xl">
+                          Plot No. 2/A &amp; 06, Opp. Sabarmati Gas Station, Khatraj, Kalol, Gandhinagar, Gujarat – 382721
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="shrink-0 flex md:flex-col items-center md:items-end justify-between gap-1 border-t md:border-t-0 md:border-l border-slate-100 pt-3 md:pt-0 md:pl-5 text-right">
+                      <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Facility Compliance</span>
+                      <span className="text-xs font-bold text-slate-800">State-Of-The-Art HVAC</span>
+                      <span className="text-[11px] text-emerald-600 font-medium">Class 10,000 Cleanrooms</span>
+                    </div>
+                  </div>
+
                   {/* Co-Manufacturing Brands Banner */}
-                  <div className="bg-slate-50 rounded-2xl border border-slate-200/80 p-5 sm:p-6 space-y-3.5">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200/60 pb-3">
+                  <div className="bg-slate-50 rounded-2xl border border-slate-200/80 p-5 space-y-3">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200/60 pb-2.5">
                       <div className="flex items-center gap-2">
-                        <Factory className="w-4 h-4 text-slate-700" />
+                        <ShieldCheck className="w-4 h-4 text-slate-700" />
                         <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800">
-                          Brands Manufactured Under The Same Certified Production Facility
+                          Trusted Production Facility: Key Brands Manufactured Here
                         </h4>
                       </div>
-                      <span className="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
-                        WHO-GMP &amp; US-FDA Compliant Line
+                      <span className="text-[11px] font-medium text-slate-600">
+                        Shared High-Potency Formulation Lines
                       </span>
                     </div>
 
-                    <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2.5 pt-1">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2.5">
                       {[
                         { name: 'Sun Pharma', tag: 'Specialty Formulations' },
                         { name: 'Cipla', tag: 'Respiratory & Critical' },
@@ -601,7 +632,7 @@ export default function Detailing({ products = [], doctors = [], company = {} })
                       ].map((brand) => (
                         <div
                           key={brand.name}
-                          className="bg-white rounded-xl border border-slate-200 p-3 text-center space-y-1 shadow-2xs hover:border-slate-400 transition-colors"
+                          className="bg-white rounded-xl border border-slate-200 p-2.5 text-center space-y-0.5 shadow-2xs hover:border-slate-400 transition-colors"
                         >
                           <span className="text-xs font-bold text-slate-900 block truncate">
                             {brand.name}
@@ -613,8 +644,8 @@ export default function Detailing({ products = [], doctors = [], company = {} })
                       ))}
                     </div>
 
-                    <p className="text-[11px] text-slate-500 text-center font-normal pt-1">
-                      Ensuring identical active ingredient assay, micronization stability, and bioequivalence profile.
+                    <p className="text-[11px] text-slate-500 text-center font-normal pt-0.5">
+                      Guarantees identical active molecule assay, micronization stability, and bioequivalence profile.
                     </p>
                   </div>
 
