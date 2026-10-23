@@ -11,7 +11,7 @@ import MRLayout from '../../layouts/MR/MRLayout';
 
 export default function Notice({ notices = [] }) {
   const { props } = usePage();
-  const isAdmin = props.auth?.user?.role === 'admin';
+  const isAdmin = props.auth?.user?.role === 'admin' || props.auth?.user?.role === 'super_admin';
   const Layout = isAdmin ? AdminLayout : MRLayout;
 
   return (

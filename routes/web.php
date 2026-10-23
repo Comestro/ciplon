@@ -149,6 +149,7 @@ Route::middleware(['auth'])->prefix('mrconnect')->name('mrconnect.')->group(func
     Route::get('/leave', [MRConnectController::class, 'leave'])->name('leave.index');
     Route::post('/leave', [MRConnectController::class, 'storeLeave'])->name('leave.store');
     Route::post('/leave/{id}/approve', [MRConnectController::class, 'approveLeave'])->name('leave.approve');
+    Route::post('/leave/{id}/reject', [MRConnectController::class, 'rejectLeave'])->name('leave.reject');
     Route::get('/primary-sales', [MRConnectController::class, 'primarySales'])->name('primary.sales');
     Route::get('/pob-order', [MRConnectController::class, 'pobOrder'])->name('pob.order');
     Route::post('/pob-order', [MRConnectController::class, 'storePobOrder'])->name('pob.order.store');

@@ -16,7 +16,7 @@ import MRLayout from '../../layouts/MR/MRLayout';
 
 export default function PobOrder({ orders = [], doctors = [], summary = {} }) {
   const { props } = usePage();
-  const isAdmin = props.auth?.user?.role === 'admin';
+  const isAdmin = props.auth?.user?.role === 'admin' || props.auth?.user?.role === 'super_admin';
   const Layout = isAdmin ? AdminLayout : MRLayout;
 
   const [showModal, setShowModal] = useState(false);

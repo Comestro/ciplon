@@ -256,6 +256,13 @@ class MRConnectController extends Controller
         return Inertia::render('mrconnect/Leave', [
             'leaves' => $leaves,
             'isAdmin' => $isAdmin,
+            'stats' => [
+                'total' => $leaves->count(),
+                'pending' => $leaves->where('status', 'pending')->count(),
+                'approved' => $leaves->where('status', 'approved')->count(),
+                'rejected' => $leaves->where('status', 'rejected')->count(),
+                'total_days_approved' => (int) $leaves->where('status', 'approved')->sum('days_count'),
+            ],
             'balances' => [
                 'casual_leave' => 8,
                 'sick_leave' => 6,
@@ -311,6 +318,28 @@ class MRConnectController extends Controller
         ]);
 
         return back()->with('success', 'Leave request approved.');
+    }
+
+    /**
+     * Reject Leave Request (Admin Only)
+     */
+    public function rejectLeave(Request $request, int $id): RedirectResponse
+    {
+        if (! $request->user()->isAdmin()) {
+            abort(403, 'Unauthorized. Only administrators can reject leave requests.');
+        }
+
+        $feedback = $request->input('reason', $request->input('admin_feedback', 'Application rejected by administration.'));
+
+        DB::table('leaves')->where('id', $id)->update([
+            'status' => 'rejected',
+            'admin_feedback' => $feedback,
+            'reviewed_by' => $request->user()->id,
+            'reviewed_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        return back()->with('success', 'Leave request rejected.');
     }
 
     /**
