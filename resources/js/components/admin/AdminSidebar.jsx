@@ -44,10 +44,11 @@ export default function AdminSidebar({ isOpen, onClose }) {
 
   const userRoles = authUser?.roles || [];
   const userPermissions = authUser?.permissions || [];
-  const isSuperAdmin = authUser?.role === 'admin' || userRoles.includes('super_admin');
+  const isSuperAdmin = authUser?.role === 'super_admin' || userRoles.includes('super_admin');
+  const isAdmin = isSuperAdmin || authUser?.role === 'admin' || userRoles.includes('admin');
 
   const hasPerm = (perm) => {
-    if (isSuperAdmin) return true;
+    if (isSuperAdmin || isAdmin) return true;
     if (!perm) return true;
     return userPermissions.includes(perm);
   };
@@ -364,7 +365,7 @@ export default function AdminSidebar({ isOpen, onClose }) {
               </div>
               <div className="min-w-0 flex-1">
                 <span className="block text-xs font-semibold text-slate-800 truncate leading-tight">{adminName}</span>
-                <span className="block text-[10px] text-slate-400 font-normal truncate">System Admin</span>
+                <span className="block text-[10px] text-slate-400 font-normal truncate">{isSuperAdmin ? 'Super Administrator' : 'Administrator'}</span>
               </div>
             </div>
 

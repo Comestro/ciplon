@@ -102,7 +102,7 @@ export default function StaffForm({ isEdit = false, staff = null, roles = [] }) 
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between">
                         <span className="text-xs font-bold text-slate-900">
-                          {r.name === 'super_admin' ? 'Super Admin' : r.name === 'mr' ? 'Medical Representative (MR)' : capitalizeWords(r.name.replace(/_/g, ' '))}
+                          {r.name === 'admin' ? 'Administrator' : r.name === 'super_admin' ? 'Super Admin' : r.name === 'mr' ? 'Medical Representative (MR)' : capitalizeWords(r.name.replace(/_/g, ' '))}
                         </span>
                         {isSelected && (
                           <span className="text-[10px] font-semibold text-teal-700 bg-teal-100/60 px-2 py-0.5 rounded-full">
@@ -111,7 +111,7 @@ export default function StaffForm({ isEdit = false, staff = null, roles = [] }) 
                         )}
                       </div>
                       <span className="text-[11px] text-slate-500 mt-0.5 block leading-tight font-normal">
-                        {r.name === 'super_admin' ? 'Unrestricted master access to all operations' : r.name === 'manager' ? 'Manages products, categories, doctor call records' : 'Field catalog access & Daily Call Reports (DCR)'}
+                        {r.name === 'admin' ? 'Full administrative access to manage products, categories, staff, and field operations' : r.name === 'super_admin' ? 'Unrestricted master access' : r.name === 'manager' ? 'Manages products, categories, doctor call records' : 'Field catalog access & Daily Call Reports (DCR)'}
                       </span>
                     </div>
                   </label>

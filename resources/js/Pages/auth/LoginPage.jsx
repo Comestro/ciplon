@@ -25,7 +25,7 @@ export default function LoginPage() {
 
   const { data, setData, post, processing, errors, reset } = useForm({
     email: 'mr@ciplon.com',
-    password: 'password',
+    password: '123456789',
     remember: true,
   });
 
@@ -42,13 +42,13 @@ export default function LoginPage() {
     if (role === 'mr') {
       setData({
         email: 'mr@ciplon.com',
-        password: 'password',
+        password: '123456789',
         remember: true,
       });
     } else {
       setData({
         email: 'admin@gmail.com',
-        password: 'password',
+        password: '123456789',
         remember: true,
       });
     }
@@ -56,7 +56,7 @@ export default function LoginPage() {
 
   const handleQuickLogin = (role) => {
     const email = role === 'mr' ? 'mr@ciplon.com' : 'admin@gmail.com';
-    const password = 'password';
+    const password = '123456789';
 
     setDemoLoading(role);
     setData('email', email);

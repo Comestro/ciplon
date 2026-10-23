@@ -52,7 +52,7 @@ class StaffController extends Controller
     // Display form to add a new staff member
     public function create(): Response
     {
-        $roles = Role::orderBy('name')->get(['id', 'name']);
+        $roles = Role::where('name', '!=', 'super_admin')->orderBy('name')->get(['id', 'name']);
 
         return Inertia::render('admin/staff/StaffForm', [
             'isEdit' => false,
@@ -70,6 +70,10 @@ class StaffController extends Controller
             'password' => ['required', 'string', 'min:8'],
         ]);
 
+        if ($validated['role'] === 'super_admin') {
+            return back()->withErrors(['role' => 'There can only be one Super Administrator. You can create an Administrator instead.'])->withInput();
+        }
+
         $user = User::create([
             'name' => ucwords(trim($validated['name'])),
             'email' => $validated['email'],
@@ -83,9 +87,15 @@ class StaffController extends Controller
     }
 
     // Display form to edit staff member and change role
-    public function edit(User $staff): Response
+    public function edit(Request $request, User $staff): Response|RedirectResponse
     {
-        $roles = Role::orderBy('name')->get(['id', 'name']);
+        if ($staff->isSuperAdmin() && ! $request->user()->isSuperAdmin()) {
+            return redirect()->route('admin.staff.index')->with('error', 'Only the Super Administrator can modify the master account.');
+        }
+
+        $roles = $staff->isSuperAdmin()
+            ? Role::orderBy('name')->get(['id', 'name'])
+            : Role::where('name', '!=', 'super_admin')->orderBy('name')->get(['id', 'name']);
         $currentRole = $staff->roles()->first()?->name ?? $staff->role;
 
         return Inertia::render('admin/staff/StaffForm', [
@@ -103,6 +113,10 @@ class StaffController extends Controller
     // Update staff profile, credentials and assigned role
     public function update(Request $request, User $staff): RedirectResponse
     {
+        if ($staff->isSuperAdmin() && ! $request->user()->isSuperAdmin()) {
+            return back()->with('error', 'Only the Super Administrator can modify the master account.');
+        }
+
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users', 'email')->ignore($staff->id)],
@@ -110,10 +124,14 @@ class StaffController extends Controller
             'password' => ['nullable', 'string', 'min:8'],
         ]);
 
+        if ($validated['role'] === 'super_admin' && ! $staff->isSuperAdmin()) {
+            return back()->withErrors(['role' => 'There can only be one Super Administrator.'])->withInput();
+        }
+
         $updateData = [
             'name' => ucwords(trim($validated['name'])),
             'email' => $validated['email'],
-            'role' => $validated['role'],
+            'role' => $staff->isSuperAdmin() ? 'super_admin' : $validated['role'],
         ];
 
         if (! empty($validated['password'])) {
@@ -121,7 +139,7 @@ class StaffController extends Controller
         }
 
         $staff->update($updateData);
-        $staff->syncRoles([$validated['role']]);
+        $staff->syncRoles([$staff->isSuperAdmin() ? 'super_admin' : $validated['role']]);
 
         return redirect()->route('admin.staff.index')->with('success', 'Staff details updated successfully.');
     }
@@ -129,6 +147,10 @@ class StaffController extends Controller
     // Remove staff member from system
     public function destroy(Request $request, User $staff): RedirectResponse
     {
+        if ($staff->isSuperAdmin() || $staff->role === 'super_admin' || $staff->hasRole('super_admin') || $staff->id === 1) {
+            return back()->with('error', 'The Super Administrator account is protected and cannot be deleted.');
+        }
+
         if ($staff->id === $request->user()?->id) {
             return back()->with('error', 'You cannot delete your own administrative account.');
         }

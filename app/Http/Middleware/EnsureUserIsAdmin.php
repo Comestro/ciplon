@@ -22,7 +22,7 @@ class EnsureUserIsAdmin
             return redirect()->guest('/login');
         }
 
-        if ($request->user()->role !== 'admin') {
+        if (! $request->user()->isAdmin()) {
             if ($request->expectsJson()) {
                 return response()->json([
                     'success' => false,

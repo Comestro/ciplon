@@ -17,17 +17,17 @@ class DatabaseSeeder extends Seeder
         // 1. Roles and Permissions
         $this->call(RoleAndPermissionSeeder::class);
 
-        // Primary Administrator Account
+        // Primary Super Administrator Account
         $admin = User::updateOrCreate(
             ['email' => 'admin@gmail.com'],
             [
                 'name' => 'System Administrator',
                 'password' => Hash::make('123456789'),
-                'role' => 'admin',
+                'role' => 'super_admin',
                 'email_verified_at' => now(),
             ]
         );
-        $admin->assignRole('super_admin');
+        $admin->syncRoles(['super_admin']);
 
         // Demo Medical Representative (MR) Account
         $mr = User::updateOrCreate(

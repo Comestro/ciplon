@@ -43,8 +43,9 @@ class LoginController extends Controller
             ]);
         }
 
-        $isAllowed = $user->hasRole(['super_admin', 'manager', 'mr', 'admin'])
-            || in_array($user->role, ['admin', 'manager', 'mr']);
+        $isAllowed = $user->isAdmin()
+            || $user->hasRole(['manager', 'mr'])
+            || in_array($user->role, ['super_admin', 'admin', 'manager', 'mr']);
 
         if (! $isAllowed) {
             throw ValidationException::withMessages([

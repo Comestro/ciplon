@@ -39,10 +39,18 @@ class User extends Authenticatable
         );
     }
 
+    // Helper to check if user is the Super Admin
+    public function isSuperAdmin(): bool
+    {
+        return $this->role === 'super_admin' || $this->hasRole('super_admin');
+    }
+
     // Helper to check if user has admin privileges
     public function isAdmin(): bool
     {
-        return $this->hasRole(['super_admin', 'admin']) || $this->role === 'admin';
+        return $this->isSuperAdmin()
+            || $this->hasRole('admin')
+            || $this->role === 'admin';
     }
 
     public function doctors(): HasMany

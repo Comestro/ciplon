@@ -285,3 +285,21 @@ test('admin can view roles list and create custom role with permissions', functi
     $role = Role::findByName('field_supervisor');
     expect($role->hasPermissionTo('dcr.view'))->toBeTrue();
 });
+test('super_admin can authenticate via web session and access admin backoffice', function () {
+    $superAdmin = User::factory()->create([
+        'email' => 'super@pharma.com',
+        'role' => 'super_admin',
+        'password' => Hash::make('password123'),
+    ]);
+
+    $response = $this->post('/login', [
+        'email' => 'super@pharma.com',
+        'password' => 'password123',
+    ]);
+
+    $response->assertRedirect('/admin');
+    $this->assertAuthenticatedAs($superAdmin);
+
+    $dashboardResponse = $this->get('/admin');
+    $dashboardResponse->assertStatus(200);
+});

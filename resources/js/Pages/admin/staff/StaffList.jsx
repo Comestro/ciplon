@@ -42,6 +42,8 @@ export default function StaffList({ staff, filters = {}, roles = [] }) {
     switch (roleName) {
       case 'super_admin':
         return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-purple-50 text-purple-700">Super Admin</span>;
+      case 'admin':
+        return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700">Admin</span>;
       case 'manager':
         return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 text-blue-700">Manager</span>;
       case 'mr':
@@ -78,7 +80,7 @@ export default function StaffList({ staff, filters = {}, roles = [] }) {
                 <option value="">All Roles</option>
                 {roles.map((r) => (
                   <option key={r.id} value={r.name}>
-                    {r.name === 'super_admin' ? 'Super Admin' : r.name === 'mr' ? 'Medical Rep' : capitalizeWords(r.name.replace(/_/g, ' '))}
+                    {r.name === 'super_admin' ? 'Super Admin' : r.name === 'admin' ? 'Admin' : r.name === 'mr' ? 'Medical Rep' : capitalizeWords(r.name.replace(/_/g, ' '))}
                   </option>
                 ))}
               </select>
@@ -127,6 +129,7 @@ export default function StaffList({ staff, filters = {}, roles = [] }) {
                   staff?.data?.map((member) => {
                     const primaryRole = member.roles?.[0]?.name || member.role;
                     const isSelf = member.id === auth.user?.id;
+                    const isSuperAdminMember = member.role === 'super_admin' || member.roles?.some(r => r.name === 'super_admin') || member.id === 1;
                     const formattedName = capitalizeWords(member.name);
                     const initial = formattedName ? formattedName.charAt(0).toUpperCase() : 'U';
 
@@ -163,25 +166,38 @@ export default function StaffList({ staff, filters = {}, roles = [] }) {
 
                         <td className="py-3.5 px-4 sm:px-5 text-right">
                           <div className="flex items-center justify-end gap-1">
-                            <Link
-                              href={`/admin/staff/${member.id}/edit`}
-                              className="p-1.5 rounded-lg text-slate-500 hover:text-teal-700 hover:bg-teal-50 transition-colors"
-                              title="Edit Member"
-                              aria-label="Edit Member"
-                            >
-                              <Edit2 className="w-3.5 h-3.5" />
-                            </Link>
-
-                            {!isSelf && (
-                              <button
-                                type="button"
-                                onClick={() => handleDelete(member)}
-                                className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
-                                title="Delete Member"
-                                aria-label="Delete Member"
+                            {/* Super Administrator is permanently protected: no edit and no delete for other admins */}
+                            {isSuperAdminMember && !isSelf ? (
+                              <span
+                                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-semibold text-purple-700 bg-purple-50 border border-purple-200/60"
+                                title="Super Administrator is protected and cannot be edited or deleted by other administrators"
                               >
-                                <Trash2 className="w-3.5 h-3.5" />
-                              </button>
+                                <Shield className="w-3.5 h-3.5 text-purple-600" />
+                                <span>Protected</span>
+                              </span>
+                            ) : (
+                              <>
+                                <Link
+                                  href={`/admin/staff/${member.id}/edit`}
+                                  className="p-1.5 rounded-lg text-slate-500 hover:text-teal-700 hover:bg-teal-50 transition-colors"
+                                  title="Edit Member"
+                                  aria-label="Edit Member"
+                                >
+                                  <Edit2 className="w-3.5 h-3.5" />
+                                </Link>
+
+                                {!isSelf && !isSuperAdminMember && (
+                                  <button
+                                    type="button"
+                                    onClick={() => handleDelete(member)}
+                                    className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
+                                    title="Delete Member"
+                                    aria-label="Delete Member"
+                                  >
+                                    <Trash2 className="w-3.5 h-3.5" />
+                                  </button>
+                                )}
+                              </>
                             )}
                           </div>
                         </td>
