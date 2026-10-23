@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, usePage } from '@inertiajs/react';
 import MRSidebar from './MRSidebar';
 import MRHeader from './MRHeader';
+import ContentLoader from '../../components/common/ContentLoader';
 import { 
   LayoutDashboard, 
   Presentation, 
@@ -36,7 +37,8 @@ export default function MRLayout({ children, title = 'MR Dashboard' }) {
           title={title}
         />
 
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto">
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto relative min-h-[calc(100vh-5rem)]">
+          <ContentLoader />
           {children}
         </main>
       </div>

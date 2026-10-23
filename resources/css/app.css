@@ -64,3 +64,9 @@
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+
+/* Hide Inertia NProgress circular top-right spinner */
+#nprogress .spinner {
+  display: none !important;
+}

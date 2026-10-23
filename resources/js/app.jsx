@@ -3,6 +3,7 @@ import { createInertiaApp } from '@inertiajs/react';
 import { createRoot } from 'react-dom/client';
 import { Toaster } from 'react-hot-toast';
 
+
 createInertiaApp({
   title: (title) => (title ? `${title} - Ciplon` : 'Ciplon Pharmaceuticals — Advancing Healthcare Through Quality & Innovation'),
   resolve: (name) => {
@@ -49,6 +50,6 @@ createInertiaApp({
   },
   progress: {
     color: '#0d9488',
-    showSpinner: true,
+    showSpinner: false,
   },
 });
