@@ -1,12 +1,21 @@
+import { useState } from 'react';
 import { Link, router } from '@inertiajs/react';
 import { Shield, Plus, Edit2, Trash2, Users, Lock, ShieldCheck, Briefcase } from 'lucide-react';
 import AdminLayout from '../../../layouts/AdminLayout';
+import ConfirmModal from '../../../components/common/ConfirmModal';
 
 export default function RoleList({ roles = [] }) {
-  const handleDelete = (role) => {
-    if (confirm(`Are you sure you want to delete role "${role.name}"?`)) {
-      router.delete(`/admin/roles/${role.id}`);
-    }
+  const [deletingRole, setDeletingRole] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const confirmDeleteRole = () => {
+    if (!deletingRole) return;
+    setIsDeleting(true);
+    router.delete(`/admin/roles/${deletingRole.id}`, {
+      onFinish: () => {
+        setIsDeleting(false);
+        setDeletingRole(null);
+      },
+    });
   };
 
   const getRoleMeta = (name) => {
@@ -125,7 +134,7 @@ export default function RoleList({ roles = [] }) {
 
                       <button
                         type="button"
-                        onClick={() => handleDelete(role)}
+                        onClick={() => setDeletingRole(role)}
                         className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
                         title="Delete Role"
                         aria-label="Delete Role"
@@ -140,6 +149,18 @@ export default function RoleList({ roles = [] }) {
           })}
         </div>
       </div>
+
+      <ConfirmModal
+        isOpen={!!deletingRole}
+        onClose={() => !isDeleting && setDeletingRole(null)}
+        onConfirm={confirmDeleteRole}
+        title="Delete Access Role"
+        message={`Are you sure you want to delete role "${deletingRole?.name}"? Assigned users will lose this role's permissions.`}
+        confirmText="Delete Role"
+        cancelText="Cancel"
+        isDanger={true}
+        isLoading={isDeleting}
+      />
     </AdminLayout>
   );
 }

@@ -1,9 +1,24 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { usePage } from '@inertiajs/react';
+import toast from 'react-hot-toast';
 import AdminSidebar from '../components/admin/AdminSidebar';
 import AdminNavbar from '../components/admin/AdminNavbar';
 
 export default function AdminLayout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { flash } = usePage().props;
+  const lastToastRef = useRef('');
+
+  useEffect(() => {
+    if (flash?.success && flash.success !== lastToastRef.current) {
+      lastToastRef.current = flash.success;
+      toast.success(flash.success);
+    }
+    if (flash?.error && flash.error !== lastToastRef.current) {
+      lastToastRef.current = flash.error;
+      toast.error(flash.error);
+    }
+  }, [flash]);
 
   return (
     <div className="min-h-screen bg-[#f8f9fc] flex antialiased text-slate-800 font-sans">

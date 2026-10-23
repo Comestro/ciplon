@@ -1,7 +1,9 @@
+import toast from 'react-hot-toast';
 import { useState } from 'react';
 import { Link, router, usePage } from '@inertiajs/react';
 import { UserPlus, Search, Edit2, Trash2, Shield, Filter, Users } from 'lucide-react';
 import AdminLayout from '../../../layouts/AdminLayout';
+import ConfirmModal from '../../../components/common/ConfirmModal';
 
 // Helper function to capitalize each word in a name
 const capitalizeWords = (str) => {
@@ -13,6 +15,8 @@ export default function StaffList({ staff, filters = {}, roles = [] }) {
   const { auth } = usePage().props;
   const [searchTerm, setSearchTerm] = useState(filters.search || '');
   const [roleFilter, setRoleFilter] = useState(filters.role || '');
+  const [deletingMember, setDeletingMember] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const applyFilters = (searchVal, roleVal) => {
     const params = {};
@@ -31,11 +35,15 @@ export default function StaffList({ staff, filters = {}, roles = [] }) {
     applyFilters(searchTerm, val);
   };
 
-  const handleDelete = (member) => {
-    const formattedName = capitalizeWords(member.name);
-    if (confirm(`Are you sure you want to remove staff member "${formattedName}"?`)) {
-      router.delete(`/admin/staff/${member.id}`);
-    }
+  const confirmDeleteMember = () => {
+    if (!deletingMember) return;
+    setIsDeleting(true);
+    router.delete(`/admin/staff/${deletingMember.id}`, {
+      onFinish: () => {
+        setIsDeleting(false);
+        setDeletingMember(null);
+      },
+    });
   };
 
   const getRoleBadge = (roleName) => {
@@ -189,7 +197,7 @@ export default function StaffList({ staff, filters = {}, roles = [] }) {
                                 {!isSelf && !isSuperAdminMember && (
                                   <button
                                     type="button"
-                                    onClick={() => handleDelete(member)}
+                                    onClick={() => setDeletingMember(member)}
                                     className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
                                     title="Delete Member"
                                     aria-label="Delete Member"
@@ -234,6 +242,19 @@ export default function StaffList({ staff, filters = {}, roles = [] }) {
           )}
         </div>
       </div>
+
+        {/* Custom Confirmation Modal for Deleting Staff Member */}
+        <ConfirmModal
+          isOpen={!!deletingMember}
+          onClose={() => !isDeleting && setDeletingMember(null)}
+          onConfirm={confirmDeleteMember}
+          title="Remove Staff Member"
+          message={`Are you sure you want to remove staff member "${capitalizeWords(deletingMember?.name)}"? This action cannot be undone.`}
+          confirmText="Remove Member"
+          cancelText="Cancel"
+          isDanger={true}
+          isLoading={isDeleting}
+        />
     </AdminLayout>
   );
 }

@@ -18,11 +18,14 @@ import {
   MessageSquare
 } from 'lucide-react';
 import AdminLayout from '../../../layouts/AdminLayout';
+import ConfirmModal from '../../../components/common/ConfirmModal';
 
 export default function EnquiryIndex({ enquiries = {}, stats = {}, filters = {} }) {
   const [searchTerm, setSearchTerm] = useState(filters.search || '');
   const [selectedEnquiry, setSelectedEnquiry] = useState(null);
   const [statusUpdating, setStatusUpdating] = useState(false);
+  const [deletingEnquiryId, setDeletingEnquiryId] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const enquiryList = enquiries.data || [];
 
@@ -59,17 +62,21 @@ export default function EnquiryIndex({ enquiries = {}, stats = {}, filters = {} 
     });
   };
 
-  const handleDelete = (enquiryId) => {
-    if (confirm('Are you sure you want to delete this commercial inquiry?')) {
-      router.delete(`/admin/enquiries/${enquiryId}`, {
-        preserveScroll: true,
-        onSuccess: () => {
-          if (selectedEnquiry && selectedEnquiry.id === enquiryId) {
-            setSelectedEnquiry(null);
-          }
+  const confirmDeleteEnquiry = () => {
+    if (!deletingEnquiryId) return;
+    setIsDeleting(true);
+    router.delete(`/admin/enquiries/${deletingEnquiryId}`, {
+      preserveScroll: true,
+      onFinish: () => {
+        setIsDeleting(false);
+        setDeletingEnquiryId(null);
+      },
+      onSuccess: () => {
+        if (selectedEnquiry && selectedEnquiry.id === deletingEnquiryId) {
+          setSelectedEnquiry(null);
         }
-      });
-    }
+      }
+    });
   };
 
   const getStatusBadge = (status) => {
@@ -452,6 +459,18 @@ export default function EnquiryIndex({ enquiries = {}, stats = {}, filters = {} 
         )}
 
       </div>
+
+      <ConfirmModal
+        isOpen={!!deletingEnquiryId}
+        onClose={() => !isDeleting && setDeletingEnquiryId(null)}
+        onConfirm={confirmDeleteEnquiry}
+        title="Delete Commercial Inquiry"
+        message="Are you sure you want to permanently delete this commercial inquiry? This action cannot be undone."
+        confirmText="Delete Inquiry"
+        cancelText="Cancel"
+        isDanger={true}
+        isLoading={isDeleting}
+      />
     </AdminLayout>
   );
 }
