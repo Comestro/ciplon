@@ -201,7 +201,6 @@ export default function ContactPage({ company }) {
                           </label>
                           <input
                             type="text"
-                            required
                             value={data.name}
                             onChange={(e) => setData('name', e.target.value)}
                             placeholder="Dr. / Mr. / Ms. Full Name"
@@ -216,7 +215,6 @@ export default function ContactPage({ company }) {
                           </label>
                           <input
                             type="email"
-                            required
                             value={data.email}
                             onChange={(e) => setData('email', e.target.value)}
                             placeholder="name@organization.com"
@@ -233,7 +231,6 @@ export default function ContactPage({ company }) {
                           </label>
                           <input
                             type="tel"
-                            required
                             value={data.phone}
                             onChange={(e) => setData('phone', e.target.value)}
                             placeholder="+91 98765 43210"
@@ -280,7 +277,6 @@ export default function ContactPage({ company }) {
                           Detailed Message & Requirements <span className="text-rose-500">*</span>
                         </label>
                         <textarea
-                          required
                           rows={4}
                           value={data.message}
                           onChange={(e) => setData('message', e.target.value)}

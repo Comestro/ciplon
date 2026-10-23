@@ -54,3 +54,33 @@ test('admin can view commercial inquiries and update status', function () {
         'status' => 'contacted',
     ]);
 });
+
+test('commercial inquiry validates fields with regex patterns', function () {
+    // Invalid name with illegal symbols and invalid email structure
+    $response = $this->post(route('enquiry.store'), [
+        'name' => 'John123#$$',
+        'email' => 'invalid-email-format',
+        'phone' => 'abc-phone-invalid',
+        'country' => 'Country123$',
+        'message' => 'Valid message text',
+    ]);
+
+    $response->assertSessionHasErrors(['name', 'email', 'phone', 'country']);
+});
+
+test('commercial inquiry accepts valid formatted names and contact info', function () {
+    $response = $this->post(route('enquiry.store'), [
+        'name' => 'Dr. Marie Curie-Sklodowska',
+        'email' => 'marie.curie@radium-institute.org',
+        'phone' => '+33 (0)1 42 34 56 78',
+        'organization' => 'Curie Research & Healthcare, Inc.',
+        'country' => 'France',
+        'message' => 'Requesting technical dossiers and formulation sample batches.',
+    ]);
+
+    $response->assertSessionHas('success');
+    $this->assertDatabaseHas('enquiries', [
+        'name' => 'Dr. Marie Curie-Sklodowska',
+        'email' => 'marie.curie@radium-institute.org',
+    ]);
+});

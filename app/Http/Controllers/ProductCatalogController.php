@@ -108,16 +108,48 @@ class ProductCatalogController extends Controller
     public function storeEnquiry(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255'],
-            'phone' => ['nullable', 'string', 'max:50'],
-            'company' => ['nullable', 'string', 'max:255'],
-            'organization' => ['nullable', 'string', 'max:255'],
-            'country' => ['nullable', 'string', 'max:255'],
+            'name' => [
+                'required',
+                'string',
+                'min:2',
+                'max:255',
+                'regex:/^[\pL\s.\'-]+$/u',
+            ],
+            'email' => [
+                'required',
+                'string',
+                'email',
+                'max:255',
+                'regex:/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/',
+            ],
+            'phone' => [
+                'nullable',
+                'string',
+                'max:50',
+                'regex:/^[+]?[0-9\s\-()]{7,20}$/',
+            ],
+            'company' => [
+                'nullable',
+                'string',
+                'max:255',
+                'regex:/^[\pL0-9\s.,&\'\(\)\/\-]+$/u',
+            ],
+            'organization' => [
+                'nullable',
+                'string',
+                'max:255',
+                'regex:/^[\pL0-9\s.,&\'\(\)\/\-]+$/u',
+            ],
+            'country' => [
+                'nullable',
+                'string',
+                'max:255',
+                'regex:/^[\pL\s.\'-]+$/u',
+            ],
             'inquiry_type' => ['nullable', 'string', 'max:255'],
             'enquiryType' => ['nullable', 'string', 'max:255'],
             'product_name' => ['nullable', 'string', 'max:255'],
-            'message' => ['required', 'string', 'max:5000'],
+            'message' => ['required', 'string', 'min:5', 'max:5000'],
         ]);
 
         Enquiry::create([
