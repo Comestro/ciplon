@@ -154,6 +154,7 @@ Route::middleware(['auth'])->prefix('mrconnect')->name('mrconnect.')->group(func
     Route::get('/primary-sales', [MRConnectController::class, 'primarySales'])->name('primary.sales');
     Route::get('/pob-order', [MRConnectController::class, 'pobOrder'])->name('pob.order');
     Route::post('/pob-order', [MRConnectController::class, 'storePobOrder'])->name('pob.order.store');
+    Route::post('/pob-order/{id}/status', [MRConnectController::class, 'updatePobStatus'])->name('pob.order.status');
     Route::get('/set-target', [MRConnectController::class, 'setTarget'])->name('set.target');
     Route::get('/video-library', [MRConnectController::class, 'videoLibrary'])->name('video.library');
     Route::get('/slider', [MRConnectController::class, 'slider'])->name('slider');

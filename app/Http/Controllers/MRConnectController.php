@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Doctor;
+use App\Models\Product;
 use App\Models\TourPlan;
 use App\Models\User;
 use App\Models\Visit;
@@ -434,7 +435,7 @@ class MRConnectController extends Controller
 
     /**
      * 6. POB ORDER (Personal Order Booking)
-     * MR only sees their own POB orders.
+     * MR only sees their own POB orders; Admin sees orders from all representatives.
      */
     public function pobOrder(Request $request): Response
     {
@@ -443,29 +444,48 @@ class MRConnectController extends Controller
 
         $query = DB::table('pob_orders')
             ->join('users', 'pob_orders.user_id', '=', 'users.id')
-            ->select('pob_orders.*', 'users.name as representative_name');
+            ->leftJoin('doctors', 'pob_orders.doctor_id', '=', 'doctors.id')
+            ->select(
+                'pob_orders.*',
+                'users.name as representative_name',
+                'doctors.name as doctor_name',
+                'doctors.clinic_hospital_name'
+            );
 
         if (! $isAdmin) {
             $query->where('pob_orders.user_id', $userId);
         }
 
-        $orders = $query->orderByDesc('pob_orders.created_at')->get();
+        $orders = $query->orderByDesc('pob_orders.created_at')->get()->map(function ($ord) {
+            $ord->items = is_string($ord->items_json)
+                ? json_decode($ord->items_json, true)
+                : ($ord->items_json ?? []);
+            return $ord;
+        });
 
-        // Scope doctors dropdown strictly to the authenticated MR
+        // Scope doctors dropdown strictly to the authenticated MR (or all if admin)
         $doctorsQuery = Doctor::active();
         if (! $isAdmin) {
             $doctorsQuery->where('user_id', $userId);
         }
         $doctors = $doctorsQuery->get(['id', 'name', 'clinic_hospital_name']);
 
+        // Active company products for itemized booking
+        $products = Product::where('status', 'active')
+            ->select('id', 'brand_name', 'generic_name', 'product_code', 'dosage_form', 'strength')
+            ->orderBy('brand_name')
+            ->get();
+
         return Inertia::render('mrconnect/PobOrder', [
             'orders' => $orders,
             'doctors' => $doctors,
+            'products' => $products,
             'isAdmin' => $isAdmin,
             'summary' => [
                 'total_orders' => $orders->count(),
-                'total_value' => $orders->sum('total_amount'),
+                'total_value' => (float) $orders->sum('total_amount'),
                 'verified_orders' => $orders->where('status', 'verified')->count(),
+                'pending_orders' => $orders->where('status', 'submitted')->count(),
             ],
         ]);
     }
@@ -478,9 +498,35 @@ class MRConnectController extends Controller
         $validated = $request->validate([
             'chemist_name' => ['required', 'string', 'max:150'],
             'doctor_id' => ['nullable', 'exists:doctors,id'],
-            'total_amount' => ['required', 'numeric', 'min:1'],
-            'notes' => ['nullable', 'string'],
+            'notes' => ['nullable', 'string', 'max:1000'],
+            'items' => ['nullable', 'array', 'min:1'],
+            'items.*.product_name' => ['required_with:items', 'string', 'max:150'],
+            'items.*.quantity' => ['required_with:items', 'integer', 'min:1'],
+            'items.*.unit_price' => ['required_with:items', 'numeric', 'min:0.01'],
+            'total_amount' => ['nullable', 'numeric', 'min:1'],
         ]);
+
+        $sanitizedItems = [];
+        $totalAmount = 0;
+
+        if (! empty($validated['items'])) {
+            foreach ($validated['items'] as $item) {
+                $qty = (int) $item['quantity'];
+                $price = (float) $item['unit_price'];
+                $subtotal = round($qty * $price, 2);
+                $totalAmount += $subtotal;
+
+                $sanitizedItems[] = [
+                    'product_id' => $item['product_id'] ?? null,
+                    'product_name' => trim($item['product_name']),
+                    'quantity' => $qty,
+                    'unit_price' => $price,
+                    'subtotal' => $subtotal,
+                ];
+            }
+        } else {
+            $totalAmount = (float) ($validated['total_amount'] ?? 0);
+        }
 
         $orderNo = 'POB-'.date('Y').'-'.rand(1000, 9999);
 
@@ -489,15 +535,42 @@ class MRConnectController extends Controller
             'doctor_id' => $validated['doctor_id'] ?? null,
             'order_no' => $orderNo,
             'chemist_name' => $validated['chemist_name'],
-            'total_amount' => $validated['total_amount'],
-            'items_count' => rand(2, 6),
-            'notes' => $validated['notes'] ?? 'Order booked during clinic visit',
+            'total_amount' => $totalAmount,
+            'items_count' => count($sanitizedItems) > 0 ? count($sanitizedItems) : 1,
+            'items_json' => ! empty($sanitizedItems) ? json_encode($sanitizedItems) : null,
+            'notes' => $validated['notes'] ?? 'Order booked during chemist visit',
             'status' => 'submitted',
             'created_at' => now(),
             'updated_at' => now(),
         ]);
 
         return back()->with('success', "Personal Order {$orderNo} booked successfully!");
+    }
+
+    /**
+     * Update POB Order Status (Admin action)
+     */
+    public function updatePobStatus(Request $request, int $id): RedirectResponse
+    {
+        if (! $request->user()->isAdmin()) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $validated = $request->validate([
+            'status' => ['required', 'string', 'in:submitted,verified,dispatched,delivered'],
+        ]);
+
+        $order = DB::table('pob_orders')->where('id', $id)->first();
+        if (! $order) {
+            abort(404, 'POB Order not found.');
+        }
+
+        DB::table('pob_orders')->where('id', $id)->update([
+            'status' => $validated['status'],
+            'updated_at' => now(),
+        ]);
+
+        return back()->with('success', "POB Order {$order->order_no} status updated to ".ucfirst($validated['status'])."!");
     }
 
     /**
