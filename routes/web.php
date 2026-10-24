@@ -5,7 +5,6 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\EnquiryController;
 use App\Http\Controllers\Admin\MRTrackingController as AdminMRTrackingController;
 use App\Http\Controllers\Admin\ProductController;
-use App\Http\Controllers\Admin\ProductSlideController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\StaffController;
@@ -75,14 +74,6 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('/products/{product}', [ProductController::class, 'update']);
     Route::delete('/products/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
     Route::patch('/products/{product}/status', [ProductController::class, 'updateStatus'])->name('products.status');
-
-    // Visual Aid Product Slides
-    Route::get('/products/{product}/slides', [ProductSlideController::class, 'index'])->name('products.slides.index');
-    Route::post('/products/{product}/slides', [ProductSlideController::class, 'store'])->name('products.slides.store');
-    Route::post('/products/{product}/slides/{slide}', [ProductSlideController::class, 'update'])->name('products.slides.update');
-    Route::delete('/products/{product}/slides/{slide}', [ProductSlideController::class, 'destroy'])->name('products.slides.destroy');
-    Route::post('/products/{product}/slides/reorder', [ProductSlideController::class, 'reorder'])->name('products.slides.reorder');
-    Route::patch('/products/{product}/slides/{slide}/status', [ProductSlideController::class, 'toggleStatus'])->name('products.slides.status');
 
     // Staff & Team Management
     Route::resource('staff', StaffController::class);

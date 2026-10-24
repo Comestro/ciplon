@@ -1,46 +1,15 @@
-import { useState, useEffect, useMemo } from 'react';
-import { createPortal } from 'react-dom';
+import { useState, useEffect } from 'react';
 import { Link } from '@inertiajs/react';
 import axios from 'axios';
 import {
-  Image as ImageIcon,
   Pill,
-  Search,
-  Filter,
   RefreshCw,
-  Sparkles,
-  Layers,
-  ChevronRight,
-  ChevronLeft,
-  X,
-  Play,
-  FileText,
-  ShieldCheck,
-  Activity,
-  CheckCircle2,
   AlertCircle,
-  Eye,
-  Maximize2,
-  Minimize2,
   Calendar,
-  Building2,
-  BookOpen,
-  Info,
-  Check,
-  Stethoscope,
-  ExternalLink,
-  Package,
-  Sun,
-  Moon,
-  Clock,
-  Zap,
-  Award,
-  HeartPulse,
-  Droplets,
-  CheckCheck,
-  Presentation
+  Presentation,
+  LayoutGrid,
+  List
 } from 'lucide-react';
-import toast from 'react-hot-toast';
 import MRLayout from '../../layouts/MR/MRLayout';
 import SearchBar from '../../components/common/SearchBar';
 
@@ -55,13 +24,6 @@ export default function Products({ initialFilters = {} }) {
   const [categoryFilter, setCategoryFilter] = useState(initialFilters.category || 'all');
   const [dosageFilter, setDosageFilter] = useState(initialFilters.dosage_form || 'all');
   const [viewMode, setViewMode] = useState('grid'); // 'grid' | 'list'
-
-  // Detailing modal & Presentation mode state
-  const [detailProduct, setDetailProduct] = useState(null);
-  const [presentationMode, setPresentationMode] = useState(false);
-  const [activeSlide, setActiveSlide] = useState(0);
-  const [deckTheme, setDeckTheme] = useState('light');
-  const [fitMode, setFitMode] = useState('full'); // 'full' or 'contain' // 'light' (matches Ciplon theme) | 'dark'
 
   // Fetch products from API
   const fetchProducts = async () => {
@@ -93,62 +55,8 @@ export default function Products({ initialFilters = {} }) {
     return () => clearTimeout(timer);
   }, [search, categoryFilter, dosageFilter]);
 
-  // Open E-Detailing Full-Screen Mode
-  const handleOpenPresentation = (prod, slideIndex = 0) => {
-    setDetailProduct(prod);
-    setActiveSlide(slideIndex);
-    setPresentationMode(true);
-  };
-
-  // Close E-Detailing Mode
-
-  // Native browser fullscreen toggle helper
-  const handleToggleFullscreen = () => {
-    if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen?.().catch(() => {});
-    } else {
-      document.exitFullscreen?.().catch(() => {});
-    }
-  };
-
-  const handleClosePresentation = () => {
-    setPresentationMode(false);
-  };
-
-  // Pure image-based carousel slides uploaded by admin
-  const carouselSlides = detailProduct?.slides && detailProduct.slides.length > 0 ? detailProduct.slides : [];
-  const totalSlideCount = carouselSlides.length;
-
-  const handleNextSlide = () => {
-    if (activeSlide < totalSlideCount - 1) {
-      setActiveSlide((prev) => prev + 1);
-    }
-  };
-
-  const handlePrevSlide = () => {
-    if (activeSlide > 0) {
-      setActiveSlide((prev) => prev - 1);
-    }
-  };
-
-  // Keyboard navigation for presentation mode
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (!presentationMode) return;
-      if (e.key === 'ArrowRight' || e.key === 'Space') {
-        handleNextSlide();
-      } else if (e.key === 'ArrowLeft') {
-        handlePrevSlide();
-      } else if (e.key === 'Escape') {
-        handleClosePresentation();
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [presentationMode, activeSlide, totalSlideCount]);
-
   return (
-    <MRLayout title="Products & Digital Detailing Aids">
+    <MRLayout title="Products & Formulations">
       <div className="space-y-5 max-w-7xl mx-auto pb-10 font-sans">
 
         {/* Top Header Card */}
@@ -156,7 +64,7 @@ export default function Products({ initialFilters = {} }) {
           <div>
             <div className="flex items-center gap-2.5">
               <h1 className="text-xl font-bold text-slate-900 tracking-tight">
-                Product Portfolio & E-Detailing
+                Product Portfolio & Detailing
               </h1>
               {meta?.total !== undefined && (
                 <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-800 border border-slate-200/80">
@@ -165,7 +73,7 @@ export default function Products({ initialFilters = {} }) {
               )}
             </div>
             <p className="text-xs text-slate-500 mt-1">
-              Interactive pharmaceutical visual aids, molecule compositions, and prescribing guides for in-clinic doctor calls
+              Pharmaceutical formulations, molecule compositions, and prescribing guides for in-clinic doctor calls
             </p>
           </div>
 
@@ -199,82 +107,90 @@ export default function Products({ initialFilters = {} }) {
           </div>
         </div>
 
-        {/* Filter Bar */}
-        <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs space-y-3">
-          <div className="flex flex-col md:flex-row items-stretch md:items-center gap-2.5">
-            {/* Search */}
+        {/* Filter Controls Bar */}
+        <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
+          <div className="flex-1 max-w-md">
             <SearchBar
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search by brand name, generic molecule, indication, or composition..."
-              className="flex-1"
+              onChange={setSearch}
+              placeholder="Search brand, generic molecule, composition..."
             />
+          </div>
 
+          <div className="flex items-center gap-2 flex-wrap">
             {/* Category Filter */}
-            <div className="w-full md:w-56">
-              <select
-                value={categoryFilter}
-                onChange={(e) => setCategoryFilter(e.target.value)}
-                className="w-full py-2 px-3 bg-slate-50/50 border border-slate-200/80 focus:border-slate-900 focus:bg-white rounded-xl text-xs text-slate-700 focus:outline-none cursor-pointer"
-              >
-                <option value="all">All Therapeutic Segments</option>
-                {meta?.categories?.map((cat) => (
-                  <option key={cat.id} value={cat.slug}>
-                    {cat.name} ({cat.products_count ?? 0})
-                  </option>
-                ))}
-              </select>
-            </div>
+            <select
+              value={categoryFilter}
+              onChange={(e) => setCategoryFilter(e.target.value)}
+              className="px-3 py-2 text-xs font-medium rounded-xl border border-slate-200 bg-slate-50 text-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 transition-all cursor-pointer"
+            >
+              <option value="all">All Categories</option>
+              {meta?.categories?.map((c) => (
+                <option key={c.id} value={c.slug}>
+                  {c.name}
+                </option>
+              ))}
+            </select>
 
             {/* Dosage Form Filter */}
-            <div className="w-full md:w-44">
-              <select
-                value={dosageFilter}
-                onChange={(e) => setDosageFilter(e.target.value)}
-                className="w-full py-2 px-3 bg-slate-50/50 border border-slate-200/80 focus:border-slate-900 focus:bg-white rounded-xl text-xs text-slate-700 focus:outline-none cursor-pointer"
-              >
-                <option value="all">All Dosage Forms</option>
-                {meta?.dosage_forms?.map((form) => (
-                  <option key={form} value={form}>{form}</option>
-                ))}
-              </select>
-            </div>
+            <select
+              value={dosageFilter}
+              onChange={(e) => setDosageFilter(e.target.value)}
+              className="px-3 py-2 text-xs font-medium rounded-xl border border-slate-200 bg-slate-50 text-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 transition-all cursor-pointer"
+            >
+              <option value="all">All Dosage Forms</option>
+              {meta?.dosage_forms?.map((d) => (
+                <option key={d} value={d}>
+                  {d}
+                </option>
+              ))}
+            </select>
 
-            {/* View Mode Toggle */}
-            <div className="flex items-center bg-slate-100 p-1 rounded-xl self-end md:self-center shrink-0">
+            {/* View Mode Toggle: Grid / Table */}
+            <div className="flex items-center bg-slate-100 p-0.5 rounded-xl border border-slate-200/60">
               <button
                 type="button"
                 onClick={() => setViewMode('grid')}
-                className={`p-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
-                  viewMode === 'grid' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-500 hover:text-slate-900'
+                className={`p-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
+                  viewMode === 'grid'
+                    ? 'bg-white text-slate-900 shadow-xs'
+                    : 'text-slate-500 hover:text-slate-900'
                 }`}
-                title="Grid presentation cards"
+                title="Grid cards view"
               >
-                <Layers className="w-4 h-4" />
+                <LayoutGrid className="w-4 h-4" />
               </button>
               <button
                 type="button"
                 onClick={() => setViewMode('list')}
-                className={`p-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
-                  viewMode === 'list' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-500 hover:text-slate-900'
+                className={`p-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
+                  viewMode === 'list'
+                    ? 'bg-white text-slate-900 shadow-xs'
+                    : 'text-slate-500 hover:text-slate-900'
                 }`}
-                title="List view"
+                title="Table view"
               >
-                <BookOpen className="w-4 h-4" />
+                <List className="w-4 h-4" />
               </button>
             </div>
           </div>
         </div>
 
-        {/* Content: Loading / Error / Empty / Products Grid */}
-        {loading ? (
+        {/* Content State: Loading, Error, Empty or List */}
+        {loading && products.length === 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {[1, 2, 3, 4, 5, 6].map((i) => (
-              <div key={i} className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs animate-pulse space-y-3">
-                <div className="h-32 bg-slate-100 rounded-xl w-full" />
-                <div className="h-4 bg-slate-100 rounded w-2/3" />
-                <div className="h-3 bg-slate-100 rounded w-1/2" />
-                <div className="h-8 bg-slate-100 rounded w-full mt-2" />
+            {[1, 2, 3, 4, 5, 6].map((n) => (
+              <div key={n} className="bg-white rounded-2xl border border-slate-200/80 p-5 space-y-4 animate-pulse">
+                <div className="flex gap-3">
+                  <div className="w-20 h-20 bg-slate-100 rounded-xl" />
+                  <div className="flex-1 space-y-2">
+                    <div className="h-3 bg-slate-100 rounded w-1/3" />
+                    <div className="h-4 bg-slate-100 rounded w-3/4" />
+                    <div className="h-3 bg-slate-100 rounded w-1/2" />
+                  </div>
+                </div>
+                <div className="h-3 bg-slate-100 rounded w-full" />
+                <div className="h-3 bg-slate-100 rounded w-5/6" />
               </div>
             ))}
           </div>
@@ -386,25 +302,12 @@ export default function Products({ initialFilters = {} }) {
                       </p>
                     )}
                   </div>
-
-                  {/* Actions Strip */}
-                  <div className="pt-3 border-t border-slate-100">
-                    <button
-                      type="button"
-                      onClick={() => handleOpenPresentation(p, 0)}
-                      className="w-full py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-medium shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer"
-                      title="Open Interactive Visual Aid Carousel"
-                    >
-                      <Play className="w-3.5 h-3.5 fill-current" />
-                      <span>Present Visual Aid</span>
-                    </button>
-                  </div>
                 </div>
               );
             })}
           </div>
         ) : (
-          /* List / Detailing Table View */
+          /* Table View */
           <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
@@ -414,7 +317,6 @@ export default function Products({ initialFilters = {} }) {
                     <th className="py-3 px-4">Segment</th>
                     <th className="py-3 px-4">Dosage / Strength</th>
                     <th className="py-3 px-4">Active Compositions</th>
-                    <th className="py-3 px-4 text-right">Detailing Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 text-xs">
@@ -444,17 +346,6 @@ export default function Products({ initialFilters = {} }) {
                           )}
                         </div>
                       </td>
-                      <td className="py-3 px-4 text-right">
-                        <button
-                          type="button"
-                          onClick={() => handleOpenPresentation(p, 0)}
-                          className="px-3.5 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-medium shadow-xs cursor-pointer inline-flex items-center gap-1.5"
-                          title="Open Interactive Visual Aid Carousel"
-                        >
-                          <Play className="w-3.5 h-3.5 fill-current" />
-                          <span>Present Visual Aid</span>
-                        </button>
-                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -464,138 +355,6 @@ export default function Products({ initialFilters = {} }) {
         )}
 
       </div>
-
-      {/* PURE IMMERSIVE FULL-SCREEN VISUAL AID CAROUSEL (NO HEADER / NO TASKBAR) */}
-      {presentationMode && detailProduct && typeof document !== 'undefined' && createPortal(
-        <div
-          className="fixed inset-0 z-[999999] w-screen h-screen bg-black select-none overflow-hidden flex items-center justify-center animate-in fade-in duration-200"
-          tabIndex={0}
-        >
-          {/* Top-Right: Floating Minimal Controls (Fullscreen & Close) */}
-          <div className="absolute top-4 right-4 z-50 flex items-center gap-2">
-            <button
-              type="button"
-              onClick={handleToggleFullscreen}
-              className="w-10 h-10 rounded-full bg-black/60 hover:bg-black/90 text-white/80 hover:text-white backdrop-blur-md border border-white/20 flex items-center justify-center transition-all cursor-pointer shadow-2xl active:scale-95"
-              title="Toggle Fullscreen"
-            >
-              <Maximize2 className="w-4 h-4" />
-            </button>
-
-            <button
-              type="button"
-              onClick={handleClosePresentation}
-              className="w-10 h-10 rounded-full bg-black/60 hover:bg-rose-600 text-white/80 hover:text-white backdrop-blur-md border border-white/20 flex items-center justify-center transition-all cursor-pointer shadow-2xl active:scale-95"
-              title="Exit Presentation (Esc)"
-            >
-              <X className="w-5 h-5 stroke-[2.5]" />
-            </button>
-          </div>
-
-          {/* Top-Left: Floating Slide Counter Badge */}
-          {totalSlideCount > 0 && (
-            <div className="absolute top-4 left-4 z-50 pointer-events-none">
-              <div className="px-3.5 py-1.5 rounded-full bg-black/65 backdrop-blur-md border border-white/20 text-white text-xs font-medium shadow-2xl flex items-center gap-2">
-                <span className="text-white font-semibold">{activeSlide + 1} / {totalSlideCount}</span>
-                <span className="text-white/40">•</span>
-                <span className="text-slate-300 max-w-xs truncate">{detailProduct.brand_name}</span>
-              </div>
-            </div>
-          )}
-
-          {/* Main Immersive Slide Image Stage - 100% Full Width & Height */}
-          <div
-            className="w-full h-full flex items-center justify-center relative cursor-default"
-            onClick={(e) => {
-              // Click right half for next slide, click left half for previous slide
-              const rect = e.currentTarget.getBoundingClientRect();
-              const clickX = e.clientX - rect.left;
-              if (clickX > rect.width * 0.6) {
-                handleNextSlide();
-              } else if (clickX < rect.width * 0.4) {
-                handlePrevSlide();
-              }
-            }}
-          >
-            {totalSlideCount === 0 ? (
-              <div className="text-center text-white space-y-3 p-8 max-w-md bg-slate-900/90 rounded-3xl border border-white/10 shadow-2xl">
-                <ImageIcon className="w-12 h-12 text-slate-400 mx-auto" />
-                <h3 className="text-lg font-bold text-white">No Slide Images Uploaded</h3>
-                <p className="text-xs text-slate-400">
-                  Please upload slide images in Admin &gt; Visual Aid Carousels.
-                </p>
-                <button
-                  type="button"
-                  onClick={handleClosePresentation}
-                  className="px-5 py-2 rounded-xl bg-white hover:bg-slate-100 text-slate-900 text-xs font-semibold transition-colors cursor-pointer"
-                >
-                  Close
-                </button>
-              </div>
-            ) : (
-              <img
-                key={activeSlide}
-                src={carouselSlides[activeSlide]?.image_path}
-                alt={carouselSlides[activeSlide]?.title || `Slide ${activeSlide + 1}`}
-                className="w-full h-full object-contain select-none transition-all duration-150 animate-in fade-in"
-              />
-            )}
-          </div>
-
-          {/* Left Floating Chevron (Previous) */}
-          {activeSlide > 0 && (
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                handlePrevSlide();
-              }}
-              className="absolute left-4 top-1/2 -translate-y-1/2 z-40 w-14 h-14 rounded-full bg-black/60 hover:bg-white/20 text-white/80 hover:text-white backdrop-blur-md border border-white/20 flex items-center justify-center transition-all hover:scale-105 active:scale-95 cursor-pointer shadow-2xl group"
-              title="Previous Slide (← Left Arrow)"
-            >
-              <ChevronLeft className="w-8 h-8 stroke-[2.2] group-hover:-translate-x-0.5 transition-transform" />
-            </button>
-          )}
-
-          {/* Right Floating Chevron (Next) */}
-          {activeSlide < totalSlideCount - 1 && (
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleNextSlide();
-              }}
-              className="absolute right-4 top-1/2 -translate-y-1/2 z-40 w-14 h-14 rounded-full bg-black/60 hover:bg-white/20 text-white/80 hover:text-white backdrop-blur-md border border-white/20 flex items-center justify-center transition-all hover:scale-105 active:scale-95 cursor-pointer shadow-2xl group"
-              title="Next Slide (→ Right Arrow or Space)"
-            >
-              <ChevronRight className="w-8 h-8 stroke-[2.2] group-hover:translate-x-0.5 transition-transform" />
-            </button>
-          )}
-
-          {/* Minimal Bottom Subtle Dots Indicator */}
-          {totalSlideCount > 1 && (
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-40 px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-md border border-white/15 flex items-center gap-1.5 shadow-2xl">
-              {carouselSlides.map((_, idx) => (
-                <button
-                  key={idx}
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setActiveSlide(idx);
-                  }}
-                  className={`transition-all rounded-full cursor-pointer ${
-                    activeSlide === idx
-                      ? 'w-6 h-2 bg-white'
-                      : 'w-2 h-2 bg-white/40 hover:bg-white/80'
-                  }`}
-                  title={`Jump to Slide ${idx + 1}`}
-                />
-              ))}
-            </div>
-          )}
-        </div>,
-        document.body
-      )}
     </MRLayout>
   );
 }

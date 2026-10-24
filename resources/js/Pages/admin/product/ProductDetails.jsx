@@ -1,8 +1,7 @@
 // ProductDetails component for viewing complete pharmaceutical profile
 import { useState } from 'react';
 import { Link, router } from '@inertiajs/react';
-import { 
-  Layers,
+import {
   Package, 
   Edit3, 
   Trash2, 
@@ -84,14 +83,7 @@ export default function ProductDetails({ product }) {
           </div>
 
           <div className="flex items-center gap-2.5 self-start sm:self-auto">
-            {/* Create Carousel Button */}
-            <Link
-              href={`/admin/products/${product.id}/slides`}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-white bg-teal-700 hover:bg-teal-800 rounded-lg transition-colors shadow-xs cursor-pointer"
-            >
-              <Layers className="w-3.5 h-3.5" />
-              <span>{product.slides && product.slides.length > 0 ? `Carousel (${product.slides.length})` : 'Create Carousel'}</span>
-            </Link>
+
 
             <Link
               href={`/admin/products/${product.id}/edit`}

@@ -48,11 +48,6 @@ class Product extends Model
     }
 
     // Product compositions / active ingredients.
-    // Detailing visual aid slides configured by admin
-    public function slides(): HasMany
-    {
-        return $this->hasMany(ProductSlide::class)->orderBy('sort_order');
-    }
 
     public function compositions(): HasMany
     {
