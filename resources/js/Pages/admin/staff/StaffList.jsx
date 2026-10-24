@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Link, router, usePage } from '@inertiajs/react';
 import { UserPlus, Search, Edit2, Trash2, Shield, Filter, Users } from 'lucide-react';
 import AdminLayout from '../../../layouts/AdminLayout';
+import SearchBar from '../../../components/common/SearchBar';
 import ConfirmModal from '../../../components/common/ConfirmModal';
 
 // Helper function to capitalize each word in a name
@@ -66,14 +67,12 @@ export default function StaffList({ staff, filters = {}, roles = [] }) {
       <div className="space-y-4 pb-8">
         {/* Controls Bar: Search, Role Filter, Actions */}
         <div className="bg-white rounded-xl border border-slate-200/80 p-3 sm:p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)] flex flex-col sm:flex-row items-center justify-between gap-3">
-          <form onSubmit={handleSearchSubmit} className="relative w-full sm:flex-1 max-w-md">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-            <input
-              type="text"
+          <form onSubmit={handleSearchSubmit} className="w-full sm:flex-1 max-w-md">
+            <SearchBar
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Search staff by name or email..."
-              className="w-full pl-9 pr-3 py-2 bg-slate-50/70 hover:bg-slate-50 focus:bg-white border border-slate-200 focus:border-teal-600 rounded-lg text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-600/10 transition-all"
+              className="w-full"
             />
           </form>
 

@@ -36,6 +36,7 @@ import {
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import MRLayout from '../../layouts/MR/MRLayout';
+import SearchBar from '../../components/common/SearchBar';
 
 const CALL_OUTCOMES = [
   'Spoke with Doctor - Positive response',
@@ -491,9 +492,7 @@ export default function Visits({
           </div>
         </div>
 
-        {/* ========================================================================= */}
-        {/* VIEW 1: DAILY CALLS & PLANNER                                             */}
-        {/* ========================================================================= */}
+        {/* VIEW 1: DAILY CALLS & PLANNER */}
         {activeView === 'planner' && (
           <div className="space-y-6">
             
@@ -635,25 +634,12 @@ export default function Visits({
                 </div>
 
                 {/* Instant Search Bar */}
-                <div className="relative w-full md:w-72">
-                  <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-                  <input
-                    type="text"
-                    placeholder="Search doctor, clinic, purpose..."
-                    value={plannerSearch}
-                    onChange={(e) => setPlannerSearch(e.target.value)}
-                    className="w-full pl-9 pr-3 py-1.5 text-xs bg-slate-50 border border-slate-200/80 rounded-xl focus:bg-white focus:outline-hidden focus:ring-1 focus:ring-slate-900 focus:border-slate-900 transition-all text-slate-800"
-                  />
-                  {plannerSearch && (
-                    <button
-                      type="button"
-                      onClick={() => setPlannerSearch('')}
-                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-0.5"
-                    >
-                      <X className="w-3.5 h-3.5" />
-                    </button>
-                  )}
-                </div>
+                <SearchBar
+                  value={plannerSearch}
+                  onChange={(e) => setPlannerSearch(e.target.value)}
+                  placeholder="Search doctor, clinic, purpose..."
+                  className="w-full md:w-72"
+                />
               </div>
 
               {/* Action & Status Filters */}
@@ -965,34 +951,19 @@ export default function Visits({
           </div>
         )}
 
-        {/* ========================================================================= */}
-        {/* VIEW 2: DETAILING & SAMPLE LOGS (DCR)                                      */}
-        {/* ========================================================================= */}
+        {/* VIEW 2: DETAILING & SAMPLE LOGS (DCR) */}
         {activeView === 'detailing' && (
           <div className="space-y-6">
             
             {/* Detailing Filter Bar */}
             <div className="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-xs space-y-3">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
-                <div className="relative w-full md:w-80">
-                  <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-                  <input
-                    type="text"
-                    placeholder="Search doctor, hospital, specialty..."
-                    value={dcrSearch}
-                    onChange={(e) => setDcrSearch(e.target.value)}
-                    className="w-full pl-9 pr-3 py-1.5 text-xs bg-slate-50 border border-slate-200/80 rounded-xl focus:bg-white focus:outline-hidden focus:ring-1 focus:ring-slate-900 focus:border-slate-900 text-slate-800"
-                  />
-                  {dcrSearch && (
-                    <button
-                      type="button"
-                      onClick={() => setDcrSearch('')}
-                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-0.5"
-                    >
-                      <X className="w-3.5 h-3.5" />
-                    </button>
-                  )}
-                </div>
+                <SearchBar
+                  value={dcrSearch}
+                  onChange={(e) => setDcrSearch(e.target.value)}
+                  placeholder="Search doctor, hospital, specialty..."
+                  className="w-full md:w-80"
+                />
 
                 <div className="flex flex-wrap items-center gap-2">
                   <select

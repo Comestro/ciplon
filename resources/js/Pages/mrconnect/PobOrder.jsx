@@ -21,6 +21,7 @@ import toast from 'react-hot-toast';
 import AdminLayout from '../../layouts/AdminLayout';
 import MRLayout from '../../layouts/MR/MRLayout';
 import ConfirmModal from '../../components/common/ConfirmModal';
+import SearchBar from '../../components/common/SearchBar';
 
 // Helper to safely format doctor name without duplicate 'Dr. Dr.'
 const formatDoctorName = (name) => {
@@ -308,16 +309,12 @@ export default function PobOrder({
 
         {/* Filter and Search Bar */}
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-white p-3.5 rounded-2xl border border-slate-200/80 shadow-xs">
-          <div className="relative flex-1 max-w-md">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-            <input
-              type="text"
-              placeholder="Search by order no, chemist shop, representative, doctor..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500"
-            />
-          </div>
+          <SearchBar
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Search by order no, chemist shop, representative, doctor..."
+            className="flex-1 max-w-md"
+          />
 
           <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
             {[

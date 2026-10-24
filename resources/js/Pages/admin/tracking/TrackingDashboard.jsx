@@ -27,6 +27,7 @@ import {
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import AdminLayout from '../../../layouts/AdminLayout';
+import SearchBar from '../../../components/common/SearchBar';
 import DoctorMovementMap from '../../../components/maps/DoctorMovementMap';
 
 export default function TrackingDashboard({
@@ -409,16 +410,12 @@ export default function TrackingDashboard({
             </div>
 
             {/* Search Input */}
-            <div className="relative">
-              <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5 pointer-events-none" />
-              <input
-                type="text"
-                value={searchRepQuery}
-                onChange={(e) => setSearchRepQuery(e.target.value)}
-                placeholder="Search representative..."
-                className="w-full pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 transition-all"
-              />
-            </div>
+            <SearchBar
+              value={searchRepQuery}
+              onChange={(e) => setSearchRepQuery(e.target.value)}
+              placeholder="Search representative..."
+              className="w-full"
+            />
 
             {/* Reps Scrollable List */}
             <div className="space-y-1.5 max-h-[580px] overflow-y-auto pr-1">

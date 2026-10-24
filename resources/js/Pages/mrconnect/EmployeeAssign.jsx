@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import AdminLayout from '../../layouts/AdminLayout';
 import MRLayout from '../../layouts/MR/MRLayout';
+import SearchBar from '../../components/common/SearchBar';
 
 export default function EmployeeAssign({ representatives = [], isIndividualMR = false }) {
   const { props } = usePage();
@@ -47,16 +48,12 @@ export default function EmployeeAssign({ representatives = [], isIndividualMR = 
           </div>
 
           {isAdmin && (
-            <div className="relative">
-              <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-3 pointer-events-none" />
-              <input
-                type="text"
-                placeholder="Search representative or HQ..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="pl-8 pr-3 py-1.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500"
-              />
-            </div>
+            <SearchBar
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search representative or HQ..."
+              className="w-64"
+            />
           )}
         </div>
 

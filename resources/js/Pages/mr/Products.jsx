@@ -42,6 +42,7 @@ import {
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import MRLayout from '../../layouts/MR/MRLayout';
+import SearchBar from '../../components/common/SearchBar';
 
 export default function Products({ initialFilters = {} }) {
   const [products, setProducts] = useState([]);
@@ -202,25 +203,12 @@ export default function Products({ initialFilters = {} }) {
         <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs space-y-3">
           <div className="flex flex-col md:flex-row items-stretch md:items-center gap-2.5">
             {/* Search */}
-            <div className="relative flex-1">
-              <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-              <input
-                type="text"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search by brand name, generic molecule, indication, or composition..."
-                className="w-full pl-9 pr-8 py-2 bg-slate-50/50 border border-slate-200/80 focus:border-slate-900 focus:bg-white rounded-xl text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-900 transition-all"
-              />
-              {search && (
-                <button
-                  type="button"
-                  onClick={() => setSearch('')}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-0.5 cursor-pointer"
-                >
-                  <X className="w-3.5 h-3.5" />
-                </button>
-              )}
-            </div>
+            <SearchBar
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search by brand name, generic molecule, indication, or composition..."
+              className="flex-1"
+            />
 
             {/* Category Filter */}
             <div className="w-full md:w-56">

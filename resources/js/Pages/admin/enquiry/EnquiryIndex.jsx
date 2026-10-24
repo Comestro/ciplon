@@ -18,6 +18,7 @@ import {
   MessageSquare
 } from 'lucide-react';
 import AdminLayout from '../../../layouts/AdminLayout';
+import SearchBar from '../../../components/common/SearchBar';
 import ConfirmModal from '../../../components/common/ConfirmModal';
 
 export default function EnquiryIndex({ enquiries = {}, stats = {}, filters = {} }) {
@@ -176,14 +177,12 @@ export default function EnquiryIndex({ enquiries = {}, stats = {}, filters = {} 
           </div>
 
           {/* Search Bar */}
-          <form onSubmit={handleSearch} className="relative w-full md:w-72">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-            <input
-              type="text"
+          <form onSubmit={handleSearch} className="w-full md:w-72">
+            <SearchBar
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Search sender, company, email..."
-              className="w-full pl-9 pr-4 py-2 bg-slate-50 focus:bg-white border border-slate-200 focus:border-[#c59324] rounded-xl text-xs text-slate-900 placeholder:text-slate-400 outline-none transition-all"
+              className="w-full"
             />
           </form>
         </div>
