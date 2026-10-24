@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import AdminLayout from '../../layouts/AdminLayout';
+import ConfirmModal from '../../components/common/ConfirmModal';
 import MRLayout from '../../layouts/MR/MRLayout';
 
 export default function Leave({ leaves = [], stats = {}, balances = {} }) {
@@ -25,9 +26,13 @@ export default function Leave({ leaves = [], stats = {}, balances = {} }) {
   const Layout = isAdmin ? AdminLayout : MRLayout;
 
   const [showModal, setShowModal] = useState(false);
-  const [rejectModalOpen, setRejectModalOpen] = useState(false);
+  const [approvingLeave, setApprovingLeave] = useState(null);
+  const [isApproving, setIsApproving] = useState(false);
+  const [rejectingLeave, setRejectingLeave] = useState(null);
+  const [isRejecting, setIsRejecting] = useState(false);
   const [selectedLeaveId, setSelectedLeaveId] = useState(null);
   const [rejectReason, setRejectReason] = useState('');
+  const [rejectError, setRejectError] = useState('');
   const [activeFilter, setActiveFilter] = useState('all'); // all, pending, approved, rejected
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -96,31 +101,39 @@ export default function Leave({ leaves = [], stats = {}, balances = {} }) {
     });
   };
 
-  const handleApprove = (id) => {
-    if (!confirm('Are you sure you want to approve this leave request?')) return;
-    router.post(`/mrconnect/leave/${id}/approve`, {}, {
-      onSuccess: () => toast.success('Leave approved successfully!'),
-      onError: () => toast.error('Failed to approve leave.'),
+  const confirmApproveLeave = () => {
+    if (!approvingLeave) return;
+    setIsApproving(true);
+    router.post(`/mrconnect/leave/${approvingLeave.id}/approve`, {}, {
+      onFinish: () => {
+        setIsApproving(false);
+        setApprovingLeave(null);
+      },
+      onError: () => {
+        setIsApproving(false);
+      },
     });
   };
 
-  const openRejectModal = (id) => {
-    setSelectedLeaveId(id);
-    setRejectReason('');
-    setRejectModalOpen(true);
-  };
+  const confirmRejectLeave = () => {
+    if (!rejectingLeave) return;
+    if (!rejectReason.trim()) {
+      setRejectError('Please provide feedback or a reason for declining this leave request.');
+      return;
+    }
 
-  const handleConfirmReject = (e) => {
-    e.preventDefault();
-    if (!selectedLeaveId) return;
-
-    router.post(`/mrconnect/leave/${selectedLeaveId}/reject`, { reason: rejectReason }, {
-      onSuccess: () => {
-        setRejectModalOpen(false);
-        setSelectedLeaveId(null);
+    setRejectError('');
+    setIsRejecting(true);
+    router.post(`/mrconnect/leave/${rejectingLeave.id}/reject`, { reason: rejectReason }, {
+      onFinish: () => {
+        setIsRejecting(false);
+        setRejectingLeave(null);
         setRejectReason('');
+        setRejectError('');
       },
-      onError: () => toast.error('Failed to reject leave.'),
+      onError: () => {
+        setIsRejecting(false);
+      },
     });
   };
 
@@ -338,7 +351,7 @@ export default function Leave({ leaves = [], stats = {}, balances = {} }) {
                             <div className="inline-flex items-center gap-1.5 justify-end">
                               <button
                                 type="button"
-                                onClick={() => handleApprove(lv.id)}
+                                onClick={() => setApprovingLeave(lv)}
                                 className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-[11px] transition-colors cursor-pointer shadow-xs"
                                 title="Approve Request"
                               >
@@ -347,7 +360,7 @@ export default function Leave({ leaves = [], stats = {}, balances = {} }) {
                               </button>
                               <button
                                 type="button"
-                                onClick={() => openRejectModal(lv.id)}
+                                onClick={() => { setRejectingLeave(lv); setRejectReason(''); setRejectError(''); }}
                                 className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-semibold text-[11px] transition-colors cursor-pointer shadow-xs"
                                 title="Reject Request"
                               >
@@ -486,57 +499,47 @@ export default function Leave({ leaves = [], stats = {}, balances = {} }) {
         </div>
       )}
 
-      {/* Reject Leave Feedback Modal (Admin Only) */}
-      {rejectModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-xs p-4">
-          <div className="bg-white rounded-2xl border border-slate-200 max-w-sm w-full p-6 space-y-4 shadow-2xl animate-in fade-in zoom-in-95 duration-150">
-            <div className="flex items-center justify-between pb-2 border-b border-slate-100">
-              <div className="flex items-center gap-2 text-rose-600">
-                <AlertCircle className="w-5 h-5" />
-                <h3 className="text-sm font-bold text-slate-900">Decline Leave Request</h3>
-              </div>
-              <button
-                type="button"
-                onClick={() => setRejectModalOpen(false)}
-                className="text-slate-400 hover:text-slate-600 p-1 rounded-lg hover:bg-slate-100 cursor-pointer"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
+      {/* Approve Leave Modal via Reusable ConfirmModal */}
+      <ConfirmModal
+        isOpen={!!approvingLeave}
+        onClose={() => !isApproving && setApprovingLeave(null)}
+        onConfirm={confirmApproveLeave}
+        title="Approve Leave Request"
+        message={`Are you sure you want to approve this ${approvingLeave?.leave_type || ''} leave request of ${approvingLeave?.days_count || 1} day(s) for ${approvingLeave?.user_name || 'Staff Member'}?`}
+        confirmText="Approve Leave"
+        loadingText="Approving..."
+        isDanger={false}
+        icon={CheckCircle2}
+        isLoading={isApproving}
+      />
 
-            <form onSubmit={handleConfirmReject} className="space-y-3 text-xs">
-              <p className="text-xs text-slate-500">
-                Please provide feedback or reason for declining this request. This will be shown to the representative.
-              </p>
-              <div>
-                <textarea
-                  rows="3"
-                  placeholder="e.g. Crucial field doctor campaign scheduled, kindly reschedule..."
-                  value={rejectReason}
-                  onChange={(e) => setRejectReason(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500"
-                ></textarea>
-              </div>
-
-              <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
-                <button
-                  type="button"
-                  onClick={() => setRejectModalOpen(false)}
-                  className="px-3.5 py-1.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-1.5 rounded-xl text-xs font-semibold text-white bg-rose-600 hover:bg-rose-700 transition-colors cursor-pointer"
-                >
-                  Confirm Reject
-                </button>
-              </div>
-            </form>
-          </div>
+      {/* Decline Leave Modal via Reusable ConfirmModal */}
+      <ConfirmModal
+        isOpen={!!rejectingLeave}
+        onClose={() => !isRejecting && setRejectingLeave(null)}
+        onConfirm={confirmRejectLeave}
+        title="Decline Leave Request"
+        message="Please provide feedback or reason for declining this request. This will be shown to the representative."
+        confirmText="Confirm Reject"
+        loadingText="Rejecting..."
+        isDanger={true}
+        icon={AlertCircle}
+        isLoading={isRejecting}
+      >
+        <div>
+          <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+            Rejection Feedback / Reason
+          </label>
+          <textarea
+            rows="3"
+            required
+            placeholder="e.g. Crucial field doctor campaign scheduled, kindly reschedule..."
+            value={rejectReason}
+            onChange={(e) => setRejectReason(e.target.value)}
+            className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500"
+          ></textarea>
         </div>
-      )}
+      </ConfirmModal>
 
     </Layout>
   );
