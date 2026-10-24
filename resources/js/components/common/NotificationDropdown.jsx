@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
 import { 
   Bell, 
+  Receipt, 
   Calendar, 
   CheckCircle2, 
   XCircle, 
@@ -101,12 +102,19 @@ export default function NotificationDropdown() {
           icon: Calendar,
           bg: 'bg-amber-50 text-amber-600 border-amber-100',
         };
+      case 'expense_submitted':
+        return {
+          icon: Receipt,
+          bg: 'bg-sky-50 text-sky-600 border-sky-100',
+        };
       case 'leave_approved':
+      case 'expense_approved':
         return {
           icon: CheckCircle2,
           bg: 'bg-emerald-50 text-emerald-600 border-emerald-100',
         };
       case 'leave_rejected':
+      case 'expense_rejected':
         return {
           icon: XCircle,
           bg: 'bg-rose-50 text-rose-600 border-rose-100',
@@ -247,21 +255,6 @@ export default function NotificationDropdown() {
                 );
               })
             )}
-          </div>
-
-          {/* Footer */}
-          <div className="p-2 border-t border-slate-100 bg-slate-50/60 text-center">
-            <button
-              type="button"
-              onClick={() => {
-                setIsOpen(false);
-                inertiaRouter.visit('/mrconnect/leave');
-              }}
-              className="w-full py-1.5 px-3 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors inline-flex items-center justify-center gap-1.5 cursor-pointer"
-            >
-              <span>View All Leave Applications</span>
-              <ExternalLink className="w-3 h-3 text-slate-400" />
-            </button>
           </div>
         </div>
       )}

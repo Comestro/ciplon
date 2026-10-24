@@ -221,7 +221,7 @@ class MRConnectController extends Controller
             }
         }
 
-        DB::table('field_expenses')->insert([
+        $expenseId = DB::table('field_expenses')->insertGetId([
             'user_id' => $request->user()->id,
             'date' => $validated['date'],
             'expense_type' => $validated['expense_type'],
@@ -235,6 +235,23 @@ class MRConnectController extends Controller
             'updated_at' => now(),
         ]);
 
+        // Dispatch in-app notification to all administrators
+        $applicantName = $request->user()->name;
+        $formattedAmount = number_format((float) $validated['amount']);
+        \App\Models\Notification::sendToAdmins(
+            type: 'expense_submitted',
+            title: 'New Field Expense Claim',
+            message: "{$applicantName} submitted an expense claim of ₹{$formattedAmount} for {$validated['expense_type']} ({$validated['date']}).",
+            link: '/mrconnect/field-expenses',
+            data: [
+                'expense_id' => $expenseId,
+                'mr_id' => $request->user()->id,
+                'mr_name' => $applicantName,
+                'expense_type' => $validated['expense_type'],
+                'amount' => $validated['amount'],
+            ]
+        );
+
         return back()->with('success', 'Field expense claim submitted successfully for review.');
     }
 
@@ -247,12 +264,28 @@ class MRConnectController extends Controller
             abort(403, 'Unauthorized. Only administrators can approve field expenses.');
         }
 
+        $expense = DB::table('field_expenses')->where('id', $id)->first();
+        if (! $expense) {
+            abort(404, 'Field expense claim not found.');
+        }
+
         DB::table('field_expenses')->where('id', $id)->update([
             'status' => 'approved',
             'reviewed_by' => $request->user()->id,
             'reviewed_at' => now(),
             'updated_at' => now(),
         ]);
+
+        // Dispatch in-app notification to the MR
+        $formattedAmount = number_format((float) $expense->amount);
+        \App\Models\Notification::sendToUser(
+            userId: (int) $expense->user_id,
+            type: 'expense_approved',
+            title: 'Expense Claim Approved',
+            message: "Your expense claim of ₹{$formattedAmount} for {$expense->expense_type} ({$expense->date}) has been approved.",
+            link: '/mrconnect/field-expenses',
+            data: ['expense_id' => $expense->id, 'amount' => $expense->amount]
+        );
 
         return back()->with('success', 'Expense claim approved.');
     }
@@ -266,6 +299,11 @@ class MRConnectController extends Controller
             abort(403, 'Unauthorized. Only administrators can reject field expenses.');
         }
 
+        $expense = DB::table('field_expenses')->where('id', $id)->first();
+        if (! $expense) {
+            abort(404, 'Field expense claim not found.');
+        }
+
         $reason = $request->input('reason', 'Claim rejected by administration.');
 
         DB::table('field_expenses')->where('id', $id)->update([
@@ -275,6 +313,17 @@ class MRConnectController extends Controller
             'reviewed_at' => now(),
             'updated_at' => now(),
         ]);
+
+        // Dispatch in-app notification to the MR
+        $formattedAmount = number_format((float) $expense->amount);
+        \App\Models\Notification::sendToUser(
+            userId: (int) $expense->user_id,
+            type: 'expense_rejected',
+            title: 'Expense Claim Rejected',
+            message: "Your expense claim of ₹{$formattedAmount} for {$expense->expense_type} was rejected. Reason: {$reason}",
+            link: '/mrconnect/field-expenses',
+            data: ['expense_id' => $expense->id, 'amount' => $expense->amount, 'reason' => $reason]
+        );
 
         return back()->with('success', 'Expense claim rejected.');
     }
