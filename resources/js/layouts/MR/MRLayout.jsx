@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, usePage } from '@inertiajs/react';
+import toast from 'react-hot-toast';
 import MRSidebar from './MRSidebar';
 import MRHeader from './MRHeader';
 import ContentLoader from '../../components/common/ContentLoader';
@@ -13,8 +14,18 @@ import {
 
 export default function MRLayout({ children, title = 'MR Dashboard' }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { url } = usePage();
+  const { url, props } = usePage();
   const currentPath = url.split('?')[0];
+  const { flash } = props;
+
+  useEffect(() => {
+    if (flash?.success) {
+      toast.success(flash.success);
+    }
+    if (flash?.error) {
+      toast.error(flash.error);
+    }
+  }, [flash]);
 
   const mobileNav = [
     { label: 'Dashboard', href: '/mr/dashboard', icon: LayoutDashboard, active: currentPath === '/mr/dashboard' },

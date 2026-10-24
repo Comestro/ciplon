@@ -79,7 +79,6 @@ export default function Leave({ leaves = [], stats = {}, balances = {} }) {
     setIsSubmitting(true);
     router.post('/mrconnect/leave', formData, {
       onSuccess: () => {
-        toast.success('Leave application submitted successfully.');
         setShowModal(false);
         setIsSubmitting(false);
         setFormData({
@@ -117,7 +116,6 @@ export default function Leave({ leaves = [], stats = {}, balances = {} }) {
 
     router.post(`/mrconnect/leave/${selectedLeaveId}/reject`, { reason: rejectReason }, {
       onSuccess: () => {
-        toast.success('Leave request rejected.');
         setRejectModalOpen(false);
         setSelectedLeaveId(null);
         setRejectReason('');

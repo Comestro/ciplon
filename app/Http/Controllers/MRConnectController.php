@@ -165,8 +165,13 @@ class MRConnectController extends Controller
         $isAdmin = $request->user()->isAdmin();
 
         $query = DB::table('field_expenses')
-            ->join('users', 'field_expenses.user_id', '=', 'users.id')
-            ->select('field_expenses.*', 'users.name as user_name');
+            ->join('users as reps', 'field_expenses.user_id', '=', 'reps.id')
+            ->leftJoin('users as reviewers', 'field_expenses.reviewed_by', '=', 'reviewers.id')
+            ->select(
+                'field_expenses.*',
+                'reps.name as user_name',
+                'reviewers.name as reviewer_name'
+            );
 
         if (! $isAdmin) {
             $query->where('field_expenses.user_id', $userId);
@@ -235,6 +240,28 @@ class MRConnectController extends Controller
     }
 
     /**
+     * Reject Expense Claim (Admin Only)
+     */
+    public function rejectExpense(Request $request, int $id): RedirectResponse
+    {
+        if (! $request->user()->isAdmin()) {
+            abort(403, 'Unauthorized. Only administrators can reject field expenses.');
+        }
+
+        $reason = $request->input('reason', 'Claim rejected by administration.');
+
+        DB::table('field_expenses')->where('id', $id)->update([
+            'status' => 'rejected',
+            'admin_feedback' => $reason,
+            'reviewed_by' => $request->user()->id,
+            'reviewed_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        return back()->with('success', 'Expense claim rejected.');
+    }
+
+    /**
      * 4. LEAVE MANAGEMENT
      * MR only sees their own leaves and balance.
      */
@@ -244,8 +271,13 @@ class MRConnectController extends Controller
         $isAdmin = $request->user()->isAdmin();
 
         $query = DB::table('leaves')
-            ->join('users', 'leaves.user_id', '=', 'users.id')
-            ->select('leaves.*', 'users.name as user_name');
+            ->join('users as reps', 'leaves.user_id', '=', 'reps.id')
+            ->leftJoin('users as reviewers', 'leaves.reviewed_by', '=', 'reviewers.id')
+            ->select(
+                'leaves.*',
+                'reps.name as user_name',
+                'reviewers.name as reviewer_name'
+            );
 
         if (! $isAdmin) {
             $query->where('leaves.user_id', $userId);

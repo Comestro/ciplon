@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { usePage } from '@inertiajs/react';
 import toast from 'react-hot-toast';
 import AdminSidebar from '../components/admin/AdminSidebar';
@@ -8,15 +8,12 @@ import ContentLoader from '../components/common/ContentLoader';
 export default function AdminLayout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { flash } = usePage().props;
-  const lastToastRef = useRef('');
 
   useEffect(() => {
-    if (flash?.success && flash.success !== lastToastRef.current) {
-      lastToastRef.current = flash.success;
+    if (flash?.success) {
       toast.success(flash.success);
     }
-    if (flash?.error && flash.error !== lastToastRef.current) {
-      lastToastRef.current = flash.error;
+    if (flash?.error) {
       toast.error(flash.error);
     }
   }, [flash]);
