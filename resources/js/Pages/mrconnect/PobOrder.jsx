@@ -22,6 +22,13 @@ import AdminLayout from '../../layouts/AdminLayout';
 import MRLayout from '../../layouts/MR/MRLayout';
 import ConfirmModal from '../../components/common/ConfirmModal';
 
+// Helper to safely format doctor name without duplicate 'Dr. Dr.'
+const formatDoctorName = (name) => {
+  if (!name) return '';
+  const cleaned = name.trim().replace(/^(Dr\.?\s*)+/i, '');
+  return `Dr. ${cleaned}`;
+};
+
 export default function PobOrder({ 
   orders = [], 
   doctors = [], 
@@ -390,7 +397,7 @@ export default function PobOrder({
                           {ord.doctor_name ? (
                             <span className="inline-flex items-center gap-1 text-[11px] text-teal-700 mt-0.5">
                               <Stethoscope className="w-3 h-3" />
-                              <span>Dr. {ord.doctor_name}</span>
+                              <span>{formatDoctorName(ord.doctor_name)}</span>
                             </span>
                           ) : (
                             <span className="text-[10px] text-slate-400 block mt-0.5">Direct Chemist Booking</span>
@@ -568,7 +575,7 @@ export default function PobOrder({
                     <option value="">Select Doctor (Prescription Driver)...</option>
                     {doctors.map((doc) => (
                       <option key={doc.id} value={doc.id}>
-                        Dr. {doc.name} ({doc.clinic_hospital_name || 'Clinic'})
+                        {formatDoctorName(doc.name)} ({doc.clinic_hospital_name || 'Clinic'})
                       </option>
                     ))}
                   </select>
@@ -819,7 +826,7 @@ export default function PobOrder({
                     <span className="text-[11px] font-medium text-slate-400">Prescribing Doctor Linked</span>
                     <p className="font-semibold text-teal-800 text-xs mt-0.5 flex items-center gap-1.5">
                       <Stethoscope className="w-3.5 h-3.5 text-teal-600" />
-                      <span>Dr. {selectedOrder.doctor_name} ({selectedOrder.clinic_hospital_name || 'Clinic'})</span>
+                      <span>{formatDoctorName(selectedOrder.doctor_name)} ({selectedOrder.clinic_hospital_name || 'Clinic'})</span>
                     </p>
                   </div>
                 )}

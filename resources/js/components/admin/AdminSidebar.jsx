@@ -20,7 +20,6 @@ import {
   Globe,
   Receipt,
   Calendar,
-  TrendingUp,
   Target,
   Film,
   Sliders,
@@ -126,19 +125,13 @@ export default function AdminSidebar({ isOpen, onClose }) {
       title: 'Sales & Targets',
       items: [
         {
-          name: 'Primary Sales',
-          path: '/mrconnect/primary-sales',
-          icon: TrendingUp,
-          active: isParentActive('/mrconnect/primary-sales'),
-        },
-        {
           name: 'POB Order',
           path: '/mrconnect/pob-order',
           icon: Package,
           active: isParentActive('/mrconnect/pob-order'),
         },
         {
-          name: 'Set Target',
+          name: 'Target',
           path: '/mrconnect/set-target',
           icon: Target,
           active: isParentActive('/mrconnect/set-target'),

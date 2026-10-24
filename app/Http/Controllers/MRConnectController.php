@@ -570,12 +570,39 @@ class MRConnectController extends Controller
             'updated_at' => now(),
         ]);
 
+        // Auto-sync MR's sales target for this month upon verification / dispatch
+        try {
+            $orderDate = Carbon::parse($order->created_at);
+            $monthName = $orderDate->format('F');
+            $yearNum = (int) $orderDate->format('Y');
+
+            $pobSum = (float) DB::table('pob_orders')
+                ->where('user_id', $order->user_id)
+                ->whereIn('status', ['verified', 'dispatched', 'delivered'])
+                ->whereBetween('created_at', [$orderDate->copy()->startOfMonth(), $orderDate->copy()->endOfMonth()])
+                ->sum('total_amount');
+
+            $target = DB::table('sales_targets')
+                ->where('user_id', $order->user_id)
+                ->where('month', $monthName)
+                ->where('year', $yearNum)
+                ->first();
+
+            if ($target) {
+                $newAchieved = max((float) $target->achieved_amount, $pobSum);
+                DB::table('sales_targets')->where('id', $target->id)->update([
+                    'achieved_amount' => $newAchieved,
+                    'updated_at' => now(),
+                ]);
+            }
+        } catch (\Throwable $e) {}
+
         return back()->with('success', "POB Order {$order->order_no} status updated to ".ucfirst($validated['status'])."!");
     }
 
     /**
      * 7. TARGET VS SALES
-     * MR only sees their own sales targets and achievement.
+     * MR only sees their own sales targets and achievement; Admin can assign and manage quotas.
      */
     public function setTarget(Request $request): Response
     {
@@ -590,19 +617,152 @@ class MRConnectController extends Controller
             $query->where('sales_targets.user_id', $user->id);
         }
 
-        $targets = $query->orderByDesc('year')->orderByDesc('id')->get();
+        $targets = $query->orderByDesc('year')->orderByDesc('id')->get()->map(function ($tgt) {
+            try {
+                $startDate = Carbon::parse("1 {$tgt->month} {$tgt->year}")->startOfMonth();
+                $endDate = Carbon::parse("1 {$tgt->month} {$tgt->year}")->endOfMonth();
+
+                $pobAchieved = (float) DB::table('pob_orders')
+                    ->where('user_id', $tgt->user_id)
+                    ->whereIn('status', ['verified', 'dispatched', 'delivered'])
+                    ->whereBetween('created_at', [$startDate, $endDate])
+                    ->sum('total_amount');
+
+                $effectiveAchieved = max((float) $tgt->achieved_amount, $pobAchieved);
+                $tgt->achieved_amount = $effectiveAchieved;
+                $tgt->pob_achieved = $pobAchieved;
+
+                // Sync with database if POB orders increased achievement
+                if ($effectiveAchieved > 0) {
+                    DB::table('sales_targets')->where('id', $tgt->id)->update([
+                        'achieved_amount' => $effectiveAchieved,
+                    ]);
+                }
+            } catch (\Throwable $e) {
+                $tgt->pob_achieved = 0;
+            }
+
+            return $tgt;
+        });
+
+        $representatives = $isAdmin
+            ? User::where('role', 'mr')->select('id', 'name', 'email')->orderBy('name')->get()
+            : [];
+
+        $totalTarget = (float) $targets->sum('target_amount');
+        $totalAchieved = (float) $targets->sum('achieved_amount');
+        $overallPercentage = $totalTarget > 0 ? min(100, round(($totalAchieved / $totalTarget) * 100, 1)) : 0;
 
         return Inertia::render('mrconnect/SetTarget', [
             'targets' => $targets,
+            'representatives' => $representatives,
             'isAdmin' => $isAdmin,
             'summary' => [
-                'total_target' => $targets->sum('target_amount'),
-                'total_achieved' => $targets->sum('achieved_amount'),
-                'overall_percentage' => $targets->sum('target_amount') > 0
-                    ? round(($targets->sum('achieved_amount') / $targets->sum('target_amount')) * 100, 1)
-                    : 0,
+                'total_target' => $totalTarget,
+                'total_achieved' => $totalAchieved,
+                'overall_percentage' => $overallPercentage,
             ],
         ]);
+    }
+
+    /**
+     * Store new Sales Target (Admin only)
+     */
+    public function storeTarget(Request $request): RedirectResponse
+    {
+        if (! $request->user()->isAdmin()) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $validated = $request->validate([
+            'user_id' => ['required', 'exists:users,id'],
+            'month' => ['required', 'string', 'max:20'],
+            'year' => ['required', 'integer', 'min:2020', 'max:2035'],
+            'target_amount' => ['required', 'numeric', 'min:1'],
+            'achieved_amount' => ['nullable', 'numeric', 'min:0'],
+            'notes' => ['nullable', 'string', 'max:500'],
+        ]);
+
+        $rep = User::find($validated['user_id']);
+
+        $existing = DB::table('sales_targets')
+            ->where('user_id', $validated['user_id'])
+            ->where('month', $validated['month'])
+            ->where('year', $validated['year'])
+            ->first();
+
+        if ($existing) {
+            DB::table('sales_targets')->where('id', $existing->id)->update([
+                'target_amount' => $validated['target_amount'],
+                'achieved_amount' => $validated['achieved_amount'] ?? $existing->achieved_amount,
+                'notes' => $validated['notes'] ?? $existing->notes,
+                'updated_at' => now(),
+            ]);
+
+            return back()->with('success', "Target for {$rep->name} ({$validated['month']} {$validated['year']}) updated successfully!");
+        }
+
+        DB::table('sales_targets')->insert([
+            'user_id' => $validated['user_id'],
+            'month' => $validated['month'],
+            'year' => $validated['year'],
+            'target_amount' => $validated['target_amount'],
+            'achieved_amount' => $validated['achieved_amount'] ?? 0,
+            'notes' => $validated['notes'] ?? 'Monthly sales quota',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        return back()->with('success', "Sales target assigned to {$rep->name} successfully!");
+    }
+
+    /**
+     * Update Sales Target / Achieved volume (Admin only)
+     */
+    public function updateTarget(Request $request, int $id): RedirectResponse
+    {
+        if (! $request->user()->isAdmin()) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $validated = $request->validate([
+            'target_amount' => ['required', 'numeric', 'min:1'],
+            'achieved_amount' => ['nullable', 'numeric', 'min:0'],
+            'notes' => ['nullable', 'string', 'max:500'],
+        ]);
+
+        $target = DB::table('sales_targets')->where('id', $id)->first();
+        if (! $target) {
+            abort(404, 'Target record not found.');
+        }
+
+        DB::table('sales_targets')->where('id', $id)->update([
+            'target_amount' => $validated['target_amount'],
+            'achieved_amount' => $validated['achieved_amount'] ?? $target->achieved_amount,
+            'notes' => $validated['notes'] ?? $target->notes,
+            'updated_at' => now(),
+        ]);
+
+        return back()->with('success', 'Sales target updated successfully!');
+    }
+
+    /**
+     * Delete Sales Target (Admin only)
+     */
+    public function destroyTarget(Request $request, int $id): RedirectResponse
+    {
+        if (! $request->user()->isAdmin()) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $target = DB::table('sales_targets')->where('id', $id)->first();
+        if (! $target) {
+            abort(404, 'Target record not found.');
+        }
+
+        DB::table('sales_targets')->where('id', $id)->delete();
+
+        return back()->with('success', 'Sales target deleted successfully!');
     }
 
     /**
