@@ -6,6 +6,7 @@ use App\Models\Doctor;
 use App\Models\TourPlan;
 use App\Models\User;
 use App\Models\Visit;
+use App\Services\ImageKitService;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -193,7 +194,7 @@ class MRConnectController extends Controller
     /**
      * Store Expense Claim
      */
-    public function storeExpense(Request $request): RedirectResponse
+    public function storeExpense(Request $request, ImageKitService $imageKit): RedirectResponse
     {
         $validated = $request->validate([
             'date' => ['required', 'date'],
@@ -202,7 +203,22 @@ class MRConnectController extends Controller
             'distance_km' => ['nullable', 'numeric'],
             'city' => ['nullable', 'string', 'max:100'],
             'notes' => ['nullable', 'string'],
+            'receipt' => ['nullable', 'file', 'mimes:jpeg,png,jpg,webp,pdf', 'max:5120'],
+            'receipt_url' => ['nullable', 'string', 'max:1000'],
         ]);
+
+        $receiptUrl = $validated['receipt_url'] ?? null;
+        if ($request->hasFile('receipt')) {
+            try {
+                $uploadData = $imageKit->upload(
+                    file: $request->file('receipt'),
+                    folder: '/expenses'
+                );
+                $receiptUrl = $uploadData['url'] ?? null;
+            } catch (\Throwable $e) {
+                return back()->withErrors(['receipt' => 'Failed to upload receipt to ImageKit: ' . $e->getMessage()]);
+            }
+        }
 
         DB::table('field_expenses')->insert([
             'user_id' => $request->user()->id,
@@ -211,6 +227,7 @@ class MRConnectController extends Controller
             'amount' => $validated['amount'],
             'distance_km' => $validated['distance_km'] ?? null,
             'city' => $validated['city'] ?? 'Headquarters',
+            'receipt_url' => $receiptUrl,
             'notes' => $validated['notes'] ?? null,
             'status' => 'pending',
             'created_at' => now(),

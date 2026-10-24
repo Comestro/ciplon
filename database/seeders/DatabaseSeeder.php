@@ -59,6 +59,7 @@ class DatabaseSeeder extends Seeder
             ProductSeeder::class,
             DoctorSeeder::class,
             VisitSeeder::class,
+            FieldExpenseSeeder::class,
         ]);
     }
 }
