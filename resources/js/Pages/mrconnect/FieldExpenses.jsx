@@ -230,7 +230,6 @@ export default function FieldExpenses({ expenses = [], summary = {} }) {
                   <th className="py-3 px-4 text-right">Amount</th>
                   <th className="py-3 px-4 text-center">Receipt</th>
                   <th className="py-3 px-4 text-center">Status</th>
-                  <th className="py-3 px-4 text-center">Reviewed By</th>
                   {isAdmin && <th className="py-3 px-4 text-right">Action</th>}
                 </tr>
               </thead>
@@ -298,29 +297,6 @@ export default function FieldExpenses({ expenses = [], summary = {} }) {
                         )}
                       </td>
 
-                      {/* Reviewed By Column */}
-                      <td className="py-3 px-4 text-center whitespace-nowrap">
-                        {exp.reviewer_name ? (
-                          <div className="inline-flex flex-col items-center">
-                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 font-semibold text-[11px]">
-                              <UserCheck className="w-3.5 h-3.5 text-teal-600 shrink-0" />
-                              <span>{exp.reviewer_name}</span>
-                            </span>
-                            {exp.reviewed_at && (
-                              <span className="text-[10px] text-slate-400 font-medium mt-0.5">
-                                {new Date(exp.reviewed_at).toLocaleDateString(undefined, {
-                                  day: 'numeric',
-                                  month: 'short',
-                                  year: 'numeric'
-                                })}
-                              </span>
-                            )}
-                          </div>
-                        ) : (
-                          <span className="text-slate-400 text-xs italic">— Awaiting</span>
-                        )}
-                      </td>
-
                       {/* Action Column (Admin Only) */}
                       {isAdmin && (
                         <td className="py-3 px-4 text-right whitespace-nowrap">
@@ -346,7 +322,30 @@ export default function FieldExpenses({ expenses = [], summary = {} }) {
                               </button>
                             </div>
                           ) : (
-                            <span className="text-[11px] text-slate-400 italic">Completed</span>
+                            <div className="relative group inline-flex items-center justify-end">
+                              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-teal-50 text-slate-600 hover:text-teal-700 border border-slate-200/60 hover:border-teal-200 text-[11px] font-medium transition-all cursor-pointer shadow-2xs">
+                                <UserCheck className="w-3.5 h-3.5 text-teal-600 shrink-0" />
+                                <span>Completed</span>
+                              </div>
+
+                              {/* Floating Tooltip on Hover */}
+                              <div className="absolute right-0 bottom-full mb-2 hidden group-hover:flex flex-col items-start px-3 py-2 bg-slate-900 text-white text-xs rounded-xl shadow-xl z-30 whitespace-nowrap pointer-events-none animate-in fade-in duration-150">
+                                <div className="flex items-center gap-1.5 font-semibold text-slate-100">
+                                  <UserCheck className="w-3.5 h-3.5 text-teal-400 shrink-0" />
+                                  <span>Reviewed by: {exp.reviewer_name || 'Administrator'}</span>
+                                </div>
+                                {exp.reviewed_at && (
+                                  <span className="text-[10px] text-slate-400 mt-0.5 pl-5">
+                                    Date: {new Date(exp.reviewed_at).toLocaleDateString(undefined, {
+                                      day: 'numeric',
+                                      month: 'short',
+                                      year: 'numeric'
+                                    })}
+                                  </span>
+                                )}
+                                <div className="absolute right-4 top-full w-0 h-0 border-x-4 border-x-transparent border-t-4 border-t-slate-900"></div>
+                              </div>
+                            </div>
                           )}
                         </td>
                       )}
@@ -354,7 +353,7 @@ export default function FieldExpenses({ expenses = [], summary = {} }) {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={isAdmin ? 9 : 7} className="py-8 text-center text-slate-400">
+                    <td colSpan={isAdmin ? 8 : 6} className="py-8 text-center text-slate-400">
                       No expense claims submitted yet.
                     </td>
                   </tr>
