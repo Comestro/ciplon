@@ -54,6 +54,39 @@ class HandleInertiaRequests extends Middleware
                 'error' => fn () => $request->session()->get('error'),
                 'message' => fn () => $request->session()->get('message'),
             ],
+            'notifications' => function () use ($request) {
+                if (! $request->user()) {
+                    return null;
+                }
+
+                $user = $request->user();
+                $unread = \App\Models\Notification::where('user_id', $user->id)
+                    ->whereNull('read_at')
+                    ->count();
+
+                $recent = \App\Models\Notification::where('user_id', $user->id)
+                    ->orderByDesc('created_at')
+                    ->limit(10)
+                    ->get()
+                    ->map(function ($n) {
+                        return [
+                            'id' => $n->id,
+                            'type' => $n->type,
+                            'title' => $n->title,
+                            'message' => $n->message,
+                            'link' => $n->link,
+                            'data' => $n->data,
+                            'read_at' => $n->read_at ? $n->read_at->toIso8601String() : null,
+                            'created_at' => $n->created_at ? $n->created_at->diffForHumans() : null,
+                            'created_at_raw' => $n->created_at ? $n->created_at->toIso8601String() : null,
+                        ];
+                    });
+
+                return [
+                    'unread_count' => $unread,
+                    'list' => $recent,
+                ];
+            },
             'company' => fn () => Setting::getPublicMap(),
             'navCategories' => fn () => Category::where('status', 'active')->whereNull('parent_id')->with('children:id,name,slug,parent_id')->orderBy('name')->get(['id', 'name', 'slug']),
         ];

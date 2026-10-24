@@ -1,5 +1,6 @@
 import { Menu, ExternalLink, ArrowLeft, Sparkles } from 'lucide-react';
 import { Link, usePage } from '@inertiajs/react';
+import NotificationDropdown from '../common/NotificationDropdown';
 
 export default function AdminNavbar({ onToggleSidebar }) {
   const { url, props } = usePage();
@@ -101,6 +102,8 @@ export default function AdminNavbar({ onToggleSidebar }) {
           <span>Live Site</span>
           <ExternalLink className="w-3 h-3 text-slate-400" />
         </Link>
+
+        <NotificationDropdown />
 
         {/* Admin Profile Pill */}
         <div className="flex items-center gap-2 p-1 pl-1.5 pr-2 rounded-xl bg-slate-50 border border-slate-200/80">

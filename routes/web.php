@@ -20,6 +20,7 @@ use App\Http\Controllers\MR\MRScheduleController;
 use App\Http\Controllers\MR\MRTrackingController;
 use App\Http\Controllers\MR\MRVisitController;
 use App\Http\Controllers\MRConnectController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProductCatalogController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
@@ -166,4 +167,12 @@ Route::middleware(['auth'])->prefix('mrconnect')->name('mrconnect.')->group(func
     Route::get('/scheme', [MRConnectController::class, 'scheme'])->name('scheme');
     Route::get('/hr-section', [MRConnectController::class, 'hrSection'])->name('hr.section');
     Route::get('/all-reports', [MRConnectController::class, 'allReports'])->name('all.reports');
+
+
+});
+
+// In-App Notifications (All Authenticated Users)
+Route::middleware(['auth'])->group(function () {
+    Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
+    Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.markAllRead');
 });

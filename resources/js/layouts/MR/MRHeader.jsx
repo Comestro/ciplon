@@ -3,6 +3,7 @@ import { Link, usePage } from '@inertiajs/react';
 import { Menu, Bell, User, LogOut, ExternalLink, ChevronDown, Sparkles, Navigation, CheckCircle2, Loader2, AlertCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 import api from '../../services/api';
+import NotificationDropdown from '../../components/common/NotificationDropdown';
 
 export default function MRHeader({ onToggleSidebar, title = 'MR Dashboard' }) {
   const { props } = usePage();
@@ -166,6 +167,8 @@ export default function MRHeader({ onToggleSidebar, title = 'MR Dashboard' }) {
           <span>Website</span>
           <ExternalLink className="w-3 h-3 text-slate-400" />
         </Link>
+
+        <NotificationDropdown />
 
         {/* User Profile Pill */}
         <div className="relative pl-1" ref={dropdownRef}>

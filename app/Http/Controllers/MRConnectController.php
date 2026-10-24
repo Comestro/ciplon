@@ -336,7 +336,7 @@ class MRConnectController extends Controller
 
         $days = (int) Carbon::parse($validated['from_date'])->diffInDays(Carbon::parse($validated['to_date'])) + 1;
 
-        DB::table('leaves')->insert([
+        $leaveId = DB::table('leaves')->insertGetId([
             'user_id' => $request->user()->id,
             'leave_type' => $validated['leave_type'],
             'from_date' => $validated['from_date'],
@@ -347,6 +347,25 @@ class MRConnectController extends Controller
             'created_at' => now(),
             'updated_at' => now(),
         ]);
+
+        // Dispatch in-app notification to all administrators
+        $applicantName = $request->user()->name;
+        $periodStr = $days > 1
+            ? "{$days} days: " . Carbon::parse($validated['from_date'])->format('d M') . ' to ' . Carbon::parse($validated['to_date'])->format('d M Y')
+            : "1 day: " . Carbon::parse($validated['from_date'])->format('d M Y');
+
+        \App\Models\Notification::sendToAdmins(
+            type: 'leave_applied',
+            title: 'New Leave Request',
+            message: "{$applicantName} applied for {$validated['leave_type']} ({$periodStr}). Reason: {$validated['reason']}",
+            link: '/mrconnect/leave',
+            data: [
+                'leave_id' => $leaveId,
+                'mr_id' => $request->user()->id,
+                'mr_name' => $applicantName,
+                'leave_type' => $validated['leave_type'],
+            ]
+        );
 
         return back()->with('success', 'Leave request submitted to administration.');
     }
@@ -360,12 +379,27 @@ class MRConnectController extends Controller
             abort(403, 'Unauthorized. Only administrators can approve leaves.');
         }
 
+        $leave = DB::table('leaves')->where('id', $id)->first();
+        if (! $leave) {
+            abort(404, 'Leave request not found.');
+        }
+
         DB::table('leaves')->where('id', $id)->update([
             'status' => 'approved',
             'reviewed_by' => $request->user()->id,
             'reviewed_at' => now(),
             'updated_at' => now(),
         ]);
+
+        // Dispatch in-app notification to the MR
+        \App\Models\Notification::sendToUser(
+            userId: (int) $leave->user_id,
+            type: 'leave_approved',
+            title: 'Leave Request Approved',
+            message: "Your {$leave->leave_type} request ({$leave->from_date} to {$leave->to_date}) has been approved by administration.",
+            link: '/mrconnect/leave',
+            data: ['leave_id' => $leave->id]
+        );
 
         return back()->with('success', 'Leave request approved.');
     }
@@ -379,6 +413,11 @@ class MRConnectController extends Controller
             abort(403, 'Unauthorized. Only administrators can reject leave requests.');
         }
 
+        $leave = DB::table('leaves')->where('id', $id)->first();
+        if (! $leave) {
+            abort(404, 'Leave request not found.');
+        }
+
         $feedback = $request->input('reason', $request->input('admin_feedback', 'Application rejected by administration.'));
 
         DB::table('leaves')->where('id', $id)->update([
@@ -388,6 +427,16 @@ class MRConnectController extends Controller
             'reviewed_at' => now(),
             'updated_at' => now(),
         ]);
+
+        // Dispatch in-app notification to the MR
+        \App\Models\Notification::sendToUser(
+            userId: (int) $leave->user_id,
+            type: 'leave_rejected',
+            title: 'Leave Request Rejected',
+            message: "Your {$leave->leave_type} request ({$leave->from_date} to {$leave->to_date}) was rejected. Reason: {$feedback}",
+            link: '/mrconnect/leave',
+            data: ['leave_id' => $leave->id, 'feedback' => $feedback]
+        );
 
         return back()->with('success', 'Leave request rejected.');
     }
