@@ -7,11 +7,12 @@ import {
   User, 
   Plus, 
   Trash2, 
-  Search, 
   X 
 } from 'lucide-react';
 import AdminLayout from '../../layouts/AdminLayout';
 import MRLayout from '../../layouts/MR/MRLayout';
+import ConfirmModal from '../../components/common/ConfirmModal';
+import SearchBar from '../../components/common/SearchBar';
 
 const capitalizeFirst = (text) => {
   if (!text) return '';
@@ -25,7 +26,8 @@ export default function Notice({ notices = [] }) {
 
   const [searchQuery, setSearchQuery] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [deletingId, setDeletingId] = useState(null);
+  const [noticeToDelete, setNoticeToDelete] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const { data, setData, post, processing, errors, reset, clearErrors } = useForm({
     title: '',
@@ -53,13 +55,17 @@ export default function Notice({ notices = [] }) {
     });
   };
 
-  const handleDelete = (id) => {
-    if (confirm('Are you sure you want to delete this notice?')) {
-      setDeletingId(id);
-      router.delete(`/mrconnect/notice/${id}`, {
-        onFinish: () => setDeletingId(null),
-      });
-    }
+  const handleConfirmDelete = () => {
+    if (!noticeToDelete) return;
+    setIsDeleting(true);
+    router.delete(`/mrconnect/notice/${noticeToDelete.id}`, {
+      onSuccess: () => {
+        setNoticeToDelete(null);
+      },
+      onFinish: () => {
+        setIsDeleting(false);
+      },
+    });
   };
 
   const filteredNotices = useMemo(() => {
@@ -94,25 +100,13 @@ export default function Notice({ notices = [] }) {
 
           <div className="flex items-center gap-3">
             {/* Search Box */}
-            <div className="relative w-48 sm:w-64">
-              <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search notices..."
-                className="w-full bg-white border border-slate-200/80 rounded-xl pl-8 pr-7 py-2 text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/10 transition-all font-normal"
-              />
-              {searchQuery && (
-                <button
-                  type="button"
-                  onClick={() => setSearchQuery('')}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs cursor-pointer"
-                >
-                  <X className="w-3.5 h-3.5" />
-                </button>
-              )}
-            </div>
+            <SearchBar
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onClear={() => setSearchQuery('')}
+              placeholder="Search notices..."
+              className="w-48 sm:w-64"
+            />
 
             {isAdmin && (
               <button
@@ -160,9 +154,8 @@ export default function Notice({ notices = [] }) {
                   {isAdmin && (
                     <button
                       type="button"
-                      disabled={deletingId === nt.id}
-                      onClick={() => handleDelete(nt.id)}
-                      className="text-slate-400 hover:text-rose-600 p-1.5 rounded-lg hover:bg-rose-50 transition-colors cursor-pointer shrink-0 disabled:opacity-50"
+                      onClick={() => setNoticeToDelete(nt)}
+                      className="text-slate-400 hover:text-rose-600 p-1.5 rounded-lg hover:bg-rose-50 transition-colors cursor-pointer shrink-0"
                       title="Delete notice"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -324,6 +317,20 @@ export default function Notice({ notices = [] }) {
             </div>
           </div>
         )}
+
+        {/* Delete Confirmation Modal */}
+        <ConfirmModal
+          isOpen={Boolean(noticeToDelete)}
+          onClose={() => !isDeleting && setNoticeToDelete(null)}
+          onConfirm={handleConfirmDelete}
+          title="Delete Notice"
+          message={noticeToDelete ? `Are you sure you want to delete "${capitalizeFirst(noticeToDelete.title)}"? This official announcement will be permanently removed.` : ''}
+          confirmText="Delete Notice"
+          cancelText="Cancel"
+          isDanger={true}
+          isLoading={isDeleting}
+          loadingText="Deleting..."
+        />
 
       </div>
     </Layout>

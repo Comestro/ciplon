@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useLayoutEffect, useEffect } from 'react';
 import { Link, router, usePage } from '@inertiajs/react';
 import {
   LayoutDashboard,
@@ -37,6 +37,36 @@ export default function AdminSidebar({ isOpen, onClose }) {
   const adminName = authUser?.name || 'Administrator';
   const adminEmail = authUser?.email || 'admin@ciplon.com';
   const [searchQuery, setSearchQuery] = useState('');
+  const navScrollRef = useRef(null);
+
+  // Restore sidebar scroll position to exactly where previously left
+  useLayoutEffect(() => {
+    const saved = sessionStorage.getItem('admin_sidebar_scroll_top');
+    if (saved !== null && navScrollRef.current) {
+      navScrollRef.current.scrollTop = Number(saved);
+      // Double check in next animation frame to account for layout shifts
+      requestAnimationFrame(() => {
+        if (navScrollRef.current) {
+          navScrollRef.current.scrollTop = Number(saved);
+        }
+      });
+    }
+  }, [currentPath, isOpen]);
+
+  const handleNavScroll = (e) => {
+    if (!searchQuery) {
+      sessionStorage.setItem('admin_sidebar_scroll_top', String(e.currentTarget.scrollTop));
+    }
+  };
+
+  const handleLinkClick = () => {
+    if (navScrollRef.current && !searchQuery) {
+      sessionStorage.setItem('admin_sidebar_scroll_top', String(navScrollRef.current.scrollTop));
+    }
+    if (isOpen && typeof onClose === 'function') {
+      onClose();
+    }
+  };
 
   const isCurrent = (path) => currentPath === path;
   const isParentActive = (prefix) => currentPath.startsWith(prefix);
@@ -306,7 +336,12 @@ export default function AdminSidebar({ isOpen, onClose }) {
         </div>
 
         {/* Navigation Sections */}
-        <div className="flex-1 overflow-y-auto px-3 py-1 space-y-4">
+        <div
+          ref={navScrollRef}
+          onScroll={handleNavScroll}
+          data-scroll-region
+          className="flex-1 overflow-y-auto px-3 py-1 space-y-4"
+        >
           {navigationSections.map((section) => {
             const filteredItems = section.items.filter((item) => {
               if (item.permission && !hasPerm(item.permission)) return false;
@@ -327,11 +362,7 @@ export default function AdminSidebar({ isOpen, onClose }) {
                       <Link
                         key={item.path}
                         href={item.path}
-                        onClick={() => {
-                          if (isOpen && typeof onClose === 'function') {
-                            onClose();
-                          }
-                        }}
+                        onClick={handleLinkClick}
                         className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium transition-all cursor-pointer ${
                           item.active
                             ? 'bg-slate-900 text-white font-medium'

@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import AdminLayout from '../../layouts/AdminLayout';
 import MRLiveTrackingModal from '../../components/admin/MRLiveTrackingModal';
+import SearchBar from '../../components/common/SearchBar';
 
 export default function MRDirectory({ mrs = [], mapbox = {} }) {
   const [searchQuery, setSearchQuery] = useState('');
@@ -58,25 +59,13 @@ export default function MRDirectory({ mrs = [], mapbox = {} }) {
           </div>
 
           {/* Search Box */}
-          <div className="relative w-full sm:w-72">
-            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search MR by name, email, or ID..."
-              className="w-full bg-white border border-slate-200/80 rounded-xl pl-8 pr-7 py-2 text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/10 transition-all font-normal shadow-2xs"
-            />
-            {searchQuery && (
-              <button
-                type="button"
-                onClick={() => setSearchQuery('')}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs cursor-pointer"
-              >
-                <X className="w-3.5 h-3.5" />
-              </button>
-            )}
-          </div>
+          <SearchBar
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onClear={() => setSearchQuery('')}
+            placeholder="Search MR by name, email, or ID..."
+            className="w-full sm:w-72"
+          />
         </div>
 
         {/* Stats Summary Cards */}
