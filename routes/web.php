@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\StaffController;
+use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\CompanyPageController;
 use App\Http\Controllers\HomeController;
@@ -39,6 +40,18 @@ Route::middleware('guest')->group(function () {
     Route::get('/login', [LoginController::class, 'create'])->name('login');
     Route::get('/admin/login', fn () => redirect()->route('login'));
     Route::post('/login', [LoginController::class, 'store'])->name('login.store');
+
+    // Forgot Password & OTP Reset Routes
+    Route::get('/forgot-password', [ForgotPasswordController::class, 'show'])->name('password.request');
+    Route::post('/forgot-password/send-otp', [ForgotPasswordController::class, 'sendOtp'])
+        ->middleware('throttle:6,1')
+        ->name('password.otp.send');
+    Route::post('/forgot-password/verify-otp', [ForgotPasswordController::class, 'verifyOtp'])
+        ->middleware('throttle:10,1')
+        ->name('password.otp.verify');
+    Route::post('/forgot-password/reset-password', [ForgotPasswordController::class, 'resetPassword'])
+        ->middleware('throttle:6,1')
+        ->name('password.reset.submit');
 });
 
 Route::post('/logout', [LoginController::class, 'destroy'])
@@ -158,7 +171,6 @@ Route::middleware(['auth'])->prefix('mrconnect')->name('mrconnect.')->group(func
     Route::get('/scheme', [MRConnectController::class, 'scheme'])->name('scheme');
     Route::get('/hr-section', [MRConnectController::class, 'hrSection'])->name('hr.section');
     Route::get('/all-reports', [MRConnectController::class, 'allReports'])->name('all.reports');
-
 
 });
 
