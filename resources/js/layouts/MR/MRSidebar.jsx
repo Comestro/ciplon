@@ -158,14 +158,8 @@ export default function MRSidebar({ isOpen, onClose }) {
       ],
     },
     {
-      title: 'HR & Reports',
+      title: 'Reports',
       items: [
-        {
-          name: 'HR Directory',
-          path: '/mrconnect/hr-section',
-          icon: UserCheck,
-          active: isParentActive('/mrconnect/hr-section'),
-        },
         {
           name: 'All Reports',
           path: '/mrconnect/all-reports',

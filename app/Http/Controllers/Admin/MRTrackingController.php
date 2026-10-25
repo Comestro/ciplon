@@ -39,9 +39,13 @@ class MRTrackingController extends Controller
     /**
      * Get specific MR's details and active doctor movement route.
      */
-    public function show(int $userId): JsonResponse
+    public function show(Request $request, int $userId): Response|JsonResponse
     {
         $data = $this->buildTrackingData($userId);
+
+        if (! $request->expectsJson()) {
+            return Inertia::render('admin/tracking/TrackingDashboard', $data);
+        }
 
         return response()->json([
             'success' => true,

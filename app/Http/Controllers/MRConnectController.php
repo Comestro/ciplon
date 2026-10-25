@@ -1081,36 +1081,41 @@ class MRConnectController extends Controller
     }
 
     /**
-     * 13. HR SECTION
-     * MR only sees their own employee profile and official HR desk coordinates.
-     * Admin sees all employees.
+     * 13. MR DIRECTORY (Admin Only)
+     * Lists all Medical Representatives with their doctor coverage, visits, and tracking data.
      */
-    public function hrSection(Request $request): Response
+    public function mrDirectory(Request $request): Response
     {
-        $user = $request->user();
-        $isAdmin = $user->isAdmin();
-
-        $query = User::query();
-        if (! $isAdmin) {
-            $query->where('id', $user->id);
+        if (! $request->user()->isAdmin()) {
+            abort(403, 'Unauthorized access. The MR Directory is reserved for administrators.');
         }
 
-        $employees = $query->get()->map(function ($u) {
-            return [
-                'id' => $u->id,
-                'name' => $u->name,
-                'email' => $u->email,
-                'role' => strtoupper($u->role),
-                'emp_id' => 'EMP-'.(1000 + $u->id),
-                'department' => $u->role === 'admin' ? 'Executive Management' : 'Field Sales & Marketing',
-                'status' => 'active',
-                'contact' => '+91 9840'.sprintf('%06d', ($u->id * 13579) % 1000000),
-            ];
-        });
+        $mrs = User::where('role', 'mr')
+            ->with(['latestLocation'])
+            ->withCount(['doctors', 'visits'])
+            ->orderBy('name')
+            ->get()
+            ->map(function ($u) {
+                return [
+                    'id' => $u->id,
+                    'name' => $u->name,
+                    'email' => $u->email,
+                    'emp_code' => 'MR-'.str_pad($u->id, 4, '0', STR_PAD_LEFT),
+                    'doctors_count' => $u->doctors_count,
+                    'visits_count' => $u->visits_count,
+                    'latest_location' => $u->latestLocation ? [
+                        'latitude' => $u->latestLocation->latitude,
+                        'longitude' => $u->latestLocation->longitude,
+                        'address' => $u->latestLocation->address,
+                        'updated_at' => $u->latestLocation->updated_at?->diffForHumans(),
+                    ] : null,
+                    'created_at' => $u->created_at?->format('d M Y'),
+                    'status' => 'active',
+                ];
+            });
 
-        return Inertia::render('mrconnect/HRSection', [
-            'employees' => $employees,
-            'isAdmin' => $isAdmin,
+        return Inertia::render('mrconnect/MRDirectory', [
+            'mrs' => $mrs,
         ]);
     }
 

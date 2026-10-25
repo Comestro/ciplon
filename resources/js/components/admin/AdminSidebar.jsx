@@ -185,13 +185,13 @@ export default function AdminSidebar({ isOpen, onClose }) {
       ],
     },
     {
-      title: 'HR & Reports',
+      title: 'Field Force & Reports',
       items: [
         {
-          name: 'HR Directory',
-          path: '/mrconnect/hr-section',
-          icon: UserCheck,
-          active: isParentActive('/mrconnect/hr-section'),
+          name: 'MR Directory',
+          path: '/mrconnect/mr-directory',
+          icon: Users,
+          active: isParentActive('/mrconnect/mr-directory'),
         },
         {
           name: 'All Reports',
