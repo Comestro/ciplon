@@ -65,4 +65,26 @@ class Notification extends Model
             'data' => $data,
         ]);
     }
+
+    /**
+     * Dispatch notification to all users (excluding a specific user if provided).
+     */
+    public static function broadcastToAll(string $type, string $title, string $message, ?string $link = null, ?array $data = null, ?int $exceptUserId = null): void
+    {
+        $query = User::query();
+        if ($exceptUserId) {
+            $query->where('id', '!=', $exceptUserId);
+        }
+
+        foreach ($query->get() as $user) {
+            self::create([
+                'user_id' => $user->id,
+                'type' => $type,
+                'title' => $title,
+                'message' => $message,
+                'link' => $link,
+                'data' => $data,
+            ]);
+        }
+    }
 }

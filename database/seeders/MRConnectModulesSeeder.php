@@ -200,26 +200,21 @@ class MRConnectModulesSeeder extends Seeder
             [
                 'title' => 'Q3 National Sales Meet & Visual Aid Launch',
                 'content' => 'All Regional Managers and Medical Representatives are requested to review the updated Factocel-IX and Globucel-SC interactive visual aid decks in the E-Detailing module.',
-                'category' => 'circular',
-                'priority' => 'high',
                 'published_by' => $adminUser->id,
-                'published_at' => Carbon::now()->subDays(2),
+                'created_at' => Carbon::now()->subDays(2),
+                'updated_at' => Carbon::now()->subDays(2),
             ],
             [
                 'title' => 'Monsoon Chemist Bonus Scheme Announced',
                 'content' => 'Exciting 10+1 free bottle bonus scheme launched for all retail chemists on AmoxiClav 625 Duo valid up to July 31, 2026.',
-                'category' => 'scheme',
-                'priority' => 'normal',
                 'published_by' => $adminUser->id,
-                'published_at' => Carbon::now()->subDays(5),
+                'created_at' => Carbon::now()->subDays(5),
+                'updated_at' => Carbon::now()->subDays(5),
             ],
         ];
 
         foreach ($notices as $nt) {
-            DB::table('notices')->insert(array_merge($nt, [
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]));
+            DB::table('notices')->insert($nt);
         }
 
         // 7. Schemes

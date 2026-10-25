@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Doctor;
+use App\Models\Notification;
 use App\Models\Product;
 use App\Models\TourPlan;
 use App\Models\User;
@@ -12,6 +13,7 @@ use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -217,7 +219,7 @@ class MRConnectController extends Controller
                 );
                 $receiptUrl = $uploadData['url'] ?? null;
             } catch (\Throwable $e) {
-                return back()->withErrors(['receipt' => 'Failed to upload receipt to ImageKit: ' . $e->getMessage()]);
+                return back()->withErrors(['receipt' => 'Failed to upload receipt to ImageKit: '.$e->getMessage()]);
             }
         }
 
@@ -238,7 +240,7 @@ class MRConnectController extends Controller
         // Dispatch in-app notification to all administrators
         $applicantName = $request->user()->name;
         $formattedAmount = number_format((float) $validated['amount']);
-        \App\Models\Notification::sendToAdmins(
+        Notification::sendToAdmins(
             type: 'expense_submitted',
             title: 'New Field Expense Claim',
             message: "{$applicantName} submitted an expense claim of ₹{$formattedAmount} for {$validated['expense_type']} ({$validated['date']}).",
@@ -278,7 +280,7 @@ class MRConnectController extends Controller
 
         // Dispatch in-app notification to the MR
         $formattedAmount = number_format((float) $expense->amount);
-        \App\Models\Notification::sendToUser(
+        Notification::sendToUser(
             userId: (int) $expense->user_id,
             type: 'expense_approved',
             title: 'Expense Claim Approved',
@@ -316,7 +318,7 @@ class MRConnectController extends Controller
 
         // Dispatch in-app notification to the MR
         $formattedAmount = number_format((float) $expense->amount);
-        \App\Models\Notification::sendToUser(
+        Notification::sendToUser(
             userId: (int) $expense->user_id,
             type: 'expense_rejected',
             title: 'Expense Claim Rejected',
@@ -400,10 +402,10 @@ class MRConnectController extends Controller
         // Dispatch in-app notification to all administrators
         $applicantName = $request->user()->name;
         $periodStr = $days > 1
-            ? "{$days} days: " . Carbon::parse($validated['from_date'])->format('d M') . ' to ' . Carbon::parse($validated['to_date'])->format('d M Y')
-            : "1 day: " . Carbon::parse($validated['from_date'])->format('d M Y');
+            ? "{$days} days: ".Carbon::parse($validated['from_date'])->format('d M').' to '.Carbon::parse($validated['to_date'])->format('d M Y')
+            : '1 day: '.Carbon::parse($validated['from_date'])->format('d M Y');
 
-        \App\Models\Notification::sendToAdmins(
+        Notification::sendToAdmins(
             type: 'leave_applied',
             title: 'New Leave Request',
             message: "{$applicantName} applied for {$validated['leave_type']} ({$periodStr}). Reason: {$validated['reason']}",
@@ -441,7 +443,7 @@ class MRConnectController extends Controller
         ]);
 
         // Dispatch in-app notification to the MR
-        \App\Models\Notification::sendToUser(
+        Notification::sendToUser(
             userId: (int) $leave->user_id,
             type: 'leave_approved',
             title: 'Leave Request Approved',
@@ -478,7 +480,7 @@ class MRConnectController extends Controller
         ]);
 
         // Dispatch in-app notification to the MR
-        \App\Models\Notification::sendToUser(
+        Notification::sendToUser(
             userId: (int) $leave->user_id,
             type: 'leave_rejected',
             title: 'Leave Request Rejected',
@@ -558,6 +560,7 @@ class MRConnectController extends Controller
             $ord->items = is_string($ord->items_json)
                 ? json_decode($ord->items_json, true)
                 : ($ord->items_json ?? []);
+
             return $ord;
         });
 
@@ -693,9 +696,10 @@ class MRConnectController extends Controller
                     'updated_at' => now(),
                 ]);
             }
-        } catch (\Throwable $e) {}
+        } catch (\Throwable $e) {
+        }
 
-        return back()->with('success', "POB Order {$order->order_no} status updated to ".ucfirst($validated['status'])."!");
+        return back()->with('success', "POB Order {$order->order_no} status updated to ".ucfirst($validated['status']).'!');
     }
 
     /**
@@ -972,12 +976,70 @@ class MRConnectController extends Controller
         $notices = DB::table('notices')
             ->leftJoin('users', 'notices.published_by', '=', 'users.id')
             ->select('notices.*', 'users.name as publisher_name')
-            ->orderByDesc('notices.published_at')
+            ->orderByDesc('notices.created_at')
             ->get();
 
         return Inertia::render('mrconnect/Notice', [
             'notices' => $notices,
         ]);
+    }
+
+    /**
+     * Store a new notice or official announcement (Admin only).
+     */
+    public function storeNotice(Request $request): RedirectResponse
+    {
+        if (! $request->user()->isAdmin()) {
+            abort(403, 'Unauthorized action. Administrator credentials required to publish circulars.');
+        }
+
+        $validated = $request->validate([
+            'title' => ['required', 'string', 'max:200'],
+            'content' => ['required', 'string'],
+        ]);
+
+        $title = ucfirst(trim($validated['title']));
+        $content = ucfirst(trim($validated['content']));
+
+        $noticeId = DB::table('notices')->insertGetId([
+            'title' => $title,
+            'content' => $content,
+            'published_by' => $request->user()->id,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        Notification::broadcastToAll(
+            type: 'notice',
+            title: 'Official Announcement: '.$title,
+            message: Str::limit($content, 120),
+            link: '/mrconnect/notice',
+            data: [
+                'notice_id' => $noticeId,
+            ],
+            exceptUserId: $request->user()->id
+        );
+
+        return back()->with('success', 'Official announcement published successfully.');
+    }
+
+    /**
+     * Delete an announcement (Admin only).
+     */
+    public function destroyNotice(Request $request, int $id): RedirectResponse
+    {
+        if (! $request->user()->isAdmin()) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $notice = DB::table('notices')->where('id', $id)->first();
+        if (! $notice) {
+            abort(404, 'Notice not found.');
+        }
+
+        DB::table('notices')->where('id', $id)->delete();
+
+        return back()->with('success', 'Announcement deleted successfully.');
     }
 
     /**

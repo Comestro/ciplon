@@ -167,6 +167,8 @@ Route::middleware(['auth'])->prefix('mrconnect')->name('mrconnect.')->group(func
     Route::get('/video-library', [MRConnectController::class, 'videoLibrary'])->name('video.library');
     Route::get('/slider', [MRConnectController::class, 'slider'])->name('slider');
     Route::get('/notice', [MRConnectController::class, 'notice'])->name('notice');
+    Route::post('/notice', [MRConnectController::class, 'storeNotice'])->name('notice.store');
+    Route::delete('/notice/{id}', [MRConnectController::class, 'destroyNotice'])->name('notice.destroy');
     Route::get('/sponsor', [MRConnectController::class, 'sponsor'])->name('sponsor');
     Route::get('/scheme', [MRConnectController::class, 'scheme'])->name('scheme');
     Route::get('/hr-section', [MRConnectController::class, 'hrSection'])->name('hr.section');

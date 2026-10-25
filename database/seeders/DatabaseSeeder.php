@@ -60,6 +60,7 @@ class DatabaseSeeder extends Seeder
             DoctorSeeder::class,
             VisitSeeder::class,
             FieldExpenseSeeder::class,
+            MRConnectModulesSeeder::class,
         ]);
     }
 }

@@ -98,12 +98,9 @@ return new class extends Migration
         // 6. Notices and Announcements Table
         Schema::create('notices', function (Blueprint $table) {
             $table->id();
-            $table->string('title', 200);
+            $table->string('title');
             $table->text('content');
-            $table->string('category', 40)->default('general'); // scheme, general, circular, price_revision
-            $table->string('priority', 20)->default('normal'); // normal, high, urgent
             $table->foreignId('published_by')->nullable()->constrained('users')->nullOnDelete();
-            $table->timestamp('published_at')->useCurrent();
             $table->timestamps();
         });
 
