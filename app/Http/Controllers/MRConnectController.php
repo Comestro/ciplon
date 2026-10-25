@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Doctor;
 use App\Models\Notification;
 use App\Models\Product;
+use App\Models\Setting;
 use App\Models\TourPlan;
 use App\Models\User;
 use App\Models\Visit;
@@ -1104,18 +1105,34 @@ class MRConnectController extends Controller
                     'doctors_count' => $u->doctors_count,
                     'visits_count' => $u->visits_count,
                     'latest_location' => $u->latestLocation ? [
-                        'latitude' => $u->latestLocation->latitude,
-                        'longitude' => $u->latestLocation->longitude,
+                        'latitude' => (float) $u->latestLocation->latitude,
+                        'longitude' => (float) $u->latestLocation->longitude,
+                        'accuracy' => $u->latestLocation->accuracy,
+                        'speed' => $u->latestLocation->speed,
+                        'battery_level' => $u->latestLocation->battery_level,
+                        'battery_status' => $u->latestLocation->battery_status,
+                        'is_online' => (bool) $u->latestLocation->is_online,
+                        'current_activity' => $u->latestLocation->current_activity,
                         'address' => $u->latestLocation->address,
                         'updated_at' => $u->latestLocation->updated_at?->diffForHumans(),
+                        'last_synced_at' => $u->latestLocation->last_synced_at?->format('d M Y, h:i A'),
                     ] : null,
                     'created_at' => $u->created_at?->format('d M Y'),
                     'status' => 'active',
                 ];
             });
 
+        $mapbox = [
+            'token' => (string) Setting::get('mapbox_token', env('MAPBOX_ACCESS_TOKEN', '')),
+            'style' => (string) Setting::get('mapbox_style', 'mapbox://styles/mapbox/streets-v12'),
+            'default_lat' => (float) Setting::get('mapbox_default_lat', 8.1833),
+            'default_lng' => (float) Setting::get('mapbox_default_lng', 77.4119),
+            'default_zoom' => (int) Setting::get('mapbox_default_zoom', 14),
+        ];
+
         return Inertia::render('mrconnect/MRDirectory', [
             'mrs' => $mrs,
+            'mapbox' => $mapbox,
         ]);
     }
 

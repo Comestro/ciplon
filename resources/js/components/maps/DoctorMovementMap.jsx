@@ -110,15 +110,45 @@ export default function DoctorMovementMap({
       }
 
       try {
-        const effectiveToken = token.trim() || 'pk.eyJ1IjoibXJjb25uZWN0LWRlbW8iLCJhIjoiY2x6cTFxZmxwMDJiazJqcXB0eGdxOGNteSJ9.mock';
+        const hasValidMapboxToken = Boolean(token.trim() && token.trim().startsWith('pk.'));
+        const effectiveToken = hasValidMapboxToken
+          ? token.trim()
+          : 'pk.eyJ1IjoibXJjb25uZWN0LWRlbW8iLCJhIjoiY2x6cTFxZmxwMDJiazJqcXB0eGdxOGNteSJ9.mock';
         window.mapboxgl.accessToken = effectiveToken;
 
         const centerLng = mrLiveLocation?.lng || (allStops[0]?.lng) || defaultLng;
         const centerLat = mrLiveLocation?.lat || (allStops[0]?.lat) || defaultLat;
 
+        const effectiveStyle = hasValidMapboxToken
+          ? mapStyle
+          : {
+              version: 8,
+              sources: {
+                'osm-raster-tiles': {
+                  type: 'raster',
+                  tiles: [
+                    'https://a.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                    'https://b.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                    'https://c.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                  ],
+                  tileSize: 256,
+                  attribution: '© OpenStreetMap contributors',
+                },
+              },
+              layers: [
+                {
+                  id: 'osm-tiles-layer',
+                  type: 'raster',
+                  source: 'osm-raster-tiles',
+                  minzoom: 0,
+                  maxzoom: 19,
+                },
+              ],
+            };
+
         const map = new window.mapboxgl.Map({
           container: mapContainerRef.current,
-          style: token.trim() ? mapStyle : 'https://demotiles.maplibre.org/style.json',
+          style: effectiveStyle,
           center: [centerLng, centerLat],
           zoom: defaultZoom,
           attributionControl: false,

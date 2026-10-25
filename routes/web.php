@@ -172,7 +172,6 @@ Route::middleware(['auth'])->prefix('mrconnect')->name('mrconnect.')->group(func
     Route::get('/sponsor', [MRConnectController::class, 'sponsor'])->name('sponsor');
     Route::get('/scheme', [MRConnectController::class, 'scheme'])->name('scheme');
     Route::get('/mr-directory', [MRConnectController::class, 'mrDirectory'])->name('mr.directory');
-    Route::get('/hr-section', fn () => redirect()->route('mrconnect.mr.directory'));
     Route::get('/all-reports', [MRConnectController::class, 'allReports'])->name('all.reports');
 
 });
