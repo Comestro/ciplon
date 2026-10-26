@@ -147,6 +147,6 @@ class FieldExpenseSeeder extends Seeder
             DB::table('field_expenses')->insert($record);
         }
 
-        $this->command->info('Seeded ' . count($records) . ' field expense claim records successfully.');
+        $this->command->info('Seeded '.count($records).' field expense claim records successfully.');
     }
 }

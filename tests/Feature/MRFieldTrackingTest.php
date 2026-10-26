@@ -191,16 +191,3 @@ test('mr only sees their own tour plan and cannot approve', function () {
     $approveResponse = $this->actingAs($mr1)->post("/mrconnect/tour-plan/{$plan2->id}/approve");
     $approveResponse->assertStatus(403);
 });
-
-test('mr only sees their own assigned profile in employee assign', function () {
-    $mr1 = User::factory()->create(['role' => 'mr']);
-    $mr1->assignRole('mr');
-    $mr2 = User::factory()->create(['role' => 'mr']);
-    $mr2->assignRole('mr');
-
-    $response = $this->actingAs($mr1)->get('/mrconnect/employee-assign');
-    $response->assertStatus(200);
-    $reps = $response->viewData('page')['props']['representatives'];
-    expect(count($reps))->toBe(1);
-    expect($reps[0]['id'])->toBe($mr1->id);
-});

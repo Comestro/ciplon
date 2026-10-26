@@ -126,12 +126,6 @@ export default function AdminSidebar({ isOpen, onClose }) {
       title: 'Employee & Field',
       items: [
         {
-          name: 'Employee Assign',
-          path: '/mrconnect/employee-assign',
-          icon: Users,
-          active: isParentActive('/mrconnect/employee-assign'),
-        },
-        {
           name: 'Tour Plan',
           path: '/mrconnect/tour-plan',
           icon: Globe,

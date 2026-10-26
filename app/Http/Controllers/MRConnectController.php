@@ -21,45 +21,7 @@ use Inertia\Response;
 class MRConnectController extends Controller
 {
     /**
-     * 1. EMPLOYEE ASSIGN
-     * MR only sees their own assigned profile, territory, and reporting manager.
-     * Admin can view all representatives.
-     */
-    public function employeeAssign(Request $request): Response
-    {
-        $user = $request->user();
-        $isAdmin = $user->isAdmin();
-
-        $query = User::where('role', 'mr');
-        if (! $isAdmin) {
-            $query->where('id', $user->id);
-        }
-
-        $reps = $query->with(['latestLocation'])->get()->map(function ($u, $idx) use ($user) {
-            return [
-                'id' => $u->id,
-                'name' => $u->name,
-                'email' => $u->email,
-                'reg_code' => 'MRC'.(1000 + $u->id),
-                'role_title' => $u->role === 'mr' ? 'Medical Representative' : 'ABM',
-                'headquarters' => 'Nagercoil Hub #'.(($u->id % 4) + 1),
-                'territory' => 'Kanyakumari / Tamil Nadu',
-                'assigned_doctors_count' => (int) Doctor::where('user_id', $u->id)->count(),
-                'reporting_manager' => 'Kesavan T (Area Business Manager)',
-                'joining_date' => '01/04/2024',
-                'status' => 'active',
-                'is_self' => $u->id === $user->id,
-            ];
-        });
-
-        return Inertia::render('mrconnect/EmployeeAssign', [
-            'representatives' => $reps,
-            'isIndividualMR' => ! $isAdmin,
-        ]);
-    }
-
-    /**
-     * 2. TOUR PLAN
+     * 1. TOUR PLAN
      * MR only sees their own tour plans.
      * Admin sees all tour plans and can approve/reject.
      */

@@ -148,7 +148,7 @@ test('user can mark notification as read and mark all as read', function () {
     expect($n2->fresh()->read_at)->toBeNull();
 
     // Mark all as read
-    $res2 = $this->actingAs($user)->postJson("/notifications/mark-all-read");
+    $res2 = $this->actingAs($user)->postJson('/notifications/mark-all-read');
     $res2->assertOk();
     expect($n2->fresh()->read_at)->not->toBeNull();
 });

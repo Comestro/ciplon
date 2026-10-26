@@ -143,7 +143,6 @@ Route::middleware(['auth', 'mr'])->prefix('mr')->name('mr.')->group(function () 
 
 // mrConnect Enterprise Field & Operations Modules
 Route::middleware(['auth'])->prefix('mrconnect')->name('mrconnect.')->group(function () {
-    Route::get('/employee-assign', [MRConnectController::class, 'employeeAssign'])->name('employee.assign');
     Route::get('/tour-plan', [MRConnectController::class, 'tourPlan'])->name('tour.plan');
     Route::post('/tour-plan', [MRConnectController::class, 'storeTourPlan'])->name('tour.plan.store');
     Route::post('/tour-plan/{id}/approve', [MRConnectController::class, 'approveTourPlan'])->name('tour.plan.approve');
