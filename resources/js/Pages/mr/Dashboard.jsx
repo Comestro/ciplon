@@ -255,7 +255,7 @@ export default function Dashboard({ initialData = null }) {
           </Link>
 
           <Link
-            href="/mrconnect/tour-plan"
+            href="/mr/visits?view=planner"
             className="p-3.5 rounded-2xl bg-white border border-slate-200/80 hover:bg-slate-50 transition-colors flex items-center justify-between group cursor-pointer"
           >
             <div className="flex items-center gap-3">
@@ -263,8 +263,8 @@ export default function Dashboard({ initialData = null }) {
                 <Calendar className="w-4 h-4" />
               </div>
               <div>
-                <span className="block text-xs font-semibold text-slate-800">Monthly Tour Plan</span>
-                <span className="block text-[11px] text-slate-400">Submit route for approval</span>
+                <span className="block text-xs font-semibold text-slate-800">Calls & Daily Planner</span>
+                <span className="block text-[11px] text-slate-400">Schedule field visits & calls</span>
               </div>
             </div>
             <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-slate-700 transition-colors" />

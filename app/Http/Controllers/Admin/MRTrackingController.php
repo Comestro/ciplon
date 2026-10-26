@@ -6,12 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Models\Doctor;
 use App\Models\MRSchedule;
 use App\Models\Setting;
-use App\Models\TourPlan;
 use App\Models\User;
 use App\Models\Visit;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -52,54 +50,6 @@ class MRTrackingController extends Controller
             'active_mr' => $data['active_mr'],
             'stats' => $data['kpi'],
         ]);
-    }
-
-    /**
-     * Approve a submitted Tour Plan.
-     */
-    public function approveTourPlan(Request $request, int $id): RedirectResponse|JsonResponse
-    {
-        $plan = TourPlan::findOrFail($id);
-        $plan->update([
-            'status' => 'approved',
-            'admin_feedback' => $request->input('notes', 'Tour plan approved by administration.'),
-            'reviewed_by' => $request->user()?->id,
-            'reviewed_at' => now(),
-        ]);
-
-        if ($request->wantsJson()) {
-            return response()->json([
-                'success' => true,
-                'message' => 'Tour plan has been approved successfully.',
-                'plan' => $plan,
-            ]);
-        }
-
-        return back()->with('success', "Tour plan for {$plan->user->name} ({$plan->month}) approved!");
-    }
-
-    /**
-     * Reject a submitted Tour Plan.
-     */
-    public function rejectTourPlan(Request $request, int $id): RedirectResponse|JsonResponse
-    {
-        $plan = TourPlan::findOrFail($id);
-        $plan->update([
-            'status' => 'rejected',
-            'admin_feedback' => $request->input('notes', 'Plan rejected - please revise schedule.'),
-            'reviewed_by' => $request->user()?->id,
-            'reviewed_at' => now(),
-        ]);
-
-        if ($request->wantsJson()) {
-            return response()->json([
-                'success' => true,
-                'message' => 'Tour plan has been rejected.',
-                'plan' => $plan,
-            ]);
-        }
-
-        return back()->with('success', "Tour plan for {$plan->user->name} has been rejected.");
     }
 
     /**
@@ -260,29 +210,7 @@ class MRTrackingController extends Controller
             ];
         }
 
-        // 5. Tour Plans for Approval
-        $tourPlans = TourPlan::with('user:id,name,email')
-            ->orderByRaw("CASE WHEN status = 'pending' THEN 0 ELSE 1 END")
-            ->latest('id')
-            ->take(12)
-            ->get()
-            ->map(function ($tp) {
-                return [
-                    'id' => $tp->id,
-                    'employee_name' => $tp->user ? $tp->user->name : 'Representative',
-                    'type' => $tp->type,
-                    'month' => $tp->month,
-                    'year' => $tp->year,
-                    'days_count' => $tp->days_count,
-                    'planned_visits' => $tp->planned_visits,
-                    'visited_count' => $tp->visited_count,
-                    'status' => $tp->status,
-                    'admin_feedback' => $tp->admin_feedback,
-                    'created_at' => $tp->created_at?->format('d M Y'),
-                ];
-            });
-
-        // 6. Last 30 Days Performance Leaderboard
+        // 5. Last 30 Days Performance Leaderboard
         $leaderboard = [
             [
                 'rank' => 1,
@@ -374,7 +302,6 @@ class MRTrackingController extends Controller
             'field_representatives' => $representatives,
             'active_mr' => $activeUser,
             'doctor_stops' => $doctorStops,
-            'tour_plans_for_approval' => $tourPlans,
             'leaderboard' => $leaderboard,
         ];
     }

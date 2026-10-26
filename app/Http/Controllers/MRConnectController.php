@@ -6,7 +6,6 @@ use App\Models\Doctor;
 use App\Models\Notification;
 use App\Models\Product;
 use App\Models\Setting;
-use App\Models\TourPlan;
 use App\Models\User;
 use App\Models\Visit;
 use App\Services\ImageKitService;
@@ -21,109 +20,7 @@ use Inertia\Response;
 class MRConnectController extends Controller
 {
     /**
-     * 1. TOUR PLAN
-     * MR only sees their own tour plans.
-     * Admin sees all tour plans and can approve/reject.
-     */
-    public function tourPlan(Request $request): Response
-    {
-        $user = $request->user();
-        $isAdmin = $user->isAdmin();
-
-        $query = TourPlan::with('user:id,name,email')->latest('id');
-        if (! $isAdmin) {
-            $query->where('user_id', $user->id);
-        }
-
-        $tourPlans = $query->get()->map(function ($p) {
-            return [
-                'id' => $p->id,
-                'user_name' => $p->user ? $p->user->name : 'Representative',
-                'user_id' => $p->user_id,
-                'type' => $p->type,
-                'month' => $p->month,
-                'year' => $p->year,
-                'days_count' => $p->days_count,
-                'planned_visits' => $p->planned_visits,
-                'visited_count' => $p->visited_count,
-                'status' => $p->status,
-                'notes' => $p->notes,
-                'admin_feedback' => $p->admin_feedback,
-                'created_at' => $p->created_at?->format('d M Y'),
-            ];
-        });
-
-        return Inertia::render('mrconnect/TourPlan', [
-            'tourPlans' => $tourPlans,
-            'isAdmin' => $isAdmin,
-        ]);
-    }
-
-    /**
-     * Store Tour Plan (Submitted by MR)
-     */
-    public function storeTourPlan(Request $request): RedirectResponse
-    {
-        $validated = $request->validate([
-            'month' => ['required', 'string', 'max:20'],
-            'year' => ['required', 'integer', 'min:2024', 'max:2030'],
-            'type' => ['required', 'string', 'max:50'],
-            'days_count' => ['required', 'integer', 'min:1', 'max:31'],
-            'planned_visits' => ['required', 'integer', 'min:1', 'max:300'],
-            'notes' => ['nullable', 'string'],
-        ]);
-
-        TourPlan::create([
-            'user_id' => $request->user()->id,
-            'month' => $validated['month'],
-            'year' => $validated['year'],
-            'type' => $validated['type'],
-            'days_count' => $validated['days_count'],
-            'planned_visits' => $validated['planned_visits'],
-            'visited_count' => 0,
-            'status' => 'pending',
-            'notes' => $validated['notes'] ?? null,
-        ]);
-
-        return back()->with('success', 'Monthly Tour Plan submitted for administrative review.');
-    }
-
-    /**
-     * Approve Tour Plan (Admin Only)
-     */
-    public function approveTourPlan(Request $request, int $id): RedirectResponse
-    {
-        if (! $request->user()->isAdmin()) {
-            abort(403, 'Unauthorized. Only administrators can approve tour plans.');
-        }
-
-        TourPlan::where('id', $id)->update([
-            'status' => 'approved',
-            'admin_feedback' => 'Approved by Regional Administration.',
-        ]);
-
-        return back()->with('success', 'Tour plan approved.');
-    }
-
-    /**
-     * Reject Tour Plan (Admin Only)
-     */
-    public function rejectTourPlan(Request $request, int $id): RedirectResponse
-    {
-        if (! $request->user()->isAdmin()) {
-            abort(403, 'Unauthorized. Only administrators can reject tour plans.');
-        }
-
-        TourPlan::where('id', $id)->update([
-            'status' => 'rejected',
-            'admin_feedback' => $request->input('reason', 'Plan requires route adjustments.'),
-        ]);
-
-        return back()->with('success', 'Tour plan rejected.');
-    }
-
-    /**
-     * 3. FIELD EXPENSES
+     * 1. FIELD EXPENSES
      * MR only sees their own expenses.
      */
     public function fieldExpenses(Request $request): Response
@@ -1111,12 +1008,10 @@ class MRConnectController extends Controller
             $dcrCount = Visit::where('user_id', $user->id)->count();
             $coverageCount = Doctor::where('user_id', $user->id)->count();
             $pobCount = DB::table('pob_orders')->where('user_id', $user->id)->count();
-            $tourCount = TourPlan::where('user_id', $user->id)->count();
         } else {
             $dcrCount = Visit::count();
             $coverageCount = Doctor::count();
             $pobCount = DB::table('pob_orders')->count();
-            $tourCount = TourPlan::count();
         }
 
         return Inertia::render('mrconnect/AllReports', [
@@ -1124,7 +1019,6 @@ class MRConnectController extends Controller
                 ['id' => 'dcr', 'title' => 'Daily Call Report (DCR)', 'category' => 'Field Operations', 'records' => $dcrCount, 'desc' => 'Detailed doctor visit logs, sample distributions, and physician feedback.'],
                 ['id' => 'coverage', 'title' => 'Doctor Territory Coverage Report', 'category' => 'Doctor Compliance', 'records' => $coverageCount, 'desc' => 'Monthly frequency compliance across Core, Class-A, and Class-B doctors.'],
                 ['id' => 'pob', 'title' => 'POB Order Booking Analysis', 'category' => 'Sales Analytics', 'records' => $pobCount, 'desc' => 'Chemist personal order bookings and prescription conversions.'],
-                ['id' => 'tour', 'title' => 'Tour Plan Compliance Report', 'category' => 'Field Operations', 'records' => $tourCount, 'desc' => 'Monthly tour schedule adherence and route deviations tracking.'],
             ],
             'isAdmin' => $isAdmin,
         ]);

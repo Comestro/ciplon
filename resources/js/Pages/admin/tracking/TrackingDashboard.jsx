@@ -36,18 +36,11 @@ export default function TrackingDashboard({
   field_representatives = [],
   active_mr = null,
   doctor_stops = {},
-  tour_plans_for_approval = [],
   leaderboard = [],
 }) {
   const [selectedMRId, setSelectedMRId] = useState(active_mr?.id || field_representatives[0]?.id || null);
   const [searchRepQuery, setSearchRepQuery] = useState('');
   const [tourMode, setTourMode] = useState('doctor'); // 'doctor' | 'distributor'
-  const [tourApprovalTab, setTourApprovalTab] = useState('doctors'); // 'doctors' | 'distributors'
-
-  // Review Modal State
-  const [reviewModalPlan, setReviewModalPlan] = useState(null);
-  const [reviewNotes, setReviewNotes] = useState('');
-  const [isProcessing, setIsProcessing] = useState(false);
 
   // Active MR object
   const activeRep = field_representatives.find((r) => r.id === selectedMRId) || active_mr || field_representatives[0];
@@ -57,13 +50,6 @@ export default function TrackingDashboard({
     rep.name.toLowerCase().includes(searchRepQuery.toLowerCase()) ||
     rep.reg_code.toLowerCase().includes(searchRepQuery.toLowerCase())
   );
-
-  // Filter tour plans by tab
-  const filteredPlans = tour_plans_for_approval.filter((plan) => {
-    if (tourApprovalTab === 'doctors') return plan.type === 'doctor';
-    if (tourApprovalTab === 'distributors') return plan.type === 'distributor';
-    return true;
-  });
 
   const tourSummary = tourMode === 'doctor'
     ? (kpi.tour_summary?.doctor_mode || { total_tours: 36, planned: 857, visited: 228, completion_percent: 27 })
@@ -79,46 +65,6 @@ export default function TrackingDashboard({
     );
   };
 
-  // Handle Tour Plan Approval
-  const handleApprovePlan = (planId) => {
-    setIsProcessing(true);
-    router.post(
-      `/admin/tour-plans/${planId}/approve`,
-      { notes: reviewNotes || 'Tour plan approved.' },
-      {
-        preserveScroll: true,
-        onSuccess: () => {
-          setReviewModalPlan(null);
-          setIsProcessing(false);
-        },
-        onError: () => {
-          toast.error('Failed to approve tour plan.');
-          setIsProcessing(false);
-        },
-      }
-    );
-  };
-
-  // Handle Tour Plan Rejection
-  const handleRejectPlan = (planId) => {
-    setIsProcessing(true);
-    router.post(
-      `/admin/tour-plans/${planId}/reject`,
-      { notes: reviewNotes || 'Tour plan rejected.' },
-      {
-        preserveScroll: true,
-        onSuccess: () => {
-          setReviewModalPlan(null);
-          setIsProcessing(false);
-        },
-        onError: () => {
-          toast.error('Failed to reject tour plan.');
-          setIsProcessing(false);
-        },
-      }
-    );
-  };
-
   return (
     <AdminLayout>
       <div className="space-y-6 pb-12 font-sans max-w-[1600px] mx-auto">
@@ -130,7 +76,7 @@ export default function TrackingDashboard({
               Field Operations & Live Tracking
             </h2>
             <p className="text-xs text-slate-500 font-normal mt-0.5">
-              Real-time Mapbox doctor movement, field telemetry, and monthly tour plan approvals.
+              Real-time Mapbox doctor movement, field telemetry, and daily visit progress.
             </p>
           </div>
 
@@ -218,177 +164,81 @@ export default function TrackingDashboard({
           </div>
         </div>
 
-        {/* 3. Tour Plan Summary - Today & Tour Plan for Approval */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
-          
-          {/* Left: Tour Plan Summary - Today */}
-          <div className="lg:col-span-5 bg-white rounded-2xl border border-slate-200/80 p-5 space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-              <div className="flex items-center gap-2">
-                <Calendar className="w-4 h-4 text-violet-600" />
-                <h3 className="text-sm font-semibold text-slate-800">Tour Plan Summary - Today</h3>
-              </div>
-
-              {/* Segmented Mode Toggle (SpaceWork Style) */}
-              <div className="flex items-center gap-1 p-0.5 rounded-xl bg-slate-200/50 text-xs">
-                <button
-                  type="button"
-                  onClick={() => setTourMode('doctor')}
-                  className={`px-3 py-1 rounded-lg transition-colors cursor-pointer ${
-                    tourMode === 'doctor'
-                      ? 'bg-white text-slate-900 font-semibold shadow-2xs'
-                      : 'text-slate-600 hover:text-slate-900 font-normal'
-                  }`}
-                >
-                  Doctor Mode
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setTourMode('distributor')}
-                  className={`px-3 py-1 rounded-lg transition-colors cursor-pointer ${
-                    tourMode === 'distributor'
-                      ? 'bg-white text-slate-900 font-semibold shadow-2xs'
-                      : 'text-slate-600 hover:text-slate-900 font-normal'
-                  }`}
-                >
-                  Distributor
-                </button>
-              </div>
+        {/* 3. Field Operations Summary - Today */}
+        <div className="bg-white rounded-2xl border border-slate-200/80 p-5 space-y-4">
+          <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+            <div className="flex items-center gap-2">
+              <Calendar className="w-4 h-4 text-violet-600" />
+              <h3 className="text-sm font-semibold text-slate-800">Field Operations Summary - Today</h3>
             </div>
 
-            {/* 4 Clean Metric Cards */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-              <div className="rounded-xl p-3 bg-slate-50 border border-slate-100 text-center">
-                <p className="text-base font-semibold text-slate-800">{tourSummary.total_tours}</p>
-                <span className="text-[10px] font-medium text-slate-500 block mt-0.5">
-                  Total Tours
-                </span>
-              </div>
-
-              <div className="rounded-xl p-3 bg-slate-50 border border-slate-100 text-center">
-                <p className="text-base font-semibold text-slate-800">{tourSummary.planned}</p>
-                <span className="text-[10px] font-medium text-slate-500 block mt-0.5">
-                  Planned
-                </span>
-              </div>
-
-              <div className="rounded-xl p-3 bg-slate-50 border border-slate-100 text-center">
-                <p className="text-base font-semibold text-emerald-600">{tourSummary.visited}</p>
-                <span className="text-[10px] font-medium text-slate-500 block mt-0.5">
-                  Visited
-                </span>
-              </div>
-
-              <div className="rounded-xl p-3 bg-slate-50 border border-slate-100 text-center">
-                <p className="text-base font-semibold text-violet-600">{tourSummary.completion_percent}%</p>
-                <span className="text-[10px] font-medium text-slate-500 block mt-0.5">
-                  Completion
-                </span>
-              </div>
-            </div>
-
-            <div className="flex items-center justify-between text-xs text-slate-500 pt-1">
-              <span>Overall regional completion progress</span>
-              <span className="font-semibold text-slate-800">{tourSummary.completion_percent}% Completed</span>
-            </div>
-            <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-              <div
-                className="bg-emerald-500 h-full rounded-full transition-all duration-500"
-                style={{ width: `${tourSummary.completion_percent}%` }}
-              ></div>
+            {/* Segmented Mode Toggle (SpaceWork Style) */}
+            <div className="flex items-center gap-1 p-0.5 rounded-xl bg-slate-200/50 text-xs">
+              <button
+                type="button"
+                onClick={() => setTourMode('doctor')}
+                className={`px-3 py-1 rounded-lg transition-colors cursor-pointer ${
+                  tourMode === 'doctor'
+                    ? 'bg-white text-slate-900 font-semibold shadow-2xs'
+                    : 'text-slate-600 hover:text-slate-900 font-normal'
+                }`}
+              >
+                Doctor Mode
+              </button>
+              <button
+                type="button"
+                onClick={() => setTourMode('distributor')}
+                className={`px-3 py-1 rounded-lg transition-colors cursor-pointer ${
+                  tourMode === 'distributor'
+                    ? 'bg-white text-slate-900 font-semibold shadow-2xs'
+                    : 'text-slate-600 hover:text-slate-900 font-normal'
+                }`}
+              >
+                Distributor
+              </button>
             </div>
           </div>
 
-          {/* Right: Tour Plan for Approval */}
-          <div className="lg:col-span-7 bg-white rounded-2xl border border-slate-200/80 p-5 space-y-3">
-            <div className="flex items-center justify-between pb-2 border-b border-slate-100">
-              <div className="flex items-center gap-2">
-                <ShieldCheck className="w-4 h-4 text-violet-600" />
-                <h3 className="text-sm font-semibold text-slate-800">Tour Plan for Approval</h3>
-              </div>
-
-              <div className="flex items-center gap-1 p-0.5 rounded-xl bg-slate-200/50 text-xs">
-                <button
-                  type="button"
-                  onClick={() => setTourApprovalTab('doctors')}
-                  className={`px-3 py-1 rounded-lg transition-colors cursor-pointer ${
-                    tourApprovalTab === 'doctors'
-                      ? 'bg-white text-slate-900 font-semibold shadow-2xs'
-                      : 'text-slate-600 hover:text-slate-900 font-normal'
-                  }`}
-                >
-                  Doctors ({tour_plans_for_approval.filter(p => p.type === 'doctor').length})
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setTourApprovalTab('distributors')}
-                  className={`px-3 py-1 rounded-lg transition-colors cursor-pointer ${
-                    tourApprovalTab === 'distributors'
-                      ? 'bg-white text-slate-900 font-semibold shadow-2xs'
-                      : 'text-slate-600 hover:text-slate-900 font-normal'
-                  }`}
-                >
-                  Distributors (0)
-                </button>
-              </div>
+          {/* 4 Clean Metric Cards */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div className="rounded-xl p-3 bg-slate-50 border border-slate-100 text-center">
+              <p className="text-base font-semibold text-slate-800">{tourSummary.total_tours}</p>
+              <span className="text-[10px] font-medium text-slate-500 block mt-0.5">
+                Total Field Units
+              </span>
             </div>
 
-            {/* Approval Table */}
-            <div className="overflow-x-auto max-h-[195px] overflow-y-auto">
-              <table className="w-full text-left text-xs border-collapse">
-                <thead>
-                  <tr className="border-b border-slate-100 text-[11px] font-semibold text-slate-400">
-                    <th className="py-2 px-2">Employee</th>
-                    <th className="py-2 px-2">Month</th>
-                    <th className="py-2 px-2 text-center">Days</th>
-                    <th className="py-2 px-2 text-right">Action</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100">
-                  {filteredPlans.length > 0 ? (
-                    filteredPlans.map((plan) => (
-                      <tr key={plan.id} className="hover:bg-slate-50/70 transition-colors">
-                        <td className="py-2 px-2 font-medium text-slate-800">
-                          {plan.employee_name}
-                        </td>
-                        <td className="py-2 px-2 text-slate-500">
-                          {plan.month}
-                        </td>
-                        <td className="py-2 px-2 text-center font-normal text-slate-700">
-                          <span className="px-2 py-0.5 rounded-md bg-slate-100 text-[11px]">
-                            {plan.days_count} days
-                          </span>
-                        </td>
-                        <td className="py-2 px-2 text-right">
-                          {plan.status === 'approved' ? (
-                            <span className="inline-flex items-center gap-1 text-[11px] font-medium text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200/60">
-                              <Check className="w-3 h-3" /> Approved
-                            </span>
-                          ) : (
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setReviewModalPlan(plan);
-                                setReviewNotes('');
-                              }}
-                              className="px-3 py-1 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-medium text-xs transition-colors cursor-pointer"
-                            >
-                              Review
-                            </button>
-                          )}
-                        </td>
-                      </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan="4" className="py-6 text-center text-slate-400">
-                        No pending tour plans found for approval.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
+            <div className="rounded-xl p-3 bg-slate-50 border border-slate-100 text-center">
+              <p className="text-base font-semibold text-slate-800">{tourSummary.planned}</p>
+              <span className="text-[10px] font-medium text-slate-500 block mt-0.5">
+                Planned Visits
+              </span>
             </div>
+
+            <div className="rounded-xl p-3 bg-slate-50 border border-slate-100 text-center">
+              <p className="text-base font-semibold text-emerald-600">{tourSummary.visited}</p>
+              <span className="text-[10px] font-medium text-slate-500 block mt-0.5">
+                Completed Visits
+              </span>
+            </div>
+
+            <div className="rounded-xl p-3 bg-slate-50 border border-slate-100 text-center">
+              <p className="text-base font-semibold text-violet-600">{tourSummary.completion_percent}%</p>
+              <span className="text-[10px] font-medium text-slate-500 block mt-0.5">
+                Completion Rate
+              </span>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between text-xs text-slate-500 pt-1">
+            <span>Overall regional completion progress</span>
+            <span className="font-semibold text-slate-800">{tourSummary.completion_percent}% Completed</span>
+          </div>
+          <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+            <div
+              className="bg-emerald-500 h-full rounded-full transition-all duration-500"
+              style={{ width: `${tourSummary.completion_percent}%` }}
+            ></div>
           </div>
         </div>
 
@@ -618,80 +468,6 @@ export default function TrackingDashboard({
         </div>
 
       </div>
-
-      {/* Review Tour Plan Modal */}
-      {reviewModalPlan && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-xs p-4">
-          <div className="bg-white rounded-2xl border border-slate-200 max-w-lg w-full p-6 space-y-4 shadow-xl">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-              <div className="flex items-center gap-2">
-                <ShieldCheck className="w-5 h-5 text-violet-600" />
-                <h3 className="text-base font-semibold text-slate-800">Review Tour Plan</h3>
-              </div>
-              <button
-                type="button"
-                onClick={() => setReviewModalPlan(null)}
-                className="text-slate-400 hover:text-slate-600 cursor-pointer"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <div className="space-y-3 text-xs text-slate-700">
-              <div className="grid grid-cols-2 gap-3 p-3 bg-slate-50 rounded-xl border border-slate-200/60">
-                <div>
-                  <span className="text-slate-400 text-[10px] font-medium">Representative</span>
-                  <p className="font-semibold text-slate-800 text-sm">{reviewModalPlan.employee_name}</p>
-                </div>
-                <div>
-                  <span className="text-slate-400 text-[10px] font-medium">Plan Period</span>
-                  <p className="font-medium text-slate-800">{reviewModalPlan.month}</p>
-                </div>
-                <div>
-                  <span className="text-slate-400 text-[10px] font-medium">Field Working Days</span>
-                  <p className="font-medium text-slate-800">{reviewModalPlan.days_count} Days</p>
-                </div>
-                <div>
-                  <span className="text-slate-400 text-[10px] font-medium">Target Doctor Visits</span>
-                  <p className="font-semibold text-violet-600">{reviewModalPlan.planned_visits} Visits</p>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">
-                  Administrator Notes & Guidance
-                </label>
-                <textarea
-                  rows="3"
-                  value={reviewNotes}
-                  onChange={(e) => setReviewNotes(e.target.value)}
-                  placeholder="Optional feedback for the representative..."
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500"
-                ></textarea>
-              </div>
-            </div>
-
-            <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100">
-              <button
-                type="button"
-                disabled={isProcessing}
-                onClick={() => handleRejectPlan(reviewModalPlan.id)}
-                className="px-4 py-2 rounded-xl text-xs font-medium text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200/60 transition-colors cursor-pointer"
-              >
-                Reject Plan
-              </button>
-              <button
-                type="button"
-                disabled={isProcessing}
-                onClick={() => handleApprovePlan(reviewModalPlan.id)}
-                className="px-5 py-2 rounded-xl text-xs font-medium text-white bg-slate-900 hover:bg-slate-800 transition-colors cursor-pointer"
-              >
-                {isProcessing ? 'Processing...' : 'Approve Tour Plan'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </AdminLayout>
   );
 }
