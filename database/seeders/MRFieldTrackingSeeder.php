@@ -421,7 +421,6 @@ class MRFieldTrackingSeeder extends Seeder
                         'scheduled_date' => Carbon::today()->toDateString(),
                     ],
                     [
-                        'scheduled_time' => $doc['time'],
                         'status' => 'completed',
                         'priority' => 'high',
                         'purpose' => 'Detailing on Hematology portfolio',
@@ -436,7 +435,6 @@ class MRFieldTrackingSeeder extends Seeder
                         'scheduled_date' => Carbon::today()->toDateString(),
                     ],
                     [
-                        'scheduled_time' => $doc['time'],
                         'status' => 'pending',
                         'priority' => 'normal',
                         'purpose' => 'Follow-up on product presentation and brochure drop',

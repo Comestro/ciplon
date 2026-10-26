@@ -19,7 +19,6 @@ class MRSchedule extends Model
         'contact_type',
         'action_type',
         'scheduled_date',
-        'scheduled_time',
         'priority',
         'purpose',
         'notes',

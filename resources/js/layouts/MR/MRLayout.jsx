@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, usePage } from '@inertiajs/react';
 import toast from 'react-hot-toast';
 import MRSidebar from './MRSidebar';
@@ -17,13 +17,16 @@ export default function MRLayout({ children, title = 'MR Dashboard' }) {
   const { url, props } = usePage();
   const currentPath = url.split('?')[0];
   const { flash } = props;
+  const lastFlash = useRef({ success: null, error: null });
 
   useEffect(() => {
-    if (flash?.success) {
-      toast.success(flash.success);
+    if (flash?.success && flash.success !== lastFlash.current.success) {
+      lastFlash.current.success = flash.success;
+      toast.success(flash.success, { id: 'flash-success' });
     }
-    if (flash?.error) {
-      toast.error(flash.error);
+    if (flash?.error && flash.error !== lastFlash.current.error) {
+      lastFlash.current.error = flash.error;
+      toast.error(flash.error, { id: 'flash-error' });
     }
   }, [flash]);
 

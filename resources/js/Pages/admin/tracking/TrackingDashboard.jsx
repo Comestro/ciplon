@@ -88,7 +88,6 @@ export default function TrackingDashboard({
       {
         preserveScroll: true,
         onSuccess: () => {
-          toast.success('Tour plan approved successfully!');
           setReviewModalPlan(null);
           setIsProcessing(false);
         },
@@ -109,7 +108,6 @@ export default function TrackingDashboard({
       {
         preserveScroll: true,
         onSuccess: () => {
-          toast.success('Tour plan marked as rejected.');
           setReviewModalPlan(null);
           setIsProcessing(false);
         },

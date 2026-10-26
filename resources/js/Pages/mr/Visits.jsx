@@ -94,7 +94,6 @@ export default function Visits({
   const [outcomeNote, setOutcomeNote] = useState('');
   const [rescheduleItem, setRescheduleItem] = useState(null);
   const [rescheduleDate, setRescheduleDate] = useState('');
-  const [rescheduleTime, setRescheduleTime] = useState('');
   const [isPlannerSubmitting, setIsPlannerSubmitting] = useState(false);
 
   // Planner Create Form
@@ -105,7 +104,6 @@ export default function Visits({
     custom_contact_name: '',
     contact_type: 'doctor',
     scheduled_date: todayDate || new Date().toISOString().split('T')[0],
-    scheduled_time: 'Morning OPD (10:30 AM)',
     priority: 'normal',
     purpose: '',
     notes: ''
@@ -216,7 +214,6 @@ export default function Visits({
         setIsPlannerSubmitting(false);
         setOutcomeModalSchedule(null);
         setOutcomeNote('');
-        toast.success(status === 'completed' ? 'Marked as completed!' : `Status updated to ${status}`);
       },
       onError: () => {
         setIsPlannerSubmitting(false);
@@ -233,15 +230,12 @@ export default function Visits({
     router.put(`/mr/schedule/${rescheduleItem.id}/status`, {
       status: 'rescheduled',
       new_date: rescheduleDate,
-      new_time: rescheduleTime
     }, {
       preserveScroll: true,
       onSuccess: () => {
         setIsPlannerSubmitting(false);
         setRescheduleItem(null);
         setRescheduleDate('');
-        setRescheduleTime('');
-        toast.success('Rescheduled successfully!');
       },
       onError: () => {
         setIsPlannerSubmitting(false);
@@ -255,7 +249,6 @@ export default function Visits({
     if (!confirm('Are you sure you want to remove this item from your schedule?')) return;
     router.delete(`/mr/schedule/${scheduleId}`, {
       preserveScroll: true,
-      onSuccess: () => toast.success('Schedule item removed.'),
       onError: () => toast.error('Failed to remove item.')
     });
   };
@@ -283,7 +276,6 @@ export default function Visits({
       contact_type: scheduleForm.contact_mode === 'doctor' ? 'doctor' : scheduleForm.contact_type,
       action_type: scheduleForm.action_type,
       scheduled_date: scheduleForm.scheduled_date,
-      scheduled_time: scheduleForm.scheduled_time,
       priority: scheduleForm.priority,
       purpose: scheduleForm.purpose,
       notes: scheduleForm.notes
@@ -299,12 +291,10 @@ export default function Visits({
           custom_contact_name: '',
           contact_type: 'doctor',
           scheduled_date: todayDate || new Date().toISOString().split('T')[0],
-          scheduled_time: 'Morning OPD (10:30 AM)',
           priority: 'normal',
           purpose: '',
           notes: ''
         });
-        toast.success('Added to your schedule!');
       },
       onError: (errs) => {
         setIsPlannerSubmitting(false);
@@ -779,13 +769,8 @@ export default function Visits({
                               )}
 
                               <span className="inline-flex items-center gap-1 text-[11px] text-slate-500 font-normal bg-slate-50 px-2 py-0.5 rounded-md border border-slate-100">
-                                <Clock className="w-3 h-3 text-slate-400" />
-                                <span>{item.scheduled_time || 'Anytime'}</span>
-                                {plannerTab !== 'today' && (
-                                  <span className="text-slate-400 font-normal">
-                                    • {new Date(item.scheduled_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                                  </span>
-                                )}
+                                <Calendar className="w-3 h-3 text-slate-400" />
+                                <span>{new Date(item.scheduled_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
                               </span>
 
                               {isCompleted && (
@@ -879,7 +864,6 @@ export default function Visits({
                                 onClick={() => {
                                   setRescheduleItem(item);
                                   setRescheduleDate(item.scheduled_date);
-                                  setRescheduleTime(item.scheduled_time || '');
                                 }}
                                 className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
                                 title="Reschedule"
@@ -1293,10 +1277,12 @@ export default function Visits({
                   )}
                 </div>
 
-                {/* Date & Time */}
+                {/* Date & Priority */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block font-medium text-slate-700 mb-1">Date</label>
+                    <label className="block font-medium text-slate-700 mb-1">
+                      Date <span className="text-rose-500">*</span>
+                    </label>
                     <input
                       type="date"
                       value={scheduleForm.scheduled_date}
@@ -1305,36 +1291,25 @@ export default function Visits({
                       required
                     />
                   </div>
-                  <div>
-                    <label className="block font-medium text-slate-700 mb-1">Preferred Time Slot</label>
-                    <input
-                      type="text"
-                      placeholder="e.g. Morning OPD (10:30 AM)"
-                      value={scheduleForm.scheduled_time}
-                      onChange={(e) => setScheduleForm(prev => ({ ...prev, scheduled_time: e.target.value }))}
-                      className="w-full bg-slate-50 border border-slate-200/80 rounded-xl px-3 py-2 text-xs focus:ring-1 focus:ring-slate-900 focus:border-slate-900"
-                    />
-                  </div>
-                </div>
 
-                {/* Priority */}
-                <div>
-                  <label className="block font-medium text-slate-700 mb-1">Priority Level</label>
-                  <div className="flex items-center gap-2">
-                    {['high', 'normal', 'low'].map(p => (
-                      <button
-                        key={p}
-                        type="button"
-                        onClick={() => setScheduleForm(prev => ({ ...prev, priority: p }))}
-                        className={`flex-1 py-1.5 rounded-xl border font-semibold capitalize text-xs transition-colors cursor-pointer ${
-                          scheduleForm.priority === p 
-                            ? (p === 'high' ? 'bg-rose-50 border-rose-300 text-rose-700' : 'bg-slate-900 border-slate-900 text-white')
-                            : 'border-slate-200/80 text-slate-600 hover:bg-slate-50'
-                        }`}
-                      >
-                        {p}
-                      </button>
-                    ))}
+                  <div>
+                    <label className="block font-medium text-slate-700 mb-1">Priority Level</label>
+                    <div className="flex items-center gap-2">
+                      {['high', 'normal', 'low'].map(p => (
+                        <button
+                          key={p}
+                          type="button"
+                          onClick={() => setScheduleForm(prev => ({ ...prev, priority: p }))}
+                          className={`flex-1 py-2 rounded-xl border font-semibold capitalize text-xs transition-colors cursor-pointer ${
+                            scheduleForm.priority === p 
+                              ? (p === 'high' ? 'bg-rose-50 border-rose-300 text-rose-700' : 'bg-slate-900 border-slate-900 text-white')
+                              : 'border-slate-200/80 text-slate-600 hover:bg-slate-50'
+                          }`}
+                        >
+                          {p}
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 </div>
 
@@ -1521,16 +1496,6 @@ export default function Visits({
                     onChange={(e) => setRescheduleDate(e.target.value)}
                     className="w-full bg-slate-50 border border-slate-200/80 rounded-xl px-3 py-2 text-xs focus:ring-1 focus:ring-slate-900 focus:border-slate-900"
                     required
-                  />
-                </div>
-                <div>
-                  <label className="block font-medium text-slate-700 mb-1">New Time Slot</label>
-                  <input
-                    type="text"
-                    value={rescheduleTime}
-                    onChange={(e) => setRescheduleTime(e.target.value)}
-                    placeholder="e.g. Tomorrow Evening OPD (06:00 PM)"
-                    className="w-full bg-slate-50 border border-slate-200/80 rounded-xl px-3 py-2 text-xs focus:ring-1 focus:ring-slate-900 focus:border-slate-900"
                   />
                 </div>
 

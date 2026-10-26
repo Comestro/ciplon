@@ -39,7 +39,6 @@ export default function TourPlan({ tourPlans = [] }) {
     e.preventDefault();
     router.post('/mrconnect/tour-plan', formData, {
       onSuccess: () => {
-        toast.success('Tour plan submitted successfully!');
         setShowModal(false);
       },
       onError: () => toast.error('Failed to submit tour plan.'),
@@ -48,14 +47,12 @@ export default function TourPlan({ tourPlans = [] }) {
 
   const handleApprove = (id) => {
     router.post(`/mrconnect/tour-plan/${id}/approve`, {}, {
-      onSuccess: () => toast.success('Tour plan approved!'),
       onError: () => toast.error('Action failed.'),
     });
   };
 
   const handleReject = (id) => {
     router.post(`/mrconnect/tour-plan/${id}/reject`, {}, {
-      onSuccess: () => toast.success('Tour plan rejected.'),
       onError: () => toast.error('Action failed.'),
     });
   };

@@ -71,7 +71,6 @@ export default function Schedule({
   // Reschedule state
   const [rescheduleItem, setRescheduleItem] = useState(null);
   const [rescheduleDate, setRescheduleDate] = useState('');
-  const [rescheduleTime, setRescheduleTime] = useState('');
 
   // Create form state
   const [formData, setFormData] = useState({
@@ -81,7 +80,6 @@ export default function Schedule({
     custom_contact_name: '',
     contact_type: 'doctor',
     scheduled_date: todayDate || new Date().toISOString().split('T')[0],
-    scheduled_time: 'Morning OPD (10:30 AM)',
     priority: 'normal',
     purpose: '',
     notes: ''
@@ -143,7 +141,6 @@ export default function Schedule({
         setIsSubmitting(false);
         setOutcomeModalSchedule(null);
         setOutcomeNote('');
-        toast.success(status === 'completed' ? 'Marked as completed!' : `Status updated to ${status}`);
       },
       onError: () => {
         setIsSubmitting(false);
@@ -160,15 +157,12 @@ export default function Schedule({
     router.put(`/mr/schedule/${rescheduleItem.id}/status`, {
       status: 'rescheduled',
       new_date: rescheduleDate,
-      new_time: rescheduleTime
     }, {
       preserveScroll: true,
       onSuccess: () => {
         setIsSubmitting(false);
         setRescheduleItem(null);
         setRescheduleDate('');
-        setRescheduleTime('');
-        toast.success('Rescheduled successfully!');
       },
       onError: () => {
         setIsSubmitting(false);
@@ -182,7 +176,6 @@ export default function Schedule({
     if (!confirm('Are you sure you want to remove this item from your schedule?')) return;
     router.delete(`/mr/schedule/${scheduleId}`, {
       preserveScroll: true,
-      onSuccess: () => toast.success('Schedule item removed.'),
       onError: () => toast.error('Failed to remove item.')
     });
   };
@@ -210,7 +203,6 @@ export default function Schedule({
       contact_type: formData.contact_mode === 'doctor' ? 'doctor' : formData.contact_type,
       action_type: formData.action_type,
       scheduled_date: formData.scheduled_date,
-      scheduled_time: formData.scheduled_time,
       priority: formData.priority,
       purpose: formData.purpose,
       notes: formData.notes
@@ -227,12 +219,10 @@ export default function Schedule({
           custom_contact_name: '',
           contact_type: 'doctor',
           scheduled_date: todayDate || new Date().toISOString().split('T')[0],
-          scheduled_time: 'Morning OPD (10:30 AM)',
           priority: 'normal',
           purpose: '',
           notes: ''
         });
-        toast.success('Added to your schedule!');
       },
       onError: (errors) => {
         setIsSubmitting(false);
@@ -576,15 +566,10 @@ export default function Schedule({
                             </span>
                           )}
 
-                          {/* Scheduled Date/Time Badge */}
+                          {/* Scheduled Date Badge */}
                           <span className="inline-flex items-center gap-1 text-[11px] text-slate-500 font-medium bg-slate-100 px-2 py-0.5 rounded-md">
-                            <Clock className="w-3 h-3 text-slate-400" />
-                            <span>{item.scheduled_time || 'Anytime'}</span>
-                            {activeTab !== 'today' && (
-                              <span className="text-slate-400 font-normal">
-                                • {new Date(item.scheduled_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                              </span>
-                            )}
+                            <Calendar className="w-3 h-3 text-slate-400" />
+                            <span>{new Date(item.scheduled_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
                           </span>
 
                           {/* Status Pill */}
@@ -689,7 +674,6 @@ export default function Schedule({
                             onClick={() => {
                               setRescheduleItem(item);
                               setRescheduleDate(item.scheduled_date);
-                              setRescheduleTime(item.scheduled_time || '');
                             }}
                             className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
                             title="Reschedule"
@@ -892,10 +876,12 @@ export default function Schedule({
                   )}
                 </div>
 
-                {/* 3. Date & Time */}
+                {/* 3. Date & Priority */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block font-semibold text-slate-700 mb-1">Date</label>
+                    <label className="block font-semibold text-slate-700 mb-1">
+                      Date <span className="text-rose-500">*</span>
+                    </label>
                     <input
                       type="date"
                       value={formData.scheduled_date}
@@ -904,36 +890,25 @@ export default function Schedule({
                       required
                     />
                   </div>
-                  <div>
-                    <label className="block font-semibold text-slate-700 mb-1">Preferred Time Slot</label>
-                    <input
-                      type="text"
-                      placeholder="e.g. Morning OPD (10:30 AM)"
-                      value={formData.scheduled_time}
-                      onChange={(e) => setFormData(prev => ({ ...prev, scheduled_time: e.target.value }))}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-teal-600/20 focus:border-teal-700"
-                    />
-                  </div>
-                </div>
 
-                {/* 4. Priority */}
-                <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Priority Level</label>
-                  <div className="flex items-center gap-2">
-                    {['high', 'normal', 'low'].map(p => (
-                      <button
-                        key={p}
-                        type="button"
-                        onClick={() => setFormData(prev => ({ ...prev, priority: p }))}
-                        className={`flex-1 py-1.5 rounded-xl border font-bold capitalize text-xs transition-all cursor-pointer ${
-                          formData.priority === p 
-                            ? (p === 'high' ? 'bg-rose-50 border-rose-600 text-rose-700 ring-1 ring-rose-500' : 'bg-slate-900 border-slate-900 text-white')
-                            : 'border-slate-200 text-slate-600 hover:bg-slate-50'
-                        }`}
-                      >
-                        {p}
-                      </button>
-                    ))}
+                  <div>
+                    <label className="block font-semibold text-slate-700 mb-1">Priority Level</label>
+                    <div className="flex items-center gap-2">
+                      {['high', 'normal', 'low'].map(p => (
+                        <button
+                          key={p}
+                          type="button"
+                          onClick={() => setFormData(prev => ({ ...prev, priority: p }))}
+                          className={`flex-1 py-2 rounded-xl border font-bold capitalize text-xs transition-all cursor-pointer ${
+                            formData.priority === p 
+                              ? (p === 'high' ? 'bg-rose-50 border-rose-600 text-rose-700 ring-1 ring-rose-500' : 'bg-slate-900 border-slate-900 text-white')
+                              : 'border-slate-200 text-slate-600 hover:bg-slate-50'
+                          }`}
+                        >
+                          {p}
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 </div>
 
@@ -1120,16 +1095,6 @@ export default function Schedule({
                     onChange={(e) => setRescheduleDate(e.target.value)}
                     className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-teal-600/20 focus:border-teal-700"
                     required
-                  />
-                </div>
-                <div>
-                  <label className="block font-semibold text-slate-700 mb-1">New Time Slot</label>
-                  <input
-                    type="text"
-                    value={rescheduleTime}
-                    onChange={(e) => setRescheduleTime(e.target.value)}
-                    placeholder="e.g. Tomorrow Evening OPD (06:00 PM)"
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-teal-600/20 focus:border-teal-700"
                   />
                 </div>
 

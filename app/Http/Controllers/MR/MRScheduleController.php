@@ -63,10 +63,10 @@ class MRScheduleController extends Controller
             });
         }
 
-        // Ordering: pending first, then by scheduled time
+        // Ordering: pending first, then by scheduled date
         $schedules = $query->orderByRaw("CASE WHEN status = 'pending' THEN 1 ELSE 2 END")
             ->orderBy('scheduled_date', $tab === 'history' ? 'desc' : 'asc')
-            ->orderBy('scheduled_time', 'asc')
+            ->orderBy('id', 'asc')
             ->get();
 
         // Calculate Today's Performance Metrics
@@ -129,7 +129,6 @@ class MRScheduleController extends Controller
             'contact_type' => ['required', 'string', 'in:doctor,chemist,hospital,stockist'],
             'action_type' => ['required', 'string', 'in:visit,call'],
             'scheduled_date' => ['required', 'date'],
-            'scheduled_time' => ['nullable', 'string', 'max:50'],
             'priority' => ['required', 'string', 'in:high,normal,low'],
             'purpose' => ['required', 'string', 'max:500'],
             'notes' => ['nullable', 'string'],
@@ -147,7 +146,6 @@ class MRScheduleController extends Controller
             'contact_type' => $validated['contact_type'],
             'action_type' => $validated['action_type'],
             'scheduled_date' => $validated['scheduled_date'],
-            'scheduled_time' => $validated['scheduled_time'] ?? null,
             'priority' => $validated['priority'],
             'purpose' => $validated['purpose'],
             'notes' => $validated['notes'] ?? null,
@@ -172,7 +170,6 @@ class MRScheduleController extends Controller
             'status' => ['required', 'string', 'in:pending,completed,missed,rescheduled'],
             'outcome_note' => ['nullable', 'string', 'max:1000'],
             'new_date' => ['nullable', 'date'],
-            'new_time' => ['nullable', 'string', 'max:50'],
         ]);
 
         $updates = [
@@ -186,9 +183,6 @@ class MRScheduleController extends Controller
             $updates['completed_at'] = null;
         } elseif ($validated['status'] === 'rescheduled' && ! empty($validated['new_date'])) {
             $updates['scheduled_date'] = $validated['new_date'];
-            if (! empty($validated['new_time'])) {
-                $updates['scheduled_time'] = $validated['new_time'];
-            }
             $updates['status'] = 'pending';
         }
 

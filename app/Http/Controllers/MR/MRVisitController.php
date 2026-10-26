@@ -67,7 +67,7 @@ class MRVisitController extends Controller
 
         $schedules = $query->orderByRaw("CASE WHEN status = 'pending' THEN 1 ELSE 2 END")
             ->orderBy('scheduled_date', $tab === 'history' ? 'desc' : 'asc')
-            ->orderBy('scheduled_time', 'asc')
+            ->orderBy('id', 'asc')
             ->get();
 
         // Calculate Today's Performance Metrics

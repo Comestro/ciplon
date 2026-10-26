@@ -16,7 +16,6 @@ return new class extends Migration
             $table->string('contact_type', 30)->default('doctor'); // doctor, chemist, hospital, stockist
             $table->string('action_type', 20)->default('visit'); // visit, call
             $table->date('scheduled_date');
-            $table->string('scheduled_time', 50)->nullable(); // e.g. "10:30 AM", "Morning OPD", "Evening Clinic"
             $table->string('priority', 20)->default('normal'); // high, normal, low
             $table->string('purpose'); // e.g. "Follow-up on AcecloPlus SP sample", "Routine Clinic Detailing"
             $table->text('notes')->nullable();

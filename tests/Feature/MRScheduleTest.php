@@ -55,7 +55,6 @@ test('mr can create a visit schedule for a registered doctor', function () {
         'contact_type' => 'doctor',
         'action_type' => 'visit',
         'scheduled_date' => Carbon::today()->toDateString(),
-        'scheduled_time' => 'Morning OPD (10:30 AM)',
         'priority' => 'high',
         'purpose' => 'Detailing Ciplox and sample distribution',
         'notes' => 'Discuss clinical trial efficacy',
@@ -83,7 +82,6 @@ test('mr can create a call schedule for a custom chemist contact', function () {
         'contact_type' => 'chemist',
         'action_type' => 'call',
         'scheduled_date' => Carbon::today()->toDateString(),
-        'scheduled_time' => '02:30 PM',
         'priority' => 'normal',
         'purpose' => 'Stock verification of Ciplocef',
     ];
@@ -182,7 +180,6 @@ test('mr can reschedule an item to a new date and time', function () {
         'contact_type' => 'hospital',
         'action_type' => 'visit',
         'scheduled_date' => Carbon::today()->toDateString(),
-        'scheduled_time' => '10:00 AM',
         'priority' => 'normal',
         'purpose' => 'Submit purchase quotation',
         'status' => 'pending',
@@ -193,14 +190,12 @@ test('mr can reschedule an item to a new date and time', function () {
     $response = $this->actingAs($mr)->put("/mr/schedule/{$schedule->id}/status", [
         'status' => 'rescheduled',
         'new_date' => $tomorrow,
-        'new_time' => '11:30 AM',
     ]);
 
     $response->assertRedirect();
 
     $schedule->refresh();
     expect($schedule->scheduled_date->toDateString())->toBe($tomorrow);
-    expect($schedule->scheduled_time)->toBe('11:30 AM');
     expect($schedule->status)->toBe('pending');
 });
 
