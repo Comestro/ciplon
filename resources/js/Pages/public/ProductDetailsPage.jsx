@@ -26,6 +26,7 @@ import PublicLayout from '../../layouts/PublicLayout';
 import Container from '../../components/common/Container';
 import Button from '../../components/common/Button';
 import EnquiryModal from '../../components/home/EnquiryModal';
+import SeoHead from '../../components/common/SeoHead';
 
 export default function ProductDetailsPage({ product, relatedProducts: initialRelated = [], categories = [] }) {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
@@ -101,6 +102,26 @@ export default function ProductDetailsPage({ product, relatedProducts: initialRe
 
   const relatedProducts = initialRelated.slice(0, 3);
 
+  // SEO Product Schema
+  const productSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'Drug',
+    name: brandName,
+    nonProprietaryName: genericName,
+    description: description,
+    dosageForm: dosageForm,
+    prescriptionStatus: prescriptionType,
+    manufacturer: {
+      '@type': 'Organization',
+      name: 'Walpar Wellness Pvt. Ltd.',
+    },
+    recognizingAuthority: {
+      '@type': 'Organization',
+      name: 'WHO-GMP & ISO 9001:2015',
+    },
+    image: images.length > 0 ? images[0] : 'https://www.ciplonpharma.in/images/ciplon_logo.png',
+  };
+
   // Image navigation handlers
   const handlePrevImage = () => {
     setSelectedImageIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
@@ -150,6 +171,14 @@ export default function ProductDetailsPage({ product, relatedProducts: initialRe
 
   return (
     <PublicLayout categories={categories}>
+      <SeoHead
+        title={`${brandName} (${dosageForm} ${strength}) — Formulation Details`}
+        description={`${brandName} (${genericName || dosageForm}) manufactured under WHO-GMP compliance. View clinical indications, dosage, composition, and technical dossier specifications.`}
+        canonicalUrl={`https://www.ciplonpharma.in/products/${product.slug || product.product_code || product.id}`}
+        ogImage={images.length > 0 ? images[0] : '/images/ciplon_logo.png'}
+        ogType="article"
+        schemaJson={productSchema}
+      />
       <div className="bg-white pt-2 pb-14 min-h-screen">
         <Container>
           {/* Breadcrumbs for desktop */}

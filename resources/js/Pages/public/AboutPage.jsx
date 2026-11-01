@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import PublicLayout from '../../layouts/PublicLayout';
 import Container from '../../components/common/Container';
+import SeoHead from '../../components/common/SeoHead';
 
 export default function AboutPage({ company, categories = [], featuredProducts = [] }) {
   const companyData = company || {};
@@ -51,6 +52,11 @@ export default function AboutPage({ company, categories = [], featuredProducts =
 
   return (
     <PublicLayout companyData={companyData} categories={categories}>
+      <SeoHead
+        title="About Us — Corporate Profile & Manufacturing Heritage"
+        description="Learn about Ciplon Pharma Private Limited, our ISO 9001:2015 certification, our WHO-GMP manufacturing partner Walpar Wellness Pvt. Ltd., and our mission to provide affordable quality healthcare."
+        canonicalUrl="https://www.ciplonpharma.in/about"
+      />
       <div className="bg-white text-slate-900">
         
         {/* 1. Hero Header */}

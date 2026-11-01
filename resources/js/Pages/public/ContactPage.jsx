@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import PublicLayout from '../../layouts/PublicLayout';
 import Container from '../../components/common/Container';
+import SeoHead from '../../components/common/SeoHead';
 
 export default function ContactPage({ company }) {
   const companyData = company || {};
@@ -42,6 +43,11 @@ export default function ContactPage({ company }) {
 
   return (
     <PublicLayout companyData={companyData}>
+      <SeoHead
+        title="Contact Us & Commercial Inquiries — PCD Distributorship & Institutional Supply"
+        description="Contact Ciplon Pharma Private Limited for PCD pharma franchise inquiries, hospital supply, third-party manufacturing partnerships, or regulatory dossier requests."
+        canonicalUrl="https://www.ciplonpharma.in/contact"
+      />
       <div className="bg-white text-slate-900">
         
         {/* 1. Hero Header */}

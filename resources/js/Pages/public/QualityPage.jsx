@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import PublicLayout from '../../layouts/PublicLayout';
 import Container from '../../components/common/Container';
+import SeoHead from '../../components/common/SeoHead';
 
 export default function QualityPage({ company }) {
   const companyData = company || {};
@@ -49,6 +50,11 @@ export default function QualityPage({ company }) {
 
   return (
     <PublicLayout companyData={companyData}>
+      <SeoHead
+        title="Quality Assurance & Regulatory Compliance — WHO-GMP & ISO 9001:2015"
+        description="Explore Ciplon Pharma's strict quality assurance framework, WHO-GMP certified manufacturing at Walpar Wellness, HPLC analytical validation, and stability testing standards."
+        canonicalUrl="https://www.ciplonpharma.in/quality"
+      />
       <div className="bg-white text-slate-900">
         
         {/* 1. Hero Header */}
