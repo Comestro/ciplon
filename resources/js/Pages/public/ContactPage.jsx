@@ -121,11 +121,11 @@ export default function ContactPage({ company }) {
                 {/* Card 2: Manufacturing Partner (Walpar Wellness) */}
                 <div className="p-6 rounded-2xl bg-white border border-slate-200 shadow-xs hover:border-[#c59324]/40 transition-colors">
                   <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-slate-100 border border-slate-200 text-[#0c2340] flex items-center justify-center shrink-0">
-                      <Factory className="w-6 h-6 stroke-[2]" />
+                    <div className="w-12 h-12 rounded-xl bg-slate-100 border border-slate-200 text-[#0c2340] flex items-center justify-center shrink-0 p-1.5">
+                      <img src="/images/walpar_logo.png" alt="Walpar" className="h-full w-auto object-contain" />
                     </div>
                     <div>
-                      <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Manufacturing Unit</span>
+                      <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Manufacturing Partner (Gujarat)</span>
                       <h3 className="text-base font-bold text-[#0c2340] mt-0.5 mb-1.5">
                         Walpar Wellness Pvt. Ltd.
                       </h3>
@@ -134,7 +134,29 @@ export default function ContactPage({ company }) {
                       </p>
                       <div className="mt-3 pt-3 border-t border-slate-100 flex flex-wrap gap-2 text-xs font-medium text-slate-500">
                         <span className="bg-amber-50 text-[#c59324] px-2 py-0.5 rounded font-semibold">WHO-GMP Certified</span>
-                        <span className="bg-slate-100 px-2 py-0.5 rounded">Automated Lines</span>
+                        <span className="bg-slate-100 px-2 py-0.5 rounded">ISO 9001:2015</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Card 3: Manufacturing Partner (Akums Group / Pure & Cure) */}
+                <div className="p-6 rounded-2xl bg-white border border-slate-200 shadow-xs hover:border-[#c59324]/40 transition-colors">
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 rounded-xl bg-slate-100 border border-slate-200 text-[#0c2340] flex items-center justify-center shrink-0 p-1.5">
+                      <img src="/images/akums_logo.png" alt="Akums" className="h-full w-auto object-contain" />
+                    </div>
+                    <div>
+                      <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Manufacturing Partner (Uttarakhand & HP)</span>
+                      <h3 className="text-base font-bold text-[#0c2340] mt-0.5 mb-1.5">
+                        Akums Drugs & Pharmaceuticals Ltd.
+                      </h3>
+                      <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                        Pure & Cure Healthcare Pvt. Ltd. (Plot No. 26A, 27-30, Sector-8A, IIE SIDCUL, Haridwar & Baddi Units)
+                      </p>
+                      <div className="mt-3 pt-3 border-t border-slate-100 flex flex-wrap gap-2 text-xs font-medium text-slate-500">
+                        <span className="bg-amber-50 text-[#c59324] px-2 py-0.5 rounded font-semibold">cGMP Certified</span>
+                        <span className="bg-slate-100 px-2 py-0.5 rounded">Akums Group</span>
                       </div>
                     </div>
                   </div>
@@ -323,7 +345,7 @@ export default function ContactPage({ company }) {
               <div className="p-5 rounded-2xl bg-slate-50 border border-slate-200">
                 <h4 className="text-sm font-bold text-[#0c2340]">How can I request Certificates of Analysis (COA)?</h4>
                 <p className="text-xs sm:text-sm text-slate-600 mt-1.5 leading-relaxed">
-                  Every batch manufactured at Walpar Wellness is accompanied by an authenticated Certificate of Analysis (COA). You can submit a request with the batch number via this form or by emailing info@ciplonpharma.in.
+                  Every batch marketed by Ciplon is accompanied by an authenticated Certificate of Analysis (COA) issued by our certified manufacturing partners (Walpar Wellness or Akums Group / Pure & Cure Healthcare). You can submit a request with the batch number via this form or by emailing info@ciplonpharma.in.
                 </p>
               </div>
 

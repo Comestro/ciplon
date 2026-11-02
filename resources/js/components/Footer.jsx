@@ -16,8 +16,8 @@ export default function Footer({ companyData, categories = [], onOpenEnquiryModa
   const fssaiLicNo = companyData?.fssai_lic_no || '10426340000172';
   const trademarkStatus = companyData?.trademark_status || 'TM-Trademark Under Registration';
   const isoCertification = companyData?.iso_certification || 'An ISO 9001: 2015 Certified Company';
-  const manufacturerName = companyData?.manufacturer_name || 'Pure & Cure Healthcare Pvt. Ltd. / Walpar Wellness';
-  const manufacturerCert = companyData?.manufacturer_certification || 'WHO-GMP & cGMP Compliant Facility';
+  const manufacturerName = companyData?.manufacturer_name || 'Walpar Wellness Pvt. Ltd. & Akums Drugs & Pharmaceuticals Ltd.';
+  const manufacturerCert = companyData?.manufacturer_certification || 'WHO-GMP, cGMP & ISO 9001:2015 Certified Facilities';
   const logoUrl = companyData?.logo_url || '/images/ciplon_logo.png';
 
   return (
@@ -144,16 +144,28 @@ export default function Footer({ companyData, categories = [], onOpenEnquiryModa
                 </div>
               </div>
 
-              <div className="pt-2 border-t border-white/10 space-y-1">
+              <div className="pt-2 border-t border-white/10 space-y-2">
                 <span className="text-[11px] font-semibold text-slate-400 block uppercase tracking-wider">
                   Manufacturing Partners:
                 </span>
-                <p className="text-xs text-slate-300 font-medium">
-                  {manufacturerName}
-                </p>
-                <p className="text-[11px] text-amber-300/80">
-                  {manufacturerCert}
-                </p>
+                
+                {/* Partner 1: Walpar Wellness */}
+                <div className="p-2 rounded-lg bg-white/5 border border-white/10 space-y-0.5">
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-1.5 h-1.5 rounded-full bg-[#dfad36]" />
+                    <span className="text-xs font-semibold text-white">Walpar Wellness Pvt. Ltd.</span>
+                  </div>
+                  <p className="text-[10px] text-amber-300/80 pl-3">WHO-GMP & ISO 9001:2015 (Khatraj, Gujarat)</p>
+                </div>
+
+                {/* Partner 2: Akums Drugs */}
+                <div className="p-2 rounded-lg bg-white/5 border border-white/10 space-y-0.5">
+                  <div className="flex items-center gap-1.5">
+                    <img src="/images/akums_logo.png" alt="Akums" className="h-3 w-auto object-contain brightness-200" />
+                    <span className="text-xs font-semibold text-white">Akums Drugs & Pharmaceuticals Ltd.</span>
+                  </div>
+                  <p className="text-[10px] text-amber-300/80 pl-3">Pure & Cure Healthcare (Haridwar & Baddi Units)</p>
+                </div>
               </div>
             </div>
 

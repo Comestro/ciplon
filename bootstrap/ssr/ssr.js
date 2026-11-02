@@ -1,10 +1,9 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Head, Link, createInertiaApp, router, useForm, usePage } from "@inertiajs/react";
-import { Activity, AlertCircle, AlertTriangle, Archive, ArrowDown, ArrowLeft, ArrowRight, ArrowUp, ArrowUpRight, Award, Bell, BookOpen, Briefcase, Building2, Calendar, CalendarClock, Check, CheckCheck, CheckCircle2, ChevronDown, ChevronLeft, ChevronRight, Clock, Crosshair, Download, Droplet, Edit2, Edit3, ExternalLink, Eye, EyeOff, Factory, FileText, Film, Filter, FlaskConical, Folder, FolderEdit, FolderPlus, FolderTree, Gift, Globe, Globe2, GripVertical, Handshake, HeartPulse, Image, ImageIcon, Key, Layers, LayoutDashboard, LayoutGrid, List, Loader2, Lock, LogIn, LogOut, Mail, MapPin, Maximize, Maximize2, Menu, MessageSquare, Microscope, Minimize, MoveLeft, MoveRight, Navigation, Package, Percent, Phone, PhoneCall, Pill, Play, Plus, PlusCircle, Presentation, Receipt, RefreshCw, RotateCcw, Save, Search, Send, Settings, Share2, Shield, ShieldCheck, Sliders, Sparkles, Star, Stethoscope, Target, Thermometer, ToggleLeft, Trash2, TrendingUp, Upload, User, UserCheck, UserPlus, Users, X, XCircle } from "lucide-react";
-import { Fragment, jsx, jsxs } from "react/jsx-runtime";
+import { Activity, AlertCircle, AlertTriangle, Archive, ArrowDown, ArrowLeft, ArrowRight, ArrowUp, ArrowUpRight, Award, Battery, BatteryCharging, Bell, Briefcase, Building2, Calendar, CalendarCheck, CalendarClock, CalendarRange, Check, CheckCheck, CheckCircle2, ChevronDown, ChevronLeft, ChevronRight, Clock, Compass, Copy, Crosshair, Download, Droplet, Edit2, Edit3, ExternalLink, Eye, EyeOff, Factory, FileText, Film, Filter, FlaskConical, Folder, FolderEdit, FolderPlus, FolderTree, Gift, Globe, Globe2, GripVertical, Handshake, HeartPulse, Image, ImageIcon, Key, KeyRound, Layers, LayoutDashboard, LayoutGrid, Link as Link$1, List, Loader2, Lock, LogIn, LogOut, Mail, MapPin, Maximize, Megaphone, Menu, MessageSquare, Microscope, Minimize, Navigation, Package, Percent, Phone, PhoneCall, Pill, Play, Plus, PlusCircle, Presentation, Radio, Receipt, RefreshCw, RotateCcw, RotateCw, Save, Search, Send, Settings, Share2, Shield, ShieldAlert, ShieldCheck, ShoppingBag, Sliders, Sparkles, Star, Stethoscope, Store, Target, Thermometer, ToggleLeft, Trash2, TrendingUp, Truck, Upload, UploadCloud, User, UserCheck, UserPlus, Users, X, XCircle } from "lucide-react";
 import toast from "react-hot-toast";
+import { Fragment, jsx, jsxs } from "react/jsx-runtime";
 import axios from "axios";
-import { createPortal } from "react-dom";
 import createServer from "@inertiajs/react/server";
 import { renderToString } from "react-dom/server";
 //#region \0rolldown/runtime.js
@@ -27,12 +26,30 @@ function AdminSidebar({ isOpen, onClose }) {
 	const adminName = authUser?.name || "Administrator";
 	authUser?.email;
 	const [searchQuery, setSearchQuery] = useState("");
+	const navScrollRef = useRef(null);
+	useLayoutEffect(() => {
+		const saved = sessionStorage.getItem("admin_sidebar_scroll_top");
+		if (saved !== null && navScrollRef.current) {
+			navScrollRef.current.scrollTop = Number(saved);
+			requestAnimationFrame(() => {
+				if (navScrollRef.current) navScrollRef.current.scrollTop = Number(saved);
+			});
+		}
+	}, [currentPath, isOpen]);
+	const handleNavScroll = (e) => {
+		if (!searchQuery) sessionStorage.setItem("admin_sidebar_scroll_top", String(e.currentTarget.scrollTop));
+	};
+	const handleLinkClick = () => {
+		if (navScrollRef.current && !searchQuery) sessionStorage.setItem("admin_sidebar_scroll_top", String(navScrollRef.current.scrollTop));
+		if (isOpen && typeof onClose === "function") onClose();
+	};
 	const isParentActive = (prefix) => currentPath.startsWith(prefix);
 	const userRoles = authUser?.roles || [];
 	const userPermissions = authUser?.permissions || [];
-	const isSuperAdmin = authUser?.role === "admin" || userRoles.includes("super_admin");
+	const isSuperAdmin = authUser?.role === "super_admin" || userRoles.includes("super_admin");
+	const isAdmin = isSuperAdmin || authUser?.role === "admin" || userRoles.includes("admin");
 	const hasPerm = (perm) => {
-		if (isSuperAdmin) return true;
+		if (isSuperAdmin || isAdmin) return true;
 		if (!perm) return true;
 		return userPermissions.includes(perm);
 	};
@@ -78,55 +95,31 @@ function AdminSidebar({ isOpen, onClose }) {
 		},
 		{
 			title: "Employee & Field",
-			items: [
-				{
-					name: "Employee Assign",
-					path: "/mrconnect/employee-assign",
-					icon: Users,
-					active: isParentActive("/mrconnect/employee-assign")
-				},
-				{
-					name: "Tour Plan",
-					path: "/mrconnect/tour-plan",
-					icon: Globe,
-					active: isParentActive("/mrconnect/tour-plan")
-				},
-				{
-					name: "Field Expenses",
-					path: "/mrconnect/field-expenses",
-					icon: Receipt,
-					active: isParentActive("/mrconnect/field-expenses")
-				},
-				{
-					name: "Leave",
-					path: "/mrconnect/leave",
-					icon: Calendar,
-					active: isParentActive("/mrconnect/leave")
-				}
-			]
+			items: [{
+				name: "Field Expenses",
+				path: "/mrconnect/field-expenses",
+				icon: Receipt,
+				active: isParentActive("/mrconnect/field-expenses")
+			}, {
+				name: "Leave",
+				path: "/mrconnect/leave",
+				icon: Calendar,
+				active: isParentActive("/mrconnect/leave")
+			}]
 		},
 		{
 			title: "Sales & Targets",
-			items: [
-				{
-					name: "Primary Sales",
-					path: "/mrconnect/primary-sales",
-					icon: TrendingUp,
-					active: isParentActive("/mrconnect/primary-sales")
-				},
-				{
-					name: "POB Order",
-					path: "/mrconnect/pob-order",
-					icon: Package,
-					active: isParentActive("/mrconnect/pob-order")
-				},
-				{
-					name: "Set Target",
-					path: "/mrconnect/set-target",
-					icon: Target,
-					active: isParentActive("/mrconnect/set-target")
-				}
-			]
+			items: [{
+				name: "POB Order",
+				path: "/mrconnect/pob-order",
+				icon: Package,
+				active: isParentActive("/mrconnect/pob-order")
+			}, {
+				name: "Target",
+				path: "/mrconnect/set-target",
+				icon: Target,
+				active: isParentActive("/mrconnect/set-target")
+			}]
 		},
 		{
 			title: "Media & Alert",
@@ -172,12 +165,12 @@ function AdminSidebar({ isOpen, onClose }) {
 			}]
 		},
 		{
-			title: "HR & Reports",
+			title: "Field Force & Reports",
 			items: [{
-				name: "HR Directory",
-				path: "/mrconnect/hr-section",
-				icon: UserCheck,
-				active: isParentActive("/mrconnect/hr-section")
+				name: "MR Directory",
+				path: "/mrconnect/mr-directory",
+				icon: Users,
+				active: isParentActive("/mrconnect/mr-directory")
 			}, {
 				name: "All Reports",
 				path: "/mrconnect/all-reports",
@@ -277,6 +270,9 @@ function AdminSidebar({ isOpen, onClose }) {
 				})
 			}),
 			/* @__PURE__ */ jsx("div", {
+				ref: navScrollRef,
+				onScroll: handleNavScroll,
+				"data-scroll-region": true,
 				className: "flex-1 overflow-y-auto px-3 py-1 space-y-4",
 				children: navigationSections.map((section) => {
 					const filteredItems = section.items.filter((item) => {
@@ -293,9 +289,7 @@ function AdminSidebar({ isOpen, onClose }) {
 							const Icon = item.icon;
 							return /* @__PURE__ */ jsxs(Link, {
 								href: item.path,
-								onClick: () => {
-									if (isOpen && typeof onClose === "function") onClose();
-								},
+								onClick: handleLinkClick,
 								className: `flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium transition-all cursor-pointer ${item.active ? "bg-slate-900 text-white font-medium" : "text-slate-600 hover:text-slate-900 hover:bg-slate-200/50"}`,
 								children: [/* @__PURE__ */ jsx(Icon, { className: `w-4 h-4 ${item.active ? "text-violet-400 stroke-[2]" : "text-slate-400"}` }), /* @__PURE__ */ jsx("span", {
 									className: "flex-1 truncate",
@@ -322,7 +316,7 @@ function AdminSidebar({ isOpen, onClose }) {
 								children: adminName
 							}), /* @__PURE__ */ jsx("span", {
 								className: "block text-[10px] text-slate-400 font-normal truncate",
-								children: "System Admin"
+								children: isSuperAdmin ? "Super Administrator" : "Administrator"
 							})]
 						})]
 					}), /* @__PURE__ */ jsx("button", {
@@ -336,6 +330,200 @@ function AdminSidebar({ isOpen, onClose }) {
 			})
 		]
 	})] });
+}
+//#endregion
+//#region resources/js/components/common/NotificationDropdown.jsx
+function NotificationDropdown() {
+	const { props } = usePage();
+	const serverNotifications = (props.notifications || {
+		unread_count: 0,
+		list: []
+	}).list || [];
+	const [isOpen, setIsOpen] = useState(false);
+	const [localReadIds, setLocalReadIds] = useState(/* @__PURE__ */ new Set());
+	const dropdownRef = useRef(null);
+	useEffect(() => {
+		const serverRead = new Set(serverNotifications.filter((n) => Boolean(n.read_at)).map((n) => n.id));
+		setLocalReadIds((prev) => {
+			return /* @__PURE__ */ new Set([...prev, ...serverRead]);
+		});
+	}, [serverNotifications]);
+	useEffect(() => {
+		function handleClickOutside(event) {
+			if (dropdownRef.current && !dropdownRef.current.contains(event.target)) setIsOpen(false);
+		}
+		document.addEventListener("mousedown", handleClickOutside);
+		document.addEventListener("touchstart", handleClickOutside);
+		return () => {
+			document.removeEventListener("mousedown", handleClickOutside);
+			document.removeEventListener("touchstart", handleClickOutside);
+		};
+	}, []);
+	const isNotificationRead = (notif) => {
+		return Boolean(notif.read_at || localReadIds.has(notif.id));
+	};
+	const effectiveUnreadCount = useMemo(() => {
+		return serverNotifications.filter((n) => !isNotificationRead(n)).length;
+	}, [serverNotifications, localReadIds]);
+	const handleMarkAllRead = (e) => {
+		e.stopPropagation();
+		if (effectiveUnreadCount === 0) return;
+		setLocalReadIds(new Set(serverNotifications.map((n) => n.id)));
+		router.post("/notifications/mark-all-read", {}, {
+			preserveScroll: true,
+			preserveState: true
+		});
+	};
+	const handleMarkSingleAsRead = (e, notif) => {
+		e.stopPropagation();
+		if (isNotificationRead(notif)) return;
+		setLocalReadIds((prev) => /* @__PURE__ */ new Set([...prev, notif.id]));
+		router.post(`/notifications/${notif.id}/read`, {}, {
+			preserveScroll: true,
+			preserveState: true
+		});
+	};
+	const handleNotificationClick = (notif) => {
+		setIsOpen(false);
+		if (!isNotificationRead(notif)) {
+			setLocalReadIds((prev) => /* @__PURE__ */ new Set([...prev, notif.id]));
+			router.post(`/notifications/${notif.id}/read`, { redirect_to: notif.link || void 0 }, { preserveScroll: true });
+		} else if (notif.link) router.visit(notif.link);
+	};
+	const getIconConfig = (type) => {
+		switch (type) {
+			case "leave_applied": return {
+				icon: Calendar,
+				bg: "bg-amber-50 text-amber-600 border-amber-100"
+			};
+			case "expense_submitted": return {
+				icon: Receipt,
+				bg: "bg-sky-50 text-sky-600 border-sky-100"
+			};
+			case "leave_approved":
+			case "expense_approved": return {
+				icon: CheckCircle2,
+				bg: "bg-emerald-50 text-emerald-600 border-emerald-100"
+			};
+			case "leave_rejected":
+			case "expense_rejected": return {
+				icon: XCircle,
+				bg: "bg-rose-50 text-rose-600 border-rose-100"
+			};
+			default: return {
+				icon: Bell,
+				bg: "bg-violet-50 text-violet-600 border-violet-100"
+			};
+		}
+	};
+	return /* @__PURE__ */ jsxs("div", {
+		className: "relative",
+		ref: dropdownRef,
+		children: [/* @__PURE__ */ jsxs("button", {
+			type: "button",
+			onClick: () => setIsOpen(!isOpen),
+			className: "relative p-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors cursor-pointer",
+			"aria-label": "View notifications",
+			title: "Notifications",
+			children: [/* @__PURE__ */ jsx(Bell, { className: "w-4 h-4 sm:w-4 sm:h-4 stroke-[2.2]" }), effectiveUnreadCount > 0 && /* @__PURE__ */ jsx("span", {
+				className: "absolute top-1 right-1 flex items-center justify-center min-w-[16px] h-4 px-1 rounded-full bg-rose-500 text-[10px] font-bold text-white shadow-xs animate-in zoom-in-50 duration-200",
+				children: effectiveUnreadCount > 9 ? "9+" : effectiveUnreadCount
+			})]
+		}), isOpen && /* @__PURE__ */ jsxs("div", {
+			className: "fixed inset-x-3 top-16 sm:absolute sm:inset-x-auto sm:right-0 sm:top-full sm:mt-2 sm:w-96 max-w-[calc(100vw-1.5rem)] bg-white rounded-2xl border border-slate-200/90 shadow-2xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-150 font-sans",
+			children: [/* @__PURE__ */ jsxs("div", {
+				className: "px-4 py-3 border-b border-slate-100 bg-slate-50/80 flex items-center justify-between",
+				children: [/* @__PURE__ */ jsxs("div", {
+					className: "flex items-center gap-2",
+					children: [/* @__PURE__ */ jsx("span", {
+						className: "text-xs font-bold text-slate-900",
+						children: "Notifications"
+					}), effectiveUnreadCount > 0 ? /* @__PURE__ */ jsxs("span", {
+						className: "text-[10px] font-semibold text-rose-600 bg-rose-50 px-2 py-0.5 rounded-full border border-rose-100",
+						children: [effectiveUnreadCount, " new"]
+					}) : /* @__PURE__ */ jsx("span", {
+						className: "text-[10px] font-medium text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full",
+						children: "All caught up"
+					})]
+				}), /* @__PURE__ */ jsxs("div", {
+					className: "flex items-center gap-2",
+					children: [effectiveUnreadCount > 0 && /* @__PURE__ */ jsxs("button", {
+						type: "button",
+						onClick: handleMarkAllRead,
+						className: "text-[11px] font-medium text-violet-600 hover:text-violet-800 hover:underline inline-flex items-center gap-1 cursor-pointer",
+						children: [/* @__PURE__ */ jsx(CheckCheck, { className: "w-3.5 h-3.5 stroke-[2.2]" }), /* @__PURE__ */ jsx("span", { children: "Mark all read" })]
+					}), /* @__PURE__ */ jsx("button", {
+						type: "button",
+						onClick: () => setIsOpen(false),
+						className: "sm:hidden p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-200/60 transition-colors cursor-pointer",
+						"aria-label": "Close",
+						children: /* @__PURE__ */ jsx(X, { className: "w-4 h-4" })
+					})]
+				})]
+			}), /* @__PURE__ */ jsx("div", {
+				className: "max-h-[65vh] sm:max-h-[380px] overflow-y-auto divide-y divide-slate-100 overscroll-contain",
+				children: serverNotifications.length === 0 ? /* @__PURE__ */ jsxs("div", {
+					className: "py-12 px-4 text-center",
+					children: [
+						/* @__PURE__ */ jsx("div", {
+							className: "w-11 h-11 rounded-full bg-slate-100 text-slate-400 mx-auto flex items-center justify-center mb-2.5",
+							children: /* @__PURE__ */ jsx(CheckCircle2, { className: "w-5 h-5 stroke-[1.8]" })
+						}),
+						/* @__PURE__ */ jsx("p", {
+							className: "text-xs font-semibold text-slate-800",
+							children: "No notifications yet"
+						}),
+						/* @__PURE__ */ jsx("p", {
+							className: "text-[11px] text-slate-400 mt-0.5 max-w-xs mx-auto",
+							children: "When field requests or approvals happen, you will see them here."
+						})
+					]
+				}) : serverNotifications.map((notif) => {
+					const read = isNotificationRead(notif);
+					const { icon: Icon, bg } = getIconConfig(notif.type);
+					return /* @__PURE__ */ jsxs("div", {
+						onClick: () => handleNotificationClick(notif),
+						className: `p-3.5 sm:p-4 flex items-start gap-3 transition-colors cursor-pointer group active:bg-slate-100/80 ${!read ? "bg-violet-50/40 hover:bg-violet-50/70" : "hover:bg-slate-50"}`,
+						children: [/* @__PURE__ */ jsx("div", {
+							className: `w-8 h-8 rounded-xl flex items-center justify-center shrink-0 border ${bg}`,
+							children: /* @__PURE__ */ jsx(Icon, { className: "w-4 h-4 stroke-[2.2]" })
+						}), /* @__PURE__ */ jsxs("div", {
+							className: "flex-1 min-w-0",
+							children: [
+								/* @__PURE__ */ jsxs("div", {
+									className: "flex items-center justify-between gap-1 mb-0.5",
+									children: [/* @__PURE__ */ jsx("span", {
+										className: `text-xs tracking-tight truncate ${!read ? "font-bold text-slate-900" : "font-semibold text-slate-700"}`,
+										children: notif.title
+									}), /* @__PURE__ */ jsxs("div", {
+										className: "flex items-center gap-1.5 shrink-0",
+										children: [!read && /* @__PURE__ */ jsx("button", {
+											type: "button",
+											onClick: (e) => handleMarkSingleAsRead(e, notif),
+											title: "Mark as read",
+											className: "p-1 rounded-md text-slate-400 hover:text-violet-600 hover:bg-violet-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity",
+											children: /* @__PURE__ */ jsx(Check, { className: "w-3.5 h-3.5 stroke-[2.5]" })
+										}), !read && /* @__PURE__ */ jsx("span", {
+											className: "w-2 h-2 rounded-full bg-violet-600",
+											title: "Unread"
+										})]
+									})]
+								}),
+								/* @__PURE__ */ jsx("p", {
+									className: "text-xs text-slate-600 line-clamp-2 leading-relaxed",
+									children: notif.message
+								}),
+								/* @__PURE__ */ jsxs("div", {
+									className: "flex items-center gap-1 mt-1.5 text-[10px] text-slate-400",
+									children: [/* @__PURE__ */ jsx(Clock, { className: "w-3 h-3 text-slate-300" }), /* @__PURE__ */ jsx("span", { children: notif.created_at || "Recently" })]
+								})
+							]
+						})]
+					}, notif.id);
+				})
+			})]
+		})]
+	});
 }
 //#endregion
 //#region resources/js/components/admin/AdminNavbar.jsx
@@ -445,27 +633,96 @@ function AdminNavbar({ onToggleSidebar }) {
 			})]
 		}), /* @__PURE__ */ jsxs("div", {
 			className: "flex items-center gap-2.5",
-			children: [/* @__PURE__ */ jsxs(Link, {
-				href: "/",
-				className: "hidden sm:inline-flex items-center gap-1 text-xs font-normal text-slate-500 hover:text-slate-800 px-2.5 py-1.5 rounded-lg hover:bg-slate-100 transition-colors",
-				children: [/* @__PURE__ */ jsx("span", { children: "Live Site" }), /* @__PURE__ */ jsx(ExternalLink, { className: "w-3 h-3 text-slate-400" })]
+			children: [
+				/* @__PURE__ */ jsxs(Link, {
+					href: "/",
+					className: "hidden sm:inline-flex items-center gap-1 text-xs font-normal text-slate-500 hover:text-slate-800 px-2.5 py-1.5 rounded-lg hover:bg-slate-100 transition-colors",
+					children: [/* @__PURE__ */ jsx("span", { children: "Live Site" }), /* @__PURE__ */ jsx(ExternalLink, { className: "w-3 h-3 text-slate-400" })]
+				}),
+				/* @__PURE__ */ jsx(NotificationDropdown, {}),
+				/* @__PURE__ */ jsxs("div", {
+					className: "flex items-center gap-2 p-1 pl-1.5 pr-2 rounded-xl bg-slate-50 border border-slate-200/80",
+					children: [/* @__PURE__ */ jsx("div", {
+						className: "w-6 h-6 rounded-lg bg-gradient-to-tr from-violet-600 to-indigo-600 text-white flex items-center justify-center text-[11px] font-semibold",
+						children: adminName.charAt(0).toUpperCase()
+					}), /* @__PURE__ */ jsx("span", {
+						className: "text-xs font-medium text-slate-700 truncate max-w-[120px]",
+						children: adminName
+					})]
+				})
+			]
+		})]
+	});
+}
+//#endregion
+//#region resources/js/components/common/ContentLoader.jsx
+function ContentLoader() {
+	const [loading, setLoading] = useState(false);
+	useEffect(() => {
+		let timer = null;
+		const handleStart = () => {
+			timer = setTimeout(() => {
+				setLoading(true);
+			}, 30);
+		};
+		const handleEnd = () => {
+			if (timer) clearTimeout(timer);
+			setLoading(false);
+		};
+		const removeStart = router.on("start", handleStart);
+		const removeFinish = router.on("finish", handleEnd);
+		const removeCancel = router.on("cancel", handleEnd);
+		const removeError = router.on("error", handleEnd);
+		return () => {
+			if (timer) clearTimeout(timer);
+			removeStart();
+			removeFinish();
+			removeCancel();
+			removeError();
+		};
+	}, []);
+	if (!loading) return null;
+	return /* @__PURE__ */ jsx("div", {
+		className: "fixed top-16 bottom-0 left-0 lg:left-64 right-0 z-30 flex items-center justify-center bg-[#f8f9fc]/85 backdrop-blur-[2px] transition-all animate-in fade-in duration-100",
+		"aria-label": "Loading page content",
+		role: "status",
+		children: /* @__PURE__ */ jsxs("div", {
+			className: "bg-white/95 backdrop-blur-md rounded-2xl border border-slate-200/90 px-8 py-6 shadow-2xl flex flex-col items-center gap-3.5 min-w-[210px] animate-in zoom-in-95 duration-100",
+			children: [/* @__PURE__ */ jsxs("div", {
+				className: "relative w-12 h-12 flex items-center justify-center",
+				children: [/* @__PURE__ */ jsx("div", { className: "w-12 h-12 rounded-full border-[3px] border-teal-100 border-t-teal-700 animate-spin" }), /* @__PURE__ */ jsx("div", { className: "absolute w-3 h-3 rounded-full bg-teal-600 animate-pulse shadow-[0_0_8px_rgba(13,148,136,0.6)]" })]
 			}), /* @__PURE__ */ jsxs("div", {
-				className: "flex items-center gap-2 p-1 pl-1.5 pr-2 rounded-xl bg-slate-50 border border-slate-200/80",
-				children: [/* @__PURE__ */ jsx("div", {
-					className: "w-6 h-6 rounded-lg bg-gradient-to-tr from-violet-600 to-indigo-600 text-white flex items-center justify-center text-[11px] font-semibold",
-					children: adminName.charAt(0).toUpperCase()
-				}), /* @__PURE__ */ jsx("span", {
-					className: "text-xs font-medium text-slate-700 truncate max-w-[120px]",
-					children: adminName
+				className: "text-center",
+				children: [/* @__PURE__ */ jsx("p", {
+					className: "text-xs font-bold text-slate-800 tracking-tight",
+					children: "Loading Page"
+				}), /* @__PURE__ */ jsx("p", {
+					className: "text-[11px] font-medium text-slate-400 mt-0.5",
+					children: "Please wait a moment..."
 				})]
 			})]
-		})]
+		})
 	});
 }
 //#endregion
 //#region resources/js/layouts/AdminLayout.jsx
 function AdminLayout({ children }) {
 	const [sidebarOpen, setSidebarOpen] = useState(false);
+	const { flash } = usePage().props;
+	const lastFlash = useRef({
+		success: null,
+		error: null
+	});
+	useEffect(() => {
+		if (flash?.success && flash.success !== lastFlash.current.success) {
+			lastFlash.current.success = flash.success;
+			toast.success(flash.success, { id: "flash-success" });
+		}
+		if (flash?.error && flash.error !== lastFlash.current.error) {
+			lastFlash.current.error = flash.error;
+			toast.error(flash.error, { id: "flash-error" });
+		}
+	}, [flash]);
 	return /* @__PURE__ */ jsxs("div", {
 		className: "min-h-screen bg-[#f8f9fc] flex antialiased text-slate-800 font-sans",
 		children: [/* @__PURE__ */ jsx(AdminSidebar, {
@@ -473,9 +730,9 @@ function AdminLayout({ children }) {
 			onClose: () => setSidebarOpen(false)
 		}), /* @__PURE__ */ jsxs("div", {
 			className: "flex-1 flex flex-col lg:pl-64 min-w-0",
-			children: [/* @__PURE__ */ jsx(AdminNavbar, { onToggleSidebar: () => setSidebarOpen(!sidebarOpen) }), /* @__PURE__ */ jsx("main", {
-				className: "flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto",
-				children
+			children: [/* @__PURE__ */ jsx(AdminNavbar, { onToggleSidebar: () => setSidebarOpen(!sidebarOpen) }), /* @__PURE__ */ jsxs("main", {
+				className: "flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto relative min-h-[calc(100vh-5rem)]",
+				children: [/* @__PURE__ */ jsx(ContentLoader, {}), children]
 			})]
 		})]
 	});
@@ -1134,7 +1391,7 @@ function CategoryForm({ category = null, parentCategories = [] }) {
 }
 //#endregion
 //#region resources/js/components/common/ConfirmModal.jsx
-function ConfirmModal({ isOpen, onClose, onConfirm, title = "Confirm Deletion", message = "Are you sure you want to proceed? This action cannot be undone.", confirmText = "Delete", cancelText = "Cancel", isDanger = true, isLoading = false }) {
+function ConfirmModal({ isOpen, onClose, onConfirm, title = "Confirm Action", message = "Are you sure you want to proceed? This action cannot be undone.", confirmText = "Confirm", cancelText = "Cancel", loadingText = null, isDanger = true, isLoading = false, icon = null, children = null }) {
 	useEffect(() => {
 		if (!isOpen) return;
 		const handleKeyDown = (e) => {
@@ -1148,97 +1405,109 @@ function ConfirmModal({ isOpen, onClose, onConfirm, title = "Confirm Deletion", 
 		onClose
 	]);
 	if (!isOpen) return null;
+	const IconComponent = icon || (isDanger ? Trash2 : AlertTriangle);
+	const activeLoadingText = loadingText || (isLoading ? `${confirmText}...` : confirmText);
+	const handleSubmit = (e) => {
+		if (e) e.preventDefault();
+		onConfirm?.(e);
+	};
 	return /* @__PURE__ */ jsxs("div", {
-		className: "fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200",
+		className: "fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs animate-in fade-in duration-200",
 		children: [/* @__PURE__ */ jsx("div", {
 			className: "fixed inset-0",
 			onClick: isLoading ? void 0 : onClose
 		}), /* @__PURE__ */ jsxs("div", {
 			className: "relative w-full max-w-md bg-white rounded-2xl border border-slate-200 shadow-xl p-6 z-10 space-y-4 animate-in zoom-in-95 duration-200",
-			children: [
-				/* @__PURE__ */ jsx("button", {
-					type: "button",
-					onClick: onClose,
-					disabled: isLoading,
-					className: "absolute top-4 right-4 p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors disabled:opacity-50 cursor-pointer",
-					"aria-label": "Close dialog",
-					children: /* @__PURE__ */ jsx(X, { className: "w-4 h-4" })
-				}),
-				/* @__PURE__ */ jsxs("div", {
-					className: "flex items-start gap-4",
-					children: [/* @__PURE__ */ jsx("div", {
-						className: `w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${isDanger ? "bg-rose-50 text-rose-600 border border-rose-100" : "bg-teal-50 text-teal-600 border border-teal-100"}`,
-						children: isDanger ? /* @__PURE__ */ jsx(Trash2, { className: "w-5 h-5 stroke-[2.2]" }) : /* @__PURE__ */ jsx(AlertTriangle, { className: "w-5 h-5 stroke-[2.2]" })
-					}), /* @__PURE__ */ jsxs("div", {
-						className: "flex-1 pr-4",
-						children: [/* @__PURE__ */ jsx("h3", {
-							className: "text-base font-bold text-slate-900",
-							children: title
-						}), /* @__PURE__ */ jsx("p", {
-							className: "mt-1.5 text-xs sm:text-sm text-slate-500 leading-relaxed",
-							children: message
+			children: [/* @__PURE__ */ jsx("button", {
+				type: "button",
+				onClick: onClose,
+				disabled: isLoading,
+				className: "absolute top-4 right-4 p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors disabled:opacity-50 cursor-pointer",
+				"aria-label": "Close dialog",
+				children: /* @__PURE__ */ jsx(X, { className: "w-4 h-4" })
+			}), /* @__PURE__ */ jsxs("form", {
+				onSubmit: handleSubmit,
+				className: "space-y-4",
+				children: [
+					/* @__PURE__ */ jsxs("div", {
+						className: "flex items-start gap-4",
+						children: [/* @__PURE__ */ jsx("div", {
+							className: `w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${isDanger ? "bg-rose-50 text-rose-600 border border-rose-100" : "bg-teal-50 text-teal-600 border border-teal-100"}`,
+							children: /* @__PURE__ */ jsx(IconComponent, { className: "w-5 h-5 stroke-[2.2]" })
+						}), /* @__PURE__ */ jsxs("div", {
+							className: "flex-1 pr-4",
+							children: [/* @__PURE__ */ jsx("h3", {
+								className: "text-base font-bold text-slate-900",
+								children: title
+							}), message && /* @__PURE__ */ jsx("p", {
+								className: "mt-1 text-xs sm:text-sm text-slate-500 leading-relaxed",
+								children: message
+							})]
 						})]
-					})]
-				}),
-				/* @__PURE__ */ jsxs("div", {
-					className: "flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100",
-					children: [/* @__PURE__ */ jsx("button", {
-						type: "button",
-						onClick: onClose,
-						disabled: isLoading,
-						className: "px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer disabled:opacity-50",
-						children: cancelText
-					}), /* @__PURE__ */ jsxs("button", {
-						type: "button",
-						onClick: onConfirm,
-						disabled: isLoading,
-						className: `px-4 py-2 text-xs font-semibold text-white rounded-lg transition-colors flex items-center gap-2 cursor-pointer disabled:opacity-50 ${isDanger ? "bg-rose-600 hover:bg-rose-700 active:bg-rose-800" : "bg-teal-600 hover:bg-teal-700 active:bg-teal-800"}`,
-						children: [isLoading && /* @__PURE__ */ jsx("div", { className: "w-3.5 h-3.5 border-2 border-white/40 border-t-white rounded-full animate-spin" }), /* @__PURE__ */ jsx("span", { children: isLoading ? "Deleting..." : confirmText })]
-					})]
-				})
-			]
+					}),
+					children && /* @__PURE__ */ jsx("div", {
+						className: "pt-1",
+						children
+					}),
+					/* @__PURE__ */ jsxs("div", {
+						className: "flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100",
+						children: [/* @__PURE__ */ jsx("button", {
+							type: "button",
+							onClick: onClose,
+							disabled: isLoading,
+							className: "px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer disabled:opacity-50",
+							children: cancelText
+						}), /* @__PURE__ */ jsxs("button", {
+							type: "submit",
+							disabled: isLoading,
+							className: `px-4 py-2 text-xs font-semibold text-white rounded-lg transition-colors flex items-center gap-2 cursor-pointer disabled:opacity-50 ${isDanger ? "bg-rose-600 hover:bg-rose-700 active:bg-rose-800" : "bg-teal-600 hover:bg-teal-700 active:bg-teal-800"}`,
+							children: [isLoading && /* @__PURE__ */ jsx("div", { className: "w-3.5 h-3.5 border-2 border-white/40 border-t-white rounded-full animate-spin" }), /* @__PURE__ */ jsx("span", { children: isLoading ? activeLoadingText : confirmText })]
+						})]
+					})
+				]
+			})]
 		})]
 	});
 }
 //#endregion
 //#region resources/js/components/common/SearchBar.jsx
 /**
-* Reusable SearchBar component for admin panel and forms.
-* Follows clean, flat aesthetic without heavy shadows or borders.
+* Standard Reusable SearchBar component for all Ciplon MR & Admin pages.
 *
 * @param {Object} props
 * @param {string} props.value - Current search term
 * @param {function} props.onChange - Event handler for input changes
 * @param {function} [props.onClear] - Optional callback when clear button is clicked
 * @param {string} [props.placeholder='Search...'] - Placeholder text
-* @param {string} [props.className='relative flex-1 w-full'] - Container class
-* @param {string} [props.inputClassName=''] - Custom classes for the input
+* @param {string} [props.className='flex-1 w-full'] - Container class
+* @param {string} [props.inputClassName=''] - Additional custom classes for input
 * @param {boolean} [props.showClear=true] - Whether to show the clear 'X' button
 * @param {boolean} [props.disabled=false] - Disable the input
 */
-function SearchBar({ value = "", onChange, onClear, placeholder = "Search...", className = "relative flex-1 w-full", inputClassName = "", showClear = true, disabled = false, ...props }) {
+function SearchBar({ value = "", onChange, onClear, placeholder = "Search...", className = "flex-1 w-full", inputClassName = "", showClear = true, disabled = false, ...props }) {
 	const handleClear = () => {
 		if (onClear) onClear();
 		else if (onChange) onChange({ target: { value: "" } });
 	};
 	const hasValue = Boolean(value && String(value).length > 0);
+	const containerClasses = className.includes("relative") ? className : `relative ${className}`;
 	return /* @__PURE__ */ jsxs("div", {
-		className,
+		className: containerClasses,
 		children: [
-			/* @__PURE__ */ jsx(Search, { className: "w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none shrink-0" }),
+			/* @__PURE__ */ jsx(Search, { className: "w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none shrink-0" }),
 			/* @__PURE__ */ jsx("input", {
 				type: "text",
 				value,
 				onChange,
 				placeholder,
 				disabled,
-				className: `w-full pl-9 ${hasValue && showClear ? "pr-9" : "pr-4"} py-2 text-xs sm:text-sm rounded-lg border border-slate-200 bg-slate-50/50 hover:bg-white focus:bg-white focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-colors outline-none text-slate-800 placeholder:text-slate-400 disabled:opacity-60 disabled:cursor-not-allowed ${inputClassName}`,
+				className: `w-full pl-9 ${hasValue && showClear ? "pr-8" : "pr-3.5"} py-2 text-xs rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-slate-50 focus:bg-white focus:border-slate-800 focus:outline-hidden focus:ring-1 focus:ring-slate-800 transition-all text-slate-800 placeholder:text-slate-400 disabled:opacity-60 disabled:cursor-not-allowed ${inputClassName}`,
 				...props
 			}),
 			hasValue && showClear && !disabled && /* @__PURE__ */ jsx("button", {
 				type: "button",
 				onClick: handleClear,
-				className: "absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600 rounded-md hover:bg-slate-100 transition-colors cursor-pointer",
+				className: "absolute right-2 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer",
 				title: "Clear search",
 				"aria-label": "Clear search",
 				children: /* @__PURE__ */ jsx(X, { className: "w-3.5 h-3.5" })
@@ -1653,6 +1922,8 @@ function EnquiryIndex({ enquiries = {}, stats = {}, filters = {} }) {
 	const [searchTerm, setSearchTerm] = useState(filters.search || "");
 	const [selectedEnquiry, setSelectedEnquiry] = useState(null);
 	const [statusUpdating, setStatusUpdating] = useState(false);
+	const [deletingEnquiryId, setDeletingEnquiryId] = useState(null);
+	const [isDeleting, setIsDeleting] = useState(false);
 	const enquiryList = enquiries.data || [];
 	const handleSearch = (e) => {
 		e.preventDefault();
@@ -1683,11 +1954,17 @@ function EnquiryIndex({ enquiries = {}, stats = {}, filters = {} }) {
 			}
 		});
 	};
-	const handleDelete = (enquiryId) => {
-		if (confirm("Are you sure you want to delete this commercial inquiry?")) router.delete(`/admin/enquiries/${enquiryId}`, {
+	const confirmDeleteEnquiry = () => {
+		if (!deletingEnquiryId) return;
+		setIsDeleting(true);
+		router.delete(`/admin/enquiries/${deletingEnquiryId}`, {
 			preserveScroll: true,
+			onFinish: () => {
+				setIsDeleting(false);
+				setDeletingEnquiryId(null);
+			},
 			onSuccess: () => {
-				if (selectedEnquiry && selectedEnquiry.id === enquiryId) setSelectedEnquiry(null);
+				if (selectedEnquiry && selectedEnquiry.id === deletingEnquiryId) setSelectedEnquiry(null);
 			}
 		});
 	};
@@ -1711,7 +1988,7 @@ function EnquiryIndex({ enquiries = {}, stats = {}, filters = {} }) {
 			});
 		}
 	};
-	return /* @__PURE__ */ jsx(AdminLayout, { children: /* @__PURE__ */ jsxs("div", {
+	return /* @__PURE__ */ jsxs(AdminLayout, { children: [/* @__PURE__ */ jsxs("div", {
 		className: "space-y-6",
 		children: [
 			/* @__PURE__ */ jsx("div", {
@@ -1796,16 +2073,15 @@ function EnquiryIndex({ enquiries = {}, stats = {}, filters = {} }) {
 						className: `px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer whitespace-nowrap ${(filters.status || "all") === tab.value ? "bg-[#0c2340] text-white shadow-xs" : "bg-slate-100 text-slate-600 hover:bg-slate-200"}`,
 						children: tab.label
 					}, tab.value))
-				}), /* @__PURE__ */ jsxs("form", {
+				}), /* @__PURE__ */ jsx("form", {
 					onSubmit: handleSearch,
-					className: "relative w-full md:w-72",
-					children: [/* @__PURE__ */ jsx(Search, { className: "w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" }), /* @__PURE__ */ jsx("input", {
-						type: "text",
+					className: "w-full md:w-72",
+					children: /* @__PURE__ */ jsx(SearchBar, {
 						value: searchTerm,
 						onChange: (e) => setSearchTerm(e.target.value),
 						placeholder: "Search sender, company, email...",
-						className: "w-full pl-9 pr-4 py-2 bg-slate-50 focus:bg-white border border-slate-200 focus:border-[#c59324] rounded-xl text-xs text-slate-900 placeholder:text-slate-400 outline-none transition-all"
-					})]
+						className: "w-full"
+					})
 				})]
 			}),
 			/* @__PURE__ */ jsxs("div", {
@@ -2069,12 +2345,22 @@ function EnquiryIndex({ enquiries = {}, stats = {}, filters = {} }) {
 				})
 			})
 		]
-	}) });
+	}), /* @__PURE__ */ jsx(ConfirmModal, {
+		isOpen: !!deletingEnquiryId,
+		onClose: () => !isDeleting && setDeletingEnquiryId(null),
+		onConfirm: confirmDeleteEnquiry,
+		title: "Delete Commercial Inquiry",
+		message: "Are you sure you want to permanently delete this commercial inquiry? This action cannot be undone.",
+		confirmText: "Delete Inquiry",
+		cancelText: "Cancel",
+		isDanger: true,
+		isLoading: isDeleting
+	})] });
 }
 //#endregion
 //#region resources/js/Pages/admin/product/ProductDetails.jsx
 var ProductDetails_exports = /* @__PURE__ */ __exportAll({ default: () => ProductDetails });
-var capitalizeFirst = (text) => {
+var capitalizeFirst$1 = (text) => {
 	if (!text || typeof text !== "string") return text;
 	return text.charAt(0).toUpperCase() + text.slice(1);
 };
@@ -2145,25 +2431,17 @@ function ProductDetails({ product }) {
 					]
 				})] }), /* @__PURE__ */ jsxs("div", {
 					className: "flex items-center gap-2.5 self-start sm:self-auto",
-					children: [
-						/* @__PURE__ */ jsxs(Link, {
-							href: `/admin/products/${product.id}/slides`,
-							className: "inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-white bg-teal-700 hover:bg-teal-800 rounded-lg transition-colors shadow-xs cursor-pointer",
-							children: [/* @__PURE__ */ jsx(Layers, { className: "w-3.5 h-3.5" }), /* @__PURE__ */ jsx("span", { children: product.slides && product.slides.length > 0 ? `Carousel (${product.slides.length})` : "Create Carousel" })]
-						}),
-						/* @__PURE__ */ jsxs(Link, {
-							href: `/admin/products/${product.id}/edit`,
-							className: "inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-white bg-teal-600 hover:bg-teal-700 rounded-lg transition-colors",
-							children: [/* @__PURE__ */ jsx(Edit3, { className: "w-3.5 h-3.5" }), /* @__PURE__ */ jsx("span", { children: "Edit" })]
-						}),
-						/* @__PURE__ */ jsx("button", {
-							type: "button",
-							onClick: () => setIsDeleteModalOpen(true),
-							className: "p-2 text-xs font-medium text-rose-600 bg-rose-50 hover:bg-rose-100 rounded-lg border border-rose-200 transition-colors cursor-pointer",
-							title: "Delete product",
-							children: /* @__PURE__ */ jsx(Trash2, { className: "w-4 h-4" })
-						})
-					]
+					children: [/* @__PURE__ */ jsxs(Link, {
+						href: `/admin/products/${product.id}/edit`,
+						className: "inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-white bg-teal-600 hover:bg-teal-700 rounded-lg transition-colors",
+						children: [/* @__PURE__ */ jsx(Edit3, { className: "w-3.5 h-3.5" }), /* @__PURE__ */ jsx("span", { children: "Edit" })]
+					}), /* @__PURE__ */ jsx("button", {
+						type: "button",
+						onClick: () => setIsDeleteModalOpen(true),
+						className: "p-2 text-xs font-medium text-rose-600 bg-rose-50 hover:bg-rose-100 rounded-lg border border-rose-200 transition-colors cursor-pointer",
+						title: "Delete product",
+						children: /* @__PURE__ */ jsx(Trash2, { className: "w-4 h-4" })
+					})]
 				})]
 			}),
 			/* @__PURE__ */ jsxs("div", {
@@ -2338,14 +2616,14 @@ function ProductDetails({ product }) {
 								children: "Highlight Summary"
 							}), /* @__PURE__ */ jsx("p", {
 								className: "text-xs sm:text-sm text-slate-700 bg-teal-50/40 p-3 rounded-lg border border-teal-100 first-letter:uppercase",
-								children: capitalizeFirst(product.short_description)
+								children: capitalizeFirst$1(product.short_description)
 							})] }),
 							product.description && /* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("h5", {
 								className: "text-xs font-bold uppercase tracking-wider text-slate-500 mb-1",
 								children: "Detailed Description"
 							}), /* @__PURE__ */ jsx("p", {
 								className: "text-xs sm:text-sm text-slate-700 whitespace-pre-line leading-relaxed first-letter:uppercase",
-								children: capitalizeFirst(product.description)
+								children: capitalizeFirst$1(product.description)
 							})] }),
 							/* @__PURE__ */ jsxs("div", {
 								className: "grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2",
@@ -2357,7 +2635,7 @@ function ProductDetails({ product }) {
 											children: "Approved Indications"
 										}), /* @__PURE__ */ jsx("p", {
 											className: "text-xs text-slate-600 leading-relaxed whitespace-pre-line first-letter:uppercase",
-											children: capitalizeFirst(product.indications) || /* @__PURE__ */ jsx("span", {
+											children: capitalizeFirst$1(product.indications) || /* @__PURE__ */ jsx("span", {
 												className: "text-slate-400 italic",
 												children: "None specified"
 											})
@@ -2370,7 +2648,7 @@ function ProductDetails({ product }) {
 											children: "Dosage & Directions"
 										}), /* @__PURE__ */ jsx("p", {
 											className: "text-xs text-slate-600 leading-relaxed whitespace-pre-line first-letter:uppercase",
-											children: capitalizeFirst(product.directions) || /* @__PURE__ */ jsx("span", {
+											children: capitalizeFirst$1(product.directions) || /* @__PURE__ */ jsx("span", {
 												className: "text-slate-400 italic",
 												children: "None specified"
 											})
@@ -2383,7 +2661,7 @@ function ProductDetails({ product }) {
 											children: "Precautions & Warnings"
 										}), /* @__PURE__ */ jsx("p", {
 											className: "text-xs text-slate-600 leading-relaxed whitespace-pre-line first-letter:uppercase",
-											children: capitalizeFirst(product.precautions) || /* @__PURE__ */ jsx("span", {
+											children: capitalizeFirst$1(product.precautions) || /* @__PURE__ */ jsx("span", {
 												className: "text-slate-400 italic",
 												children: "None specified"
 											})
@@ -2396,7 +2674,7 @@ function ProductDetails({ product }) {
 											children: "Storage Parameters"
 										}), /* @__PURE__ */ jsx("p", {
 											className: "text-xs text-slate-600 leading-relaxed whitespace-pre-line first-letter:uppercase",
-											children: capitalizeFirst(product.storage) || /* @__PURE__ */ jsx("span", {
+											children: capitalizeFirst$1(product.storage) || /* @__PURE__ */ jsx("span", {
 												className: "text-slate-400 italic",
 												children: "None specified"
 											})
@@ -3890,442 +4168,6 @@ function ProductList({ products: paginatedProducts, categories: initialCategorie
 	}) });
 }
 //#endregion
-//#region resources/js/Pages/admin/product/ProductSlides.jsx
-var ProductSlides_exports = /* @__PURE__ */ __exportAll({ default: () => ProductSlides });
-function ProductSlides({ product, slides = [] }) {
-	const [selectedFiles, setSelectedFiles] = useState([]);
-	const [filePreviews, setFilePreviews] = useState([]);
-	const [isUploading, setIsUploading] = useState(false);
-	const [lightboxIndex, setLightboxIndex] = useState(null);
-	const [deleteConfirm, setDeleteConfirm] = useState({
-		isOpen: false,
-		slide: null
-	});
-	const [editingTitleId, setEditingTitleId] = useState(null);
-	const [editTitleValue, setEditTitleValue] = useState("");
-	const fileInputRef = useRef(null);
-	const handleFilesChange = (e) => {
-		const files = Array.from(e.target.files || []);
-		if (files.length === 0) return;
-		setSelectedFiles((prev) => [...prev, ...files]);
-		const newPreviews = files.map((file) => ({
-			file,
-			url: URL.createObjectURL(file),
-			name: file.name
-		}));
-		setFilePreviews((prev) => [...prev, ...newPreviews]);
-	};
-	const handleRemoveStaged = (index) => {
-		setSelectedFiles((prev) => prev.filter((_, i) => i !== index));
-		setFilePreviews((prev) => prev.filter((_, i) => i !== index));
-	};
-	const handleUploadSubmit = (e) => {
-		e?.preventDefault();
-		if (selectedFiles.length === 0) return;
-		setIsUploading(true);
-		const formData = new FormData();
-		selectedFiles.forEach((file) => {
-			formData.append("images[]", file);
-		});
-		router.post(`/admin/products/${product.id}/slides`, formData, {
-			onSuccess: () => {
-				setSelectedFiles([]);
-				setFilePreviews([]);
-				setIsUploading(false);
-				if (fileInputRef.current) fileInputRef.current.value = "";
-			},
-			onError: () => setIsUploading(false)
-		});
-	};
-	const handleMove = (index, direction) => {
-		const targetIdx = index + direction;
-		if (targetIdx < 0 || targetIdx >= slides.length) return;
-		const newOrder = [...slides];
-		const [moved] = newOrder.splice(index, 1);
-		newOrder.splice(targetIdx, 0, moved);
-		const slideIds = newOrder.map((s) => s.id);
-		router.post(`/admin/products/${product.id}/slides/reorder`, { slide_ids: slideIds }, { preserveScroll: true });
-	};
-	const handleToggleStatus = (slide) => {
-		router.patch(`/admin/products/${product.id}/slides/${slide.id}/status`, {}, { preserveScroll: true });
-	};
-	const handleConfirmDelete = () => {
-		if (!deleteConfirm.slide) return;
-		router.delete(`/admin/products/${product.id}/slides/${deleteConfirm.slide.id}`, {
-			preserveScroll: true,
-			onSuccess: () => setDeleteConfirm({
-				isOpen: false,
-				slide: null
-			})
-		});
-	};
-	const handleSaveTitle = (slide) => {
-		router.post(`/admin/products/${product.id}/slides/${slide.id}`, { title: editTitleValue.trim() || slide.title }, {
-			preserveScroll: true,
-			onSuccess: () => setEditingTitleId(null)
-		});
-	};
-	const activeSlides = slides.filter((s) => s.is_active);
-	return /* @__PURE__ */ jsxs(AdminLayout, { children: [
-		/* @__PURE__ */ jsx(Head, { title: `${product.brand_name} — Visual Aid Carousel` }),
-		/* @__PURE__ */ jsxs("div", {
-			className: "space-y-6",
-			children: [
-				/* @__PURE__ */ jsxs("div", {
-					className: "flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4",
-					children: [/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsxs("div", {
-						className: "flex items-center gap-2 text-xs text-slate-500 mb-1",
-						children: [
-							/* @__PURE__ */ jsx(Link, {
-								href: "/admin/products",
-								className: "hover:text-teal-600 transition-colors",
-								children: "Products"
-							}),
-							/* @__PURE__ */ jsx("span", { children: "/" }),
-							/* @__PURE__ */ jsx(Link, {
-								href: `/admin/products/${product.id}`,
-								className: "hover:text-teal-600 transition-colors font-medium",
-								children: product.brand_name
-							}),
-							/* @__PURE__ */ jsx("span", { children: "/" }),
-							/* @__PURE__ */ jsx("span", {
-								className: "text-slate-800 font-semibold",
-								children: "Visual Aid Carousel"
-							})
-						]
-					}), /* @__PURE__ */ jsxs("div", {
-						className: "flex items-center gap-3",
-						children: [/* @__PURE__ */ jsx("div", {
-							className: "w-10 h-10 rounded-xl bg-teal-50 text-teal-700 flex items-center justify-center shadow-xs",
-							children: /* @__PURE__ */ jsx(Image, { className: "w-5 h-5 stroke-[2.2]" })
-						}), /* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsxs("h1", {
-							className: "text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2",
-							children: [/* @__PURE__ */ jsx("span", { children: product.brand_name }), /* @__PURE__ */ jsx("span", {
-								className: "text-xs px-2.5 py-0.5 rounded-full bg-teal-50 text-teal-800 border border-teal-200/80 font-bold",
-								children: "Visual Aid Carousel"
-							})]
-						}), /* @__PURE__ */ jsx("p", {
-							className: "text-xs text-slate-500",
-							children: "Upload slide images directly. MRs present them as a full-screen interactive carousel on their tablet."
-						})] })]
-					})] }), /* @__PURE__ */ jsxs("div", {
-						className: "flex items-center gap-2.5",
-						children: [/* @__PURE__ */ jsx(Link, {
-							href: `/admin/products/${product.id}`,
-							className: "px-3.5 py-2 text-xs font-semibold text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 rounded-xl transition-colors cursor-pointer",
-							children: "Back to Product"
-						}), /* @__PURE__ */ jsxs(Link, {
-							href: "/mr/products",
-							target: "_blank",
-							className: "inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-teal-700 bg-teal-50 hover:bg-teal-100 border border-teal-200 rounded-xl transition-colors cursor-pointer",
-							children: [
-								/* @__PURE__ */ jsx(Eye, { className: "w-4 h-4" }),
-								/* @__PURE__ */ jsx("span", { children: "Preview MR Carousel" }),
-								/* @__PURE__ */ jsx(ExternalLink, { className: "w-3 h-3 opacity-60" })
-							]
-						})]
-					})]
-				}),
-				/* @__PURE__ */ jsxs("div", {
-					className: "bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/90 shadow-xs space-y-4",
-					children: [
-						/* @__PURE__ */ jsxs("div", {
-							className: "flex items-center justify-between pb-3 border-b border-slate-100",
-							children: [/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("h2", {
-								className: "text-sm font-bold text-slate-900",
-								children: "Upload Carousel Slide Images"
-							}), /* @__PURE__ */ jsx("p", {
-								className: "text-xs text-slate-500",
-								children: "Select one or multiple presentation slide images (PNG, JPG, WebP) to add to the visual aid carousel."
-							})] }), /* @__PURE__ */ jsxs("span", {
-								className: "text-xs font-semibold px-3 py-1 rounded-full bg-teal-50 text-teal-800 border border-teal-200",
-								children: [
-									slides.length,
-									" ",
-									slides.length === 1 ? "Slide" : "Slides",
-									" in Carousel"
-								]
-							})]
-						}),
-						/* @__PURE__ */ jsxs("div", {
-							onClick: () => fileInputRef.current?.click(),
-							className: "border-2 border-dashed border-teal-500/40 hover:border-teal-600 bg-teal-50/20 hover:bg-teal-50/40 rounded-2xl p-8 text-center cursor-pointer transition-all space-y-3 group",
-							children: [
-								/* @__PURE__ */ jsx("div", {
-									className: "w-12 h-12 rounded-2xl bg-teal-100 text-teal-700 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform shadow-xs",
-									children: /* @__PURE__ */ jsx(Upload, { className: "w-6 h-6 stroke-[2.2]" })
-								}),
-								/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("p", {
-									className: "text-sm font-bold text-slate-800",
-									children: "Click to browse or drop slide images here"
-								}), /* @__PURE__ */ jsx("p", {
-									className: "text-xs text-slate-400 mt-1",
-									children: "Select multiple slides at once. Recommended resolution: 1920x1080 (16:9) or 4:3 for optimal tablet presentation."
-								})] }),
-								/* @__PURE__ */ jsx("input", {
-									ref: fileInputRef,
-									type: "file",
-									accept: "image/png,image/jpeg,image/webp,image/svg+xml",
-									multiple: true,
-									onChange: handleFilesChange,
-									className: "hidden"
-								})
-							]
-						}),
-						filePreviews.length > 0 && /* @__PURE__ */ jsxs("div", {
-							className: "p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3",
-							children: [/* @__PURE__ */ jsxs("div", {
-								className: "flex items-center justify-between",
-								children: [/* @__PURE__ */ jsxs("span", {
-									className: "text-xs font-bold text-slate-700",
-									children: [
-										filePreviews.length,
-										" ",
-										filePreviews.length === 1 ? "image" : "images",
-										" selected for upload:"
-									]
-								}), /* @__PURE__ */ jsxs("button", {
-									type: "button",
-									onClick: handleUploadSubmit,
-									disabled: isUploading,
-									className: "px-4 py-2 rounded-xl bg-teal-700 hover:bg-teal-800 text-white font-bold text-xs shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer disabled:opacity-50",
-									children: [/* @__PURE__ */ jsx(Upload, { className: "w-3.5 h-3.5" }), /* @__PURE__ */ jsx("span", { children: isUploading ? "Uploading Slides..." : `Upload ${filePreviews.length} Slide(s)` })]
-								})]
-							}), /* @__PURE__ */ jsx("div", {
-								className: "grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-3",
-								children: filePreviews.map((item, idx) => /* @__PURE__ */ jsxs("div", {
-									className: "relative rounded-xl border border-slate-200 bg-white overflow-hidden shadow-xs group",
-									children: [
-										/* @__PURE__ */ jsx("img", {
-											src: item.url,
-											alt: item.name,
-											className: "w-full h-24 object-cover"
-										}),
-										/* @__PURE__ */ jsx("button", {
-											type: "button",
-											onClick: () => handleRemoveStaged(idx),
-											className: "absolute top-1 right-1 p-1 bg-red-600/90 text-white rounded-md hover:bg-red-700 cursor-pointer shadow-xs",
-											title: "Remove",
-											children: /* @__PURE__ */ jsx(X, { className: "w-3 h-3" })
-										}),
-										/* @__PURE__ */ jsx("div", {
-											className: "p-1.5 text-[10px] font-medium text-slate-600 truncate text-center",
-											children: item.name
-										})
-									]
-								}, idx))
-							})]
-						})
-					]
-				}),
-				/* @__PURE__ */ jsxs("div", {
-					className: "bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/90 shadow-xs space-y-4",
-					children: [/* @__PURE__ */ jsxs("div", {
-						className: "flex items-center justify-between pb-3 border-b border-slate-100",
-						children: [/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("h2", {
-							className: "text-sm font-bold text-slate-900",
-							children: "Presentation Slide Sequence"
-						}), /* @__PURE__ */ jsx("p", {
-							className: "text-xs text-slate-500",
-							children: "Drag or use arrows to arrange the order that MRs flip through during doctor meetings."
-						})] }), /* @__PURE__ */ jsxs("span", {
-							className: "text-xs font-semibold text-slate-500",
-							children: [
-								activeSlides.length,
-								" of ",
-								slides.length,
-								" active in deck"
-							]
-						})]
-					}), slides.length === 0 ? /* @__PURE__ */ jsxs("div", {
-						className: "p-12 text-center space-y-3",
-						children: [
-							/* @__PURE__ */ jsx("div", {
-								className: "w-14 h-14 mx-auto rounded-2xl bg-teal-50 text-teal-700 flex items-center justify-center",
-								children: /* @__PURE__ */ jsx(Image, { className: "w-7 h-7" })
-							}),
-							/* @__PURE__ */ jsx("h3", {
-								className: "text-sm font-bold text-slate-900",
-								children: "No Slide Images in Carousel Yet"
-							}),
-							/* @__PURE__ */ jsx("p", {
-								className: "text-xs text-slate-500 max-w-md mx-auto",
-								children: "Upload your pharmaceutical visual aid images above. MRs will flip through them as an interactive full-screen carousel."
-							})
-						]
-					}) : /* @__PURE__ */ jsx("div", {
-						className: "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4",
-						children: slides.map((slide, idx) => /* @__PURE__ */ jsxs("div", {
-							className: `rounded-2xl border transition-all overflow-hidden flex flex-col justify-between shadow-xs ${slide.is_active ? "bg-white border-slate-200 hover:border-teal-400 hover:shadow-md" : "bg-slate-50/70 border-slate-200 opacity-60"}`,
-							children: [
-								/* @__PURE__ */ jsxs("div", {
-									className: "p-2.5 px-3 bg-slate-50/80 border-b border-slate-100 flex items-center justify-between",
-									children: [/* @__PURE__ */ jsxs("span", {
-										className: "text-xs font-black text-teal-800 bg-teal-50 px-2.5 py-0.5 rounded-md border border-teal-200",
-										children: ["Slide #", idx + 1]
-									}), /* @__PURE__ */ jsx("button", {
-										type: "button",
-										onClick: () => handleToggleStatus(slide),
-										className: `p-1 rounded-lg text-xs font-semibold cursor-pointer transition-colors ${slide.is_active ? "text-emerald-700 hover:bg-emerald-50" : "text-slate-400 hover:bg-slate-200"}`,
-										title: slide.is_active ? "Active in presentation" : "Hidden from presentation",
-										children: slide.is_active ? /* @__PURE__ */ jsx(CheckCircle2, { className: "w-4 h-4" }) : /* @__PURE__ */ jsx(XCircle, { className: "w-4 h-4" })
-									})]
-								}),
-								/* @__PURE__ */ jsxs("div", {
-									onClick: () => setLightboxIndex(idx),
-									className: "relative w-full h-44 bg-slate-900 cursor-pointer overflow-hidden group",
-									children: [/* @__PURE__ */ jsx("img", {
-										src: slide.image_path,
-										alt: slide.title,
-										className: "w-full h-full object-contain group-hover:scale-105 transition-transform duration-200"
-									}), /* @__PURE__ */ jsxs("div", {
-										className: "absolute inset-0 bg-slate-900/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-bold gap-1.5 backdrop-blur-[1px]",
-										children: [/* @__PURE__ */ jsx(Eye, { className: "w-4 h-4" }), /* @__PURE__ */ jsx("span", { children: "View Full Slide" })]
-									})]
-								}),
-								/* @__PURE__ */ jsxs("div", {
-									className: "p-3 bg-white space-y-2",
-									children: [editingTitleId === slide.id ? /* @__PURE__ */ jsxs("div", {
-										className: "flex items-center gap-1",
-										children: [
-											/* @__PURE__ */ jsx("input", {
-												type: "text",
-												value: editTitleValue,
-												onChange: (e) => setEditTitleValue(e.target.value),
-												className: "flex-1 px-2 py-1 text-xs border rounded-lg focus:outline-none focus:ring-1 focus:ring-teal-500",
-												placeholder: "Slide Title"
-											}),
-											/* @__PURE__ */ jsx("button", {
-												type: "button",
-												onClick: () => handleSaveTitle(slide),
-												className: "p-1 text-emerald-700 hover:bg-emerald-50 rounded",
-												children: /* @__PURE__ */ jsx(Check, { className: "w-3.5 h-3.5" })
-											}),
-											/* @__PURE__ */ jsx("button", {
-												type: "button",
-												onClick: () => setEditingTitleId(null),
-												className: "p-1 text-slate-400 hover:bg-slate-100 rounded",
-												children: /* @__PURE__ */ jsx(X, { className: "w-3.5 h-3.5" })
-											})
-										]
-									}) : /* @__PURE__ */ jsxs("div", {
-										className: "flex items-center justify-between",
-										children: [/* @__PURE__ */ jsx("span", {
-											className: "text-xs font-bold text-slate-800 truncate",
-											title: slide.title,
-											children: slide.title || `Slide ${idx + 1}`
-										}), /* @__PURE__ */ jsx("button", {
-											type: "button",
-											onClick: () => {
-												setEditingTitleId(slide.id);
-												setEditTitleValue(slide.title || "");
-											},
-											className: "p-1 text-slate-400 hover:text-teal-700 rounded cursor-pointer",
-											title: "Rename slide",
-											children: /* @__PURE__ */ jsx(Edit2, { className: "w-3 h-3" })
-										})]
-									}), /* @__PURE__ */ jsxs("div", {
-										className: "flex items-center justify-between pt-1 border-t border-slate-100",
-										children: [/* @__PURE__ */ jsxs("div", {
-											className: "flex items-center gap-1",
-											children: [/* @__PURE__ */ jsx("button", {
-												type: "button",
-												onClick: () => handleMove(idx, -1),
-												disabled: idx === 0,
-												className: "p-1.5 rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-900 disabled:opacity-20 cursor-pointer",
-												title: "Move Left (Earlier in Carousel)",
-												children: /* @__PURE__ */ jsx(MoveLeft, { className: "w-3.5 h-3.5" })
-											}), /* @__PURE__ */ jsx("button", {
-												type: "button",
-												onClick: () => handleMove(idx, 1),
-												disabled: idx === slides.length - 1,
-												className: "p-1.5 rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-900 disabled:opacity-20 cursor-pointer",
-												title: "Move Right (Later in Carousel)",
-												children: /* @__PURE__ */ jsx(MoveRight, { className: "w-3.5 h-3.5" })
-											})]
-										}), /* @__PURE__ */ jsx("button", {
-											type: "button",
-											onClick: () => setDeleteConfirm({
-												isOpen: true,
-												slide
-											}),
-											className: "p-1.5 rounded-lg text-red-500 hover:bg-red-50 hover:text-red-700 cursor-pointer",
-											title: "Delete Slide",
-											children: /* @__PURE__ */ jsx(Trash2, { className: "w-3.5 h-3.5" })
-										})]
-									})]
-								})
-							]
-						}, slide.id))
-					})]
-				})
-			]
-		}),
-		lightboxIndex !== null && slides[lightboxIndex] && /* @__PURE__ */ jsx("div", {
-			className: "fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-md animate-in fade-in duration-200",
-			children: /* @__PURE__ */ jsxs("div", {
-				className: "relative max-w-5xl w-full flex flex-col items-center",
-				children: [/* @__PURE__ */ jsxs("div", {
-					className: "w-full flex items-center justify-between pb-3 text-white",
-					children: [/* @__PURE__ */ jsxs("div", {
-						className: "flex items-center gap-2",
-						children: [/* @__PURE__ */ jsxs("span", {
-							className: "text-xs font-bold px-2.5 py-0.5 rounded-full bg-teal-500/30 text-teal-300 border border-teal-500/50",
-							children: [
-								"Slide ",
-								lightboxIndex + 1,
-								" of ",
-								slides.length
-							]
-						}), /* @__PURE__ */ jsx("span", {
-							className: "text-sm font-semibold text-slate-200",
-							children: slides[lightboxIndex].title
-						})]
-					}), /* @__PURE__ */ jsx("button", {
-						type: "button",
-						onClick: () => setLightboxIndex(null),
-						className: "p-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/10 cursor-pointer",
-						children: /* @__PURE__ */ jsx(X, { className: "w-6 h-6" })
-					})]
-				}), /* @__PURE__ */ jsxs("div", {
-					className: "relative w-full max-h-[80vh] flex items-center justify-center",
-					children: [
-						/* @__PURE__ */ jsx("img", {
-							src: slides[lightboxIndex].image_path,
-							alt: slides[lightboxIndex].title,
-							className: "max-h-[75vh] w-auto max-w-full object-contain rounded-2xl shadow-2xl border border-white/10"
-						}),
-						lightboxIndex > 0 && /* @__PURE__ */ jsx("button", {
-							type: "button",
-							onClick: () => setLightboxIndex(lightboxIndex - 1),
-							className: "absolute left-2 top-1/2 -translate-y-1/2 p-3 rounded-full bg-black/60 hover:bg-black/80 text-white cursor-pointer backdrop-blur-xs transition-colors",
-							children: /* @__PURE__ */ jsx(ChevronLeft, { className: "w-6 h-6" })
-						}),
-						lightboxIndex < slides.length - 1 && /* @__PURE__ */ jsx("button", {
-							type: "button",
-							onClick: () => setLightboxIndex(lightboxIndex + 1),
-							className: "absolute right-2 top-1/2 -translate-y-1/2 p-3 rounded-full bg-black/60 hover:bg-black/80 text-white cursor-pointer backdrop-blur-xs transition-colors",
-							children: /* @__PURE__ */ jsx(ChevronRight, { className: "w-6 h-6" })
-						})
-					]
-				})]
-			})
-		}),
-		/* @__PURE__ */ jsx(ConfirmModal, {
-			isOpen: deleteConfirm.isOpen,
-			title: "Delete Slide Image?",
-			message: `Are you sure you want to remove "${deleteConfirm.slide?.title || "this slide"}" from the visual aid carousel?`,
-			confirmText: "Delete Slide",
-			confirmVariant: "danger",
-			onConfirm: handleConfirmDelete,
-			onClose: () => setDeleteConfirm({
-				isOpen: false,
-				slide: null
-			})
-		})
-	] });
-}
-//#endregion
 //#region resources/js/Pages/admin/roles/RoleForm.jsx
 var RoleForm_exports = /* @__PURE__ */ __exportAll({ default: () => RoleForm });
 function RoleForm({ isEdit = false, role = null, groupedPermissions = {} }) {
@@ -4501,8 +4343,15 @@ function RoleForm({ isEdit = false, role = null, groupedPermissions = {} }) {
 //#region resources/js/Pages/admin/roles/RoleList.jsx
 var RoleList_exports = /* @__PURE__ */ __exportAll({ default: () => RoleList });
 function RoleList({ roles = [] }) {
-	const handleDelete = (role) => {
-		if (confirm(`Are you sure you want to delete role "${role.name}"?`)) router.delete(`/admin/roles/${role.id}`);
+	const [deletingRole, setDeletingRole] = useState(null);
+	const [isDeleting, setIsDeleting] = useState(false);
+	const confirmDeleteRole = () => {
+		if (!deletingRole) return;
+		setIsDeleting(true);
+		router.delete(`/admin/roles/${deletingRole.id}`, { onFinish: () => {
+			setIsDeleting(false);
+			setDeletingRole(null);
+		} });
 	};
 	const getRoleMeta = (name) => {
 		switch (name) {
@@ -4532,7 +4381,7 @@ function RoleList({ roles = [] }) {
 			};
 		}
 	};
-	return /* @__PURE__ */ jsx(AdminLayout, { children: /* @__PURE__ */ jsxs("div", {
+	return /* @__PURE__ */ jsxs(AdminLayout, { children: [/* @__PURE__ */ jsxs("div", {
 		className: "space-y-5 pb-8",
 		children: [/* @__PURE__ */ jsxs("div", {
 			className: "flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white rounded-xl border border-slate-200/80 p-4 sm:p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)]",
@@ -4598,7 +4447,7 @@ function RoleList({ roles = [] }) {
 								children: [/* @__PURE__ */ jsx(Edit2, { className: "w-3.5 h-3.5" }), /* @__PURE__ */ jsx("span", { children: "Edit Permissions" })]
 							}), /* @__PURE__ */ jsx("button", {
 								type: "button",
-								onClick: () => handleDelete(role),
+								onClick: () => setDeletingRole(role),
 								className: "p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer",
 								title: "Delete Role",
 								"aria-label": "Delete Role",
@@ -4609,7 +4458,17 @@ function RoleList({ roles = [] }) {
 				}, role.id);
 			})
 		})]
-	}) });
+	}), /* @__PURE__ */ jsx(ConfirmModal, {
+		isOpen: !!deletingRole,
+		onClose: () => !isDeleting && setDeletingRole(null),
+		onConfirm: confirmDeleteRole,
+		title: "Delete Access Role",
+		message: `Are you sure you want to delete role "${deletingRole?.name}"? Assigned users will lose this role's permissions.`,
+		confirmText: "Delete Role",
+		cancelText: "Cancel",
+		isDanger: true,
+		isLoading: isDeleting
+	})] });
 }
 //#endregion
 //#region resources/js/Pages/admin/settings/Settings.jsx
@@ -5492,14 +5351,14 @@ function StaffForm({ isEdit = false, staff = null, roles = [] }) {
 										className: "flex items-center justify-between",
 										children: [/* @__PURE__ */ jsx("span", {
 											className: "text-xs font-bold text-slate-900",
-											children: r.name === "super_admin" ? "Super Admin" : r.name === "mr" ? "Medical Representative (MR)" : capitalizeWords$1(r.name.replace(/_/g, " "))
+											children: r.name === "admin" ? "Administrator" : r.name === "super_admin" ? "Super Admin" : r.name === "mr" ? "Medical Representative (MR)" : capitalizeWords$1(r.name.replace(/_/g, " "))
 										}), isSelected && /* @__PURE__ */ jsx("span", {
 											className: "text-[10px] font-semibold text-teal-700 bg-teal-100/60 px-2 py-0.5 rounded-full",
 											children: "Active"
 										})]
 									}), /* @__PURE__ */ jsx("span", {
 										className: "text-[11px] text-slate-500 mt-0.5 block leading-tight font-normal",
-										children: r.name === "super_admin" ? "Unrestricted master access to all operations" : r.name === "manager" ? "Manages products, categories, doctor call records" : "Field catalog access & Daily Call Reports (DCR)"
+										children: r.name === "admin" ? "Full administrative access to manage products, categories, staff, and field operations" : r.name === "super_admin" ? "Unrestricted master access" : r.name === "manager" ? "Manages products, categories, doctor call records" : "Field catalog access & Daily Call Reports (DCR)"
 									})]
 								})]
 							}, r.id);
@@ -5565,6 +5424,8 @@ function StaffList({ staff, filters = {}, roles = [] }) {
 	const { auth } = usePage().props;
 	const [searchTerm, setSearchTerm] = useState(filters.search || "");
 	const [roleFilter, setRoleFilter] = useState(filters.role || "");
+	const [deletingMember, setDeletingMember] = useState(null);
+	const [isDeleting, setIsDeleting] = useState(false);
 	const applyFilters = (searchVal, roleVal) => {
 		const params = {};
 		if (searchVal.trim()) params.search = searchVal.trim();
@@ -5579,15 +5440,23 @@ function StaffList({ staff, filters = {}, roles = [] }) {
 		setRoleFilter(val);
 		applyFilters(searchTerm, val);
 	};
-	const handleDelete = (member) => {
-		const formattedName = capitalizeWords(member.name);
-		if (confirm(`Are you sure you want to remove staff member "${formattedName}"?`)) router.delete(`/admin/staff/${member.id}`);
+	const confirmDeleteMember = () => {
+		if (!deletingMember) return;
+		setIsDeleting(true);
+		router.delete(`/admin/staff/${deletingMember.id}`, { onFinish: () => {
+			setIsDeleting(false);
+			setDeletingMember(null);
+		} });
 	};
 	const getRoleBadge = (roleName) => {
 		switch (roleName) {
 			case "super_admin": return /* @__PURE__ */ jsx("span", {
 				className: "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-purple-50 text-purple-700",
 				children: "Super Admin"
+			});
+			case "admin": return /* @__PURE__ */ jsx("span", {
+				className: "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700",
+				children: "Admin"
 			});
 			case "manager": return /* @__PURE__ */ jsx("span", {
 				className: "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 text-blue-700",
@@ -5603,20 +5472,19 @@ function StaffList({ staff, filters = {}, roles = [] }) {
 			});
 		}
 	};
-	return /* @__PURE__ */ jsx(AdminLayout, { children: /* @__PURE__ */ jsxs("div", {
+	return /* @__PURE__ */ jsxs(AdminLayout, { children: [/* @__PURE__ */ jsxs("div", {
 		className: "space-y-4 pb-8",
 		children: [/* @__PURE__ */ jsxs("div", {
 			className: "bg-white rounded-xl border border-slate-200/80 p-3 sm:p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)] flex flex-col sm:flex-row items-center justify-between gap-3",
-			children: [/* @__PURE__ */ jsxs("form", {
+			children: [/* @__PURE__ */ jsx("form", {
 				onSubmit: handleSearchSubmit,
-				className: "relative w-full sm:flex-1 max-w-md",
-				children: [/* @__PURE__ */ jsx(Search, { className: "w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" }), /* @__PURE__ */ jsx("input", {
-					type: "text",
+				className: "w-full sm:flex-1 max-w-md",
+				children: /* @__PURE__ */ jsx(SearchBar, {
 					value: searchTerm,
 					onChange: (e) => setSearchTerm(e.target.value),
 					placeholder: "Search staff by name or email...",
-					className: "w-full pl-9 pr-3 py-2 bg-slate-50/70 hover:bg-slate-50 focus:bg-white border border-slate-200 focus:border-teal-600 rounded-lg text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-600/10 transition-all"
-				})]
+					className: "w-full"
+				})
 			}), /* @__PURE__ */ jsxs("div", {
 				className: "flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end",
 				children: [
@@ -5631,7 +5499,7 @@ function StaffList({ staff, filters = {}, roles = [] }) {
 								children: "All Roles"
 							}), roles.map((r) => /* @__PURE__ */ jsx("option", {
 								value: r.name,
-								children: r.name === "super_admin" ? "Super Admin" : r.name === "mr" ? "Medical Rep" : capitalizeWords(r.name.replace(/_/g, " "))
+								children: r.name === "super_admin" ? "Super Admin" : r.name === "admin" ? "Admin" : r.name === "mr" ? "Medical Rep" : capitalizeWords(r.name.replace(/_/g, " "))
 							}, r.id))]
 						})]
 					}),
@@ -5686,6 +5554,7 @@ function StaffList({ staff, filters = {}, roles = [] }) {
 						}) }) : staff?.data?.map((member) => {
 							const primaryRole = member.roles?.[0]?.name || member.role;
 							const isSelf = member.id === auth.user?.id;
+							const isSuperAdminMember = member.role === "super_admin" || member.roles?.some((r) => r.name === "super_admin") || member.id === 1;
 							const formattedName = capitalizeWords(member.name);
 							const initial = formattedName ? formattedName.charAt(0).toUpperCase() : "U";
 							return /* @__PURE__ */ jsxs("tr", {
@@ -5730,22 +5599,26 @@ function StaffList({ staff, filters = {}, roles = [] }) {
 									}),
 									/* @__PURE__ */ jsx("td", {
 										className: "py-3.5 px-4 sm:px-5 text-right",
-										children: /* @__PURE__ */ jsxs("div", {
+										children: /* @__PURE__ */ jsx("div", {
 											className: "flex items-center justify-end gap-1",
-											children: [/* @__PURE__ */ jsx(Link, {
+											children: isSuperAdminMember && !isSelf ? /* @__PURE__ */ jsxs("span", {
+												className: "inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-semibold text-purple-700 bg-purple-50 border border-purple-200/60",
+												title: "Super Administrator is protected and cannot be edited or deleted by other administrators",
+												children: [/* @__PURE__ */ jsx(Shield, { className: "w-3.5 h-3.5 text-purple-600" }), /* @__PURE__ */ jsx("span", { children: "Protected" })]
+											}) : /* @__PURE__ */ jsxs(Fragment, { children: [/* @__PURE__ */ jsx(Link, {
 												href: `/admin/staff/${member.id}/edit`,
 												className: "p-1.5 rounded-lg text-slate-500 hover:text-teal-700 hover:bg-teal-50 transition-colors",
 												title: "Edit Member",
 												"aria-label": "Edit Member",
 												children: /* @__PURE__ */ jsx(Edit2, { className: "w-3.5 h-3.5" })
-											}), !isSelf && /* @__PURE__ */ jsx("button", {
+											}), !isSelf && !isSuperAdminMember && /* @__PURE__ */ jsx("button", {
 												type: "button",
-												onClick: () => handleDelete(member),
+												onClick: () => setDeletingMember(member),
 												className: "p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer",
 												title: "Delete Member",
 												"aria-label": "Delete Member",
 												children: /* @__PURE__ */ jsx(Trash2, { className: "w-3.5 h-3.5" })
-											})]
+											})] })
 										})
 									})
 								]
@@ -5774,7 +5647,17 @@ function StaffList({ staff, filters = {}, roles = [] }) {
 				})]
 			})]
 		})]
-	}) });
+	}), /* @__PURE__ */ jsx(ConfirmModal, {
+		isOpen: !!deletingMember,
+		onClose: () => !isDeleting && setDeletingMember(null),
+		onConfirm: confirmDeleteMember,
+		title: "Remove Staff Member",
+		message: `Are you sure you want to remove staff member "${capitalizeWords(deletingMember?.name)}"? This action cannot be undone.`,
+		confirmText: "Remove Member",
+		cancelText: "Cancel",
+		isDanger: true,
+		isLoading: isDeleting
+	})] });
 }
 //#endregion
 //#region resources/js/components/maps/DoctorMovementMap.jsx
@@ -5851,13 +5734,34 @@ function DoctorMovementMap({ mapboxConfig = {}, doctorStops = {}, activeMR = nul
 				mapInstanceRef.current = null;
 			}
 			try {
-				const effectiveToken = token.trim() || "pk.eyJ1IjoibXJjb25uZWN0LWRlbW8iLCJhIjoiY2x6cTFxZmxwMDJiazJqcXB0eGdxOGNteSJ9.mock";
+				const hasValidMapboxToken = Boolean(token.trim() && token.trim().startsWith("pk."));
+				const effectiveToken = hasValidMapboxToken ? token.trim() : "pk.eyJ1IjoibXJjb25uZWN0LWRlbW8iLCJhIjoiY2x6cTFxZmxwMDJiazJqcXB0eGdxOGNteSJ9.mock";
 				window.mapboxgl.accessToken = effectiveToken;
 				const centerLng = mrLiveLocation?.lng || allStops[0]?.lng || defaultLng;
 				const centerLat = mrLiveLocation?.lat || allStops[0]?.lat || defaultLat;
+				const effectiveStyle = hasValidMapboxToken ? mapStyle : {
+					version: 8,
+					sources: { "osm-raster-tiles": {
+						type: "raster",
+						tiles: [
+							"https://a.tile.openstreetmap.org/{z}/{x}/{y}.png",
+							"https://b.tile.openstreetmap.org/{z}/{x}/{y}.png",
+							"https://c.tile.openstreetmap.org/{z}/{x}/{y}.png"
+						],
+						tileSize: 256,
+						attribution: "© OpenStreetMap contributors"
+					} },
+					layers: [{
+						id: "osm-tiles-layer",
+						type: "raster",
+						source: "osm-raster-tiles",
+						minzoom: 0,
+						maxzoom: 19
+					}]
+				};
 				const map = new window.mapboxgl.Map({
 					container: mapContainerRef.current,
-					style: token.trim() ? mapStyle : "https://demotiles.maplibre.org/style.json",
+					style: effectiveStyle,
 					center: [centerLng, centerLat],
 					zoom: defaultZoom,
 					attributionControl: false
@@ -6168,21 +6072,12 @@ function DoctorMovementMap({ mapboxConfig = {}, doctorStops = {}, activeMR = nul
 //#endregion
 //#region resources/js/Pages/admin/tracking/TrackingDashboard.jsx
 var TrackingDashboard_exports = /* @__PURE__ */ __exportAll({ default: () => TrackingDashboard });
-function TrackingDashboard({ mapbox = {}, kpi = {}, field_representatives = [], active_mr = null, doctor_stops = {}, tour_plans_for_approval = [], leaderboard = [] }) {
+function TrackingDashboard({ mapbox = {}, kpi = {}, field_representatives = [], active_mr = null, doctor_stops = {}, leaderboard = [] }) {
 	const [selectedMRId, setSelectedMRId] = useState(active_mr?.id || field_representatives[0]?.id || null);
 	const [searchRepQuery, setSearchRepQuery] = useState("");
 	const [tourMode, setTourMode] = useState("doctor");
-	const [tourApprovalTab, setTourApprovalTab] = useState("doctors");
-	const [reviewModalPlan, setReviewModalPlan] = useState(null);
-	const [reviewNotes, setReviewNotes] = useState("");
-	const [isProcessing, setIsProcessing] = useState(false);
 	const activeRep = field_representatives.find((r) => r.id === selectedMRId) || active_mr || field_representatives[0];
 	const filteredReps = field_representatives.filter((rep) => rep.name.toLowerCase().includes(searchRepQuery.toLowerCase()) || rep.reg_code.toLowerCase().includes(searchRepQuery.toLowerCase()));
-	const filteredPlans = tour_plans_for_approval.filter((plan) => {
-		if (tourApprovalTab === "doctors") return plan.type === "doctor";
-		if (tourApprovalTab === "distributors") return plan.type === "distributor";
-		return true;
-	});
 	const tourSummary = tourMode === "doctor" ? kpi.tour_summary?.doctor_mode || {
 		total_tours: 36,
 		planned: 857,
@@ -6201,37 +6096,7 @@ function TrackingDashboard({ mapbox = {}, kpi = {}, field_representatives = [], 
 			preserveScroll: true
 		});
 	};
-	const handleApprovePlan = (planId) => {
-		setIsProcessing(true);
-		router.post(`/admin/tour-plans/${planId}/approve`, { notes: reviewNotes || "Tour plan approved." }, {
-			preserveScroll: true,
-			onSuccess: () => {
-				toast.success("Tour plan approved successfully!");
-				setReviewModalPlan(null);
-				setIsProcessing(false);
-			},
-			onError: () => {
-				toast.error("Failed to approve tour plan.");
-				setIsProcessing(false);
-			}
-		});
-	};
-	const handleRejectPlan = (planId) => {
-		setIsProcessing(true);
-		router.post(`/admin/tour-plans/${planId}/reject`, { notes: reviewNotes || "Tour plan rejected." }, {
-			preserveScroll: true,
-			onSuccess: () => {
-				toast.success("Tour plan marked as rejected.");
-				setReviewModalPlan(null);
-				setIsProcessing(false);
-			},
-			onError: () => {
-				toast.error("Failed to reject tour plan.");
-				setIsProcessing(false);
-			}
-		});
-	};
-	return /* @__PURE__ */ jsxs(AdminLayout, { children: [/* @__PURE__ */ jsxs("div", {
+	return /* @__PURE__ */ jsx(AdminLayout, { children: /* @__PURE__ */ jsxs("div", {
 		className: "space-y-6 pb-12 font-sans max-w-[1600px] mx-auto",
 		children: [
 			/* @__PURE__ */ jsxs("div", {
@@ -6241,7 +6106,7 @@ function TrackingDashboard({ mapbox = {}, kpi = {}, field_representatives = [], 
 					children: "Field Operations & Live Tracking"
 				}), /* @__PURE__ */ jsx("p", {
 					className: "text-xs text-slate-500 font-normal mt-0.5",
-					children: "Real-time Mapbox doctor movement, field telemetry, and monthly tour plan approvals."
+					children: "Real-time Mapbox doctor movement, field telemetry, and daily visit progress."
 				})] }), /* @__PURE__ */ jsxs("div", {
 					className: "flex items-center gap-2.5",
 					children: [/* @__PURE__ */ jsxs("div", {
@@ -6376,190 +6241,91 @@ function TrackingDashboard({ mapbox = {}, kpi = {}, field_representatives = [], 
 				]
 			}),
 			/* @__PURE__ */ jsxs("div", {
-				className: "grid grid-cols-1 lg:grid-cols-12 gap-5",
-				children: [/* @__PURE__ */ jsxs("div", {
-					className: "lg:col-span-5 bg-white rounded-2xl border border-slate-200/80 p-5 space-y-4",
-					children: [
-						/* @__PURE__ */ jsxs("div", {
-							className: "flex items-center justify-between pb-3 border-b border-slate-100",
-							children: [/* @__PURE__ */ jsxs("div", {
-								className: "flex items-center gap-2",
-								children: [/* @__PURE__ */ jsx(Calendar, { className: "w-4 h-4 text-violet-600" }), /* @__PURE__ */ jsx("h3", {
-									className: "text-sm font-semibold text-slate-800",
-									children: "Tour Plan Summary - Today"
-								})]
-							}), /* @__PURE__ */ jsxs("div", {
-								className: "flex items-center gap-1 p-0.5 rounded-xl bg-slate-200/50 text-xs",
-								children: [/* @__PURE__ */ jsx("button", {
-									type: "button",
-									onClick: () => setTourMode("doctor"),
-									className: `px-3 py-1 rounded-lg transition-colors cursor-pointer ${tourMode === "doctor" ? "bg-white text-slate-900 font-semibold shadow-2xs" : "text-slate-600 hover:text-slate-900 font-normal"}`,
-									children: "Doctor Mode"
-								}), /* @__PURE__ */ jsx("button", {
-									type: "button",
-									onClick: () => setTourMode("distributor"),
-									className: `px-3 py-1 rounded-lg transition-colors cursor-pointer ${tourMode === "distributor" ? "bg-white text-slate-900 font-semibold shadow-2xs" : "text-slate-600 hover:text-slate-900 font-normal"}`,
-									children: "Distributor"
-								})]
-							})]
-						}),
-						/* @__PURE__ */ jsxs("div", {
-							className: "grid grid-cols-2 sm:grid-cols-4 gap-2.5",
-							children: [
-								/* @__PURE__ */ jsxs("div", {
-									className: "rounded-xl p-3 bg-slate-50 border border-slate-100 text-center",
-									children: [/* @__PURE__ */ jsx("p", {
-										className: "text-base font-semibold text-slate-800",
-										children: tourSummary.total_tours
-									}), /* @__PURE__ */ jsx("span", {
-										className: "text-[10px] font-medium text-slate-500 block mt-0.5",
-										children: "Total Tours"
-									})]
-								}),
-								/* @__PURE__ */ jsxs("div", {
-									className: "rounded-xl p-3 bg-slate-50 border border-slate-100 text-center",
-									children: [/* @__PURE__ */ jsx("p", {
-										className: "text-base font-semibold text-slate-800",
-										children: tourSummary.planned
-									}), /* @__PURE__ */ jsx("span", {
-										className: "text-[10px] font-medium text-slate-500 block mt-0.5",
-										children: "Planned"
-									})]
-								}),
-								/* @__PURE__ */ jsxs("div", {
-									className: "rounded-xl p-3 bg-slate-50 border border-slate-100 text-center",
-									children: [/* @__PURE__ */ jsx("p", {
-										className: "text-base font-semibold text-emerald-600",
-										children: tourSummary.visited
-									}), /* @__PURE__ */ jsx("span", {
-										className: "text-[10px] font-medium text-slate-500 block mt-0.5",
-										children: "Visited"
-									})]
-								}),
-								/* @__PURE__ */ jsxs("div", {
-									className: "rounded-xl p-3 bg-slate-50 border border-slate-100 text-center",
-									children: [/* @__PURE__ */ jsxs("p", {
-										className: "text-base font-semibold text-violet-600",
-										children: [tourSummary.completion_percent, "%"]
-									}), /* @__PURE__ */ jsx("span", {
-										className: "text-[10px] font-medium text-slate-500 block mt-0.5",
-										children: "Completion"
-									})]
-								})
-							]
-						}),
-						/* @__PURE__ */ jsxs("div", {
-							className: "flex items-center justify-between text-xs text-slate-500 pt-1",
-							children: [/* @__PURE__ */ jsx("span", { children: "Overall regional completion progress" }), /* @__PURE__ */ jsxs("span", {
-								className: "font-semibold text-slate-800",
-								children: [tourSummary.completion_percent, "% Completed"]
-							})]
-						}),
-						/* @__PURE__ */ jsx("div", {
-							className: "w-full bg-slate-100 h-2 rounded-full overflow-hidden",
-							children: /* @__PURE__ */ jsx("div", {
-								className: "bg-emerald-500 h-full rounded-full transition-all duration-500",
-								style: { width: `${tourSummary.completion_percent}%` }
-							})
-						})
-					]
-				}), /* @__PURE__ */ jsxs("div", {
-					className: "lg:col-span-7 bg-white rounded-2xl border border-slate-200/80 p-5 space-y-3",
-					children: [/* @__PURE__ */ jsxs("div", {
-						className: "flex items-center justify-between pb-2 border-b border-slate-100",
+				className: "bg-white rounded-2xl border border-slate-200/80 p-5 space-y-4",
+				children: [
+					/* @__PURE__ */ jsxs("div", {
+						className: "flex items-center justify-between pb-3 border-b border-slate-100",
 						children: [/* @__PURE__ */ jsxs("div", {
 							className: "flex items-center gap-2",
-							children: [/* @__PURE__ */ jsx(ShieldCheck, { className: "w-4 h-4 text-violet-600" }), /* @__PURE__ */ jsx("h3", {
+							children: [/* @__PURE__ */ jsx(Calendar, { className: "w-4 h-4 text-violet-600" }), /* @__PURE__ */ jsx("h3", {
 								className: "text-sm font-semibold text-slate-800",
-								children: "Tour Plan for Approval"
+								children: "Field Operations Summary - Today"
 							})]
 						}), /* @__PURE__ */ jsxs("div", {
 							className: "flex items-center gap-1 p-0.5 rounded-xl bg-slate-200/50 text-xs",
-							children: [/* @__PURE__ */ jsxs("button", {
+							children: [/* @__PURE__ */ jsx("button", {
 								type: "button",
-								onClick: () => setTourApprovalTab("doctors"),
-								className: `px-3 py-1 rounded-lg transition-colors cursor-pointer ${tourApprovalTab === "doctors" ? "bg-white text-slate-900 font-semibold shadow-2xs" : "text-slate-600 hover:text-slate-900 font-normal"}`,
-								children: [
-									"Doctors (",
-									tour_plans_for_approval.filter((p) => p.type === "doctor").length,
-									")"
-								]
+								onClick: () => setTourMode("doctor"),
+								className: `px-3 py-1 rounded-lg transition-colors cursor-pointer ${tourMode === "doctor" ? "bg-white text-slate-900 font-semibold shadow-2xs" : "text-slate-600 hover:text-slate-900 font-normal"}`,
+								children: "Doctor Mode"
 							}), /* @__PURE__ */ jsx("button", {
 								type: "button",
-								onClick: () => setTourApprovalTab("distributors"),
-								className: `px-3 py-1 rounded-lg transition-colors cursor-pointer ${tourApprovalTab === "distributors" ? "bg-white text-slate-900 font-semibold shadow-2xs" : "text-slate-600 hover:text-slate-900 font-normal"}`,
-								children: "Distributors (0)"
+								onClick: () => setTourMode("distributor"),
+								className: `px-3 py-1 rounded-lg transition-colors cursor-pointer ${tourMode === "distributor" ? "bg-white text-slate-900 font-semibold shadow-2xs" : "text-slate-600 hover:text-slate-900 font-normal"}`,
+								children: "Distributor"
 							})]
 						})]
-					}), /* @__PURE__ */ jsx("div", {
-						className: "overflow-x-auto max-h-[195px] overflow-y-auto",
-						children: /* @__PURE__ */ jsxs("table", {
-							className: "w-full text-left text-xs border-collapse",
-							children: [/* @__PURE__ */ jsx("thead", { children: /* @__PURE__ */ jsxs("tr", {
-								className: "border-b border-slate-100 text-[11px] font-semibold text-slate-400",
-								children: [
-									/* @__PURE__ */ jsx("th", {
-										className: "py-2 px-2",
-										children: "Employee"
-									}),
-									/* @__PURE__ */ jsx("th", {
-										className: "py-2 px-2",
-										children: "Month"
-									}),
-									/* @__PURE__ */ jsx("th", {
-										className: "py-2 px-2 text-center",
-										children: "Days"
-									}),
-									/* @__PURE__ */ jsx("th", {
-										className: "py-2 px-2 text-right",
-										children: "Action"
-									})
-								]
-							}) }), /* @__PURE__ */ jsx("tbody", {
-								className: "divide-y divide-slate-100",
-								children: filteredPlans.length > 0 ? filteredPlans.map((plan) => /* @__PURE__ */ jsxs("tr", {
-									className: "hover:bg-slate-50/70 transition-colors",
-									children: [
-										/* @__PURE__ */ jsx("td", {
-											className: "py-2 px-2 font-medium text-slate-800",
-											children: plan.employee_name
-										}),
-										/* @__PURE__ */ jsx("td", {
-											className: "py-2 px-2 text-slate-500",
-											children: plan.month
-										}),
-										/* @__PURE__ */ jsx("td", {
-											className: "py-2 px-2 text-center font-normal text-slate-700",
-											children: /* @__PURE__ */ jsxs("span", {
-												className: "px-2 py-0.5 rounded-md bg-slate-100 text-[11px]",
-												children: [plan.days_count, " days"]
-											})
-										}),
-										/* @__PURE__ */ jsx("td", {
-											className: "py-2 px-2 text-right",
-											children: plan.status === "approved" ? /* @__PURE__ */ jsxs("span", {
-												className: "inline-flex items-center gap-1 text-[11px] font-medium text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200/60",
-												children: [/* @__PURE__ */ jsx(Check, { className: "w-3 h-3" }), " Approved"]
-											}) : /* @__PURE__ */ jsx("button", {
-												type: "button",
-												onClick: () => {
-													setReviewModalPlan(plan);
-													setReviewNotes("");
-												},
-												className: "px-3 py-1 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-medium text-xs transition-colors cursor-pointer",
-												children: "Review"
-											})
-										})
-									]
-								}, plan.id)) : /* @__PURE__ */ jsx("tr", { children: /* @__PURE__ */ jsx("td", {
-									colSpan: "4",
-									className: "py-6 text-center text-slate-400",
-									children: "No pending tour plans found for approval."
-								}) })
-							})]
+					}),
+					/* @__PURE__ */ jsxs("div", {
+						className: "grid grid-cols-2 sm:grid-cols-4 gap-3",
+						children: [
+							/* @__PURE__ */ jsxs("div", {
+								className: "rounded-xl p-3 bg-slate-50 border border-slate-100 text-center",
+								children: [/* @__PURE__ */ jsx("p", {
+									className: "text-base font-semibold text-slate-800",
+									children: tourSummary.total_tours
+								}), /* @__PURE__ */ jsx("span", {
+									className: "text-[10px] font-medium text-slate-500 block mt-0.5",
+									children: "Total Field Units"
+								})]
+							}),
+							/* @__PURE__ */ jsxs("div", {
+								className: "rounded-xl p-3 bg-slate-50 border border-slate-100 text-center",
+								children: [/* @__PURE__ */ jsx("p", {
+									className: "text-base font-semibold text-slate-800",
+									children: tourSummary.planned
+								}), /* @__PURE__ */ jsx("span", {
+									className: "text-[10px] font-medium text-slate-500 block mt-0.5",
+									children: "Planned Visits"
+								})]
+							}),
+							/* @__PURE__ */ jsxs("div", {
+								className: "rounded-xl p-3 bg-slate-50 border border-slate-100 text-center",
+								children: [/* @__PURE__ */ jsx("p", {
+									className: "text-base font-semibold text-emerald-600",
+									children: tourSummary.visited
+								}), /* @__PURE__ */ jsx("span", {
+									className: "text-[10px] font-medium text-slate-500 block mt-0.5",
+									children: "Completed Visits"
+								})]
+							}),
+							/* @__PURE__ */ jsxs("div", {
+								className: "rounded-xl p-3 bg-slate-50 border border-slate-100 text-center",
+								children: [/* @__PURE__ */ jsxs("p", {
+									className: "text-base font-semibold text-violet-600",
+									children: [tourSummary.completion_percent, "%"]
+								}), /* @__PURE__ */ jsx("span", {
+									className: "text-[10px] font-medium text-slate-500 block mt-0.5",
+									children: "Completion Rate"
+								})]
+							})
+						]
+					}),
+					/* @__PURE__ */ jsxs("div", {
+						className: "flex items-center justify-between text-xs text-slate-500 pt-1",
+						children: [/* @__PURE__ */ jsx("span", { children: "Overall regional completion progress" }), /* @__PURE__ */ jsxs("span", {
+							className: "font-semibold text-slate-800",
+							children: [tourSummary.completion_percent, "% Completed"]
+						})]
+					}),
+					/* @__PURE__ */ jsx("div", {
+						className: "w-full bg-slate-100 h-2 rounded-full overflow-hidden",
+						children: /* @__PURE__ */ jsx("div", {
+							className: "bg-emerald-500 h-full rounded-full transition-all duration-500",
+							style: { width: `${tourSummary.completion_percent}%` }
 						})
-					})]
-				})]
+					})
+				]
 			}),
 			/* @__PURE__ */ jsxs("div", {
 				className: "grid grid-cols-1 lg:grid-cols-12 gap-5 items-start",
@@ -6580,15 +6346,11 @@ function TrackingDashboard({ mapbox = {}, kpi = {}, field_representatives = [], 
 									children: [filteredReps.length, " Active"]
 								})]
 							}),
-							/* @__PURE__ */ jsxs("div", {
-								className: "relative",
-								children: [/* @__PURE__ */ jsx(Search, { className: "w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5 pointer-events-none" }), /* @__PURE__ */ jsx("input", {
-									type: "text",
-									value: searchRepQuery,
-									onChange: (e) => setSearchRepQuery(e.target.value),
-									placeholder: "Search representative...",
-									className: "w-full pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 transition-all"
-								})]
+							/* @__PURE__ */ jsx(SearchBar, {
+								value: searchRepQuery,
+								onChange: (e) => setSearchRepQuery(e.target.value),
+								placeholder: "Search representative...",
+								className: "w-full"
 							}),
 							/* @__PURE__ */ jsx("div", {
 								className: "space-y-1.5 max-h-[580px] overflow-y-auto pr-1",
@@ -6793,90 +6555,466 @@ function TrackingDashboard({ mapbox = {}, kpi = {}, field_representatives = [], 
 				]
 			})
 		]
-	}), reviewModalPlan && /* @__PURE__ */ jsx("div", {
-		className: "fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-xs p-4",
+	}) });
+}
+//#endregion
+//#region resources/js/components/auth/ForgotPasswordModal.jsx
+function FieldError({ error }) {
+	if (!error) return null;
+	return /* @__PURE__ */ jsxs("p", {
+		className: "text-[11px] text-rose-600 flex items-center gap-1 font-normal mt-1 animate-in fade-in",
+		children: [/* @__PURE__ */ jsx(AlertCircle, { className: "w-3 h-3 shrink-0" }), /* @__PURE__ */ jsx("span", { children: error })]
+	});
+}
+function ActionButton({ loading, loadingText, text, icon: Icon = ArrowRight, ...props }) {
+	return /* @__PURE__ */ jsx("button", {
+		...props,
+		disabled: loading || props.disabled,
+		className: "w-full mt-2 py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-medium flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-60 shadow-2xs",
+		children: loading ? /* @__PURE__ */ jsxs(Fragment, { children: [/* @__PURE__ */ jsx("div", { className: "w-3.5 h-3.5 border-2 border-white/60 border-t-white rounded-full animate-spin" }), /* @__PURE__ */ jsx("span", { children: loadingText })] }) : /* @__PURE__ */ jsxs(Fragment, { children: [/* @__PURE__ */ jsx("span", { children: text }), /* @__PURE__ */ jsx(Icon, { className: "w-3.5 h-3.5 text-violet-400" })] })
+	});
+}
+function PasswordInput({ label, value, onChange, error, placeholder, show, onToggle }) {
+	return /* @__PURE__ */ jsxs("div", {
+		className: "space-y-1",
+		children: [
+			/* @__PURE__ */ jsx("label", {
+				className: "text-xs font-medium text-slate-700 block",
+				children: label
+			}),
+			/* @__PURE__ */ jsxs("div", {
+				className: "relative",
+				children: [
+					/* @__PURE__ */ jsx(Lock, { className: "w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" }),
+					/* @__PURE__ */ jsx("input", {
+						type: show ? "text" : "password",
+						value,
+						onChange,
+						placeholder,
+						className: `w-full bg-slate-50/60 hover:bg-slate-50 focus:bg-white border rounded-xl pl-8 pr-9 py-2 text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none transition-all font-normal ${error ? "border-rose-300 focus:border-rose-500 focus:ring-2 focus:ring-rose-500/15" : "border-slate-200 focus:border-slate-300 focus:ring-2 focus:ring-violet-500/10"}`
+					}),
+					/* @__PURE__ */ jsx("button", {
+						type: "button",
+						onClick: onToggle,
+						className: "absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 transition-colors cursor-pointer",
+						children: show ? /* @__PURE__ */ jsx(EyeOff, { className: "w-3.5 h-3.5" }) : /* @__PURE__ */ jsx(Eye, { className: "w-3.5 h-3.5" })
+					})
+				]
+			}),
+			/* @__PURE__ */ jsx(FieldError, { error })
+		]
+	});
+}
+function ForgotPasswordModal({ isOpen, onClose, onSuccess }) {
+	const [step, setStep] = useState(1);
+	const [email, setEmail] = useState("");
+	const [otp, setOtp] = useState([
+		"",
+		"",
+		"",
+		"",
+		"",
+		""
+	]);
+	const [password, setPassword] = useState("");
+	const [passwordConfirmation, setPasswordConfirmation] = useState("");
+	const [showPassword, setShowPassword] = useState(false);
+	const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+	const [loading, setLoading] = useState(false);
+	const [errors, setErrors] = useState({});
+	const [countdown, setCountdown] = useState(0);
+	const otpInputsRef = useRef([]);
+	useEffect(() => {
+		let timer;
+		if (countdown > 0) timer = setTimeout(() => setCountdown(countdown - 1), 1e3);
+		return () => clearTimeout(timer);
+	}, [countdown]);
+	useEffect(() => {
+		if (isOpen) {
+			setStep(1);
+			setEmail("");
+			setOtp([
+				"",
+				"",
+				"",
+				"",
+				"",
+				""
+			]);
+			setPassword("");
+			setPasswordConfirmation("");
+			setErrors({});
+			setCountdown(0);
+		}
+	}, [isOpen]);
+	if (!isOpen) return null;
+	const clearError = (field) => {
+		if (errors[field]) setErrors((prev) => ({
+			...prev,
+			[field]: ""
+		}));
+	};
+	const handleOtpChange = (index, value) => {
+		clearError("otp");
+		if (value.length > 1) {
+			const digits = value.replace(/\D/g, "").slice(0, 6).split("");
+			const newOtp = [...otp];
+			digits.forEach((d, i) => newOtp[i] = d);
+			setOtp(newOtp);
+			otpInputsRef.current[Math.min(digits.length, 5)]?.focus();
+			return;
+		}
+		const cleanDigit = value.replace(/\D/g, "");
+		const newOtp = [...otp];
+		newOtp[index] = cleanDigit;
+		setOtp(newOtp);
+		if (cleanDigit && index < 5) otpInputsRef.current[index + 1]?.focus();
+	};
+	const handleOtpKeyDown = (index, e) => {
+		if (e.key === "Backspace" && !otp[index] && index > 0) otpInputsRef.current[index - 1]?.focus();
+	};
+	const fullOtp = otp.join("");
+	const handleSendOtp = async (e) => {
+		if (e) e.preventDefault();
+		setErrors({});
+		if (!email.trim()) {
+			setErrors({ email: "Please enter your registered email address." });
+			return;
+		}
+		setLoading(true);
+		try {
+			const { data } = await axios.post("/forgot-password/send-otp", { email });
+			if (data.success) {
+				setStep(2);
+				setCountdown(60);
+				setOtp([
+					"",
+					"",
+					"",
+					"",
+					"",
+					""
+				]);
+				setTimeout(() => otpInputsRef.current[0]?.focus(), 100);
+			}
+		} catch (err) {
+			setErrors({ email: err.response?.data?.errors?.email?.[0] || err.response?.data?.message || "Unable to process request." });
+		} finally {
+			setLoading(false);
+		}
+	};
+	const handleResendOtp = async () => {
+		if (countdown > 0 || loading) return;
+		setErrors({});
+		setLoading(true);
+		try {
+			const { data } = await axios.post("/forgot-password/send-otp", { email });
+			if (data.success) {
+				setCountdown(60);
+				setOtp([
+					"",
+					"",
+					"",
+					"",
+					"",
+					""
+				]);
+				otpInputsRef.current[0]?.focus();
+			}
+		} catch (err) {
+			setErrors({ otp: err.response?.data?.errors?.email?.[0] || err.response?.data?.message || "Failed to resend code." });
+		} finally {
+			setLoading(false);
+		}
+	};
+	const handleVerifyOtp = async (e) => {
+		if (e) e.preventDefault();
+		setErrors({});
+		if (fullOtp.length !== 6) {
+			setErrors({ otp: "Please enter all 6 digits of the code." });
+			return;
+		}
+		setLoading(true);
+		try {
+			const { data } = await axios.post("/forgot-password/verify-otp", {
+				email,
+				otp: fullOtp
+			});
+			if (data.success) setStep(3);
+		} catch (err) {
+			setErrors({ otp: err.response?.data?.errors?.otp?.[0] || err.response?.data?.message || "Verification failed." });
+		} finally {
+			setLoading(false);
+		}
+	};
+	const handleResetPassword = async (e) => {
+		if (e) e.preventDefault();
+		const newErrors = {};
+		if (!password) newErrors.password = "Please enter a new password.";
+		else if (password.length < 8) newErrors.password = "Password must be at least 8 characters long.";
+		if (!passwordConfirmation) newErrors.password_confirmation = "Please confirm your new password.";
+		else if (password && password !== passwordConfirmation) newErrors.password_confirmation = "Passwords do not match.";
+		if (Object.keys(newErrors).length > 0) {
+			setErrors(newErrors);
+			return;
+		}
+		setLoading(true);
+		setErrors({});
+		try {
+			const { data } = await axios.post("/forgot-password/reset-password", {
+				email,
+				otp: fullOtp,
+				password,
+				password_confirmation: passwordConfirmation
+			});
+			if (data.success) setStep(4);
+		} catch (err) {
+			const resErrors = err.response?.data?.errors;
+			if (resErrors) setErrors({
+				password: resErrors.password?.[0],
+				password_confirmation: resErrors.password_confirmation?.[0],
+				otp: resErrors.otp?.[0]
+			});
+			else setErrors({ password: err.response?.data?.message || "Failed to update password." });
+		} finally {
+			setLoading(false);
+		}
+	};
+	const headerMeta = {
+		1: {
+			title: "Reset Password",
+			desc: "Enter your email to receive an OTP",
+			Icon: Mail
+		},
+		2: {
+			title: "Verify Code",
+			desc: "Enter the 6-digit verification code",
+			Icon: KeyRound
+		},
+		3: {
+			title: "New Password",
+			desc: "Create a strong, secure password",
+			Icon: Lock
+		},
+		4: {
+			title: "Password Updated",
+			desc: "Your credentials are now updated",
+			Icon: CheckCircle2
+		}
+	}[step];
+	return /* @__PURE__ */ jsx("div", {
+		className: "fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs animate-in fade-in duration-200",
+		onClick: onClose,
 		children: /* @__PURE__ */ jsxs("div", {
-			className: "bg-white rounded-2xl border border-slate-200 max-w-lg w-full p-6 space-y-4 shadow-xl",
+			className: "w-full max-w-sm bg-white rounded-3xl shadow-xl border border-slate-200/80 overflow-hidden transform transition-all text-slate-800",
+			onClick: (e) => e.stopPropagation(),
 			children: [
 				/* @__PURE__ */ jsxs("div", {
-					className: "flex items-center justify-between pb-3 border-b border-slate-100",
+					className: "px-6 pt-6 pb-4 flex items-start justify-between",
 					children: [/* @__PURE__ */ jsxs("div", {
-						className: "flex items-center gap-2",
-						children: [/* @__PURE__ */ jsx(ShieldCheck, { className: "w-5 h-5 text-violet-600" }), /* @__PURE__ */ jsx("h3", {
-							className: "text-base font-semibold text-slate-800",
-							children: "Review Tour Plan"
-						})]
+						className: "flex items-center gap-3",
+						children: [/* @__PURE__ */ jsx("div", {
+							className: "w-10 h-10 rounded-2xl bg-gradient-to-br from-violet-500/10 via-purple-500/10 to-indigo-500/10 border border-violet-100 flex items-center justify-center text-violet-600 shrink-0",
+							children: /* @__PURE__ */ jsx(headerMeta.Icon, { className: `w-5 h-5 ${step === 4 ? "text-emerald-600" : ""}` })
+						}), /* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("h3", {
+							className: "text-base font-semibold text-slate-900 tracking-tight",
+							children: headerMeta.title
+						}), /* @__PURE__ */ jsx("p", {
+							className: "text-xs text-slate-400 font-normal",
+							children: headerMeta.desc
+						})] })]
 					}), /* @__PURE__ */ jsx("button", {
 						type: "button",
-						onClick: () => setReviewModalPlan(null),
-						className: "text-slate-400 hover:text-slate-600 cursor-pointer",
-						children: /* @__PURE__ */ jsx(X, { className: "w-5 h-5" })
+						onClick: onClose,
+						className: "w-8 h-8 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100 flex items-center justify-center transition-colors cursor-pointer shrink-0 -mr-1",
+						children: /* @__PURE__ */ jsx(X, { className: "w-4 h-4" })
 					})]
 				}),
-				/* @__PURE__ */ jsxs("div", {
-					className: "space-y-3 text-xs text-slate-700",
-					children: [/* @__PURE__ */ jsxs("div", {
-						className: "grid grid-cols-2 gap-3 p-3 bg-slate-50 rounded-xl border border-slate-200/60",
+				step < 4 && /* @__PURE__ */ jsx("div", {
+					className: "px-6 pb-2",
+					children: /* @__PURE__ */ jsx("div", {
+						className: "flex items-center gap-1.5",
 						children: [
-							/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("span", {
-								className: "text-slate-400 text-[10px] font-medium",
-								children: "Representative"
-							}), /* @__PURE__ */ jsx("p", {
-								className: "font-semibold text-slate-800 text-sm",
-								children: reviewModalPlan.employee_name
-							})] }),
-							/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("span", {
-								className: "text-slate-400 text-[10px] font-medium",
-								children: "Plan Period"
-							}), /* @__PURE__ */ jsx("p", {
-								className: "font-medium text-slate-800",
-								children: reviewModalPlan.month
-							})] }),
-							/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("span", {
-								className: "text-slate-400 text-[10px] font-medium",
-								children: "Field Working Days"
-							}), /* @__PURE__ */ jsxs("p", {
-								className: "font-medium text-slate-800",
-								children: [reviewModalPlan.days_count, " Days"]
-							})] }),
-							/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("span", {
-								className: "text-slate-400 text-[10px] font-medium",
-								children: "Target Doctor Visits"
-							}), /* @__PURE__ */ jsxs("p", {
-								className: "font-semibold text-violet-600",
-								children: [reviewModalPlan.planned_visits, " Visits"]
-							})] })
-						]
-					}), /* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("label", {
-						className: "block text-xs font-medium text-slate-700 mb-1",
-						children: "Administrator Notes & Guidance"
-					}), /* @__PURE__ */ jsx("textarea", {
-						rows: "3",
-						value: reviewNotes,
-						onChange: (e) => setReviewNotes(e.target.value),
-						placeholder: "Optional feedback for the representative...",
-						className: "w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500"
-					})] })]
+							1,
+							2,
+							3
+						].map((s) => /* @__PURE__ */ jsx("div", { className: `h-1 flex-1 rounded-full transition-all duration-300 ${s <= step ? "bg-violet-600" : "bg-slate-100"}` }, s))
+					})
 				}),
 				/* @__PURE__ */ jsxs("div", {
-					className: "flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100",
-					children: [/* @__PURE__ */ jsx("button", {
-						type: "button",
-						disabled: isProcessing,
-						onClick: () => handleRejectPlan(reviewModalPlan.id),
-						className: "px-4 py-2 rounded-xl text-xs font-medium text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200/60 transition-colors cursor-pointer",
-						children: "Reject Plan"
-					}), /* @__PURE__ */ jsx("button", {
-						type: "button",
-						disabled: isProcessing,
-						onClick: () => handleApprovePlan(reviewModalPlan.id),
-						className: "px-5 py-2 rounded-xl text-xs font-medium text-white bg-slate-900 hover:bg-slate-800 transition-colors cursor-pointer",
-						children: isProcessing ? "Processing..." : "Approve Tour Plan"
-					})]
+					className: "px-6 pb-6 pt-2",
+					children: [
+						step === 1 && /* @__PURE__ */ jsxs("form", {
+							onSubmit: handleSendOtp,
+							noValidate: true,
+							className: "space-y-4",
+							children: [/* @__PURE__ */ jsxs("div", {
+								className: "space-y-1.5",
+								children: [
+									/* @__PURE__ */ jsx("label", {
+										className: "text-xs font-medium text-slate-700 block",
+										children: "Email Address"
+									}),
+									/* @__PURE__ */ jsxs("div", {
+										className: "relative",
+										children: [/* @__PURE__ */ jsx(Mail, { className: "w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" }), /* @__PURE__ */ jsx("input", {
+											type: "email",
+											value: email,
+											onChange: (e) => {
+												setEmail(e.target.value);
+												clearError("email");
+											},
+											placeholder: "name@example.com",
+											autoFocus: true,
+											className: `w-full bg-slate-50/60 hover:bg-slate-50 focus:bg-white border rounded-xl pl-8 pr-3 py-2 text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none transition-all font-normal ${errors.email ? "border-rose-300 focus:border-rose-500 focus:ring-2 focus:ring-rose-500/15" : "border-slate-200 focus:border-slate-300 focus:ring-2 focus:ring-violet-500/10"}`
+										})]
+									}),
+									/* @__PURE__ */ jsx(FieldError, { error: errors.email })
+								]
+							}), /* @__PURE__ */ jsx(ActionButton, {
+								loading,
+								loadingText: "Sending code...",
+								text: "Send Verification Code"
+							})]
+						}),
+						step === 2 && /* @__PURE__ */ jsxs("form", {
+							onSubmit: handleVerifyOtp,
+							noValidate: true,
+							className: "space-y-4",
+							children: [
+								/* @__PURE__ */ jsxs("div", {
+									className: "text-center space-y-0.5 pb-1",
+									children: [/* @__PURE__ */ jsxs("p", {
+										className: "text-xs text-slate-600 font-normal",
+										children: [
+											"Code sent to",
+											" ",
+											/* @__PURE__ */ jsx("span", {
+												className: "font-semibold text-slate-800",
+												children: email
+											})
+										]
+									}), /* @__PURE__ */ jsx("p", {
+										className: "text-[10px] text-slate-400",
+										children: "Valid for 10 minutes"
+									})]
+								}),
+								/* @__PURE__ */ jsxs("div", {
+									className: "space-y-1.5",
+									children: [/* @__PURE__ */ jsx("div", {
+										className: "flex items-center justify-center gap-1.5 sm:gap-2",
+										children: otp.map((digit, idx) => /* @__PURE__ */ jsx("input", {
+											ref: (el) => otpInputsRef.current[idx] = el,
+											type: "text",
+											inputMode: "numeric",
+											maxLength: 1,
+											value: digit,
+											onChange: (e) => handleOtpChange(idx, e.target.value),
+											onKeyDown: (e) => handleOtpKeyDown(idx, e),
+											autoFocus: idx === 0,
+											className: `w-9 h-11 sm:w-10 sm:h-12 text-center text-base sm:text-lg font-semibold rounded-xl border focus:outline-none transition-all ${errors.otp ? "border-rose-300 bg-rose-50/40 text-rose-900 focus:border-rose-500 focus:ring-2 focus:ring-rose-500/15" : "border-slate-200 bg-slate-50/60 hover:bg-slate-50 focus:bg-white text-slate-900 focus:border-violet-600 focus:ring-2 focus:ring-violet-500/10"}`
+										}, idx))
+									}), errors.otp && /* @__PURE__ */ jsxs("p", {
+										className: "text-[11px] text-rose-600 flex items-center justify-center gap-1 font-normal mt-2 animate-in fade-in",
+										children: [/* @__PURE__ */ jsx(AlertCircle, { className: "w-3 h-3 shrink-0" }), /* @__PURE__ */ jsx("span", { children: errors.otp })]
+									})]
+								}),
+								/* @__PURE__ */ jsxs("div", {
+									className: "flex items-center justify-between text-xs pt-1",
+									children: [/* @__PURE__ */ jsxs("button", {
+										type: "button",
+										onClick: () => {
+											setStep(1);
+											setErrors({});
+										},
+										className: "text-slate-400 hover:text-slate-700 flex items-center gap-1 transition-colors cursor-pointer text-[11px]",
+										children: [/* @__PURE__ */ jsx(ArrowLeft, { className: "w-3 h-3" }), /* @__PURE__ */ jsx("span", { children: "Change Email" })]
+									}), /* @__PURE__ */ jsxs("button", {
+										type: "button",
+										disabled: countdown > 0 || loading,
+										onClick: handleResendOtp,
+										className: `flex items-center gap-1 transition-colors text-[11px] ${countdown > 0 ? "text-slate-400 cursor-not-allowed" : "text-violet-600 hover:text-violet-700 font-medium cursor-pointer"}`,
+										children: [/* @__PURE__ */ jsx(RotateCcw, { className: "w-3 h-3" }), /* @__PURE__ */ jsx("span", { children: countdown > 0 ? `Resend in ${countdown}s` : "Resend Code" })]
+									})]
+								}),
+								/* @__PURE__ */ jsx(ActionButton, {
+									loading,
+									loadingText: "Verifying code...",
+									text: "Verify Code",
+									disabled: fullOtp.length !== 6
+								})
+							]
+						}),
+						step === 3 && /* @__PURE__ */ jsxs("form", {
+							onSubmit: handleResetPassword,
+							noValidate: true,
+							className: "space-y-4",
+							children: [
+								/* @__PURE__ */ jsx(PasswordInput, {
+									label: "New Password",
+									value: password,
+									onChange: (e) => {
+										setPassword(e.target.value);
+										clearError("password");
+									},
+									error: errors.password,
+									placeholder: "At least 8 characters",
+									show: showPassword,
+									onToggle: () => setShowPassword(!showPassword)
+								}),
+								/* @__PURE__ */ jsx(PasswordInput, {
+									label: "Confirm New Password",
+									value: passwordConfirmation,
+									onChange: (e) => {
+										setPasswordConfirmation(e.target.value);
+										clearError("password_confirmation");
+									},
+									error: errors.password_confirmation,
+									placeholder: "Re-enter password",
+									show: showConfirmPassword,
+									onToggle: () => setShowConfirmPassword(!showConfirmPassword)
+								}),
+								/* @__PURE__ */ jsx(ActionButton, {
+									loading,
+									loadingText: "Updating password...",
+									text: "Reset Password",
+									icon: ShieldCheck
+								})
+							]
+						}),
+						step === 4 && /* @__PURE__ */ jsxs("div", {
+							className: "text-center py-4 space-y-4",
+							children: [
+								/* @__PURE__ */ jsx("div", {
+									className: "w-12 h-12 mx-auto rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-100",
+									children: /* @__PURE__ */ jsx(CheckCircle2, { className: "w-6 h-6 text-emerald-600" })
+								}),
+								/* @__PURE__ */ jsxs("div", {
+									className: "space-y-1",
+									children: [/* @__PURE__ */ jsx("h4", {
+										className: "text-sm font-semibold text-slate-900",
+										children: "Password Reset Successfully!"
+									}), /* @__PURE__ */ jsx("p", {
+										className: "text-xs text-slate-500 max-w-xs mx-auto font-normal",
+										children: "Your credentials have been securely updated. You can now sign in with your new password."
+									})]
+								}),
+								/* @__PURE__ */ jsxs("button", {
+									type: "button",
+									onClick: () => {
+										if (onSuccess) onSuccess(email);
+										onClose();
+									},
+									className: "w-full py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-medium flex items-center justify-center gap-2 transition-all cursor-pointer shadow-2xs",
+									children: [/* @__PURE__ */ jsx("span", { children: "Back to Sign In" }), /* @__PURE__ */ jsx(ArrowRight, { className: "w-3.5 h-3.5 text-violet-400" })]
+								})
+							]
+						})
+					]
 				})
 			]
 		})
-	})] });
+	});
 }
 //#endregion
 //#region resources/js/Pages/auth/LoginPage.jsx
@@ -6886,32 +7024,24 @@ function LoginPage() {
 	const companyProfile = props.company || {};
 	const [showPassword, setShowPassword] = useState(false);
 	const [demoLoading, setDemoLoading] = useState(null);
-	const [selectedRole, setSelectedRole] = useState("mr");
+	const [showForgotModal, setShowForgotModal] = useState(false);
+	useEffect(() => {
+		if (typeof window !== "undefined") {
+			if (new URLSearchParams(window.location.search).get("forgot") === "1") setShowForgotModal(true);
+		}
+	}, []);
 	const { data, setData, post, processing, errors, reset } = useForm({
-		email: "mr@ciplon.com",
-		password: "password",
-		remember: true
+		email: "",
+		password: "",
+		remember: false
 	});
 	const handleSubmit = (e) => {
 		e.preventDefault();
 		post("/login", { onFinish: () => reset("password") });
 	};
-	const selectRoleTab = (role) => {
-		setSelectedRole(role);
-		if (role === "mr") setData({
-			email: "mr@ciplon.com",
-			password: "password",
-			remember: true
-		});
-		else setData({
-			email: "admin@gmail.com",
-			password: "password",
-			remember: true
-		});
-	};
 	const handleQuickLogin = (role) => {
 		const email = role === "mr" ? "mr@ciplon.com" : "admin@gmail.com";
-		const password = "password";
+		const password = "123456789";
 		setDemoLoading(role);
 		setData("email", email);
 		setData("password", password);
@@ -6970,20 +7100,6 @@ function LoginPage() {
 								children: "Sign in with your verified credentials to access your portal."
 							})]
 						}),
-						/* @__PURE__ */ jsxs("div", {
-							className: "p-1 bg-slate-100/80 rounded-xl flex items-center gap-1 border border-slate-200/60",
-							children: [/* @__PURE__ */ jsxs("button", {
-								type: "button",
-								onClick: () => selectRoleTab("mr"),
-								className: `flex-1 py-1.5 px-3 rounded-lg text-xs font-medium transition-all flex items-center justify-center gap-1.5 cursor-pointer ${selectedRole === "mr" ? "bg-white text-slate-900 shadow-2xs font-semibold" : "text-slate-500 hover:text-slate-800"}`,
-								children: [/* @__PURE__ */ jsx(Stethoscope, { className: `w-3.5 h-3.5 ${selectedRole === "mr" ? "text-violet-600" : "text-slate-400"}` }), /* @__PURE__ */ jsx("span", { children: "MR Portal" })]
-							}), /* @__PURE__ */ jsxs("button", {
-								type: "button",
-								onClick: () => selectRoleTab("admin"),
-								className: `flex-1 py-1.5 px-3 rounded-lg text-xs font-medium transition-all flex items-center justify-center gap-1.5 cursor-pointer ${selectedRole === "admin" ? "bg-white text-slate-900 shadow-2xs font-semibold" : "text-slate-500 hover:text-slate-800"}`,
-								children: [/* @__PURE__ */ jsx(ShieldCheck, { className: `w-3.5 h-3.5 ${selectedRole === "admin" ? "text-violet-600" : "text-slate-400"}` }), /* @__PURE__ */ jsx("span", { children: "Admin Panel" })]
-							})]
-						}),
 						props.flash?.error && /* @__PURE__ */ jsxs("div", {
 							className: "p-3 rounded-xl bg-rose-50 text-rose-700 text-xs border border-rose-200/60 flex items-center gap-2",
 							children: [/* @__PURE__ */ jsx(AlertCircle, { className: "w-4 h-4 shrink-0 text-rose-500" }), /* @__PURE__ */ jsx("span", { children: props.flash.error })]
@@ -7029,7 +7145,7 @@ function LoginPage() {
 													children: "Password"
 												}), /* @__PURE__ */ jsx("button", {
 													type: "button",
-													onClick: () => alert("Please contact administrator at support@ciplon.com to reset your credentials."),
+													onClick: () => setShowForgotModal(true),
 													className: "text-[11px] font-normal text-slate-400 hover:text-slate-700 transition-colors cursor-pointer",
 													children: "Forgot password?"
 												})]
@@ -7080,7 +7196,7 @@ function LoginPage() {
 										type: "submit",
 										disabled: processing || demoLoading !== null,
 										className: "w-full mt-2 py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-medium flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-60",
-										children: processing && demoLoading === null ? /* @__PURE__ */ jsxs(Fragment, { children: [/* @__PURE__ */ jsx("div", { className: "w-3.5 h-3.5 border-2 border-white/60 border-t-white rounded-full animate-spin" }), /* @__PURE__ */ jsx("span", { children: "Authenticating..." })] }) : /* @__PURE__ */ jsxs(Fragment, { children: [/* @__PURE__ */ jsxs("span", { children: ["Sign In to ", selectedRole === "mr" ? "MR Portal" : "Admin Panel"] }), /* @__PURE__ */ jsx(ArrowRight, { className: "w-3.5 h-3.5 text-violet-400" })] })
+										children: processing && demoLoading === null ? /* @__PURE__ */ jsxs(Fragment, { children: [/* @__PURE__ */ jsx("div", { className: "w-3.5 h-3.5 border-2 border-white/60 border-t-white rounded-full animate-spin" }), /* @__PURE__ */ jsx("span", { children: "Authenticating..." })] }) : /* @__PURE__ */ jsxs(Fragment, { children: [/* @__PURE__ */ jsx("span", { children: "Sign In" }), /* @__PURE__ */ jsx(ArrowRight, { className: "w-3.5 h-3.5 text-violet-400" })] })
 									})
 								]
 							}), /* @__PURE__ */ jsxs("div", {
@@ -7141,6 +7257,14 @@ function LoginPage() {
 						children: "Support"
 					})]
 				})]
+			}),
+			/* @__PURE__ */ jsx(ForgotPasswordModal, {
+				isOpen: showForgotModal,
+				onClose: () => setShowForgotModal(false),
+				onSuccess: (recoveredEmail) => {
+					setData("email", recoveredEmail);
+					setData("password", "");
+				}
 			})
 		]
 	});
@@ -7154,6 +7278,23 @@ function MRSidebar({ isOpen, onClose }) {
 	const userName = authUser?.name || "Medical Representative";
 	authUser?.email;
 	const [searchQuery, setSearchQuery] = useState("");
+	const navScrollRef = useRef(null);
+	useLayoutEffect(() => {
+		const saved = sessionStorage.getItem("mr_sidebar_scroll_top");
+		if (saved !== null && navScrollRef.current) {
+			navScrollRef.current.scrollTop = Number(saved);
+			requestAnimationFrame(() => {
+				if (navScrollRef.current) navScrollRef.current.scrollTop = Number(saved);
+			});
+		}
+	}, [currentPath, isOpen]);
+	const handleNavScroll = (e) => {
+		if (!searchQuery) sessionStorage.setItem("mr_sidebar_scroll_top", String(e.currentTarget.scrollTop));
+	};
+	const handleLinkClick = () => {
+		if (navScrollRef.current && !searchQuery) sessionStorage.setItem("mr_sidebar_scroll_top", String(navScrollRef.current.scrollTop));
+		if (isOpen && typeof onClose === "function") onClose();
+	};
 	const isParentActive = (prefix) => currentPath.startsWith(prefix);
 	const navigationSections = [
 		{
@@ -7187,55 +7328,31 @@ function MRSidebar({ isOpen, onClose }) {
 		},
 		{
 			title: "Employee & Field",
-			items: [
-				{
-					name: "Employee Assign",
-					path: "/mrconnect/employee-assign",
-					icon: Users,
-					active: isParentActive("/mrconnect/employee-assign")
-				},
-				{
-					name: "Tour Plan",
-					path: "/mrconnect/tour-plan",
-					icon: Globe,
-					active: isParentActive("/mrconnect/tour-plan")
-				},
-				{
-					name: "Field Expenses",
-					path: "/mrconnect/field-expenses",
-					icon: Receipt,
-					active: isParentActive("/mrconnect/field-expenses")
-				},
-				{
-					name: "Leave",
-					path: "/mrconnect/leave",
-					icon: Calendar,
-					active: isParentActive("/mrconnect/leave")
-				}
-			]
+			items: [{
+				name: "Field Expenses",
+				path: "/mrconnect/field-expenses",
+				icon: Receipt,
+				active: isParentActive("/mrconnect/field-expenses")
+			}, {
+				name: "Leave",
+				path: "/mrconnect/leave",
+				icon: Calendar,
+				active: isParentActive("/mrconnect/leave")
+			}]
 		},
 		{
 			title: "Sales & Targets",
-			items: [
-				{
-					name: "Primary Sales",
-					path: "/mrconnect/primary-sales",
-					icon: TrendingUp,
-					active: isParentActive("/mrconnect/primary-sales")
-				},
-				{
-					name: "POB Order",
-					path: "/mrconnect/pob-order",
-					icon: Package,
-					active: isParentActive("/mrconnect/pob-order")
-				},
-				{
-					name: "Set Target",
-					path: "/mrconnect/set-target",
-					icon: Target,
-					active: isParentActive("/mrconnect/set-target")
-				}
-			]
+			items: [{
+				name: "POB Order",
+				path: "/mrconnect/pob-order",
+				icon: Package,
+				active: isParentActive("/mrconnect/pob-order")
+			}, {
+				name: "Target",
+				path: "/mrconnect/set-target",
+				icon: Target,
+				active: isParentActive("/mrconnect/set-target")
+			}]
 		},
 		{
 			title: "Media & Alert",
@@ -7281,13 +7398,8 @@ function MRSidebar({ isOpen, onClose }) {
 			}]
 		},
 		{
-			title: "HR & Reports",
+			title: "Reports",
 			items: [{
-				name: "HR Directory",
-				path: "/mrconnect/hr-section",
-				icon: UserCheck,
-				active: isParentActive("/mrconnect/hr-section")
-			}, {
 				name: "All Reports",
 				path: "/mrconnect/all-reports",
 				icon: FileText,
@@ -7354,6 +7466,9 @@ function MRSidebar({ isOpen, onClose }) {
 				})
 			}),
 			/* @__PURE__ */ jsx("div", {
+				ref: navScrollRef,
+				onScroll: handleNavScroll,
+				"data-scroll-region": true,
 				className: "flex-1 overflow-y-auto px-3 py-1 space-y-4",
 				children: navigationSections.map((section) => {
 					const filteredItems = section.items.filter((item) => item.name.toLowerCase().includes(searchQuery.toLowerCase()));
@@ -7367,9 +7482,7 @@ function MRSidebar({ isOpen, onClose }) {
 							const Icon = item.icon;
 							return /* @__PURE__ */ jsxs(Link, {
 								href: item.path,
-								onClick: () => {
-									if (isOpen && typeof onClose === "function") onClose();
-								},
+								onClick: handleLinkClick,
 								className: `flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium transition-all cursor-pointer ${item.active ? "bg-slate-900 text-white font-medium" : "text-slate-600 hover:text-slate-900 hover:bg-slate-200/50"}`,
 								children: [/* @__PURE__ */ jsx(Icon, { className: `w-4 h-4 ${item.active ? "text-violet-400 stroke-[2]" : "text-slate-400"}` }), /* @__PURE__ */ jsx("span", {
 									className: "flex-1 truncate",
@@ -7544,6 +7657,7 @@ function MRHeader({ onToggleSidebar, title = "MR Dashboard" }) {
 					className: "hidden md:inline-flex items-center gap-1 text-xs font-normal text-slate-500 hover:text-slate-800 px-2.5 py-1.5 rounded-lg hover:bg-slate-100 transition-colors",
 					children: [/* @__PURE__ */ jsx("span", { children: "Website" }), /* @__PURE__ */ jsx(ExternalLink, { className: "w-3 h-3 text-slate-400" })]
 				}),
+				/* @__PURE__ */ jsx(NotificationDropdown, {}),
 				/* @__PURE__ */ jsxs("div", {
 					className: "relative pl-1",
 					ref: dropdownRef,
@@ -7600,8 +7714,23 @@ function MRHeader({ onToggleSidebar, title = "MR Dashboard" }) {
 //#region resources/js/layouts/MR/MRLayout.jsx
 function MRLayout({ children, title = "MR Dashboard" }) {
 	const [sidebarOpen, setSidebarOpen] = useState(false);
-	const { url } = usePage();
+	const { url, props } = usePage();
 	const currentPath = url.split("?")[0];
+	const { flash } = props;
+	const lastFlash = useRef({
+		success: null,
+		error: null
+	});
+	useEffect(() => {
+		if (flash?.success && flash.success !== lastFlash.current.success) {
+			lastFlash.current.success = flash.success;
+			toast.success(flash.success, { id: "flash-success" });
+		}
+		if (flash?.error && flash.error !== lastFlash.current.error) {
+			lastFlash.current.error = flash.error;
+			toast.error(flash.error, { id: "flash-error" });
+		}
+	}, [flash]);
 	const mobileNav = [
 		{
 			label: "Dashboard",
@@ -7646,9 +7775,9 @@ function MRLayout({ children, title = "MR Dashboard" }) {
 				children: [/* @__PURE__ */ jsx(MRHeader, {
 					onToggleSidebar: () => setSidebarOpen(!sidebarOpen),
 					title
-				}), /* @__PURE__ */ jsx("main", {
-					className: "flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto",
-					children
+				}), /* @__PURE__ */ jsxs("main", {
+					className: "flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto relative min-h-[calc(100vh-5rem)]",
+					children: [/* @__PURE__ */ jsx(ContentLoader, {}), children]
 				})]
 			}),
 			/* @__PURE__ */ jsx("nav", {
@@ -7945,7 +8074,7 @@ function Dashboard({ initialData = null }) {
 							}), /* @__PURE__ */ jsx(ChevronRight, { className: "w-4 h-4 text-slate-400 group-hover:text-slate-700 transition-colors" })]
 						}),
 						/* @__PURE__ */ jsxs(Link, {
-							href: "/mrconnect/tour-plan",
+							href: "/mr/visits?view=planner",
 							className: "p-3.5 rounded-2xl bg-white border border-slate-200/80 hover:bg-slate-50 transition-colors flex items-center justify-between group cursor-pointer",
 							children: [/* @__PURE__ */ jsxs("div", {
 								className: "flex items-center gap-3",
@@ -7954,10 +8083,10 @@ function Dashboard({ initialData = null }) {
 									children: /* @__PURE__ */ jsx(Calendar, { className: "w-4 h-4" })
 								}), /* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("span", {
 									className: "block text-xs font-semibold text-slate-800",
-									children: "Monthly Tour Plan"
+									children: "Calls & Daily Planner"
 								}), /* @__PURE__ */ jsx("span", {
 									className: "block text-[11px] text-slate-400",
-									children: "Submit route for approval"
+									children: "Schedule field visits & calls"
 								})] })]
 							}), /* @__PURE__ */ jsx(ChevronRight, { className: "w-4 h-4 text-slate-400 group-hover:text-slate-700 transition-colors" })]
 						})
@@ -9926,24 +10055,11 @@ function Doctors({ initialFilters = {} }) {
 						children: [/* @__PURE__ */ jsxs("div", {
 							className: "flex flex-col md:flex-row items-stretch md:items-center gap-2.5",
 							children: [
-								/* @__PURE__ */ jsxs("div", {
-									className: "relative flex-1",
-									children: [
-										/* @__PURE__ */ jsx(Search, { className: "w-3.5 h-3.5 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" }),
-										/* @__PURE__ */ jsx("input", {
-											type: "text",
-											value: search,
-											onChange: (e) => setSearch(e.target.value),
-											placeholder: "Search by doctor name, clinic, territory, or phone...",
-											className: "w-full pl-9 pr-8 py-2 bg-slate-50 border border-slate-200/80 focus:border-slate-900 focus:bg-white rounded-xl text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-900 transition-all"
-										}),
-										search && /* @__PURE__ */ jsx("button", {
-											type: "button",
-											onClick: () => setSearch(""),
-											className: "absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-0.5",
-											children: /* @__PURE__ */ jsx(X, { className: "w-3.5 h-3.5" })
-										})
-									]
+								/* @__PURE__ */ jsx(SearchBar, {
+									value: search,
+									onChange: (e) => setSearch(e.target.value),
+									placeholder: "Search by doctor name, clinic, territory, or phone...",
+									className: "flex-1"
 								}),
 								/* @__PURE__ */ jsx("div", {
 									className: "w-full md:w-48",
@@ -10516,11 +10632,6 @@ function Products({ initialFilters = {} }) {
 	const [categoryFilter, setCategoryFilter] = useState(initialFilters.category || "all");
 	const [dosageFilter, setDosageFilter] = useState(initialFilters.dosage_form || "all");
 	const [viewMode, setViewMode] = useState("grid");
-	const [detailProduct, setDetailProduct] = useState(null);
-	const [presentationMode, setPresentationMode] = useState(false);
-	const [activeSlide, setActiveSlide] = useState(0);
-	const [deckTheme, setDeckTheme] = useState("light");
-	const [fitMode, setFitMode] = useState("full");
 	const fetchProducts = async () => {
 		setLoading(true);
 		setError(null);
@@ -10551,43 +10662,9 @@ function Products({ initialFilters = {} }) {
 		categoryFilter,
 		dosageFilter
 	]);
-	const handleOpenPresentation = (prod, slideIndex = 0) => {
-		setDetailProduct(prod);
-		setActiveSlide(slideIndex);
-		setPresentationMode(true);
-	};
-	const handleToggleFullscreen = () => {
-		if (!document.fullscreenElement) document.documentElement.requestFullscreen?.().catch(() => {});
-		else document.exitFullscreen?.().catch(() => {});
-	};
-	const handleClosePresentation = () => {
-		setPresentationMode(false);
-	};
-	const carouselSlides = detailProduct?.slides && detailProduct.slides.length > 0 ? detailProduct.slides : [];
-	const totalSlideCount = carouselSlides.length;
-	const handleNextSlide = () => {
-		if (activeSlide < totalSlideCount - 1) setActiveSlide((prev) => prev + 1);
-	};
-	const handlePrevSlide = () => {
-		if (activeSlide > 0) setActiveSlide((prev) => prev - 1);
-	};
-	useEffect(() => {
-		const handleKeyDown = (e) => {
-			if (!presentationMode) return;
-			if (e.key === "ArrowRight" || e.key === "Space") handleNextSlide();
-			else if (e.key === "ArrowLeft") handlePrevSlide();
-			else if (e.key === "Escape") handleClosePresentation();
-		};
-		window.addEventListener("keydown", handleKeyDown);
-		return () => window.removeEventListener("keydown", handleKeyDown);
-	}, [
-		presentationMode,
-		activeSlide,
-		totalSlideCount
-	]);
-	return /* @__PURE__ */ jsxs(MRLayout, {
-		title: "Products & Digital Detailing Aids",
-		children: [/* @__PURE__ */ jsxs("div", {
+	return /* @__PURE__ */ jsx(MRLayout, {
+		title: "Products & Formulations",
+		children: /* @__PURE__ */ jsxs("div", {
 			className: "space-y-5 max-w-7xl mx-auto pb-10 font-sans",
 			children: [
 				/* @__PURE__ */ jsxs("div", {
@@ -10596,14 +10673,14 @@ function Products({ initialFilters = {} }) {
 						className: "flex items-center gap-2.5",
 						children: [/* @__PURE__ */ jsx("h1", {
 							className: "text-xl font-bold text-slate-900 tracking-tight",
-							children: "Product Portfolio & E-Detailing"
+							children: "Product Portfolio & Detailing"
 						}), meta?.total !== void 0 && /* @__PURE__ */ jsxs("span", {
 							className: "px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-800 border border-slate-200/80",
 							children: [meta.total, " Formulations"]
 						})]
 					}), /* @__PURE__ */ jsx("p", {
 						className: "text-xs text-slate-500 mt-1",
-						children: "Interactive pharmaceutical visual aids, molecule compositions, and prescribing guides for in-clinic doctor calls"
+						children: "Pharmaceutical formulations, molecule compositions, and prescribing guides for in-clinic doctor calls"
 					})] }), /* @__PURE__ */ jsxs("div", {
 						className: "flex items-center gap-2",
 						children: [
@@ -10629,85 +10706,62 @@ function Products({ initialFilters = {} }) {
 						]
 					})]
 				}),
-				/* @__PURE__ */ jsx("div", {
-					className: "bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs space-y-3",
-					children: /* @__PURE__ */ jsxs("div", {
-						className: "flex flex-col md:flex-row items-stretch md:items-center gap-2.5",
+				/* @__PURE__ */ jsxs("div", {
+					className: "bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between",
+					children: [/* @__PURE__ */ jsx("div", {
+						className: "flex-1 max-w-md",
+						children: /* @__PURE__ */ jsx(SearchBar, {
+							value: search,
+							onChange: setSearch,
+							placeholder: "Search brand, generic molecule, composition..."
+						})
+					}), /* @__PURE__ */ jsxs("div", {
+						className: "flex items-center gap-2 flex-wrap",
 						children: [
-							/* @__PURE__ */ jsxs("div", {
-								className: "relative flex-1",
-								children: [
-									/* @__PURE__ */ jsx(Search, { className: "w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" }),
-									/* @__PURE__ */ jsx("input", {
-										type: "text",
-										value: search,
-										onChange: (e) => setSearch(e.target.value),
-										placeholder: "Search by brand name, generic molecule, indication, or composition...",
-										className: "w-full pl-9 pr-8 py-2 bg-slate-50/50 border border-slate-200/80 focus:border-slate-900 focus:bg-white rounded-xl text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-900 transition-all"
-									}),
-									search && /* @__PURE__ */ jsx("button", {
-										type: "button",
-										onClick: () => setSearch(""),
-										className: "absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-0.5 cursor-pointer",
-										children: /* @__PURE__ */ jsx(X, { className: "w-3.5 h-3.5" })
-									})
-								]
+							/* @__PURE__ */ jsxs("select", {
+								value: categoryFilter,
+								onChange: (e) => setCategoryFilter(e.target.value),
+								className: "px-3 py-2 text-xs font-medium rounded-xl border border-slate-200 bg-slate-50 text-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 transition-all cursor-pointer",
+								children: [/* @__PURE__ */ jsx("option", {
+									value: "all",
+									children: "All Categories"
+								}), meta?.categories?.map((c) => /* @__PURE__ */ jsx("option", {
+									value: c.slug,
+									children: c.name
+								}, c.id))]
 							}),
-							/* @__PURE__ */ jsx("div", {
-								className: "w-full md:w-56",
-								children: /* @__PURE__ */ jsxs("select", {
-									value: categoryFilter,
-									onChange: (e) => setCategoryFilter(e.target.value),
-									className: "w-full py-2 px-3 bg-slate-50/50 border border-slate-200/80 focus:border-slate-900 focus:bg-white rounded-xl text-xs text-slate-700 focus:outline-none cursor-pointer",
-									children: [/* @__PURE__ */ jsx("option", {
-										value: "all",
-										children: "All Therapeutic Segments"
-									}), meta?.categories?.map((cat) => /* @__PURE__ */ jsxs("option", {
-										value: cat.slug,
-										children: [
-											cat.name,
-											" (",
-											cat.products_count ?? 0,
-											")"
-										]
-									}, cat.id))]
-								})
-							}),
-							/* @__PURE__ */ jsx("div", {
-								className: "w-full md:w-44",
-								children: /* @__PURE__ */ jsxs("select", {
-									value: dosageFilter,
-									onChange: (e) => setDosageFilter(e.target.value),
-									className: "w-full py-2 px-3 bg-slate-50/50 border border-slate-200/80 focus:border-slate-900 focus:bg-white rounded-xl text-xs text-slate-700 focus:outline-none cursor-pointer",
-									children: [/* @__PURE__ */ jsx("option", {
-										value: "all",
-										children: "All Dosage Forms"
-									}), meta?.dosage_forms?.map((form) => /* @__PURE__ */ jsx("option", {
-										value: form,
-										children: form
-									}, form))]
-								})
+							/* @__PURE__ */ jsxs("select", {
+								value: dosageFilter,
+								onChange: (e) => setDosageFilter(e.target.value),
+								className: "px-3 py-2 text-xs font-medium rounded-xl border border-slate-200 bg-slate-50 text-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 transition-all cursor-pointer",
+								children: [/* @__PURE__ */ jsx("option", {
+									value: "all",
+									children: "All Dosage Forms"
+								}), meta?.dosage_forms?.map((d) => /* @__PURE__ */ jsx("option", {
+									value: d,
+									children: d
+								}, d))]
 							}),
 							/* @__PURE__ */ jsxs("div", {
-								className: "flex items-center bg-slate-100 p-1 rounded-xl self-end md:self-center shrink-0",
+								className: "flex items-center bg-slate-100 p-0.5 rounded-xl border border-slate-200/60",
 								children: [/* @__PURE__ */ jsx("button", {
 									type: "button",
 									onClick: () => setViewMode("grid"),
-									className: `p-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${viewMode === "grid" ? "bg-white text-slate-900 shadow-xs" : "text-slate-500 hover:text-slate-900"}`,
-									title: "Grid presentation cards",
-									children: /* @__PURE__ */ jsx(Layers, { className: "w-4 h-4" })
+									className: `p-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${viewMode === "grid" ? "bg-white text-slate-900 shadow-xs" : "text-slate-500 hover:text-slate-900"}`,
+									title: "Grid cards view",
+									children: /* @__PURE__ */ jsx(LayoutGrid, { className: "w-4 h-4" })
 								}), /* @__PURE__ */ jsx("button", {
 									type: "button",
 									onClick: () => setViewMode("list"),
-									className: `p-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${viewMode === "list" ? "bg-white text-slate-900 shadow-xs" : "text-slate-500 hover:text-slate-900"}`,
-									title: "List view",
-									children: /* @__PURE__ */ jsx(BookOpen, { className: "w-4 h-4" })
+									className: `p-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${viewMode === "list" ? "bg-white text-slate-900 shadow-xs" : "text-slate-500 hover:text-slate-900"}`,
+									title: "Table view",
+									children: /* @__PURE__ */ jsx(List, { className: "w-4 h-4" })
 								})]
 							})
 						]
-					})
+					})]
 				}),
-				loading ? /* @__PURE__ */ jsx("div", {
+				loading && products.length === 0 ? /* @__PURE__ */ jsx("div", {
 					className: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4",
 					children: [
 						1,
@@ -10716,15 +10770,24 @@ function Products({ initialFilters = {} }) {
 						4,
 						5,
 						6
-					].map((i) => /* @__PURE__ */ jsxs("div", {
-						className: "bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs animate-pulse space-y-3",
+					].map((n) => /* @__PURE__ */ jsxs("div", {
+						className: "bg-white rounded-2xl border border-slate-200/80 p-5 space-y-4 animate-pulse",
 						children: [
-							/* @__PURE__ */ jsx("div", { className: "h-32 bg-slate-100 rounded-xl w-full" }),
-							/* @__PURE__ */ jsx("div", { className: "h-4 bg-slate-100 rounded w-2/3" }),
-							/* @__PURE__ */ jsx("div", { className: "h-3 bg-slate-100 rounded w-1/2" }),
-							/* @__PURE__ */ jsx("div", { className: "h-8 bg-slate-100 rounded w-full mt-2" })
+							/* @__PURE__ */ jsxs("div", {
+								className: "flex gap-3",
+								children: [/* @__PURE__ */ jsx("div", { className: "w-20 h-20 bg-slate-100 rounded-xl" }), /* @__PURE__ */ jsxs("div", {
+									className: "flex-1 space-y-2",
+									children: [
+										/* @__PURE__ */ jsx("div", { className: "h-3 bg-slate-100 rounded w-1/3" }),
+										/* @__PURE__ */ jsx("div", { className: "h-4 bg-slate-100 rounded w-3/4" }),
+										/* @__PURE__ */ jsx("div", { className: "h-3 bg-slate-100 rounded w-1/2" })
+									]
+								})]
+							}),
+							/* @__PURE__ */ jsx("div", { className: "h-3 bg-slate-100 rounded w-full" }),
+							/* @__PURE__ */ jsx("div", { className: "h-3 bg-slate-100 rounded w-5/6" })
 						]
-					}, i))
+					}, n))
 				}) : error ? /* @__PURE__ */ jsxs("div", {
 					className: "bg-rose-50 border border-rose-200 rounded-2xl p-8 text-center space-y-3",
 					children: [
@@ -10770,9 +10833,9 @@ function Products({ initialFilters = {} }) {
 					className: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4",
 					children: products.map((p) => {
 						const primaryImg = p.primary_image?.file_path || p.images?.[0]?.file_path;
-						return /* @__PURE__ */ jsxs("div", {
+						return /* @__PURE__ */ jsx("div", {
 							className: "bg-white rounded-2xl border border-slate-200/80 hover:border-slate-300 hover:shadow-xs transition-all p-5 flex flex-col justify-between gap-4 group",
-							children: [/* @__PURE__ */ jsxs("div", {
+							children: /* @__PURE__ */ jsxs("div", {
 								className: "space-y-3",
 								children: [
 									/* @__PURE__ */ jsxs("div", {
@@ -10838,16 +10901,7 @@ function Products({ initialFilters = {} }) {
 										}), p.indications]
 									})
 								]
-							}), /* @__PURE__ */ jsx("div", {
-								className: "pt-3 border-t border-slate-100",
-								children: /* @__PURE__ */ jsxs("button", {
-									type: "button",
-									onClick: () => handleOpenPresentation(p, 0),
-									className: "w-full py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-medium shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer",
-									title: "Open Interactive Visual Aid Carousel",
-									children: [/* @__PURE__ */ jsx(Play, { className: "w-3.5 h-3.5 fill-current" }), /* @__PURE__ */ jsx("span", { children: "Present Visual Aid" })]
-								})
-							})]
+							})
 						}, p.id);
 					})
 				}) : /* @__PURE__ */ jsx("div", {
@@ -10874,10 +10928,6 @@ function Products({ initialFilters = {} }) {
 									/* @__PURE__ */ jsx("th", {
 										className: "py-3 px-4",
 										children: "Active Compositions"
-									}),
-									/* @__PURE__ */ jsx("th", {
-										className: "py-3 px-4 text-right",
-										children: "Detailing Actions"
 									})
 								]
 							}) }), /* @__PURE__ */ jsx("tbody", {
@@ -10931,16 +10981,6 @@ function Products({ initialFilters = {} }) {
 													]
 												})]
 											})
-										}),
-										/* @__PURE__ */ jsx("td", {
-											className: "py-3 px-4 text-right",
-											children: /* @__PURE__ */ jsxs("button", {
-												type: "button",
-												onClick: () => handleOpenPresentation(p, 0),
-												className: "px-3.5 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-medium shadow-xs cursor-pointer inline-flex items-center gap-1.5",
-												title: "Open Interactive Visual Aid Carousel",
-												children: [/* @__PURE__ */ jsx(Play, { className: "w-3.5 h-3.5 fill-current" }), /* @__PURE__ */ jsx("span", { children: "Present Visual Aid" })]
-											})
 										})
 									]
 								}, p.id))
@@ -10949,117 +10989,7 @@ function Products({ initialFilters = {} }) {
 					})
 				})
 			]
-		}), presentationMode && detailProduct && typeof document !== "undefined" && createPortal(/* @__PURE__ */ jsxs("div", {
-			className: "fixed inset-0 z-[999999] w-screen h-screen bg-black select-none overflow-hidden flex items-center justify-center animate-in fade-in duration-200",
-			tabIndex: 0,
-			children: [
-				/* @__PURE__ */ jsxs("div", {
-					className: "absolute top-4 right-4 z-50 flex items-center gap-2",
-					children: [/* @__PURE__ */ jsx("button", {
-						type: "button",
-						onClick: handleToggleFullscreen,
-						className: "w-10 h-10 rounded-full bg-black/60 hover:bg-black/90 text-white/80 hover:text-white backdrop-blur-md border border-white/20 flex items-center justify-center transition-all cursor-pointer shadow-2xl active:scale-95",
-						title: "Toggle Fullscreen",
-						children: /* @__PURE__ */ jsx(Maximize2, { className: "w-4 h-4" })
-					}), /* @__PURE__ */ jsx("button", {
-						type: "button",
-						onClick: handleClosePresentation,
-						className: "w-10 h-10 rounded-full bg-black/60 hover:bg-rose-600 text-white/80 hover:text-white backdrop-blur-md border border-white/20 flex items-center justify-center transition-all cursor-pointer shadow-2xl active:scale-95",
-						title: "Exit Presentation (Esc)",
-						children: /* @__PURE__ */ jsx(X, { className: "w-5 h-5 stroke-[2.5]" })
-					})]
-				}),
-				totalSlideCount > 0 && /* @__PURE__ */ jsx("div", {
-					className: "absolute top-4 left-4 z-50 pointer-events-none",
-					children: /* @__PURE__ */ jsxs("div", {
-						className: "px-3.5 py-1.5 rounded-full bg-black/65 backdrop-blur-md border border-white/20 text-white text-xs font-medium shadow-2xl flex items-center gap-2",
-						children: [
-							/* @__PURE__ */ jsxs("span", {
-								className: "text-white font-semibold",
-								children: [
-									activeSlide + 1,
-									" / ",
-									totalSlideCount
-								]
-							}),
-							/* @__PURE__ */ jsx("span", {
-								className: "text-white/40",
-								children: "•"
-							}),
-							/* @__PURE__ */ jsx("span", {
-								className: "text-slate-300 max-w-xs truncate",
-								children: detailProduct.brand_name
-							})
-						]
-					})
-				}),
-				/* @__PURE__ */ jsx("div", {
-					className: "w-full h-full flex items-center justify-center relative cursor-default",
-					onClick: (e) => {
-						const rect = e.currentTarget.getBoundingClientRect();
-						const clickX = e.clientX - rect.left;
-						if (clickX > rect.width * .6) handleNextSlide();
-						else if (clickX < rect.width * .4) handlePrevSlide();
-					},
-					children: totalSlideCount === 0 ? /* @__PURE__ */ jsxs("div", {
-						className: "text-center text-white space-y-3 p-8 max-w-md bg-slate-900/90 rounded-3xl border border-white/10 shadow-2xl",
-						children: [
-							/* @__PURE__ */ jsx(Image, { className: "w-12 h-12 text-slate-400 mx-auto" }),
-							/* @__PURE__ */ jsx("h3", {
-								className: "text-lg font-bold text-white",
-								children: "No Slide Images Uploaded"
-							}),
-							/* @__PURE__ */ jsx("p", {
-								className: "text-xs text-slate-400",
-								children: "Please upload slide images in Admin > Visual Aid Carousels."
-							}),
-							/* @__PURE__ */ jsx("button", {
-								type: "button",
-								onClick: handleClosePresentation,
-								className: "px-5 py-2 rounded-xl bg-white hover:bg-slate-100 text-slate-900 text-xs font-semibold transition-colors cursor-pointer",
-								children: "Close"
-							})
-						]
-					}) : /* @__PURE__ */ jsx("img", {
-						src: carouselSlides[activeSlide]?.image_path,
-						alt: carouselSlides[activeSlide]?.title || `Slide ${activeSlide + 1}`,
-						className: "w-full h-full object-contain select-none transition-all duration-150 animate-in fade-in"
-					}, activeSlide)
-				}),
-				activeSlide > 0 && /* @__PURE__ */ jsx("button", {
-					type: "button",
-					onClick: (e) => {
-						e.stopPropagation();
-						handlePrevSlide();
-					},
-					className: "absolute left-4 top-1/2 -translate-y-1/2 z-40 w-14 h-14 rounded-full bg-black/60 hover:bg-white/20 text-white/80 hover:text-white backdrop-blur-md border border-white/20 flex items-center justify-center transition-all hover:scale-105 active:scale-95 cursor-pointer shadow-2xl group",
-					title: "Previous Slide (← Left Arrow)",
-					children: /* @__PURE__ */ jsx(ChevronLeft, { className: "w-8 h-8 stroke-[2.2] group-hover:-translate-x-0.5 transition-transform" })
-				}),
-				activeSlide < totalSlideCount - 1 && /* @__PURE__ */ jsx("button", {
-					type: "button",
-					onClick: (e) => {
-						e.stopPropagation();
-						handleNextSlide();
-					},
-					className: "absolute right-4 top-1/2 -translate-y-1/2 z-40 w-14 h-14 rounded-full bg-black/60 hover:bg-white/20 text-white/80 hover:text-white backdrop-blur-md border border-white/20 flex items-center justify-center transition-all hover:scale-105 active:scale-95 cursor-pointer shadow-2xl group",
-					title: "Next Slide (→ Right Arrow or Space)",
-					children: /* @__PURE__ */ jsx(ChevronRight, { className: "w-8 h-8 stroke-[2.2] group-hover:translate-x-0.5 transition-transform" })
-				}),
-				totalSlideCount > 1 && /* @__PURE__ */ jsx("div", {
-					className: "absolute bottom-4 left-1/2 -translate-x-1/2 z-40 px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-md border border-white/15 flex items-center gap-1.5 shadow-2xl",
-					children: carouselSlides.map((_, idx) => /* @__PURE__ */ jsx("button", {
-						type: "button",
-						onClick: (e) => {
-							e.stopPropagation();
-							setActiveSlide(idx);
-						},
-						className: `transition-all rounded-full cursor-pointer ${activeSlide === idx ? "w-6 h-2 bg-white" : "w-2 h-2 bg-white/40 hover:bg-white/80"}`,
-						title: `Jump to Slide ${idx + 1}`
-					}, idx))
-				})
-			]
-		}), document.body)]
+		})
 	});
 }
 //#endregion
@@ -11090,7 +11020,6 @@ function Schedule({ schedules = [], metrics = {}, doctors = [], products = [], t
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [rescheduleItem, setRescheduleItem] = useState(null);
 	const [rescheduleDate, setRescheduleDate] = useState("");
-	const [rescheduleTime, setRescheduleTime] = useState("");
 	const [formData, setFormData] = useState({
 		action_type: "call",
 		contact_mode: "doctor",
@@ -11098,7 +11027,6 @@ function Schedule({ schedules = [], metrics = {}, doctors = [], products = [], t
 		custom_contact_name: "",
 		contact_type: "doctor",
 		scheduled_date: todayDate || (/* @__PURE__ */ new Date()).toISOString().split("T")[0],
-		scheduled_time: "Morning OPD (10:30 AM)",
 		priority: "normal",
 		purpose: "",
 		notes: ""
@@ -11151,7 +11079,6 @@ function Schedule({ schedules = [], metrics = {}, doctors = [], products = [], t
 				setIsSubmitting(false);
 				setOutcomeModalSchedule(null);
 				setOutcomeNote("");
-				toast.success(status === "completed" ? "Marked as completed!" : `Status updated to ${status}`);
 			},
 			onError: () => {
 				setIsSubmitting(false);
@@ -11165,16 +11092,13 @@ function Schedule({ schedules = [], metrics = {}, doctors = [], products = [], t
 		setIsSubmitting(true);
 		router.put(`/mr/schedule/${rescheduleItem.id}/status`, {
 			status: "rescheduled",
-			new_date: rescheduleDate,
-			new_time: rescheduleTime
+			new_date: rescheduleDate
 		}, {
 			preserveScroll: true,
 			onSuccess: () => {
 				setIsSubmitting(false);
 				setRescheduleItem(null);
 				setRescheduleDate("");
-				setRescheduleTime("");
-				toast.success("Rescheduled successfully!");
 			},
 			onError: () => {
 				setIsSubmitting(false);
@@ -11186,7 +11110,6 @@ function Schedule({ schedules = [], metrics = {}, doctors = [], products = [], t
 		if (!confirm("Are you sure you want to remove this item from your schedule?")) return;
 		router.delete(`/mr/schedule/${scheduleId}`, {
 			preserveScroll: true,
-			onSuccess: () => toast.success("Schedule item removed."),
 			onError: () => toast.error("Failed to remove item.")
 		});
 	};
@@ -11211,7 +11134,6 @@ function Schedule({ schedules = [], metrics = {}, doctors = [], products = [], t
 			contact_type: formData.contact_mode === "doctor" ? "doctor" : formData.contact_type,
 			action_type: formData.action_type,
 			scheduled_date: formData.scheduled_date,
-			scheduled_time: formData.scheduled_time,
 			priority: formData.priority,
 			purpose: formData.purpose,
 			notes: formData.notes
@@ -11227,12 +11149,10 @@ function Schedule({ schedules = [], metrics = {}, doctors = [], products = [], t
 					custom_contact_name: "",
 					contact_type: "doctor",
 					scheduled_date: todayDate || (/* @__PURE__ */ new Date()).toISOString().split("T")[0],
-					scheduled_time: "Morning OPD (10:30 AM)",
 					priority: "normal",
 					purpose: "",
 					notes: ""
 				});
-				toast.success("Added to your schedule!");
 			},
 			onError: (errors) => {
 				setIsSubmitting(false);
@@ -11419,24 +11339,11 @@ function Schedule({ schedules = [], metrics = {}, doctors = [], products = [], t
 									children: /* @__PURE__ */ jsx("span", { children: "All" })
 								})
 							]
-						}), /* @__PURE__ */ jsxs("div", {
-							className: "relative w-full md:w-72",
-							children: [
-								/* @__PURE__ */ jsx(Search, { className: "w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" }),
-								/* @__PURE__ */ jsx("input", {
-									type: "text",
-									placeholder: "Search doctor, clinic, purpose...",
-									value: searchQuery,
-									onChange: (e) => setSearchQuery(e.target.value),
-									className: "w-full pl-9 pr-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-teal-600/20 focus:border-teal-700 transition-all"
-								}),
-								searchQuery && /* @__PURE__ */ jsx("button", {
-									type: "button",
-									onClick: () => setSearchQuery(""),
-									className: "absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-0.5",
-									children: /* @__PURE__ */ jsx(X, { className: "w-3.5 h-3.5" })
-								})
-							]
+						}), /* @__PURE__ */ jsx(SearchBar, {
+							value: searchQuery,
+							onChange: (e) => setSearchQuery(e.target.value),
+							placeholder: "Search doctor, clinic, purpose...",
+							className: "w-full md:w-72"
 						})]
 					}), /* @__PURE__ */ jsxs("div", {
 						className: "flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-slate-100 text-xs",
@@ -11555,17 +11462,11 @@ function Schedule({ schedules = [], metrics = {}, doctors = [], products = [], t
 													}),
 													/* @__PURE__ */ jsxs("span", {
 														className: "inline-flex items-center gap-1 text-[11px] text-slate-500 font-medium bg-slate-100 px-2 py-0.5 rounded-md",
-														children: [
-															/* @__PURE__ */ jsx(Clock, { className: "w-3 h-3 text-slate-400" }),
-															/* @__PURE__ */ jsx("span", { children: item.scheduled_time || "Anytime" }),
-															activeTab !== "today" && /* @__PURE__ */ jsxs("span", {
-																className: "text-slate-400 font-normal",
-																children: ["• ", new Date(item.scheduled_date).toLocaleDateString("en-US", {
-																	month: "short",
-																	day: "numeric"
-																})]
-															})
-														]
+														children: [/* @__PURE__ */ jsx(Calendar, { className: "w-3 h-3 text-slate-400" }), /* @__PURE__ */ jsx("span", { children: new Date(item.scheduled_date).toLocaleDateString("en-US", {
+															month: "short",
+															day: "numeric",
+															year: "numeric"
+														}) })]
 													}),
 													isCompleted && /* @__PURE__ */ jsxs("span", {
 														className: "inline-flex items-center gap-1 text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300",
@@ -11652,7 +11553,6 @@ function Schedule({ schedules = [], metrics = {}, doctors = [], products = [], t
 													onClick: () => {
 														setRescheduleItem(item);
 														setRescheduleDate(item.scheduled_date);
-														setRescheduleTime(item.scheduled_time || "");
 													},
 													className: "p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer",
 													title: "Reschedule",
@@ -11887,9 +11787,12 @@ function Schedule({ schedules = [], metrics = {}, doctors = [], products = [], t
 								}),
 								/* @__PURE__ */ jsxs("div", {
 									className: "grid grid-cols-1 sm:grid-cols-2 gap-3",
-									children: [/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("label", {
+									children: [/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsxs("label", {
 										className: "block font-semibold text-slate-700 mb-1",
-										children: "Date"
+										children: ["Date ", /* @__PURE__ */ jsx("span", {
+											className: "text-rose-500",
+											children: "*"
+										})]
 									}), /* @__PURE__ */ jsx("input", {
 										type: "date",
 										value: formData.scheduled_date,
@@ -11901,37 +11804,24 @@ function Schedule({ schedules = [], metrics = {}, doctors = [], products = [], t
 										required: true
 									})] }), /* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("label", {
 										className: "block font-semibold text-slate-700 mb-1",
-										children: "Preferred Time Slot"
-									}), /* @__PURE__ */ jsx("input", {
-										type: "text",
-										placeholder: "e.g. Morning OPD (10:30 AM)",
-										value: formData.scheduled_time,
-										onChange: (e) => setFormData((prev) => ({
-											...prev,
-											scheduled_time: e.target.value
-										})),
-										className: "w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-teal-600/20 focus:border-teal-700"
+										children: "Priority Level"
+									}), /* @__PURE__ */ jsx("div", {
+										className: "flex items-center gap-2",
+										children: [
+											"high",
+											"normal",
+											"low"
+										].map((p) => /* @__PURE__ */ jsx("button", {
+											type: "button",
+											onClick: () => setFormData((prev) => ({
+												...prev,
+												priority: p
+											})),
+											className: `flex-1 py-2 rounded-xl border font-bold capitalize text-xs transition-all cursor-pointer ${formData.priority === p ? p === "high" ? "bg-rose-50 border-rose-600 text-rose-700 ring-1 ring-rose-500" : "bg-slate-900 border-slate-900 text-white" : "border-slate-200 text-slate-600 hover:bg-slate-50"}`,
+											children: p
+										}, p))
 									})] })]
 								}),
-								/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("label", {
-									className: "block font-semibold text-slate-700 mb-1",
-									children: "Priority Level"
-								}), /* @__PURE__ */ jsx("div", {
-									className: "flex items-center gap-2",
-									children: [
-										"high",
-										"normal",
-										"low"
-									].map((p) => /* @__PURE__ */ jsx("button", {
-										type: "button",
-										onClick: () => setFormData((prev) => ({
-											...prev,
-											priority: p
-										})),
-										className: `flex-1 py-1.5 rounded-xl border font-bold capitalize text-xs transition-all cursor-pointer ${formData.priority === p ? p === "high" ? "bg-rose-50 border-rose-600 text-rose-700 ring-1 ring-rose-500" : "bg-slate-900 border-slate-900 text-white" : "border-slate-200 text-slate-600 hover:bg-slate-50"}`,
-										children: p
-									}, p))
-								})] }),
 								/* @__PURE__ */ jsxs("div", { children: [
 									/* @__PURE__ */ jsxs("div", {
 										className: "flex items-center justify-between mb-1",
@@ -12084,42 +11974,29 @@ function Schedule({ schedules = [], metrics = {}, doctors = [], products = [], t
 						}), /* @__PURE__ */ jsxs("form", {
 							onSubmit: handleRescheduleSubmit,
 							className: "space-y-3 pt-3 text-xs",
-							children: [
-								/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("label", {
-									className: "block font-semibold text-slate-700 mb-1",
-									children: "New Date"
-								}), /* @__PURE__ */ jsx("input", {
-									type: "date",
-									value: rescheduleDate,
-									onChange: (e) => setRescheduleDate(e.target.value),
-									className: "w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-teal-600/20 focus:border-teal-700",
-									required: true
-								})] }),
-								/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("label", {
-									className: "block font-semibold text-slate-700 mb-1",
-									children: "New Time Slot"
-								}), /* @__PURE__ */ jsx("input", {
-									type: "text",
-									value: rescheduleTime,
-									onChange: (e) => setRescheduleTime(e.target.value),
-									placeholder: "e.g. Tomorrow Evening OPD (06:00 PM)",
-									className: "w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-teal-600/20 focus:border-teal-700"
-								})] }),
-								/* @__PURE__ */ jsxs("div", {
-									className: "flex items-center justify-end gap-2 pt-2 border-t border-slate-100",
-									children: [/* @__PURE__ */ jsx("button", {
-										type: "button",
-										onClick: () => setRescheduleItem(null),
-										className: "px-3 py-1.5 rounded-xl text-slate-600 hover:bg-slate-100 font-medium cursor-pointer",
-										children: "Cancel"
-									}), /* @__PURE__ */ jsx("button", {
-										type: "submit",
-										disabled: isSubmitting,
-										className: "px-4 py-1.5 rounded-xl bg-teal-700 hover:bg-teal-800 text-white font-bold cursor-pointer disabled:opacity-50",
-										children: "Save Reschedule"
-									})]
-								})
-							]
+							children: [/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("label", {
+								className: "block font-semibold text-slate-700 mb-1",
+								children: "New Date"
+							}), /* @__PURE__ */ jsx("input", {
+								type: "date",
+								value: rescheduleDate,
+								onChange: (e) => setRescheduleDate(e.target.value),
+								className: "w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-teal-600/20 focus:border-teal-700",
+								required: true
+							})] }), /* @__PURE__ */ jsxs("div", {
+								className: "flex items-center justify-end gap-2 pt-2 border-t border-slate-100",
+								children: [/* @__PURE__ */ jsx("button", {
+									type: "button",
+									onClick: () => setRescheduleItem(null),
+									className: "px-3 py-1.5 rounded-xl text-slate-600 hover:bg-slate-100 font-medium cursor-pointer",
+									children: "Cancel"
+								}), /* @__PURE__ */ jsx("button", {
+									type: "submit",
+									disabled: isSubmitting,
+									className: "px-4 py-1.5 rounded-xl bg-teal-700 hover:bg-teal-800 text-white font-bold cursor-pointer disabled:opacity-50",
+									children: "Save Reschedule"
+								})]
+							})]
 						})]
 					})
 				})
@@ -12204,7 +12081,6 @@ function Visits({ schedules = [], metrics = {}, doctors = [], products = [], tod
 	const [outcomeNote, setOutcomeNote] = useState("");
 	const [rescheduleItem, setRescheduleItem] = useState(null);
 	const [rescheduleDate, setRescheduleDate] = useState("");
-	const [rescheduleTime, setRescheduleTime] = useState("");
 	const [isPlannerSubmitting, setIsPlannerSubmitting] = useState(false);
 	const [scheduleForm, setScheduleForm] = useState({
 		action_type: "call",
@@ -12213,7 +12089,6 @@ function Visits({ schedules = [], metrics = {}, doctors = [], products = [], tod
 		custom_contact_name: "",
 		contact_type: "doctor",
 		scheduled_date: todayDate || (/* @__PURE__ */ new Date()).toISOString().split("T")[0],
-		scheduled_time: "Morning OPD (10:30 AM)",
 		priority: "normal",
 		purpose: "",
 		notes: ""
@@ -12317,7 +12192,6 @@ function Visits({ schedules = [], metrics = {}, doctors = [], products = [], tod
 				setIsPlannerSubmitting(false);
 				setOutcomeModalSchedule(null);
 				setOutcomeNote("");
-				toast.success(status === "completed" ? "Marked as completed!" : `Status updated to ${status}`);
 			},
 			onError: () => {
 				setIsPlannerSubmitting(false);
@@ -12331,16 +12205,13 @@ function Visits({ schedules = [], metrics = {}, doctors = [], products = [], tod
 		setIsPlannerSubmitting(true);
 		router.put(`/mr/schedule/${rescheduleItem.id}/status`, {
 			status: "rescheduled",
-			new_date: rescheduleDate,
-			new_time: rescheduleTime
+			new_date: rescheduleDate
 		}, {
 			preserveScroll: true,
 			onSuccess: () => {
 				setIsPlannerSubmitting(false);
 				setRescheduleItem(null);
 				setRescheduleDate("");
-				setRescheduleTime("");
-				toast.success("Rescheduled successfully!");
 			},
 			onError: () => {
 				setIsPlannerSubmitting(false);
@@ -12352,7 +12223,6 @@ function Visits({ schedules = [], metrics = {}, doctors = [], products = [], tod
 		if (!confirm("Are you sure you want to remove this item from your schedule?")) return;
 		router.delete(`/mr/schedule/${scheduleId}`, {
 			preserveScroll: true,
-			onSuccess: () => toast.success("Schedule item removed."),
 			onError: () => toast.error("Failed to remove item.")
 		});
 	};
@@ -12377,7 +12247,6 @@ function Visits({ schedules = [], metrics = {}, doctors = [], products = [], tod
 			contact_type: scheduleForm.contact_mode === "doctor" ? "doctor" : scheduleForm.contact_type,
 			action_type: scheduleForm.action_type,
 			scheduled_date: scheduleForm.scheduled_date,
-			scheduled_time: scheduleForm.scheduled_time,
 			priority: scheduleForm.priority,
 			purpose: scheduleForm.purpose,
 			notes: scheduleForm.notes
@@ -12393,12 +12262,10 @@ function Visits({ schedules = [], metrics = {}, doctors = [], products = [], tod
 					custom_contact_name: "",
 					contact_type: "doctor",
 					scheduled_date: todayDate || (/* @__PURE__ */ new Date()).toISOString().split("T")[0],
-					scheduled_time: "Morning OPD (10:30 AM)",
 					priority: "normal",
 					purpose: "",
 					notes: ""
 				});
-				toast.success("Added to your schedule!");
 			},
 			onError: (errs) => {
 				setIsPlannerSubmitting(false);
@@ -12687,24 +12554,11 @@ function Visits({ schedules = [], metrics = {}, doctors = [], products = [], tod
 											children: /* @__PURE__ */ jsx("span", { children: "All" })
 										})
 									]
-								}), /* @__PURE__ */ jsxs("div", {
-									className: "relative w-full md:w-72",
-									children: [
-										/* @__PURE__ */ jsx(Search, { className: "w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" }),
-										/* @__PURE__ */ jsx("input", {
-											type: "text",
-											placeholder: "Search doctor, clinic, purpose...",
-											value: plannerSearch,
-											onChange: (e) => setPlannerSearch(e.target.value),
-											className: "w-full pl-9 pr-3 py-1.5 text-xs bg-slate-50 border border-slate-200/80 rounded-xl focus:bg-white focus:outline-hidden focus:ring-1 focus:ring-slate-900 focus:border-slate-900 transition-all text-slate-800"
-										}),
-										plannerSearch && /* @__PURE__ */ jsx("button", {
-											type: "button",
-											onClick: () => setPlannerSearch(""),
-											className: "absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-0.5",
-											children: /* @__PURE__ */ jsx(X, { className: "w-3.5 h-3.5" })
-										})
-									]
+								}), /* @__PURE__ */ jsx(SearchBar, {
+									value: plannerSearch,
+									onChange: (e) => setPlannerSearch(e.target.value),
+									placeholder: "Search doctor, clinic, purpose...",
+									className: "w-full md:w-72"
 								})]
 							}), /* @__PURE__ */ jsxs("div", {
 								className: "flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-slate-100 text-xs",
@@ -12823,17 +12677,11 @@ function Visits({ schedules = [], metrics = {}, doctors = [], products = [], tod
 															}),
 															/* @__PURE__ */ jsxs("span", {
 																className: "inline-flex items-center gap-1 text-[11px] text-slate-500 font-normal bg-slate-50 px-2 py-0.5 rounded-md border border-slate-100",
-																children: [
-																	/* @__PURE__ */ jsx(Clock, { className: "w-3 h-3 text-slate-400" }),
-																	/* @__PURE__ */ jsx("span", { children: item.scheduled_time || "Anytime" }),
-																	plannerTab !== "today" && /* @__PURE__ */ jsxs("span", {
-																		className: "text-slate-400 font-normal",
-																		children: ["• ", new Date(item.scheduled_date).toLocaleDateString("en-US", {
-																			month: "short",
-																			day: "numeric"
-																		})]
-																	})
-																]
+																children: [/* @__PURE__ */ jsx(Calendar, { className: "w-3 h-3 text-slate-400" }), /* @__PURE__ */ jsx("span", { children: new Date(item.scheduled_date).toLocaleDateString("en-US", {
+																	month: "short",
+																	day: "numeric",
+																	year: "numeric"
+																}) })]
 															}),
 															isCompleted && /* @__PURE__ */ jsxs("span", {
 																className: "inline-flex items-center gap-1 text-[10px] uppercase font-semibold px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-100",
@@ -12923,7 +12771,6 @@ function Visits({ schedules = [], metrics = {}, doctors = [], products = [], tod
 															onClick: () => {
 																setRescheduleItem(item);
 																setRescheduleDate(item.scheduled_date);
-																setRescheduleTime(item.scheduled_time || "");
 															},
 															className: "p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer",
 															title: "Reschedule",
@@ -12989,24 +12836,11 @@ function Visits({ schedules = [], metrics = {}, doctors = [], products = [], tod
 						className: "bg-white rounded-2xl border border-slate-200/80 p-4 shadow-xs space-y-3",
 						children: /* @__PURE__ */ jsxs("div", {
 							className: "flex flex-col md:flex-row md:items-center justify-between gap-3",
-							children: [/* @__PURE__ */ jsxs("div", {
-								className: "relative w-full md:w-80",
-								children: [
-									/* @__PURE__ */ jsx(Search, { className: "w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" }),
-									/* @__PURE__ */ jsx("input", {
-										type: "text",
-										placeholder: "Search doctor, hospital, specialty...",
-										value: dcrSearch,
-										onChange: (e) => setDcrSearch(e.target.value),
-										className: "w-full pl-9 pr-3 py-1.5 text-xs bg-slate-50 border border-slate-200/80 rounded-xl focus:bg-white focus:outline-hidden focus:ring-1 focus:ring-slate-900 focus:border-slate-900 text-slate-800"
-									}),
-									dcrSearch && /* @__PURE__ */ jsx("button", {
-										type: "button",
-										onClick: () => setDcrSearch(""),
-										className: "absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-0.5",
-										children: /* @__PURE__ */ jsx(X, { className: "w-3.5 h-3.5" })
-									})
-								]
+							children: [/* @__PURE__ */ jsx(SearchBar, {
+								value: dcrSearch,
+								onChange: (e) => setDcrSearch(e.target.value),
+								placeholder: "Search doctor, hospital, specialty...",
+								className: "w-full md:w-80"
 							}), /* @__PURE__ */ jsxs("div", {
 								className: "flex flex-wrap items-center gap-2",
 								children: [
@@ -13396,9 +13230,12 @@ function Visits({ schedules = [], metrics = {}, doctors = [], products = [], tod
 								}),
 								/* @__PURE__ */ jsxs("div", {
 									className: "grid grid-cols-1 sm:grid-cols-2 gap-3",
-									children: [/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("label", {
+									children: [/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsxs("label", {
 										className: "block font-medium text-slate-700 mb-1",
-										children: "Date"
+										children: ["Date ", /* @__PURE__ */ jsx("span", {
+											className: "text-rose-500",
+											children: "*"
+										})]
 									}), /* @__PURE__ */ jsx("input", {
 										type: "date",
 										value: scheduleForm.scheduled_date,
@@ -13410,37 +13247,24 @@ function Visits({ schedules = [], metrics = {}, doctors = [], products = [], tod
 										required: true
 									})] }), /* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("label", {
 										className: "block font-medium text-slate-700 mb-1",
-										children: "Preferred Time Slot"
-									}), /* @__PURE__ */ jsx("input", {
-										type: "text",
-										placeholder: "e.g. Morning OPD (10:30 AM)",
-										value: scheduleForm.scheduled_time,
-										onChange: (e) => setScheduleForm((prev) => ({
-											...prev,
-											scheduled_time: e.target.value
-										})),
-										className: "w-full bg-slate-50 border border-slate-200/80 rounded-xl px-3 py-2 text-xs focus:ring-1 focus:ring-slate-900 focus:border-slate-900"
+										children: "Priority Level"
+									}), /* @__PURE__ */ jsx("div", {
+										className: "flex items-center gap-2",
+										children: [
+											"high",
+											"normal",
+											"low"
+										].map((p) => /* @__PURE__ */ jsx("button", {
+											type: "button",
+											onClick: () => setScheduleForm((prev) => ({
+												...prev,
+												priority: p
+											})),
+											className: `flex-1 py-2 rounded-xl border font-semibold capitalize text-xs transition-colors cursor-pointer ${scheduleForm.priority === p ? p === "high" ? "bg-rose-50 border-rose-300 text-rose-700" : "bg-slate-900 border-slate-900 text-white" : "border-slate-200/80 text-slate-600 hover:bg-slate-50"}`,
+											children: p
+										}, p))
 									})] })]
 								}),
-								/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("label", {
-									className: "block font-medium text-slate-700 mb-1",
-									children: "Priority Level"
-								}), /* @__PURE__ */ jsx("div", {
-									className: "flex items-center gap-2",
-									children: [
-										"high",
-										"normal",
-										"low"
-									].map((p) => /* @__PURE__ */ jsx("button", {
-										type: "button",
-										onClick: () => setScheduleForm((prev) => ({
-											...prev,
-											priority: p
-										})),
-										className: `flex-1 py-1.5 rounded-xl border font-semibold capitalize text-xs transition-colors cursor-pointer ${scheduleForm.priority === p ? p === "high" ? "bg-rose-50 border-rose-300 text-rose-700" : "bg-slate-900 border-slate-900 text-white" : "border-slate-200/80 text-slate-600 hover:bg-slate-50"}`,
-										children: p
-									}, p))
-								})] }),
 								/* @__PURE__ */ jsxs("div", { children: [
 									/* @__PURE__ */ jsxs("div", {
 										className: "flex items-center justify-between mb-1",
@@ -13593,42 +13417,29 @@ function Visits({ schedules = [], metrics = {}, doctors = [], products = [], tod
 						}), /* @__PURE__ */ jsxs("form", {
 							onSubmit: handleRescheduleSubmit,
 							className: "space-y-3 pt-3 text-xs",
-							children: [
-								/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("label", {
-									className: "block font-medium text-slate-700 mb-1",
-									children: "New Date"
-								}), /* @__PURE__ */ jsx("input", {
-									type: "date",
-									value: rescheduleDate,
-									onChange: (e) => setRescheduleDate(e.target.value),
-									className: "w-full bg-slate-50 border border-slate-200/80 rounded-xl px-3 py-2 text-xs focus:ring-1 focus:ring-slate-900 focus:border-slate-900",
-									required: true
-								})] }),
-								/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("label", {
-									className: "block font-medium text-slate-700 mb-1",
-									children: "New Time Slot"
-								}), /* @__PURE__ */ jsx("input", {
-									type: "text",
-									value: rescheduleTime,
-									onChange: (e) => setRescheduleTime(e.target.value),
-									placeholder: "e.g. Tomorrow Evening OPD (06:00 PM)",
-									className: "w-full bg-slate-50 border border-slate-200/80 rounded-xl px-3 py-2 text-xs focus:ring-1 focus:ring-slate-900 focus:border-slate-900"
-								})] }),
-								/* @__PURE__ */ jsxs("div", {
-									className: "flex items-center justify-end gap-2 pt-2 border-t border-slate-100",
-									children: [/* @__PURE__ */ jsx("button", {
-										type: "button",
-										onClick: () => setRescheduleItem(null),
-										className: "px-3.5 py-1.5 rounded-xl text-slate-600 hover:bg-slate-100 text-xs font-medium cursor-pointer",
-										children: "Cancel"
-									}), /* @__PURE__ */ jsx("button", {
-										type: "submit",
-										disabled: isPlannerSubmitting,
-										className: "px-4 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-medium transition-colors cursor-pointer disabled:opacity-50",
-										children: "Save Reschedule"
-									})]
-								})
-							]
+							children: [/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("label", {
+								className: "block font-medium text-slate-700 mb-1",
+								children: "New Date"
+							}), /* @__PURE__ */ jsx("input", {
+								type: "date",
+								value: rescheduleDate,
+								onChange: (e) => setRescheduleDate(e.target.value),
+								className: "w-full bg-slate-50 border border-slate-200/80 rounded-xl px-3 py-2 text-xs focus:ring-1 focus:ring-slate-900 focus:border-slate-900",
+								required: true
+							})] }), /* @__PURE__ */ jsxs("div", {
+								className: "flex items-center justify-end gap-2 pt-2 border-t border-slate-100",
+								children: [/* @__PURE__ */ jsx("button", {
+									type: "button",
+									onClick: () => setRescheduleItem(null),
+									className: "px-3.5 py-1.5 rounded-xl text-slate-600 hover:bg-slate-100 text-xs font-medium cursor-pointer",
+									children: "Cancel"
+								}), /* @__PURE__ */ jsx("button", {
+									type: "submit",
+									disabled: isPlannerSubmitting,
+									className: "px-4 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-medium transition-colors cursor-pointer disabled:opacity-50",
+									children: "Save Reschedule"
+								})]
+							})]
 						})]
 					})
 				}),
@@ -13834,7 +13645,7 @@ function Visits({ schedules = [], metrics = {}, doctors = [], products = [], tod
 var AllReports_exports = /* @__PURE__ */ __exportAll({ default: () => AllReports });
 function AllReports({ reports = [] }) {
 	const { props } = usePage();
-	const isAdmin = props.auth?.user?.role === "admin";
+	const isAdmin = props.auth?.user?.role === "admin" || props.auth?.user?.role === "super_admin";
 	const Layout = isAdmin ? AdminLayout : MRLayout;
 	const handleExport = (reportTitle) => {
 		toast.success(`Exporting ${reportTitle} to CSV format...`);
@@ -13900,1317 +13711,2663 @@ function AllReports({ reports = [] }) {
 	});
 }
 //#endregion
-//#region resources/js/Pages/mrconnect/EmployeeAssign.jsx
-var EmployeeAssign_exports = /* @__PURE__ */ __exportAll({ default: () => EmployeeAssign });
-function EmployeeAssign({ representatives = [], isIndividualMR = false }) {
-	const { props } = usePage();
-	const isAdmin = props.auth?.user?.role === "admin";
-	const Layout = isAdmin ? AdminLayout : MRLayout;
-	const [search, setSearch] = useState("");
-	const filtered = representatives.filter((r) => r.name.toLowerCase().includes(search.toLowerCase()) || r.reg_code.toLowerCase().includes(search.toLowerCase()) || r.headquarters.toLowerCase().includes(search.toLowerCase()));
-	const selfRep = representatives[0] || {};
-	return /* @__PURE__ */ jsx(Layout, {
-		title: isAdmin ? "Employee Territory Assignment" : "My Territory Assignment",
-		children: /* @__PURE__ */ jsxs("div", {
-			className: "space-y-6 pb-12 font-sans max-w-[1400px] mx-auto",
-			children: [/* @__PURE__ */ jsxs("div", {
-				className: "flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-200/80",
-				children: [/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("h2", {
-					className: "text-xl sm:text-2xl font-semibold tracking-tight text-slate-800",
-					children: isAdmin ? "Employee Territory Assignment" : "My Territory Assignment"
-				}), /* @__PURE__ */ jsx("p", {
-					className: "text-xs text-slate-500 font-normal mt-0.5",
-					children: isAdmin ? "Assign medical representatives to territories, operational headquarters, and reporting managers." : "Your official operational headquarters, territory jurisdiction, and reporting hierarchy."
-				})] }), isAdmin && /* @__PURE__ */ jsxs("div", {
-					className: "relative",
-					children: [/* @__PURE__ */ jsx(Search, { className: "w-3.5 h-3.5 text-slate-400 absolute left-3 top-3 pointer-events-none" }), /* @__PURE__ */ jsx("input", {
-						type: "text",
-						placeholder: "Search representative or HQ...",
-						value: search,
-						onChange: (e) => setSearch(e.target.value),
-						className: "pl-8 pr-3 py-1.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500"
-					})]
-				})]
-			}), !isAdmin ? /* @__PURE__ */ jsxs("div", {
-				className: "space-y-6",
-				children: [/* @__PURE__ */ jsxs("div", {
-					className: "bg-white rounded-2xl border border-slate-200/80 p-6 space-y-6",
-					children: [/* @__PURE__ */ jsxs("div", {
-						className: "flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100",
-						children: [/* @__PURE__ */ jsxs("div", {
-							className: "flex items-center gap-4",
-							children: [/* @__PURE__ */ jsx("div", {
-								className: "w-14 h-14 rounded-2xl bg-slate-900 text-white font-bold text-xl flex items-center justify-center shrink-0",
-								children: selfRep.name?.charAt(0) || "M"
-							}), /* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("h3", {
-								className: "text-lg font-semibold text-slate-800",
-								children: selfRep.name
-							}), /* @__PURE__ */ jsxs("div", {
-								className: "flex items-center gap-2 mt-1",
-								children: [
-									/* @__PURE__ */ jsx("span", {
-										className: "font-mono text-xs font-semibold bg-violet-50 text-violet-700 border border-violet-100 px-2 py-0.5 rounded-md",
-										children: selfRep.reg_code
-									}),
-									/* @__PURE__ */ jsx("span", {
-										className: "text-xs text-slate-500 font-medium",
-										children: selfRep.role_title
-									}),
-									/* @__PURE__ */ jsx("span", {
-										className: "inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/60",
-										children: "Active Assignment"
-									})
-								]
-							})] })]
-						}), /* @__PURE__ */ jsxs(Link, {
-							href: "/mr/doctors",
-							className: "inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-violet-600 hover:bg-violet-700 text-white font-medium text-xs transition-colors",
-							children: [/* @__PURE__ */ jsx(Users, { className: "w-3.5 h-3.5" }), /* @__PURE__ */ jsx("span", { children: "View My Assigned Doctors" })]
-						})]
-					}), /* @__PURE__ */ jsxs("div", {
-						className: "grid grid-cols-1 sm:grid-cols-3 gap-6",
-						children: [
-							/* @__PURE__ */ jsxs("div", {
-								className: "p-4 rounded-xl bg-slate-50/60 border border-slate-100 space-y-1",
-								children: [/* @__PURE__ */ jsx("span", {
-									className: "text-xs font-medium text-slate-400",
-									children: "Operational HQ"
-								}), /* @__PURE__ */ jsxs("p", {
-									className: "text-sm font-semibold text-slate-800 flex items-center gap-1.5 pt-1",
-									children: [/* @__PURE__ */ jsx(Building2, { className: "w-4 h-4 text-violet-600" }), /* @__PURE__ */ jsx("span", { children: selfRep.headquarters })]
-								})]
-							}),
-							/* @__PURE__ */ jsxs("div", {
-								className: "p-4 rounded-xl bg-slate-50/60 border border-slate-100 space-y-1",
-								children: [/* @__PURE__ */ jsx("span", {
-									className: "text-xs font-medium text-slate-400",
-									children: "Territory Jurisdiction"
-								}), /* @__PURE__ */ jsxs("p", {
-									className: "text-sm font-semibold text-slate-800 flex items-center gap-1.5 pt-1",
-									children: [/* @__PURE__ */ jsx(MapPin, { className: "w-4 h-4 text-indigo-600" }), /* @__PURE__ */ jsx("span", { children: selfRep.territory })]
-								})]
-							}),
-							/* @__PURE__ */ jsxs("div", {
-								className: "p-4 rounded-xl bg-slate-50/60 border border-slate-100 space-y-1",
-								children: [/* @__PURE__ */ jsx("span", {
-									className: "text-xs font-medium text-slate-400",
-									children: "Reporting Line Manager"
-								}), /* @__PURE__ */ jsxs("p", {
-									className: "text-sm font-semibold text-slate-800 flex items-center gap-1.5 pt-1",
-									children: [/* @__PURE__ */ jsx(UserCheck, { className: "w-4 h-4 text-emerald-600" }), /* @__PURE__ */ jsx("span", { children: selfRep.reporting_manager })]
-								})]
-							})
-						]
-					})]
-				}), /* @__PURE__ */ jsxs("div", {
-					className: "grid grid-cols-1 sm:grid-cols-3 gap-4",
-					children: [
-						/* @__PURE__ */ jsxs("div", {
-							className: "bg-white rounded-2xl border border-slate-200/80 p-5",
-							children: [
-								/* @__PURE__ */ jsx("span", {
-									className: "text-xs font-medium text-slate-500",
-									children: "Allocated Doctors"
-								}),
-								/* @__PURE__ */ jsx("p", {
-									className: "text-2xl font-semibold text-slate-800 mt-2",
-									children: selfRep.assigned_doctors_count
-								}),
-								/* @__PURE__ */ jsx("p", {
-									className: "text-[11px] text-slate-400 mt-1",
-									children: "Exclusive practitioner coverage"
-								})
-							]
-						}),
-						/* @__PURE__ */ jsxs("div", {
-							className: "bg-white rounded-2xl border border-slate-200/80 p-5",
-							children: [
-								/* @__PURE__ */ jsx("span", {
-									className: "text-xs font-medium text-slate-500",
-									children: "Appointment Date"
-								}),
-								/* @__PURE__ */ jsx("p", {
-									className: "text-2xl font-semibold text-violet-600 mt-2",
-									children: selfRep.joining_date
-								}),
-								/* @__PURE__ */ jsx("p", {
-									className: "text-[11px] text-slate-400 mt-1",
-									children: "Territory assignment inception"
-								})
-							]
-						}),
-						/* @__PURE__ */ jsxs("div", {
-							className: "bg-white rounded-2xl border border-slate-200/80 p-5",
-							children: [
-								/* @__PURE__ */ jsx("span", {
-									className: "text-xs font-medium text-slate-500",
-									children: "Route Compliance"
-								}),
-								/* @__PURE__ */ jsx("p", {
-									className: "text-2xl font-semibold text-emerald-600 mt-2",
-									children: "100%"
-								}),
-								/* @__PURE__ */ jsx("p", {
-									className: "text-[11px] text-emerald-600 font-medium mt-1",
-									children: "Active verified field representative"
-								})
-							]
-						})
-					]
-				})]
-			}) : /* @__PURE__ */ jsxs("div", {
-				className: "space-y-6",
-				children: [/* @__PURE__ */ jsxs("div", {
-					className: "grid grid-cols-1 sm:grid-cols-4 gap-4",
-					children: [
-						/* @__PURE__ */ jsxs("div", {
-							className: "bg-white rounded-2xl border border-slate-200/80 p-5",
-							children: [
-								/* @__PURE__ */ jsx("span", {
-									className: "text-xs font-medium text-slate-500",
-									children: "Field Representatives"
-								}),
-								/* @__PURE__ */ jsx("p", {
-									className: "text-2xl font-semibold text-slate-800 mt-2",
-									children: representatives.length
-								}),
-								/* @__PURE__ */ jsx("p", {
-									className: "text-[11px] text-slate-400 mt-1",
-									children: "Active field personnel"
-								})
-							]
-						}),
-						/* @__PURE__ */ jsxs("div", {
-							className: "bg-white rounded-2xl border border-slate-200/80 p-5",
-							children: [
-								/* @__PURE__ */ jsx("span", {
-									className: "text-xs font-medium text-slate-500",
-									children: "Total Headquarters"
-								}),
-								/* @__PURE__ */ jsx("p", {
-									className: "text-2xl font-semibold text-violet-600 mt-2",
-									children: "26 HQs"
-								}),
-								/* @__PURE__ */ jsx("p", {
-									className: "text-[11px] text-slate-400 mt-1",
-									children: "Assigned hubs"
-								})
-							]
-						}),
-						/* @__PURE__ */ jsxs("div", {
-							className: "bg-white rounded-2xl border border-slate-200/80 p-5",
-							children: [
-								/* @__PURE__ */ jsx("span", {
-									className: "text-xs font-medium text-slate-500",
-									children: "Area Business Managers"
-								}),
-								/* @__PURE__ */ jsx("p", {
-									className: "text-2xl font-semibold text-emerald-600 mt-2",
-									children: "13 ABMs"
-								}),
-								/* @__PURE__ */ jsx("p", {
-									className: "text-[11px] text-slate-400 mt-1",
-									children: "First-line supervisors"
-								})
-							]
-						}),
-						/* @__PURE__ */ jsxs("div", {
-							className: "bg-white rounded-2xl border border-slate-200/80 p-5",
-							children: [
-								/* @__PURE__ */ jsx("span", {
-									className: "text-xs font-medium text-slate-500",
-									children: "Territory Coverage"
-								}),
-								/* @__PURE__ */ jsx("p", {
-									className: "text-2xl font-semibold text-slate-800 mt-2",
-									children: "100%"
-								}),
-								/* @__PURE__ */ jsx("p", {
-									className: "text-[11px] text-emerald-600 font-medium mt-1",
-									children: "Fully allocated"
-								})
-							]
-						})
-					]
-				}), /* @__PURE__ */ jsxs("div", {
-					className: "bg-white rounded-2xl border border-slate-200/80 overflow-hidden",
-					children: [/* @__PURE__ */ jsxs("div", {
-						className: "px-5 py-3.5 border-b border-slate-100 flex items-center justify-between",
-						children: [/* @__PURE__ */ jsx("h3", {
-							className: "text-sm font-semibold text-slate-800",
-							children: "Assigned Representatives & Territories"
-						}), /* @__PURE__ */ jsxs("span", {
-							className: "text-xs text-slate-400",
-							children: [filtered.length, " representatives"]
-						})]
-					}), /* @__PURE__ */ jsx("div", {
-						className: "overflow-x-auto",
-						children: /* @__PURE__ */ jsxs("table", {
-							className: "w-full text-left text-xs border-collapse",
-							children: [/* @__PURE__ */ jsx("thead", { children: /* @__PURE__ */ jsxs("tr", {
-								className: "border-b border-slate-100 text-[11px] font-semibold text-slate-400 bg-slate-50/50",
-								children: [
-									/* @__PURE__ */ jsx("th", {
-										className: "py-2.5 px-4",
-										children: "Employee"
-									}),
-									/* @__PURE__ */ jsx("th", {
-										className: "py-2.5 px-4",
-										children: "Role / Reg"
-									}),
-									/* @__PURE__ */ jsx("th", {
-										className: "py-2.5 px-4",
-										children: "Headquarters"
-									}),
-									/* @__PURE__ */ jsx("th", {
-										className: "py-2.5 px-4",
-										children: "Territory"
-									}),
-									/* @__PURE__ */ jsx("th", {
-										className: "py-2.5 px-4 text-center",
-										children: "Assigned Doctors"
-									}),
-									/* @__PURE__ */ jsx("th", {
-										className: "py-2.5 px-4",
-										children: "Reporting Manager"
-									}),
-									/* @__PURE__ */ jsx("th", {
-										className: "py-2.5 px-4 text-center",
-										children: "Status"
-									})
-								]
-							}) }), /* @__PURE__ */ jsx("tbody", {
-								className: "divide-y divide-slate-100",
-								children: filtered.map((rep) => /* @__PURE__ */ jsxs("tr", {
-									className: "hover:bg-slate-50/70 transition-colors",
-									children: [
-										/* @__PURE__ */ jsx("td", {
-											className: "py-3 px-4 font-medium text-slate-800",
-											children: rep.name
-										}),
-										/* @__PURE__ */ jsxs("td", {
-											className: "py-3 px-4 text-slate-600",
-											children: [/* @__PURE__ */ jsx("span", {
-												className: "font-mono text-[11px] font-semibold bg-slate-100 px-1.5 py-0.5 rounded mr-1.5 text-slate-700",
-												children: rep.reg_code
-											}), rep.role_title]
-										}),
-										/* @__PURE__ */ jsx("td", {
-											className: "py-3 px-4 text-slate-700 font-medium",
-											children: rep.headquarters
-										}),
-										/* @__PURE__ */ jsx("td", {
-											className: "py-3 px-4 text-slate-500",
-											children: rep.territory
-										}),
-										/* @__PURE__ */ jsxs("td", {
-											className: "py-3 px-4 text-center font-medium text-violet-700",
-											children: [rep.assigned_doctors_count, " doctors"]
-										}),
-										/* @__PURE__ */ jsx("td", {
-											className: "py-3 px-4 text-slate-600",
-											children: rep.reporting_manager
-										}),
-										/* @__PURE__ */ jsx("td", {
-											className: "py-3 px-4 text-center",
-											children: /* @__PURE__ */ jsx("span", {
-												className: "inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[11px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200/60",
-												children: "Active"
-											})
-										})
-									]
-								}, rep.id))
-							})]
-						})
-					})]
-				})]
-			})]
-		})
-	});
-}
-//#endregion
 //#region resources/js/Pages/mrconnect/FieldExpenses.jsx
 var FieldExpenses_exports = /* @__PURE__ */ __exportAll({ default: () => FieldExpenses });
 function FieldExpenses({ expenses = [], summary = {} }) {
 	const { props } = usePage();
-	const isAdmin = props.auth?.user?.role === "admin";
+	const isAdmin = props.auth?.user?.role === "admin" || props.auth?.user?.role === "super_admin";
 	const Layout = isAdmin ? AdminLayout : MRLayout;
 	const [showModal, setShowModal] = useState(false);
-	const [formData, setFormData] = useState({
+	const [approvingExpense, setApprovingExpense] = useState(null);
+	const [isApproving, setIsApproving] = useState(false);
+	const [rejectingExpense, setRejectingExpense] = useState(null);
+	const [isRejecting, setIsRejecting] = useState(false);
+	const [rejectReason, setRejectReason] = useState("");
+	const [rejectError, setRejectError] = useState("");
+	const [receiptMode, setReceiptMode] = useState("file");
+	const [receiptPreview, setReceiptPreview] = useState(null);
+	const [previewModalUrl, setPreviewModalUrl] = useState(null);
+	const [isSubmitting, setIsSubmitting] = useState(false);
+	const [formErrors, setFormErrors] = useState({});
+	const initialFormState = {
 		date: (/* @__PURE__ */ new Date()).toISOString().split("T")[0],
 		expense_type: "daily_allowance",
 		amount: "",
 		distance_km: "",
 		city: "",
-		notes: ""
-	});
+		notes: "",
+		receipt: null,
+		receipt_url: ""
+	};
+	const [formData, setFormData] = useState(initialFormState);
+	const handleFileChange = (e) => {
+		const file = e.target.files?.[0];
+		if (!file) return;
+		if (file.size > 5242880) {
+			setFormErrors((prev) => ({
+				...prev,
+				receipt: "File size cannot exceed 5MB."
+			}));
+			return;
+		}
+		if (formErrors.receipt || formErrors.receipt_url) setFormErrors((prev) => ({
+			...prev,
+			receipt: void 0,
+			receipt_url: void 0
+		}));
+		setFormData((prev) => ({
+			...prev,
+			receipt: file
+		}));
+		if (file.type.startsWith("image/")) {
+			const url = URL.createObjectURL(file);
+			setReceiptPreview(url);
+		} else setReceiptPreview(null);
+	};
+	const handleRemoveFile = () => {
+		if (receiptPreview) URL.revokeObjectURL(receiptPreview);
+		setFormData((prev) => ({
+			...prev,
+			receipt: null
+		}));
+		setReceiptPreview(null);
+		if (formErrors.receipt) setFormErrors((prev) => ({
+			...prev,
+			receipt: void 0
+		}));
+	};
+	const resetForm = () => {
+		if (receiptPreview) URL.revokeObjectURL(receiptPreview);
+		setFormData(initialFormState);
+		setReceiptPreview(null);
+		setReceiptMode("file");
+		setFormErrors({});
+	};
 	const handleSubmit = (e) => {
 		e.preventDefault();
+		setFormErrors({});
+		setIsSubmitting(true);
 		router.post("/mrconnect/field-expenses", formData, {
+			forceFormData: true,
 			onSuccess: () => {
-				toast.success("Field expense claim submitted successfully.");
 				setShowModal(false);
-				setFormData({
-					date: (/* @__PURE__ */ new Date()).toISOString().split("T")[0],
-					expense_type: "daily_allowance",
-					amount: "",
-					distance_km: "",
-					city: "",
-					notes: ""
-				});
+				resetForm();
 			},
-			onError: () => toast.error("Failed to submit expense.")
+			onError: (errs) => {
+				setFormErrors(errs || {});
+			},
+			onFinish: () => setIsSubmitting(false)
 		});
 	};
-	const handleApprove = (id) => {
-		router.post(`/mrconnect/field-expenses/${id}/approve`, {}, { onSuccess: () => toast.success("Expense claim approved!") });
+	const confirmApproveExpense = () => {
+		if (!approvingExpense) return;
+		setIsApproving(true);
+		router.post(`/mrconnect/field-expenses/${approvingExpense.id}/approve`, {}, {
+			onFinish: () => {
+				setIsApproving(false);
+				setApprovingExpense(null);
+			},
+			onError: () => {
+				setIsApproving(false);
+			}
+		});
+	};
+	const confirmRejectExpense = () => {
+		if (!rejectingExpense) return;
+		if (!rejectReason.trim()) {
+			setRejectError("Please provide a reason for declining this claim.");
+			return;
+		}
+		setRejectError("");
+		setIsRejecting(true);
+		router.post(`/mrconnect/field-expenses/${rejectingExpense.id}/reject`, { reason: rejectReason }, {
+			onFinish: () => {
+				setIsRejecting(false);
+				setRejectingExpense(null);
+				setRejectReason("");
+				setRejectError("");
+			},
+			onError: () => {
+				setIsRejecting(false);
+			}
+		});
 	};
 	return /* @__PURE__ */ jsxs(Layout, {
 		title: isAdmin ? "Field Expenses" : "My Field Expenses",
-		children: [/* @__PURE__ */ jsxs("div", {
-			className: "space-y-6 pb-12 font-sans max-w-[1400px] mx-auto",
-			children: [
-				/* @__PURE__ */ jsxs("div", {
-					className: "flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-200/80",
-					children: [/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("h2", {
-						className: "text-xl sm:text-2xl font-semibold tracking-tight text-slate-800",
-						children: isAdmin ? "Field Expenses & Daily Allowance (DA/TA)" : "My Field Expenses (DA/TA)"
-					}), /* @__PURE__ */ jsx("p", {
-						className: "text-xs text-slate-500 font-normal mt-0.5",
-						children: isAdmin ? "Review, audit, and approve field representative travel claims and allowances." : "Submit daily travel claims, mileage allowances, lodging, and meal expenses."
-					})] }), /* @__PURE__ */ jsxs("button", {
-						type: "button",
-						onClick: () => setShowModal(true),
-						className: "inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-medium text-xs transition-colors cursor-pointer",
-						children: [/* @__PURE__ */ jsx(Plus, { className: "w-3.5 h-3.5" }), /* @__PURE__ */ jsx("span", { children: "Claim Expense" })]
-					})]
-				}),
-				/* @__PURE__ */ jsxs("div", {
-					className: "grid grid-cols-1 sm:grid-cols-3 gap-4",
-					children: [
-						/* @__PURE__ */ jsxs("div", {
-							className: "bg-white rounded-2xl border border-slate-200/80 p-5",
-							children: [
-								/* @__PURE__ */ jsx("span", {
-									className: "text-xs font-medium text-slate-500",
-									children: "Total Claimed"
-								}),
-								/* @__PURE__ */ jsxs("p", {
-									className: "text-2xl font-semibold text-slate-800 mt-2",
-									children: ["₹", Number(summary.total_claimed || 0).toLocaleString()]
-								}),
-								/* @__PURE__ */ jsx("p", {
-									className: "text-[11px] text-slate-400 mt-1",
-									children: "All submitted claims"
-								})
-							]
-						}),
-						/* @__PURE__ */ jsxs("div", {
-							className: "bg-white rounded-2xl border border-slate-200/80 p-5",
-							children: [
-								/* @__PURE__ */ jsx("span", {
-									className: "text-xs font-medium text-slate-500",
-									children: "Approved & Disbursed"
-								}),
-								/* @__PURE__ */ jsxs("p", {
-									className: "text-2xl font-semibold text-emerald-600 mt-2",
-									children: ["₹", Number(summary.approved_amount || 0).toLocaleString()]
-								}),
-								/* @__PURE__ */ jsx("p", {
-									className: "text-[11px] text-emerald-600 font-medium mt-1",
-									children: "Processed by finance"
-								})
-							]
-						}),
-						/* @__PURE__ */ jsxs("div", {
-							className: "bg-white rounded-2xl border border-slate-200/80 p-5",
-							children: [
-								/* @__PURE__ */ jsx("span", {
-									className: "text-xs font-medium text-slate-500",
-									children: "Pending Review"
-								}),
-								/* @__PURE__ */ jsxs("p", {
-									className: "text-2xl font-semibold text-amber-600 mt-2",
-									children: ["₹", Number(summary.pending_amount || 0).toLocaleString()]
-								}),
-								/* @__PURE__ */ jsx("p", {
-									className: "text-[11px] text-amber-600 font-medium mt-1",
-									children: "Awaiting management"
-								})
-							]
-						})
-					]
-				}),
-				/* @__PURE__ */ jsxs("div", {
-					className: "bg-white rounded-2xl border border-slate-200/80 overflow-hidden",
-					children: [/* @__PURE__ */ jsxs("div", {
-						className: "px-5 py-3.5 border-b border-slate-100 flex items-center justify-between",
-						children: [/* @__PURE__ */ jsx("h3", {
-							className: "text-sm font-semibold text-slate-800",
-							children: "Expense Claim Records"
-						}), /* @__PURE__ */ jsxs("span", {
-							className: "text-xs text-slate-400",
-							children: [expenses.length, " claims"]
+		children: [
+			/* @__PURE__ */ jsxs("div", {
+				className: "space-y-6 pb-12 font-sans max-w-[1400px] mx-auto",
+				children: [
+					/* @__PURE__ */ jsxs("div", {
+						className: "flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-200/80",
+						children: [/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("h2", {
+							className: "text-xl sm:text-2xl font-semibold tracking-tight text-slate-800",
+							children: isAdmin ? "Field Expenses & Daily Allowance (DA/TA)" : "My Field Expenses (DA/TA)"
+						}), /* @__PURE__ */ jsx("p", {
+							className: "text-xs text-slate-500 font-normal mt-0.5",
+							children: isAdmin ? "Review, audit, and approve field representative travel claims and allowances." : "Submit daily travel claims, mileage allowances, lodging, and meal expenses."
+						})] }), /* @__PURE__ */ jsxs("button", {
+							type: "button",
+							onClick: () => {
+								resetForm();
+								setShowModal(true);
+							},
+							className: "inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-medium text-xs transition-colors cursor-pointer shadow-sm hover:shadow",
+							children: [/* @__PURE__ */ jsx(Plus, { className: "w-3.5 h-3.5" }), /* @__PURE__ */ jsx("span", { children: "Claim Expense" })]
 						})]
-					}), /* @__PURE__ */ jsx("div", {
-						className: "overflow-x-auto",
-						children: /* @__PURE__ */ jsxs("table", {
-							className: "w-full text-left text-xs border-collapse",
-							children: [/* @__PURE__ */ jsx("thead", { children: /* @__PURE__ */ jsxs("tr", {
-								className: "border-b border-slate-100 text-[11px] font-semibold text-slate-400 bg-slate-50/50",
+					}),
+					/* @__PURE__ */ jsxs("div", {
+						className: "grid grid-cols-1 sm:grid-cols-3 gap-4",
+						children: [
+							/* @__PURE__ */ jsxs("div", {
+								className: "bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs",
 								children: [
-									/* @__PURE__ */ jsx("th", {
-										className: "py-2.5 px-4",
-										children: "Date"
+									/* @__PURE__ */ jsx("span", {
+										className: "text-xs font-medium text-slate-500",
+										children: "Total Claimed"
 									}),
-									isAdmin && /* @__PURE__ */ jsx("th", {
-										className: "py-2.5 px-4",
-										children: "Representative"
+									/* @__PURE__ */ jsxs("p", {
+										className: "text-2xl font-semibold text-slate-800 mt-2",
+										children: ["₹", Number(summary.total_claimed || 0).toLocaleString()]
 									}),
-									/* @__PURE__ */ jsx("th", {
-										className: "py-2.5 px-4",
-										children: "Type"
-									}),
-									/* @__PURE__ */ jsx("th", {
-										className: "py-2.5 px-4",
-										children: "Location / Distance"
-									}),
-									/* @__PURE__ */ jsx("th", {
-										className: "py-2.5 px-4 text-right",
-										children: "Amount"
-									}),
-									/* @__PURE__ */ jsx("th", {
-										className: "py-2.5 px-4 text-center",
-										children: "Status"
-									}),
-									isAdmin && /* @__PURE__ */ jsx("th", {
-										className: "py-2.5 px-4 text-right",
-										children: "Action"
+									/* @__PURE__ */ jsx("p", {
+										className: "text-[11px] text-slate-400 mt-1",
+										children: "All submitted claims"
 									})
 								]
-							}) }), /* @__PURE__ */ jsx("tbody", {
-								className: "divide-y divide-slate-100",
-								children: expenses.length > 0 ? expenses.map((exp) => /* @__PURE__ */ jsxs("tr", {
-									className: "hover:bg-slate-50/70 transition-colors",
+							}),
+							/* @__PURE__ */ jsxs("div", {
+								className: "bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs",
+								children: [
+									/* @__PURE__ */ jsx("span", {
+										className: "text-xs font-medium text-slate-500",
+										children: "Approved & Disbursed"
+									}),
+									/* @__PURE__ */ jsxs("p", {
+										className: "text-2xl font-semibold text-emerald-600 mt-2",
+										children: ["₹", Number(summary.approved_amount || 0).toLocaleString()]
+									}),
+									/* @__PURE__ */ jsx("p", {
+										className: "text-[11px] text-emerald-600 font-medium mt-1",
+										children: "Processed by finance"
+									})
+								]
+							}),
+							/* @__PURE__ */ jsxs("div", {
+								className: "bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs",
+								children: [
+									/* @__PURE__ */ jsx("span", {
+										className: "text-xs font-medium text-slate-500",
+										children: "Pending Review"
+									}),
+									/* @__PURE__ */ jsxs("p", {
+										className: "text-2xl font-semibold text-amber-600 mt-2",
+										children: ["₹", Number(summary.pending_amount || 0).toLocaleString()]
+									}),
+									/* @__PURE__ */ jsx("p", {
+										className: "text-[11px] text-amber-600 font-medium mt-1",
+										children: "Awaiting management"
+									})
+								]
+							})
+						]
+					}),
+					/* @__PURE__ */ jsxs("div", {
+						className: "bg-white rounded-2xl border border-slate-200/80 overflow-hidden shadow-xs",
+						children: [/* @__PURE__ */ jsxs("div", {
+							className: "px-5 py-3.5 border-b border-slate-100 flex items-center justify-between bg-slate-50/40",
+							children: [/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("h3", {
+								className: "text-sm font-semibold text-slate-800",
+								children: "Expense Claim Records"
+							}), /* @__PURE__ */ jsx("p", {
+								className: "text-[11px] text-slate-400",
+								children: "Audit trail with reviewer and approval tracking"
+							})] }), /* @__PURE__ */ jsxs("span", {
+								className: "text-xs text-slate-400 font-medium",
+								children: [expenses.length, " claims"]
+							})]
+						}), /* @__PURE__ */ jsx("div", {
+							className: "overflow-x-auto",
+							children: /* @__PURE__ */ jsxs("table", {
+								className: "w-full text-left text-xs border-collapse",
+								children: [/* @__PURE__ */ jsx("thead", { children: /* @__PURE__ */ jsxs("tr", {
+									className: "border-b border-slate-100 text-[11px] font-semibold text-slate-500 bg-slate-50/60 uppercase tracking-wider",
 									children: [
-										/* @__PURE__ */ jsx("td", {
-											className: "py-3 px-4 font-medium text-slate-800 whitespace-nowrap",
-											children: exp.date
+										/* @__PURE__ */ jsx("th", {
+											className: "py-3 px-4",
+											children: "Date"
 										}),
-										isAdmin && /* @__PURE__ */ jsx("td", {
-											className: "py-3 px-4 font-medium text-slate-700",
-											children: exp.user_name || "Representative"
+										isAdmin && /* @__PURE__ */ jsx("th", {
+											className: "py-3 px-4",
+											children: "Representative"
 										}),
-										/* @__PURE__ */ jsx("td", {
-											className: "py-3 px-4 capitalize text-slate-600",
-											children: exp.expense_type.replace("_", " ")
+										/* @__PURE__ */ jsx("th", {
+											className: "py-3 px-4",
+											children: "Type"
 										}),
-										/* @__PURE__ */ jsxs("td", {
-											className: "py-3 px-4 text-slate-500",
-											children: [
-												exp.city,
-												" ",
-												exp.distance_km ? `(${exp.distance_km} km)` : ""
-											]
+										/* @__PURE__ */ jsx("th", {
+											className: "py-3 px-4",
+											children: "Location / Distance"
 										}),
-										/* @__PURE__ */ jsxs("td", {
-											className: "py-3 px-4 text-right font-semibold text-slate-800",
-											children: ["₹", Number(exp.amount).toFixed(2)]
-										}),
-										/* @__PURE__ */ jsx("td", {
-											className: "py-3 px-4 text-center",
-											children: /* @__PURE__ */ jsxs("span", {
-												className: `inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[11px] font-medium ${exp.status === "approved" ? "bg-emerald-50 text-emerald-700 border border-emerald-200/60" : exp.status === "rejected" ? "bg-rose-50 text-rose-700 border border-rose-200/60" : "bg-amber-50 text-amber-700 border border-amber-200/60"}`,
-												children: [
-													exp.status === "approved" && /* @__PURE__ */ jsx(CheckCircle2, { className: "w-3 h-3" }),
-													exp.status === "pending" && /* @__PURE__ */ jsx(Clock, { className: "w-3 h-3" }),
-													exp.status.charAt(0).toUpperCase() + exp.status.slice(1)
-												]
-											})
-										}),
-										isAdmin && /* @__PURE__ */ jsx("td", {
+										/* @__PURE__ */ jsx("th", {
 											className: "py-3 px-4 text-right",
-											children: exp.status === "pending" && /* @__PURE__ */ jsx("button", {
-												type: "button",
-												onClick: () => handleApprove(exp.id),
-												className: "px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-[11px] transition-colors cursor-pointer",
-												children: "Approve"
-											})
+											children: "Amount"
+										}),
+										/* @__PURE__ */ jsx("th", {
+											className: "py-3 px-4 text-center",
+											children: "Receipt"
+										}),
+										/* @__PURE__ */ jsx("th", {
+											className: "py-3 px-4 text-center",
+											children: "Status"
+										}),
+										isAdmin && /* @__PURE__ */ jsx("th", {
+											className: "py-3 px-4 text-right",
+											children: "Action"
 										})
 									]
-								}, exp.id)) : /* @__PURE__ */ jsx("tr", { children: /* @__PURE__ */ jsx("td", {
-									colSpan: isAdmin ? 7 : 5,
-									className: "py-8 text-center text-slate-400",
-									children: "No expense claims submitted yet."
-								}) })
-							})]
-						})
-					})]
-				})
-			]
-		}), showModal && /* @__PURE__ */ jsx("div", {
-			className: "fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-xs p-4",
-			children: /* @__PURE__ */ jsxs("div", {
-				className: "bg-white rounded-2xl border border-slate-200 max-w-md w-full p-6 space-y-4 shadow-xl",
-				children: [/* @__PURE__ */ jsxs("div", {
-					className: "flex items-center justify-between pb-3 border-b border-slate-100",
-					children: [/* @__PURE__ */ jsx("h3", {
-						className: "text-base font-semibold text-slate-800",
-						children: "Submit Expense Claim"
-					}), /* @__PURE__ */ jsx("button", {
-						type: "button",
-						onClick: () => setShowModal(false),
-						className: "text-slate-400 hover:text-slate-600 cursor-pointer",
-						children: /* @__PURE__ */ jsx(X, { className: "w-5 h-5" })
-					})]
-				}), /* @__PURE__ */ jsxs("form", {
-					onSubmit: handleSubmit,
-					className: "space-y-3.5 text-xs",
-					children: [
-						/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("label", {
-							className: "block text-xs font-medium text-slate-700 mb-1",
-							children: "Date"
-						}), /* @__PURE__ */ jsx("input", {
-							type: "date",
-							required: true,
-							value: formData.date,
-							onChange: (e) => setFormData({
-								...formData,
-								date: e.target.value
-							}),
-							className: "w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500"
-						})] }),
-						/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("label", {
-							className: "block text-xs font-medium text-slate-700 mb-1",
-							children: "Expense Type"
-						}), /* @__PURE__ */ jsxs("select", {
-							value: formData.expense_type,
-							onChange: (e) => setFormData({
-								...formData,
-								expense_type: e.target.value
-							}),
-							className: "w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 cursor-pointer",
-							children: [
-								/* @__PURE__ */ jsx("option", {
-									value: "daily_allowance",
-									children: "Daily Allowance (DA)"
-								}),
-								/* @__PURE__ */ jsx("option", {
-									value: "travel_fuel",
-									children: "Travel & Fuel Allowance (TA)"
-								}),
-								/* @__PURE__ */ jsx("option", {
-									value: "lodging",
-									children: "Hotel & Lodging"
-								}),
-								/* @__PURE__ */ jsx("option", {
-									value: "meal",
-									children: "Client / Doctor CME Hospitality"
-								}),
-								/* @__PURE__ */ jsx("option", {
-									value: "miscellaneous",
-									children: "Stationery & Courier"
-								})
-							]
-						})] }),
-						/* @__PURE__ */ jsxs("div", {
-							className: "grid grid-cols-2 gap-3",
-							children: [/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("label", {
-								className: "block text-xs font-medium text-slate-700 mb-1",
-								children: "Claim Amount (₹)"
-							}), /* @__PURE__ */ jsx("input", {
-								type: "number",
-								required: true,
-								min: "1",
-								placeholder: "450",
-								value: formData.amount,
-								onChange: (e) => setFormData({
-									...formData,
-									amount: e.target.value
-								}),
-								className: "w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500"
-							})] }), /* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("label", {
-								className: "block text-xs font-medium text-slate-700 mb-1",
-								children: "Distance (km)"
-							}), /* @__PURE__ */ jsx("input", {
-								type: "number",
-								placeholder: "42",
-								value: formData.distance_km,
-								onChange: (e) => setFormData({
-									...formData,
-									distance_km: e.target.value
-								}),
-								className: "w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500"
-							})] })]
-						}),
-						/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("label", {
-							className: "block text-xs font-medium text-slate-700 mb-1",
-							children: "Territory / City"
-						}), /* @__PURE__ */ jsx("input", {
-							type: "text",
-							placeholder: "Nagercoil / Kanyakumari",
-							value: formData.city,
-							onChange: (e) => setFormData({
-								...formData,
-								city: e.target.value
-							}),
-							className: "w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500"
-						})] }),
-						/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("label", {
-							className: "block text-xs font-medium text-slate-700 mb-1",
-							children: "Remarks"
-						}), /* @__PURE__ */ jsx("textarea", {
-							rows: "2",
-							placeholder: "Notes regarding fieldwork coverage...",
-							value: formData.notes,
-							onChange: (e) => setFormData({
-								...formData,
-								notes: e.target.value
-							}),
-							className: "w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500"
-						})] }),
-						/* @__PURE__ */ jsxs("div", {
-							className: "flex items-center justify-end gap-2.5 pt-2 border-t border-slate-100",
-							children: [/* @__PURE__ */ jsx("button", {
-								type: "button",
-								onClick: () => setShowModal(false),
-								className: "px-4 py-2 rounded-xl text-xs font-medium text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer",
-								children: "Cancel"
-							}), /* @__PURE__ */ jsx("button", {
-								type: "submit",
-								className: "px-5 py-2 rounded-xl text-xs font-medium text-white bg-slate-900 hover:bg-slate-800 transition-colors cursor-pointer",
-								children: "Submit Claim"
-							})]
-						})
-					]
-				})]
-			})
-		})]
-	});
-}
-//#endregion
-//#region resources/js/Pages/mrconnect/HRSection.jsx
-var HRSection_exports = /* @__PURE__ */ __exportAll({ default: () => HRSection });
-function HRSection({ employees = [] }) {
-	const { props } = usePage();
-	const isAdmin = props.auth?.user?.role === "admin";
-	return /* @__PURE__ */ jsx(isAdmin ? AdminLayout : MRLayout, {
-		title: isAdmin ? "HR Directory & Records" : "My HR & Employment Profile",
-		children: /* @__PURE__ */ jsxs("div", {
-			className: "space-y-6 pb-12 font-sans max-w-[1400px] mx-auto",
-			children: [/* @__PURE__ */ jsx("div", {
-				className: "flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-200/80",
-				children: /* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("h2", {
-					className: "text-xl sm:text-2xl font-semibold tracking-tight text-slate-800",
-					children: isAdmin ? "Human Resources Directory" : "My HR & Employment Profile"
-				}), /* @__PURE__ */ jsx("p", {
-					className: "text-xs text-slate-500 font-normal mt-0.5",
-					children: isAdmin ? "Official company personnel records, departments, and communication coordinates." : "Your official company employment record, registration code, and department designation."
-				})] })
-			}), /* @__PURE__ */ jsxs("div", {
-				className: "bg-white rounded-2xl border border-slate-200/80 overflow-hidden",
-				children: [/* @__PURE__ */ jsxs("div", {
-					className: "px-5 py-3.5 border-b border-slate-100 flex items-center justify-between",
-					children: [/* @__PURE__ */ jsx("h3", {
-						className: "text-sm font-semibold text-slate-800",
-						children: isAdmin ? "Employee Master" : "Personal Employment Details"
-					}), /* @__PURE__ */ jsx("span", {
-						className: "text-xs text-slate-400",
-						children: isAdmin ? `${employees.length} employees` : "Verified Official Record"
-					})]
-				}), /* @__PURE__ */ jsx("div", {
-					className: "overflow-x-auto",
-					children: /* @__PURE__ */ jsxs("table", {
-						className: "w-full text-left text-xs border-collapse",
-						children: [/* @__PURE__ */ jsx("thead", { children: /* @__PURE__ */ jsxs("tr", {
-							className: "border-b border-slate-100 text-[11px] font-semibold text-slate-400 bg-slate-50/50",
-							children: [
-								/* @__PURE__ */ jsx("th", {
-									className: "py-2.5 px-4",
-									children: "Emp ID"
-								}),
-								/* @__PURE__ */ jsx("th", {
-									className: "py-2.5 px-4",
-									children: "Employee Name"
-								}),
-								/* @__PURE__ */ jsx("th", {
-									className: "py-2.5 px-4",
-									children: "Email Address"
-								}),
-								/* @__PURE__ */ jsx("th", {
-									className: "py-2.5 px-4",
-									children: "Department"
-								}),
-								/* @__PURE__ */ jsx("th", {
-									className: "py-2.5 px-4",
-									children: "Role"
-								}),
-								/* @__PURE__ */ jsx("th", {
-									className: "py-2.5 px-4 text-center",
-									children: "Status"
-								})
-							]
-						}) }), /* @__PURE__ */ jsx("tbody", {
-							className: "divide-y divide-slate-100",
-							children: employees.map((emp) => /* @__PURE__ */ jsxs("tr", {
-								className: "hover:bg-slate-50/70 transition-colors",
-								children: [
-									/* @__PURE__ */ jsx("td", {
-										className: "py-3 px-4 font-mono font-semibold text-slate-800",
-										children: emp.emp_id
-									}),
-									/* @__PURE__ */ jsx("td", {
-										className: "py-3 px-4 font-medium text-slate-800",
-										children: emp.name
-									}),
-									/* @__PURE__ */ jsx("td", {
-										className: "py-3 px-4 text-slate-500",
-										children: emp.email
-									}),
-									/* @__PURE__ */ jsx("td", {
-										className: "py-3 px-4 text-slate-600 font-medium",
-										children: emp.department
-									}),
-									/* @__PURE__ */ jsx("td", {
-										className: "py-3 px-4 text-slate-700",
-										children: /* @__PURE__ */ jsx("span", {
-											className: "bg-slate-100 text-slate-700 font-medium px-2 py-0.5 rounded text-[11px]",
-											children: emp.role
-										})
-									}),
-									/* @__PURE__ */ jsx("td", {
-										className: "py-3 px-4 text-center",
-										children: /* @__PURE__ */ jsx("span", {
-											className: "inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[11px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200/60",
-											children: "Active"
-										})
-									})
-								]
-							}, emp.id))
+								}) }), /* @__PURE__ */ jsx("tbody", {
+									className: "divide-y divide-slate-100",
+									children: expenses.length > 0 ? expenses.map((exp) => /* @__PURE__ */ jsxs("tr", {
+										className: "hover:bg-slate-50/70 transition-colors",
+										children: [
+											/* @__PURE__ */ jsx("td", {
+												className: "py-3 px-4 font-medium text-slate-800 whitespace-nowrap",
+												children: exp.date
+											}),
+											isAdmin && /* @__PURE__ */ jsx("td", {
+												className: "py-3 px-4 font-medium text-slate-700 whitespace-nowrap",
+												children: /* @__PURE__ */ jsxs("div", {
+													className: "flex items-center gap-2",
+													children: [/* @__PURE__ */ jsx("div", {
+														className: "w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 font-semibold text-[10px]",
+														children: (exp.user_name || "U").charAt(0).toUpperCase()
+													}), /* @__PURE__ */ jsx("span", { children: exp.user_name || "Representative" })]
+												})
+											}),
+											/* @__PURE__ */ jsx("td", {
+												className: "py-3 px-4 capitalize text-slate-700 font-medium",
+												children: exp.expense_type.replace("_", " ")
+											}),
+											/* @__PURE__ */ jsxs("td", {
+												className: "py-3 px-4 text-slate-500",
+												children: [/* @__PURE__ */ jsx("span", { children: exp.city || "Headquarters" }), exp.distance_km && /* @__PURE__ */ jsxs("span", {
+													className: "ml-1.5 text-[11px] font-medium text-slate-400",
+													children: [
+														"(",
+														exp.distance_km,
+														" km)"
+													]
+												})]
+											}),
+											/* @__PURE__ */ jsxs("td", {
+												className: "py-3 px-4 text-right font-semibold text-slate-800 whitespace-nowrap",
+												children: ["₹", Number(exp.amount).toFixed(2)]
+											}),
+											/* @__PURE__ */ jsx("td", {
+												className: "py-3 px-4 text-center whitespace-nowrap",
+												children: exp.receipt_url ? /* @__PURE__ */ jsxs("button", {
+													type: "button",
+													onClick: () => setPreviewModalUrl(exp.receipt_url),
+													className: "inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-violet-50 text-violet-700 hover:bg-violet-100 border border-violet-200/60 font-semibold text-[11px] transition-colors cursor-pointer shadow-2xs",
+													title: "View attached bill receipt",
+													children: [/* @__PURE__ */ jsx(Receipt, { className: "w-3.5 h-3.5 text-violet-600" }), /* @__PURE__ */ jsx("span", { children: "View Bill" })]
+												}) : /* @__PURE__ */ jsx("span", {
+													className: "text-slate-300 italic text-xs",
+													children: "—"
+												})
+											}),
+											/* @__PURE__ */ jsxs("td", {
+												className: "py-3 px-4 text-center whitespace-nowrap",
+												children: [/* @__PURE__ */ jsxs("span", {
+													className: `inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-medium ${exp.status === "approved" ? "bg-emerald-50 text-emerald-700 border border-emerald-200/60" : exp.status === "rejected" ? "bg-rose-50 text-rose-700 border border-rose-200/60" : "bg-amber-50 text-amber-700 border border-amber-200/60"}`,
+													children: [
+														exp.status === "approved" && /* @__PURE__ */ jsx(CheckCircle2, { className: "w-3 h-3" }),
+														exp.status === "rejected" && /* @__PURE__ */ jsx(XCircle, { className: "w-3 h-3" }),
+														exp.status === "pending" && /* @__PURE__ */ jsx(Clock, { className: "w-3 h-3" }),
+														exp.status.charAt(0).toUpperCase() + exp.status.slice(1)
+													]
+												}), exp.admin_feedback && /* @__PURE__ */ jsx("p", {
+													className: "text-[10px] text-rose-600 font-medium mt-1 truncate max-w-[130px]",
+													title: exp.admin_feedback,
+													children: exp.admin_feedback
+												})]
+											}),
+											isAdmin && /* @__PURE__ */ jsx("td", {
+												className: "py-3 px-4 text-right whitespace-nowrap",
+												children: exp.status === "pending" ? /* @__PURE__ */ jsxs("div", {
+													className: "inline-flex items-center gap-1.5 justify-end",
+													children: [/* @__PURE__ */ jsxs("button", {
+														type: "button",
+														onClick: () => setApprovingExpense(exp),
+														className: "inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-[11px] transition-colors cursor-pointer shadow-xs",
+														title: "Approve Claim",
+														children: [/* @__PURE__ */ jsx(Check, { className: "w-3 h-3" }), "Approve"]
+													}), /* @__PURE__ */ jsxs("button", {
+														type: "button",
+														onClick: () => {
+															setRejectingExpense(exp);
+															setRejectReason("");
+															setRejectError("");
+														},
+														className: "inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-semibold text-[11px] transition-colors cursor-pointer shadow-xs",
+														title: "Reject Claim",
+														children: [/* @__PURE__ */ jsx(X, { className: "w-3 h-3" }), "Reject"]
+													})]
+												}) : /* @__PURE__ */ jsxs("div", {
+													className: "relative group inline-flex items-center justify-end",
+													children: [/* @__PURE__ */ jsxs("div", {
+														className: "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-teal-50 text-slate-600 hover:text-teal-700 border border-slate-200/60 hover:border-teal-200 text-[11px] font-medium transition-all cursor-pointer shadow-2xs",
+														children: [/* @__PURE__ */ jsx(UserCheck, { className: "w-3.5 h-3.5 text-teal-600 shrink-0" }), /* @__PURE__ */ jsx("span", { children: "Completed" })]
+													}), /* @__PURE__ */ jsxs("div", {
+														className: "absolute right-0 bottom-full mb-2 hidden group-hover:flex flex-col items-start px-3 py-2 bg-slate-900 text-white text-xs rounded-xl shadow-xl z-30 whitespace-nowrap pointer-events-none animate-in fade-in duration-150",
+														children: [
+															/* @__PURE__ */ jsxs("div", {
+																className: "flex items-center gap-1.5 font-semibold text-slate-100",
+																children: [/* @__PURE__ */ jsx(UserCheck, { className: "w-3.5 h-3.5 text-teal-400 shrink-0" }), /* @__PURE__ */ jsxs("span", { children: ["Reviewed by: ", exp.reviewer_name || "Administrator"] })]
+															}),
+															exp.reviewed_at && /* @__PURE__ */ jsxs("span", {
+																className: "text-[10px] text-slate-400 mt-0.5 pl-5",
+																children: ["Date: ", new Date(exp.reviewed_at).toLocaleDateString(void 0, {
+																	day: "numeric",
+																	month: "short",
+																	year: "numeric"
+																})]
+															}),
+															/* @__PURE__ */ jsx("div", { className: "absolute right-4 top-full w-0 h-0 border-x-4 border-x-transparent border-t-4 border-t-slate-900" })
+														]
+													})]
+												})
+											})
+										]
+									}, exp.id)) : /* @__PURE__ */ jsx("tr", { children: /* @__PURE__ */ jsx("td", {
+										colSpan: isAdmin ? 8 : 6,
+										className: "py-8 text-center text-slate-400",
+										children: "No expense claims submitted yet."
+									}) })
+								})]
+							})
 						})]
 					})
-				})]
-			})]
-		})
+				]
+			}),
+			showModal && /* @__PURE__ */ jsx("div", {
+				className: "fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-xs p-4",
+				children: /* @__PURE__ */ jsxs("div", {
+					className: "bg-white rounded-2xl border border-slate-200 max-w-md w-full p-6 space-y-4 shadow-xl",
+					children: [/* @__PURE__ */ jsxs("div", {
+						className: "flex items-center justify-between pb-3 border-b border-slate-100",
+						children: [/* @__PURE__ */ jsx("h3", {
+							className: "text-base font-semibold text-slate-800",
+							children: "Submit Expense Claim"
+						}), /* @__PURE__ */ jsx("button", {
+							type: "button",
+							onClick: () => setShowModal(false),
+							className: "text-slate-400 hover:text-slate-600 cursor-pointer",
+							children: /* @__PURE__ */ jsx(X, { className: "w-5 h-5" })
+						})]
+					}), /* @__PURE__ */ jsxs("form", {
+						onSubmit: handleSubmit,
+						className: "space-y-3.5 text-xs",
+						children: [
+							/* @__PURE__ */ jsxs("div", { children: [
+								/* @__PURE__ */ jsxs("label", {
+									className: "block text-xs font-medium text-slate-700 mb-1",
+									children: ["Date ", /* @__PURE__ */ jsx("span", {
+										className: "text-rose-500",
+										children: "*"
+									})]
+								}),
+								/* @__PURE__ */ jsx("input", {
+									type: "date",
+									value: formData.date,
+									onChange: (e) => {
+										setFormData({
+											...formData,
+											date: e.target.value
+										});
+										if (formErrors.date) setFormErrors((prev) => ({
+											...prev,
+											date: void 0
+										}));
+									},
+									className: `w-full px-3 py-2 bg-slate-50 border rounded-xl text-xs text-slate-800 transition-colors focus:bg-white focus:outline-none ${formErrors.date ? "border-rose-400 focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20 bg-rose-50/20" : "border-slate-200 focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500"}`
+								}),
+								formErrors.date && /* @__PURE__ */ jsxs("p", {
+									className: "mt-1 text-xs text-rose-600 font-medium flex items-center gap-1 animate-in fade-in duration-150",
+									children: [/* @__PURE__ */ jsx(AlertCircle, { className: "w-3 h-3 shrink-0" }), /* @__PURE__ */ jsx("span", { children: formErrors.date })]
+								})
+							] }),
+							/* @__PURE__ */ jsxs("div", { children: [
+								/* @__PURE__ */ jsxs("label", {
+									className: "block text-xs font-medium text-slate-700 mb-1",
+									children: ["Expense Type ", /* @__PURE__ */ jsx("span", {
+										className: "text-rose-500",
+										children: "*"
+									})]
+								}),
+								/* @__PURE__ */ jsxs("select", {
+									value: formData.expense_type,
+									onChange: (e) => {
+										setFormData({
+											...formData,
+											expense_type: e.target.value
+										});
+										if (formErrors.expense_type) setFormErrors((prev) => ({
+											...prev,
+											expense_type: void 0
+										}));
+									},
+									className: `w-full px-3 py-2 bg-slate-50 border rounded-xl text-xs text-slate-800 focus:bg-white focus:outline-none transition-colors cursor-pointer ${formErrors.expense_type ? "border-rose-400 focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20 bg-rose-50/20" : "border-slate-200 focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500"}`,
+									children: [
+										/* @__PURE__ */ jsx("option", {
+											value: "daily_allowance",
+											children: "Daily Allowance (DA)"
+										}),
+										/* @__PURE__ */ jsx("option", {
+											value: "travel_fuel",
+											children: "Travel & Fuel Allowance (TA)"
+										}),
+										/* @__PURE__ */ jsx("option", {
+											value: "lodging",
+											children: "Hotel & Lodging"
+										}),
+										/* @__PURE__ */ jsx("option", {
+											value: "meal",
+											children: "Client / Doctor CME Hospitality"
+										}),
+										/* @__PURE__ */ jsx("option", {
+											value: "miscellaneous",
+											children: "Stationery & Courier"
+										})
+									]
+								}),
+								formErrors.expense_type && /* @__PURE__ */ jsxs("p", {
+									className: "mt-1 text-xs text-rose-600 font-medium flex items-center gap-1 animate-in fade-in duration-150",
+									children: [/* @__PURE__ */ jsx(AlertCircle, { className: "w-3 h-3 shrink-0" }), /* @__PURE__ */ jsx("span", { children: formErrors.expense_type })]
+								})
+							] }),
+							/* @__PURE__ */ jsxs("div", {
+								className: "grid grid-cols-2 gap-3",
+								children: [/* @__PURE__ */ jsxs("div", { children: [
+									/* @__PURE__ */ jsxs("label", {
+										className: "block text-xs font-medium text-slate-700 mb-1",
+										children: ["Claim Amount (₹) ", /* @__PURE__ */ jsx("span", {
+											className: "text-rose-500",
+											children: "*"
+										})]
+									}),
+									/* @__PURE__ */ jsx("input", {
+										type: "number",
+										min: "1",
+										placeholder: "e.g. 450",
+										value: formData.amount,
+										onChange: (e) => {
+											setFormData({
+												...formData,
+												amount: e.target.value
+											});
+											if (formErrors.amount) setFormErrors((prev) => ({
+												...prev,
+												amount: void 0
+											}));
+										},
+										className: `w-full px-3 py-2 bg-slate-50 border rounded-xl text-xs text-slate-800 transition-colors focus:bg-white focus:outline-none ${formErrors.amount ? "border-rose-400 focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20 bg-rose-50/20" : "border-slate-200 focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500"}`
+									}),
+									formErrors.amount && /* @__PURE__ */ jsxs("p", {
+										className: "mt-1 text-xs text-rose-600 font-medium flex items-center gap-1 animate-in fade-in duration-150",
+										children: [/* @__PURE__ */ jsx(AlertCircle, { className: "w-3 h-3 shrink-0" }), /* @__PURE__ */ jsx("span", { children: formErrors.amount })]
+									})
+								] }), /* @__PURE__ */ jsxs("div", { children: [
+									/* @__PURE__ */ jsx("label", {
+										className: "block text-xs font-medium text-slate-700 mb-1",
+										children: "Distance (km)"
+									}),
+									/* @__PURE__ */ jsx("input", {
+										type: "number",
+										placeholder: "e.g. 42",
+										value: formData.distance_km,
+										onChange: (e) => {
+											setFormData({
+												...formData,
+												distance_km: e.target.value
+											});
+											if (formErrors.distance_km) setFormErrors((prev) => ({
+												...prev,
+												distance_km: void 0
+											}));
+										},
+										className: `w-full px-3 py-2 bg-slate-50 border rounded-xl text-xs text-slate-800 transition-colors focus:bg-white focus:outline-none ${formErrors.distance_km ? "border-rose-400 focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20 bg-rose-50/20" : "border-slate-200 focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500"}`
+									}),
+									formErrors.distance_km && /* @__PURE__ */ jsxs("p", {
+										className: "mt-1 text-xs text-rose-600 font-medium flex items-center gap-1 animate-in fade-in duration-150",
+										children: [/* @__PURE__ */ jsx(AlertCircle, { className: "w-3 h-3 shrink-0" }), /* @__PURE__ */ jsx("span", { children: formErrors.distance_km })]
+									})
+								] })]
+							}),
+							/* @__PURE__ */ jsxs("div", { children: [
+								/* @__PURE__ */ jsx("label", {
+									className: "block text-xs font-medium text-slate-700 mb-1",
+									children: "Territory / City"
+								}),
+								/* @__PURE__ */ jsx("input", {
+									type: "text",
+									placeholder: "e.g. Nagercoil / Kanyakumari",
+									value: formData.city,
+									onChange: (e) => {
+										setFormData({
+											...formData,
+											city: e.target.value
+										});
+										if (formErrors.city) setFormErrors((prev) => ({
+											...prev,
+											city: void 0
+										}));
+									},
+									className: `w-full px-3 py-2 bg-slate-50 border rounded-xl text-xs text-slate-800 transition-colors focus:bg-white focus:outline-none ${formErrors.city ? "border-rose-400 focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20 bg-rose-50/20" : "border-slate-200 focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500"}`
+								}),
+								formErrors.city && /* @__PURE__ */ jsxs("p", {
+									className: "mt-1 text-xs text-rose-600 font-medium flex items-center gap-1 animate-in fade-in duration-150",
+									children: [/* @__PURE__ */ jsx(AlertCircle, { className: "w-3 h-3 shrink-0" }), /* @__PURE__ */ jsx("span", { children: formErrors.city })]
+								})
+							] }),
+							/* @__PURE__ */ jsxs("div", { children: [
+								/* @__PURE__ */ jsxs("div", {
+									className: "flex items-center justify-between mb-1.5",
+									children: [/* @__PURE__ */ jsxs("label", {
+										className: "text-xs font-medium text-slate-700 flex items-center gap-1.5",
+										children: [
+											/* @__PURE__ */ jsx(Receipt, { className: "w-3.5 h-3.5 text-slate-500" }),
+											/* @__PURE__ */ jsx("span", { children: "Bill / Receipt Attachment" }),
+											/* @__PURE__ */ jsx("span", {
+												className: "text-[10px] text-slate-400 font-normal",
+												children: "(Optional)"
+											})
+										]
+									}), /* @__PURE__ */ jsxs("div", {
+										className: "inline-flex p-0.5 bg-slate-100 rounded-lg text-[10px] font-medium text-slate-600",
+										children: [/* @__PURE__ */ jsx("button", {
+											type: "button",
+											onClick: () => setReceiptMode("file"),
+											className: `px-2 py-0.5 rounded-md transition-all cursor-pointer ${receiptMode === "file" ? "bg-white text-slate-900 shadow-2xs font-semibold" : "hover:text-slate-900"}`,
+											children: "Upload File"
+										}), /* @__PURE__ */ jsx("button", {
+											type: "button",
+											onClick: () => setReceiptMode("url"),
+											className: `px-2 py-0.5 rounded-md transition-all cursor-pointer ${receiptMode === "url" ? "bg-white text-slate-900 shadow-2xs font-semibold" : "hover:text-slate-900"}`,
+											children: "Enter URL"
+										})]
+									})]
+								}),
+								receiptMode === "file" ? /* @__PURE__ */ jsx("div", { children: !formData.receipt ? /* @__PURE__ */ jsxs("label", {
+									className: `relative flex flex-col items-center justify-center p-3.5 border-2 border-dashed rounded-xl transition-all cursor-pointer group ${formErrors.receipt ? "border-rose-400 bg-rose-50/20" : "border-slate-200 hover:border-violet-400 bg-slate-50/70 hover:bg-violet-50/20"}`,
+									children: [
+										/* @__PURE__ */ jsx(UploadCloud, { className: "w-5 h-5 text-slate-400 group-hover:text-violet-600 mb-1 transition-colors" }),
+										/* @__PURE__ */ jsx("span", {
+											className: "text-xs font-medium text-slate-600 group-hover:text-slate-900",
+											children: "Click to browse or drop bill receipt"
+										}),
+										/* @__PURE__ */ jsx("span", {
+											className: "text-[10px] text-slate-400 mt-0.5",
+											children: "Supports PNG, JPG, WEBP, or PDF (up to 5MB)"
+										}),
+										/* @__PURE__ */ jsx("input", {
+											type: "file",
+											accept: "image/png,image/jpeg,image/webp,application/pdf",
+											onChange: handleFileChange,
+											className: "hidden"
+										})
+									]
+								}) : /* @__PURE__ */ jsxs("div", {
+									className: "flex items-center justify-between p-2.5 bg-violet-50/50 border border-violet-200/80 rounded-xl",
+									children: [/* @__PURE__ */ jsxs("div", {
+										className: "flex items-center gap-2.5 overflow-hidden",
+										children: [receiptPreview ? /* @__PURE__ */ jsx("img", {
+											src: receiptPreview,
+											alt: "Receipt preview",
+											className: "w-10 h-10 rounded-lg object-cover border border-violet-200 shrink-0"
+										}) : /* @__PURE__ */ jsx("div", {
+											className: "w-10 h-10 rounded-lg bg-violet-100 flex items-center justify-center shrink-0",
+											children: /* @__PURE__ */ jsx(FileText, { className: "w-5 h-5 text-violet-600" })
+										}), /* @__PURE__ */ jsxs("div", {
+											className: "overflow-hidden",
+											children: [/* @__PURE__ */ jsx("p", {
+												className: "text-xs font-semibold text-slate-800 truncate",
+												children: formData.receipt.name
+											}), /* @__PURE__ */ jsxs("p", {
+												className: "text-[10px] text-slate-500",
+												children: [(formData.receipt.size / 1024).toFixed(1), " KB"]
+											})]
+										})]
+									}), /* @__PURE__ */ jsx("button", {
+										type: "button",
+										onClick: handleRemoveFile,
+										className: "p-1.5 rounded-lg text-rose-500 hover:bg-rose-50 transition-colors cursor-pointer",
+										title: "Remove file",
+										children: /* @__PURE__ */ jsx(Trash2, { className: "w-4 h-4" })
+									})]
+								}) }) : /* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsxs("div", {
+									className: "relative",
+									children: [/* @__PURE__ */ jsx("div", {
+										className: "absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400",
+										children: /* @__PURE__ */ jsx(Link$1, { className: "w-3.5 h-3.5" })
+									}), /* @__PURE__ */ jsx("input", {
+										type: "url",
+										placeholder: "https://example.com/receipt-or-bill-image.jpg",
+										value: formData.receipt_url,
+										onChange: (e) => {
+											setFormData({
+												...formData,
+												receipt_url: e.target.value
+											});
+											if (formErrors.receipt_url) setFormErrors((prev) => ({
+												...prev,
+												receipt_url: void 0
+											}));
+										},
+										className: `w-full pl-8.5 pr-3 py-2 bg-slate-50 border rounded-xl text-xs text-slate-800 focus:bg-white focus:outline-none transition-colors ${formErrors.receipt_url ? "border-rose-400 focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20 bg-rose-50/20" : "border-slate-200 focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500"}`
+									})]
+								}), /* @__PURE__ */ jsx("span", {
+									className: "block text-[10px] text-slate-400 mt-1",
+									children: "Paste a direct link to a hosted invoice, fuel slip, or Google Drive / Cloud photo."
+								})] }),
+								(formErrors.receipt || formErrors.receipt_url) && /* @__PURE__ */ jsxs("p", {
+									className: "mt-1 text-xs text-rose-600 font-medium flex items-center gap-1 animate-in fade-in duration-150",
+									children: [/* @__PURE__ */ jsx(AlertCircle, { className: "w-3 h-3 shrink-0" }), /* @__PURE__ */ jsx("span", { children: formErrors.receipt || formErrors.receipt_url })]
+								})
+							] }),
+							/* @__PURE__ */ jsxs("div", { children: [
+								/* @__PURE__ */ jsx("label", {
+									className: "block text-xs font-medium text-slate-700 mb-1",
+									children: "Remarks"
+								}),
+								/* @__PURE__ */ jsx("textarea", {
+									rows: "2",
+									placeholder: "Notes regarding fieldwork coverage...",
+									value: formData.notes,
+									onChange: (e) => {
+										setFormData({
+											...formData,
+											notes: e.target.value
+										});
+										if (formErrors.notes) setFormErrors((prev) => ({
+											...prev,
+											notes: void 0
+										}));
+									},
+									className: `w-full px-3 py-2 bg-slate-50 border rounded-xl text-xs text-slate-800 transition-colors focus:bg-white focus:outline-none ${formErrors.notes ? "border-rose-400 focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20 bg-rose-50/20" : "border-slate-200 focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500"}`
+								}),
+								formErrors.notes && /* @__PURE__ */ jsxs("p", {
+									className: "mt-1 text-xs text-rose-600 font-medium flex items-center gap-1 animate-in fade-in duration-150",
+									children: [/* @__PURE__ */ jsx(AlertCircle, { className: "w-3 h-3 shrink-0" }), /* @__PURE__ */ jsx("span", { children: formErrors.notes })]
+								})
+							] }),
+							/* @__PURE__ */ jsxs("div", {
+								className: "flex items-center justify-end gap-2.5 pt-2 border-t border-slate-100",
+								children: [/* @__PURE__ */ jsx("button", {
+									type: "button",
+									onClick: () => {
+										setShowModal(false);
+										resetForm();
+									},
+									className: "px-4 py-2 rounded-xl text-xs font-medium text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer",
+									children: "Cancel"
+								}), /* @__PURE__ */ jsx("button", {
+									type: "submit",
+									disabled: isSubmitting,
+									className: "px-5 py-2 rounded-xl text-xs font-medium text-white bg-slate-900 hover:bg-slate-800 disabled:opacity-50 transition-colors cursor-pointer",
+									children: isSubmitting ? "Submitting..." : "Submit Claim"
+								})]
+							})
+						]
+					})]
+				})
+			}),
+			/* @__PURE__ */ jsx(ConfirmModal, {
+				isOpen: !!approvingExpense,
+				onClose: () => !isApproving && setApprovingExpense(null),
+				onConfirm: confirmApproveExpense,
+				title: "Approve Expense Claim",
+				message: `Are you sure you want to approve this expense claim of ₹${Number(approvingExpense?.amount || 0).toFixed(2)} submitted by ${approvingExpense?.user_name || "Representative"}?`,
+				confirmText: "Approve Claim",
+				loadingText: "Approving...",
+				isDanger: false,
+				icon: CheckCircle2,
+				isLoading: isApproving
+			}),
+			/* @__PURE__ */ jsx(ConfirmModal, {
+				isOpen: !!rejectingExpense,
+				onClose: () => !isRejecting && setRejectingExpense(null),
+				onConfirm: confirmRejectExpense,
+				title: "Decline Expense Claim",
+				message: "Please provide feedback or reason for declining this claim. This will be shown to the representative.",
+				confirmText: "Confirm Reject",
+				loadingText: "Rejecting...",
+				isDanger: true,
+				icon: AlertCircle,
+				isLoading: isRejecting,
+				children: /* @__PURE__ */ jsxs("div", { children: [
+					/* @__PURE__ */ jsxs("label", {
+						className: "block text-xs font-semibold text-slate-700 mb-1.5",
+						children: ["Rejection Feedback / Reason ", /* @__PURE__ */ jsx("span", {
+							className: "text-rose-500",
+							children: "*"
+						})]
+					}),
+					/* @__PURE__ */ jsx("textarea", {
+						rows: "3",
+						placeholder: "e.g. Mileage exceeds territory limit, bill receipt required...",
+						value: rejectReason,
+						onChange: (e) => {
+							setRejectReason(e.target.value);
+							if (rejectError) setRejectError("");
+						},
+						className: `w-full px-3 py-2 bg-slate-50 border rounded-xl text-xs text-slate-800 transition-colors focus:bg-white focus:outline-none ${rejectError ? "border-rose-400 focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20 bg-rose-50/20" : "border-slate-200 focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20"}`
+					}),
+					rejectError && /* @__PURE__ */ jsxs("p", {
+						className: "mt-1.5 text-xs text-rose-600 font-medium flex items-center gap-1.5 animate-in fade-in duration-150",
+						children: [/* @__PURE__ */ jsx(AlertCircle, { className: "w-3.5 h-3.5 shrink-0 text-rose-500" }), /* @__PURE__ */ jsx("span", { children: rejectError })]
+					})
+				] })
+			}),
+			previewModalUrl && /* @__PURE__ */ jsx("div", {
+				className: "fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4",
+				children: /* @__PURE__ */ jsxs("div", {
+					className: "bg-white rounded-2xl border border-slate-200 max-w-lg w-full overflow-hidden shadow-2xl animate-in fade-in zoom-in-95 duration-150",
+					children: [
+						/* @__PURE__ */ jsxs("div", {
+							className: "flex items-center justify-between px-5 py-3.5 border-b border-slate-100 bg-slate-50/50",
+							children: [/* @__PURE__ */ jsxs("div", {
+								className: "flex items-center gap-2",
+								children: [/* @__PURE__ */ jsx(Receipt, { className: "w-4 h-4 text-violet-600" }), /* @__PURE__ */ jsx("h3", {
+									className: "text-sm font-semibold text-slate-800",
+									children: "Expense Bill Receipt"
+								})]
+							}), /* @__PURE__ */ jsxs("div", {
+								className: "flex items-center gap-2",
+								children: [/* @__PURE__ */ jsxs("a", {
+									href: previewModalUrl,
+									target: "_blank",
+									rel: "noopener noreferrer",
+									className: "inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors",
+									children: [/* @__PURE__ */ jsx(ExternalLink, { className: "w-3.5 h-3.5" }), /* @__PURE__ */ jsx("span", { children: "Open Full" })]
+								}), /* @__PURE__ */ jsx("button", {
+									type: "button",
+									onClick: () => setPreviewModalUrl(null),
+									className: "text-slate-400 hover:text-slate-600 p-1 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer",
+									children: /* @__PURE__ */ jsx(X, { className: "w-4 h-4" })
+								})]
+							})]
+						}),
+						/* @__PURE__ */ jsxs("div", {
+							className: "p-4 flex items-center justify-center bg-slate-900/5 max-h-[70vh] overflow-auto",
+							children: [previewModalUrl.match(/\.(jpeg|jpg|png|webp|gif)($|\?)/i) || previewModalUrl.startsWith("data:image") || !previewModalUrl.endsWith(".pdf") && !previewModalUrl.match(/\.pdf($|\?)/i) ? /* @__PURE__ */ jsx("img", {
+								src: previewModalUrl,
+								alt: "Receipt",
+								className: "max-h-[60vh] w-auto max-w-full rounded-lg shadow-xs object-contain",
+								onError: (e) => {
+									e.currentTarget.style.display = "none";
+									if (e.currentTarget.nextElementSibling) e.currentTarget.nextElementSibling.style.display = "block";
+								}
+							}) : null, /* @__PURE__ */ jsxs("div", {
+								style: { display: previewModalUrl.endsWith(".pdf") || previewModalUrl.match(/\.pdf($|\?)/i) ? "block" : "none" },
+								className: "w-full text-center py-8",
+								children: [
+									/* @__PURE__ */ jsx(FileText, { className: "w-12 h-12 text-slate-400 mx-auto mb-2" }),
+									/* @__PURE__ */ jsx("p", {
+										className: "text-xs text-slate-600 font-medium mb-3",
+										children: "Document / PDF Attachment"
+									}),
+									/* @__PURE__ */ jsxs("a", {
+										href: previewModalUrl,
+										target: "_blank",
+										rel: "noopener noreferrer",
+										className: "inline-flex items-center gap-1.5 px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-medium rounded-xl transition-colors",
+										children: [/* @__PURE__ */ jsx(ExternalLink, { className: "w-3.5 h-3.5" }), /* @__PURE__ */ jsx("span", { children: "View PDF in New Tab" })]
+									})
+								]
+							})]
+						}),
+						/* @__PURE__ */ jsx("div", {
+							className: "px-5 py-3 border-t border-slate-100 bg-slate-50/50 flex justify-end",
+							children: /* @__PURE__ */ jsx("button", {
+								type: "button",
+								onClick: () => setPreviewModalUrl(null),
+								className: "px-4 py-1.5 rounded-xl text-xs font-medium text-slate-600 hover:bg-slate-200/60 transition-colors cursor-pointer",
+								children: "Close"
+							})
+						})
+					]
+				})
+			})
+		]
 	});
 }
 //#endregion
 //#region resources/js/Pages/mrconnect/Leave.jsx
 var Leave_exports = /* @__PURE__ */ __exportAll({ default: () => Leave });
-function Leave({ leaves = [], balances = {} }) {
+function Leave({ leaves = [], stats = {}, balances = {} }) {
 	const { props } = usePage();
-	const isAdmin = props.auth?.user?.role === "admin";
+	const isAdmin = props.auth?.user?.role === "admin" || props.auth?.user?.role === "super_admin";
 	const Layout = isAdmin ? AdminLayout : MRLayout;
 	const [showModal, setShowModal] = useState(false);
+	const [approvingLeave, setApprovingLeave] = useState(null);
+	const [isApproving, setIsApproving] = useState(false);
+	const [rejectingLeave, setRejectingLeave] = useState(null);
+	const [isRejecting, setIsRejecting] = useState(false);
+	const [selectedLeaveId, setSelectedLeaveId] = useState(null);
+	const [rejectReason, setRejectReason] = useState("");
+	const [rejectError, setRejectError] = useState("");
+	const [activeFilter, setActiveFilter] = useState("all");
+	const [isSubmitting, setIsSubmitting] = useState(false);
+	const todayStr = (/* @__PURE__ */ new Date()).toISOString().split("T")[0];
 	const [formData, setFormData] = useState({
 		leave_type: "casual",
-		from_date: (/* @__PURE__ */ new Date()).toISOString().split("T")[0],
-		to_date: (/* @__PURE__ */ new Date()).toISOString().split("T")[0],
+		from_date: todayStr,
+		to_date: todayStr,
 		reason: ""
 	});
+	const calculatedDays = useMemo(() => {
+		if (!formData.from_date || !formData.to_date) return 0;
+		const start = new Date(formData.from_date);
+		const diffTime = new Date(formData.to_date) - start;
+		return Math.ceil(diffTime / 864e5) + 1;
+	}, [formData.from_date, formData.to_date]);
+	const computedStats = useMemo(() => {
+		return {
+			total: stats.total ?? leaves.length,
+			pending: stats.pending ?? leaves.filter((l) => l.status === "pending").length,
+			approved: stats.approved ?? leaves.filter((l) => l.status === "approved").length,
+			rejected: stats.rejected ?? leaves.filter((l) => l.status === "rejected").length,
+			totalDaysApproved: stats.total_days_approved ?? leaves.filter((l) => l.status === "approved").reduce((sum, l) => sum + (Number(l.days_count) || 0), 0)
+		};
+	}, [leaves, stats]);
+	const filteredLeaves = useMemo(() => {
+		if (activeFilter === "all") return leaves;
+		return leaves.filter((l) => l.status === activeFilter);
+	}, [leaves, activeFilter]);
 	const handleSubmit = (e) => {
 		e.preventDefault();
+		if (calculatedDays <= 0) {
+			toast.error("To Date cannot be earlier than From Date.");
+			return;
+		}
+		setIsSubmitting(true);
 		router.post("/mrconnect/leave", formData, {
 			onSuccess: () => {
-				toast.success("Leave application submitted.");
 				setShowModal(false);
+				setIsSubmitting(false);
 				setFormData({
 					leave_type: "casual",
-					from_date: (/* @__PURE__ */ new Date()).toISOString().split("T")[0],
-					to_date: (/* @__PURE__ */ new Date()).toISOString().split("T")[0],
+					from_date: todayStr,
+					to_date: todayStr,
 					reason: ""
 				});
 			},
-			onError: () => toast.error("Failed to submit leave.")
+			onError: (err) => {
+				setIsSubmitting(false);
+				const msg = Object.values(err)[0] || "Failed to submit leave.";
+				toast.error(msg);
+			}
 		});
 	};
-	const handleApprove = (id) => {
-		router.post(`/mrconnect/leave/${id}/approve`, {}, { onSuccess: () => toast.success("Leave approved!") });
+	const confirmApproveLeave = () => {
+		if (!approvingLeave) return;
+		setIsApproving(true);
+		router.post(`/mrconnect/leave/${approvingLeave.id}/approve`, {}, {
+			onFinish: () => {
+				setIsApproving(false);
+				setApprovingLeave(null);
+			},
+			onError: () => {
+				setIsApproving(false);
+			}
+		});
+	};
+	const confirmRejectLeave = () => {
+		if (!rejectingLeave) return;
+		if (!rejectReason.trim()) {
+			setRejectError("Please provide feedback or a reason for declining this leave request.");
+			return;
+		}
+		setRejectError("");
+		setIsRejecting(true);
+		router.post(`/mrconnect/leave/${rejectingLeave.id}/reject`, { reason: rejectReason }, {
+			onFinish: () => {
+				setIsRejecting(false);
+				setRejectingLeave(null);
+				setRejectReason("");
+				setRejectError("");
+			},
+			onError: () => {
+				setIsRejecting(false);
+			}
+		});
 	};
 	return /* @__PURE__ */ jsxs(Layout, {
 		title: isAdmin ? "Leave Management" : "My Leaves",
-		children: [/* @__PURE__ */ jsxs("div", {
-			className: "space-y-6 pb-12 font-sans max-w-[1400px] mx-auto",
+		children: [
+			/* @__PURE__ */ jsxs("div", {
+				className: "space-y-6 pb-12 font-sans max-w-[1400px] mx-auto",
+				children: [
+					/* @__PURE__ */ jsxs("div", {
+						className: "flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-200/80",
+						children: [/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("h2", {
+							className: "text-xl sm:text-2xl font-bold tracking-tight text-slate-900",
+							children: isAdmin ? "Staff Leave Management" : "My Leaves & Absence"
+						}), /* @__PURE__ */ jsx("p", {
+							className: "text-xs text-slate-500 font-normal mt-0.5",
+							children: isAdmin ? "Review, audit, approve or decline field staff absence requests." : "Submit leave requests and monitor your application status in real-time."
+						})] }), /* @__PURE__ */ jsxs("button", {
+							type: "button",
+							onClick: () => setShowModal(true),
+							className: "inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-medium text-xs shadow-sm hover:shadow transition-all cursor-pointer",
+							children: [/* @__PURE__ */ jsx(Plus, { className: "w-4 h-4" }), /* @__PURE__ */ jsx("span", { children: "Apply Leave" })]
+						})]
+					}),
+					/* @__PURE__ */ jsxs("div", {
+						className: "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4",
+						children: [
+							/* @__PURE__ */ jsxs("div", {
+								className: "bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs hover:border-slate-300 transition-all",
+								children: [
+									/* @__PURE__ */ jsxs("div", {
+										className: "flex items-center justify-between",
+										children: [/* @__PURE__ */ jsx("span", {
+											className: "text-xs font-semibold text-slate-500 uppercase tracking-wider",
+											children: "Total Applications"
+										}), /* @__PURE__ */ jsx("div", {
+											className: "w-9 h-9 rounded-xl bg-slate-100 flex items-center justify-center text-slate-700",
+											children: /* @__PURE__ */ jsx(FileText, { className: "w-4 h-4" })
+										})]
+									}),
+									/* @__PURE__ */ jsx("p", {
+										className: "text-2xl sm:text-3xl font-bold text-slate-800 mt-2",
+										children: computedStats.total
+									}),
+									/* @__PURE__ */ jsx("p", {
+										className: "text-[11px] text-slate-400 mt-1",
+										children: "Total requests recorded"
+									})
+								]
+							}),
+							/* @__PURE__ */ jsxs("div", {
+								className: "bg-white rounded-2xl border border-amber-200/70 p-5 shadow-xs hover:border-amber-300 bg-amber-50/20 transition-all",
+								children: [
+									/* @__PURE__ */ jsxs("div", {
+										className: "flex items-center justify-between",
+										children: [/* @__PURE__ */ jsx("span", {
+											className: "text-xs font-semibold text-amber-700 uppercase tracking-wider",
+											children: "Pending Review"
+										}), /* @__PURE__ */ jsx("div", {
+											className: "w-9 h-9 rounded-xl bg-amber-100 flex items-center justify-center text-amber-600",
+											children: /* @__PURE__ */ jsx(Clock, { className: "w-4 h-4" })
+										})]
+									}),
+									/* @__PURE__ */ jsx("p", {
+										className: "text-2xl sm:text-3xl font-bold text-amber-600 mt-2",
+										children: computedStats.pending
+									}),
+									/* @__PURE__ */ jsx("p", {
+										className: "text-[11px] text-amber-600/80 font-medium mt-1",
+										children: "Awaiting manager action"
+									})
+								]
+							}),
+							/* @__PURE__ */ jsxs("div", {
+								className: "bg-white rounded-2xl border border-emerald-200/70 p-5 shadow-xs hover:border-emerald-300 bg-emerald-50/20 transition-all",
+								children: [
+									/* @__PURE__ */ jsxs("div", {
+										className: "flex items-center justify-between",
+										children: [/* @__PURE__ */ jsx("span", {
+											className: "text-xs font-semibold text-emerald-700 uppercase tracking-wider",
+											children: "Approved"
+										}), /* @__PURE__ */ jsx("div", {
+											className: "w-9 h-9 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-600",
+											children: /* @__PURE__ */ jsx(CheckCircle2, { className: "w-4 h-4" })
+										})]
+									}),
+									/* @__PURE__ */ jsx("p", {
+										className: "text-2xl sm:text-3xl font-bold text-emerald-600 mt-2",
+										children: computedStats.approved
+									}),
+									/* @__PURE__ */ jsxs("p", {
+										className: "text-[11px] text-emerald-700/80 font-medium mt-1",
+										children: [computedStats.totalDaysApproved, " days total sanctioned"]
+									})
+								]
+							}),
+							/* @__PURE__ */ jsxs("div", {
+								className: "bg-white rounded-2xl border border-rose-200/70 p-5 shadow-xs hover:border-rose-300 bg-rose-50/20 transition-all",
+								children: [
+									/* @__PURE__ */ jsxs("div", {
+										className: "flex items-center justify-between",
+										children: [/* @__PURE__ */ jsx("span", {
+											className: "text-xs font-semibold text-rose-700 uppercase tracking-wider",
+											children: "Rejected"
+										}), /* @__PURE__ */ jsx("div", {
+											className: "w-9 h-9 rounded-xl bg-rose-100 flex items-center justify-center text-rose-600",
+											children: /* @__PURE__ */ jsx(XCircle, { className: "w-4 h-4" })
+										})]
+									}),
+									/* @__PURE__ */ jsx("p", {
+										className: "text-2xl sm:text-3xl font-bold text-rose-600 mt-2",
+										children: computedStats.rejected
+									}),
+									/* @__PURE__ */ jsx("p", {
+										className: "text-[11px] text-rose-600/80 font-medium mt-1",
+										children: "Declined applications"
+									})
+								]
+							})
+						]
+					}),
+					/* @__PURE__ */ jsxs("div", {
+						className: "bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden",
+						children: [/* @__PURE__ */ jsxs("div", {
+							className: "px-5 py-3.5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-50/40",
+							children: [/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("h3", {
+								className: "text-sm font-bold text-slate-800",
+								children: isAdmin ? "All Staff Leave Applications" : "Leave History"
+							}), /* @__PURE__ */ jsxs("p", {
+								className: "text-[11px] text-slate-400",
+								children: [
+									"Showing ",
+									filteredLeaves.length,
+									" of ",
+									leaves.length,
+									" records"
+								]
+							})] }), /* @__PURE__ */ jsxs("div", {
+								className: "flex items-center gap-1 bg-slate-100/80 p-1 rounded-xl text-xs",
+								children: [
+									/* @__PURE__ */ jsxs("button", {
+										type: "button",
+										onClick: () => setActiveFilter("all"),
+										className: `px-3 py-1 rounded-lg font-medium transition-all cursor-pointer ${activeFilter === "all" ? "bg-white text-slate-900 shadow-xs" : "text-slate-500 hover:text-slate-700"}`,
+										children: [
+											"All (",
+											computedStats.total,
+											")"
+										]
+									}),
+									/* @__PURE__ */ jsxs("button", {
+										type: "button",
+										onClick: () => setActiveFilter("pending"),
+										className: `px-3 py-1 rounded-lg font-medium transition-all cursor-pointer ${activeFilter === "pending" ? "bg-amber-500 text-white shadow-xs" : "text-amber-700 hover:text-amber-800"}`,
+										children: [
+											"Pending (",
+											computedStats.pending,
+											")"
+										]
+									}),
+									/* @__PURE__ */ jsxs("button", {
+										type: "button",
+										onClick: () => setActiveFilter("approved"),
+										className: `px-3 py-1 rounded-lg font-medium transition-all cursor-pointer ${activeFilter === "approved" ? "bg-emerald-600 text-white shadow-xs" : "text-emerald-700 hover:text-emerald-800"}`,
+										children: [
+											"Approved (",
+											computedStats.approved,
+											")"
+										]
+									}),
+									/* @__PURE__ */ jsxs("button", {
+										type: "button",
+										onClick: () => setActiveFilter("rejected"),
+										className: `px-3 py-1 rounded-lg font-medium transition-all cursor-pointer ${activeFilter === "rejected" ? "bg-rose-600 text-white shadow-xs" : "text-rose-700 hover:text-rose-800"}`,
+										children: [
+											"Rejected (",
+											computedStats.rejected,
+											")"
+										]
+									})
+								]
+							})]
+						}), /* @__PURE__ */ jsx("div", {
+							className: "overflow-x-auto",
+							children: /* @__PURE__ */ jsxs("table", {
+								className: "w-full text-left text-xs border-collapse",
+								children: [/* @__PURE__ */ jsx("thead", { children: /* @__PURE__ */ jsxs("tr", {
+									className: "border-b border-slate-100 text-[11px] font-semibold text-slate-500 bg-slate-50/60 uppercase tracking-wider",
+									children: [
+										isAdmin && /* @__PURE__ */ jsx("th", {
+											className: "py-3 px-4",
+											children: "Employee"
+										}),
+										/* @__PURE__ */ jsx("th", {
+											className: "py-3 px-4",
+											children: "Leave Type"
+										}),
+										/* @__PURE__ */ jsx("th", {
+											className: "py-3 px-4",
+											children: "Dates"
+										}),
+										/* @__PURE__ */ jsx("th", {
+											className: "py-3 px-4 text-center",
+											children: "Duration"
+										}),
+										/* @__PURE__ */ jsx("th", {
+											className: "py-3 px-4",
+											children: "Reason & Feedback"
+										}),
+										/* @__PURE__ */ jsx("th", {
+											className: "py-3 px-4 text-center",
+											children: "Status"
+										}),
+										isAdmin && /* @__PURE__ */ jsx("th", {
+											className: "py-3 px-4 text-right",
+											children: "Actions"
+										})
+									]
+								}) }), /* @__PURE__ */ jsx("tbody", {
+									className: "divide-y divide-slate-100",
+									children: filteredLeaves.length > 0 ? filteredLeaves.map((lv) => /* @__PURE__ */ jsxs("tr", {
+										className: "hover:bg-slate-50/70 transition-colors",
+										children: [
+											isAdmin && /* @__PURE__ */ jsx("td", {
+												className: "py-3 px-4",
+												children: /* @__PURE__ */ jsxs("div", {
+													className: "flex items-center gap-2",
+													children: [/* @__PURE__ */ jsx("div", {
+														className: "w-7 h-7 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 font-semibold text-[11px]",
+														children: (lv.user_name || "U").charAt(0).toUpperCase()
+													}), /* @__PURE__ */ jsx("span", {
+														className: "font-semibold text-slate-800",
+														children: lv.user_name || "Staff Member"
+													})]
+												})
+											}),
+											/* @__PURE__ */ jsx("td", {
+												className: "py-3 px-4",
+												children: /* @__PURE__ */ jsxs("span", {
+													className: "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 capitalize",
+													children: [lv.leave_type, " Leave"]
+												})
+											}),
+											/* @__PURE__ */ jsx("td", {
+												className: "py-3 px-4 text-slate-600 font-medium whitespace-nowrap",
+												children: /* @__PURE__ */ jsxs("div", {
+													className: "flex items-center gap-1.5 text-xs text-slate-700",
+													children: [
+														/* @__PURE__ */ jsx(CalendarRange, { className: "w-3.5 h-3.5 text-slate-400" }),
+														/* @__PURE__ */ jsx("span", { children: lv.from_date }),
+														/* @__PURE__ */ jsx("span", {
+															className: "text-slate-400",
+															children: "→"
+														}),
+														/* @__PURE__ */ jsx("span", { children: lv.to_date })
+													]
+												})
+											}),
+											/* @__PURE__ */ jsx("td", {
+												className: "py-3 px-4 text-center",
+												children: /* @__PURE__ */ jsxs("span", {
+													className: "inline-block px-2.5 py-0.5 rounded-full font-bold text-xs bg-slate-100 text-slate-800",
+													children: [
+														lv.days_count,
+														" ",
+														Number(lv.days_count) === 1 ? "Day" : "Days"
+													]
+												})
+											}),
+											/* @__PURE__ */ jsxs("td", {
+												className: "py-3 px-4 max-w-xs",
+												children: [/* @__PURE__ */ jsx("p", {
+													className: "text-slate-700 text-xs font-normal line-clamp-2",
+													children: lv.reason
+												}), lv.admin_feedback && /* @__PURE__ */ jsxs("div", {
+													className: "mt-1 flex items-start gap-1 text-[11px] text-rose-600 bg-rose-50 px-2 py-0.5 rounded-md border border-rose-100",
+													children: [/* @__PURE__ */ jsx(MessageSquare, { className: "w-3 h-3 mt-0.5 shrink-0" }), /* @__PURE__ */ jsxs("span", { children: [
+														/* @__PURE__ */ jsx("strong", {
+															className: "font-semibold",
+															children: "Manager:"
+														}),
+														" ",
+														lv.admin_feedback
+													] })]
+												})]
+											}),
+											/* @__PURE__ */ jsx("td", {
+												className: "py-3 px-4 text-center whitespace-nowrap",
+												children: /* @__PURE__ */ jsxs("span", {
+													className: `inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold ${lv.status === "approved" ? "bg-emerald-50 text-emerald-700 border border-emerald-200" : lv.status === "rejected" ? "bg-rose-50 text-rose-700 border border-rose-200" : "bg-amber-50 text-amber-700 border border-amber-200"}`,
+													children: [
+														lv.status === "approved" && /* @__PURE__ */ jsx(CheckCircle2, { className: "w-3 h-3" }),
+														lv.status === "rejected" && /* @__PURE__ */ jsx(XCircle, { className: "w-3 h-3" }),
+														lv.status === "pending" && /* @__PURE__ */ jsx(Clock, { className: "w-3 h-3" }),
+														lv.status.charAt(0).toUpperCase() + lv.status.slice(1)
+													]
+												})
+											}),
+											isAdmin && /* @__PURE__ */ jsx("td", {
+												className: "py-3 px-4 text-right whitespace-nowrap",
+												children: lv.status === "pending" ? /* @__PURE__ */ jsxs("div", {
+													className: "inline-flex items-center gap-1.5 justify-end",
+													children: [/* @__PURE__ */ jsxs("button", {
+														type: "button",
+														onClick: () => setApprovingLeave(lv),
+														className: "inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-[11px] transition-colors cursor-pointer shadow-xs",
+														title: "Approve Request",
+														children: [/* @__PURE__ */ jsx(Check, { className: "w-3 h-3" }), "Approve"]
+													}), /* @__PURE__ */ jsxs("button", {
+														type: "button",
+														onClick: () => {
+															setRejectingLeave(lv);
+															setRejectReason("");
+															setRejectError("");
+														},
+														className: "inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-semibold text-[11px] transition-colors cursor-pointer shadow-xs",
+														title: "Reject Request",
+														children: [/* @__PURE__ */ jsx(X, { className: "w-3 h-3" }), "Reject"]
+													})]
+												}) : /* @__PURE__ */ jsx("span", {
+													className: "text-[11px] text-slate-400 italic",
+													children: "Completed"
+												})
+											})
+										]
+									}, lv.id)) : /* @__PURE__ */ jsx("tr", { children: /* @__PURE__ */ jsx("td", {
+										colSpan: isAdmin ? 7 : 6,
+										className: "py-10 text-center text-slate-400",
+										children: /* @__PURE__ */ jsxs("div", {
+											className: "flex flex-col items-center justify-center gap-2",
+											children: [/* @__PURE__ */ jsx(FileText, { className: "w-8 h-8 text-slate-300" }), /* @__PURE__ */ jsx("p", {
+												className: "text-xs font-medium text-slate-500",
+												children: "No leave records found for this filter."
+											})]
+										})
+									}) })
+								})]
+							})
+						})]
+					})
+				]
+			}),
+			showModal && /* @__PURE__ */ jsx("div", {
+				className: "fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-xs p-4",
+				children: /* @__PURE__ */ jsxs("div", {
+					className: "bg-white rounded-2xl border border-slate-200 max-w-md w-full p-6 space-y-4 shadow-2xl animate-in fade-in zoom-in-95 duration-150",
+					children: [/* @__PURE__ */ jsxs("div", {
+						className: "flex items-center justify-between pb-3 border-b border-slate-100",
+						children: [/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("h3", {
+							className: "text-base font-bold text-slate-900",
+							children: "Apply for Leave"
+						}), /* @__PURE__ */ jsx("p", {
+							className: "text-xs text-slate-400",
+							children: "Submit your leave application for manager approval"
+						})] }), /* @__PURE__ */ jsx("button", {
+							type: "button",
+							onClick: () => setShowModal(false),
+							className: "text-slate-400 hover:text-slate-600 p-1 rounded-lg hover:bg-slate-100 cursor-pointer",
+							children: /* @__PURE__ */ jsx(X, { className: "w-5 h-5" })
+						})]
+					}), /* @__PURE__ */ jsxs("form", {
+						onSubmit: handleSubmit,
+						className: "space-y-4 text-xs",
+						children: [
+							/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("label", {
+								className: "block text-xs font-semibold text-slate-700 mb-1.5",
+								children: "Leave Category"
+							}), /* @__PURE__ */ jsxs("select", {
+								value: formData.leave_type,
+								onChange: (e) => setFormData({
+									...formData,
+									leave_type: e.target.value
+								}),
+								className: "w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 cursor-pointer",
+								children: [
+									/* @__PURE__ */ jsx("option", {
+										value: "casual",
+										children: "Casual Leave (CL)"
+									}),
+									/* @__PURE__ */ jsx("option", {
+										value: "sick",
+										children: "Sick Leave (SL)"
+									}),
+									/* @__PURE__ */ jsx("option", {
+										value: "earned",
+										children: "Earned Leave (EL)"
+									}),
+									/* @__PURE__ */ jsx("option", {
+										value: "compensatory",
+										children: "Compensatory Off"
+									})
+								]
+							})] }),
+							/* @__PURE__ */ jsxs("div", {
+								className: "grid grid-cols-2 gap-3",
+								children: [/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("label", {
+									className: "block text-xs font-semibold text-slate-700 mb-1.5",
+									children: "From Date"
+								}), /* @__PURE__ */ jsx("input", {
+									type: "date",
+									required: true,
+									value: formData.from_date,
+									onChange: (e) => {
+										const newFrom = e.target.value;
+										setFormData((prev) => ({
+											...prev,
+											from_date: newFrom,
+											to_date: prev.to_date < newFrom ? newFrom : prev.to_date
+										}));
+									},
+									className: "w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+								})] }), /* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("label", {
+									className: "block text-xs font-semibold text-slate-700 mb-1.5",
+									children: "To Date"
+								}), /* @__PURE__ */ jsx("input", {
+									type: "date",
+									required: true,
+									min: formData.from_date,
+									value: formData.to_date,
+									onChange: (e) => setFormData({
+										...formData,
+										to_date: e.target.value
+									}),
+									className: "w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+								})] })]
+							}),
+							/* @__PURE__ */ jsxs("div", {
+								className: "p-3 rounded-xl bg-indigo-50/60 border border-indigo-100 flex items-center justify-between",
+								children: [/* @__PURE__ */ jsx("span", {
+									className: "text-xs font-medium text-indigo-900",
+									children: "Calculated Duration:"
+								}), /* @__PURE__ */ jsx("span", {
+									className: `text-xs font-bold px-2.5 py-0.5 rounded-full ${calculatedDays > 0 ? "bg-indigo-600 text-white" : "bg-rose-500 text-white"}`,
+									children: calculatedDays > 0 ? `${calculatedDays} ${calculatedDays === 1 ? "Day" : "Days"}` : "Invalid Dates"
+								})]
+							}),
+							/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("label", {
+								className: "block text-xs font-semibold text-slate-700 mb-1.5",
+								children: "Reason for Absence"
+							}), /* @__PURE__ */ jsx("textarea", {
+								rows: "3",
+								required: true,
+								placeholder: "Please state details regarding your leave (e.g. personal, medical, family event)...",
+								value: formData.reason,
+								onChange: (e) => setFormData({
+									...formData,
+									reason: e.target.value
+								}),
+								className: "w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+							})] }),
+							/* @__PURE__ */ jsxs("div", {
+								className: "flex items-center justify-end gap-2.5 pt-2 border-t border-slate-100",
+								children: [/* @__PURE__ */ jsx("button", {
+									type: "button",
+									onClick: () => setShowModal(false),
+									className: "px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer",
+									children: "Cancel"
+								}), /* @__PURE__ */ jsx("button", {
+									type: "submit",
+									disabled: isSubmitting || calculatedDays <= 0,
+									className: "px-5 py-2 rounded-xl text-xs font-semibold text-white bg-slate-900 hover:bg-slate-800 transition-colors disabled:opacity-50 cursor-pointer",
+									children: isSubmitting ? "Submitting..." : "Submit Application"
+								})]
+							})
+						]
+					})]
+				})
+			}),
+			/* @__PURE__ */ jsx(ConfirmModal, {
+				isOpen: !!approvingLeave,
+				onClose: () => !isApproving && setApprovingLeave(null),
+				onConfirm: confirmApproveLeave,
+				title: "Approve Leave Request",
+				message: `Are you sure you want to approve this ${approvingLeave?.leave_type || ""} leave request of ${approvingLeave?.days_count || 1} day(s) for ${approvingLeave?.user_name || "Staff Member"}?`,
+				confirmText: "Approve Leave",
+				loadingText: "Approving...",
+				isDanger: false,
+				icon: CheckCircle2,
+				isLoading: isApproving
+			}),
+			/* @__PURE__ */ jsx(ConfirmModal, {
+				isOpen: !!rejectingLeave,
+				onClose: () => !isRejecting && setRejectingLeave(null),
+				onConfirm: confirmRejectLeave,
+				title: "Decline Leave Request",
+				message: "Please provide feedback or reason for declining this request. This will be shown to the representative.",
+				confirmText: "Confirm Reject",
+				loadingText: "Rejecting...",
+				isDanger: true,
+				icon: AlertCircle,
+				isLoading: isRejecting,
+				children: /* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("label", {
+					className: "block text-xs font-semibold text-slate-700 mb-1.5",
+					children: "Rejection Feedback / Reason"
+				}), /* @__PURE__ */ jsx("textarea", {
+					rows: "3",
+					required: true,
+					placeholder: "e.g. Crucial field doctor campaign scheduled, kindly reschedule...",
+					value: rejectReason,
+					onChange: (e) => setRejectReason(e.target.value),
+					className: "w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500"
+				})] })
+			})
+		]
+	});
+}
+//#endregion
+//#region resources/js/components/admin/MRLiveTrackingModal.jsx
+function MRLiveTrackingModal({ mr = null, isOpen = false, onClose, mapboxConfig = {} }) {
+	const [copied, setCopied] = useState(false);
+	const [mapLoaded, setMapLoaded] = useState(false);
+	const [mapError, setMapError] = useState(false);
+	const mapContainerRef = useRef(null);
+	const mapInstanceRef = useRef(null);
+	const markerRef = useRef(null);
+	const loc = mr?.latest_location;
+	const hasLiveLocation = Boolean(loc && loc.latitude && loc.longitude);
+	const lat = hasLiveLocation ? Number(loc.latitude) : null;
+	const lng = hasLiveLocation ? Number(loc.longitude) : null;
+	const token = (mapboxConfig.token || (typeof window !== "undefined" ? window.MAPBOX_TOKEN : "") || "").trim();
+	const mapStyle = mapboxConfig.style || "mapbox://styles/mapbox/streets-v12";
+	const handleCopyCoords = () => {
+		if (!lat || !lng) return;
+		navigator.clipboard.writeText(`${lat}, ${lng}`);
+		setCopied(true);
+		setTimeout(() => setCopied(false), 2e3);
+	};
+	const googleMapsUrl = hasLiveLocation ? `https://www.google.com/maps?q=${lat},${lng}` : "";
+	useEffect(() => {
+		if (!isOpen || !hasLiveLocation || !lat || !lng) return;
+		let isMounted = true;
+		setMapLoaded(false);
+		setMapError(false);
+		const initMapbox = () => {
+			if (!mapContainerRef.current || !window.mapboxgl) return;
+			if (mapInstanceRef.current) {
+				mapInstanceRef.current.remove();
+				mapInstanceRef.current = null;
+			}
+			try {
+				const hasValidMapboxToken = Boolean(token && token.startsWith("pk."));
+				const effectiveToken = hasValidMapboxToken ? token : "pk.eyJ1IjoibXJjb25uZWN0LWRlbW8iLCJhIjoiY2x6cTFxZmxwMDJiazJqcXB0eGdxOGNteSJ9.mock";
+				window.mapboxgl.accessToken = effectiveToken;
+				const effectiveStyle = hasValidMapboxToken ? mapStyle : {
+					version: 8,
+					sources: { "osm-raster-tiles": {
+						type: "raster",
+						tiles: [
+							"https://a.tile.openstreetmap.org/{z}/{x}/{y}.png",
+							"https://b.tile.openstreetmap.org/{z}/{x}/{y}.png",
+							"https://c.tile.openstreetmap.org/{z}/{x}/{y}.png"
+						],
+						tileSize: 256,
+						attribution: "© OpenStreetMap contributors"
+					} },
+					layers: [{
+						id: "osm-tiles-layer",
+						type: "raster",
+						source: "osm-raster-tiles",
+						minzoom: 0,
+						maxzoom: 19
+					}]
+				};
+				const map = new window.mapboxgl.Map({
+					container: mapContainerRef.current,
+					style: effectiveStyle,
+					center: [lng, lat],
+					zoom: 15,
+					attributionControl: true
+				});
+				map.addControl(new window.mapboxgl.NavigationControl({ showCompass: true }), "bottom-right");
+				map.on("load", () => {
+					if (!isMounted) return;
+					mapInstanceRef.current = map;
+					setMapLoaded(true);
+					const mrEl = document.createElement("div");
+					mrEl.className = "relative flex items-center justify-center cursor-pointer";
+					mrEl.innerHTML = `
+            <div class="relative flex items-center justify-center">
+              <span class="absolute w-10 h-10 rounded-full bg-violet-500/25 animate-ping"></span>
+              <span class="absolute w-7 h-7 rounded-full bg-violet-500/40"></span>
+              <div class="relative w-7 h-7 rounded-lg bg-slate-900 text-white flex items-center justify-center border-2 border-white text-[11px] font-bold shadow-lg">
+                ${mr?.name ? mr.name.charAt(0).toUpperCase() : "M"}
+              </div>
+            </div>
+          `;
+					const mrPopup = new window.mapboxgl.Popup({ offset: 25 }).setHTML(`
+            <div class="p-2 font-sans text-xs">
+              <div class="font-bold text-slate-900">${mr?.name || "Representative"}</div>
+              <div class="text-[11px] text-slate-500">${mr?.emp_code || ""} • Live GPS</div>
+              <div class="mt-1 flex items-center gap-1.5 text-[11px] text-emerald-600 font-medium">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                Active in Field
+              </div>
+            </div>
+          `);
+					const marker = new window.mapboxgl.Marker(mrEl).setLngLat([lng, lat]).setPopup(mrPopup).addTo(map);
+					markerRef.current = marker;
+					setTimeout(() => {
+						if (isMounted && map) map.resize();
+					}, 150);
+				});
+				map.on("error", () => {
+					if (!mapLoaded) setMapError(true);
+				});
+			} catch (err) {
+				setMapError(true);
+			}
+		};
+		const loadMapboxSDK = async () => {
+			if (window.mapboxgl) {
+				initMapbox();
+				return;
+			}
+			try {
+				if (!document.getElementById("mapbox-gl-css")) {
+					const link = document.createElement("link");
+					link.id = "mapbox-gl-css";
+					link.rel = "stylesheet";
+					link.href = "https://api.mapbox.com/mapbox-gl-js/v3.4.0/mapbox-gl.css";
+					document.head.appendChild(link);
+				}
+				if (!document.getElementById("mapbox-gl-js")) {
+					const script = document.createElement("script");
+					script.id = "mapbox-gl-js";
+					script.src = "https://api.mapbox.com/mapbox-gl-js/v3.4.0/mapbox-gl.js";
+					script.async = true;
+					script.onload = () => {
+						if (isMounted) initMapbox();
+					};
+					script.onerror = () => {
+						if (isMounted) setMapError(true);
+					};
+					document.body.appendChild(script);
+				} else initMapbox();
+			} catch (e) {
+				if (isMounted) setMapError(true);
+			}
+		};
+		loadMapboxSDK();
+		return () => {
+			isMounted = false;
+			if (mapInstanceRef.current) {
+				mapInstanceRef.current.remove();
+				mapInstanceRef.current = null;
+			}
+		};
+	}, [
+		isOpen,
+		hasLiveLocation,
+		lat,
+		lng,
+		token,
+		mapStyle
+	]);
+	if (!isOpen || !mr) return null;
+	return /* @__PURE__ */ jsx("div", {
+		className: "fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs transition-opacity animate-in fade-in duration-200",
+		children: /* @__PURE__ */ jsxs("div", {
+			className: "relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl border border-slate-100 overflow-hidden flex flex-col max-h-[92vh] animate-in zoom-in-95 duration-200",
+			role: "dialog",
+			"aria-modal": "true",
 			children: [
 				/* @__PURE__ */ jsxs("div", {
-					className: "flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-200/80",
-					children: [/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("h2", {
-						className: "text-xl sm:text-2xl font-semibold tracking-tight text-slate-800",
-						children: isAdmin ? "Leave Applications & Approvals" : "My Leaves & Absence"
-					}), /* @__PURE__ */ jsx("p", {
-						className: "text-xs text-slate-500 font-normal mt-0.5",
-						children: isAdmin ? "Review, audit, and approve field staff absence requests and quota balances." : "Apply for casual, sick, and earned leaves with instant manager workflow."
-					})] }), /* @__PURE__ */ jsxs("button", {
+					className: "px-5 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/60",
+					children: [/* @__PURE__ */ jsxs("div", {
+						className: "flex items-center gap-3 min-w-0",
+						children: [/* @__PURE__ */ jsx("div", {
+							className: "w-10 h-10 rounded-full bg-violet-100 text-violet-700 font-semibold text-sm flex items-center justify-center shrink-0",
+							children: mr.name ? mr.name.charAt(0).toUpperCase() : "M"
+						}), /* @__PURE__ */ jsxs("div", {
+							className: "min-w-0",
+							children: [/* @__PURE__ */ jsxs("div", {
+								className: "flex items-center gap-2 flex-wrap",
+								children: [
+									/* @__PURE__ */ jsx("h3", {
+										className: "text-sm font-semibold text-slate-900 truncate",
+										children: mr.name
+									}),
+									/* @__PURE__ */ jsx("span", {
+										className: "font-mono text-[11px] font-medium px-2 py-0.5 rounded-md bg-slate-200/70 text-slate-700",
+										children: mr.emp_code
+									}),
+									hasLiveLocation ? /* @__PURE__ */ jsxs("span", {
+										className: "inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200",
+										children: [/* @__PURE__ */ jsx("span", { className: "w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" }), "Live Location Active"]
+									}) : /* @__PURE__ */ jsx("span", {
+										className: "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-slate-100 text-slate-500",
+										children: "Location Offline"
+									})
+								]
+							}), /* @__PURE__ */ jsx("p", {
+								className: "text-xs text-slate-400 truncate mt-0.5",
+								children: mr.email
+							})]
+						})]
+					}), /* @__PURE__ */ jsx("button", {
 						type: "button",
-						onClick: () => setShowModal(true),
-						className: "inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-medium text-xs transition-colors cursor-pointer",
-						children: [/* @__PURE__ */ jsx(Plus, { className: "w-3.5 h-3.5" }), /* @__PURE__ */ jsx("span", { children: "Apply Leave" })]
+						onClick: onClose,
+						className: "w-8 h-8 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-200/60 flex items-center justify-center transition-colors cursor-pointer shrink-0 ml-2",
+						children: /* @__PURE__ */ jsx(X, { className: "w-4 h-4" })
+					})]
+				}),
+				/* @__PURE__ */ jsx("div", {
+					className: "p-5 overflow-y-auto space-y-4",
+					children: hasLiveLocation ? /* @__PURE__ */ jsxs(Fragment, { children: [
+						/* @__PURE__ */ jsxs("div", {
+							className: "relative w-full h-[320px] rounded-xl overflow-hidden border border-slate-200 shadow-inner bg-slate-100",
+							children: [
+								/* @__PURE__ */ jsx("div", {
+									ref: mapContainerRef,
+									className: "w-full h-full"
+								}),
+								!mapLoaded && !mapError && /* @__PURE__ */ jsxs("div", {
+									className: "absolute inset-0 bg-slate-100 flex items-center justify-center gap-2 text-xs text-slate-500",
+									children: [/* @__PURE__ */ jsx(RotateCw, { className: "w-4 h-4 animate-spin text-violet-600" }), /* @__PURE__ */ jsx("span", { children: "Loading Mapbox View..." })]
+								}),
+								mapError && /* @__PURE__ */ jsx("iframe", {
+									title: `Live Location of ${mr.name}`,
+									src: `https://www.openstreetmap.org/export/embed.html?bbox=${lng - .008}%2C${lat - .006}%2C${lng + .008}%2C${lat + .006}&layer=mapnik&marker=${lat}%2C${lng}`,
+									className: "w-full h-full border-0",
+									loading: "lazy"
+								}),
+								/* @__PURE__ */ jsxs("div", {
+									className: "absolute top-3 left-3 bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-lg shadow-md border border-slate-200/80 flex items-center gap-2 pointer-events-none",
+									children: [
+										/* @__PURE__ */ jsxs("div", {
+											className: "relative flex items-center justify-center",
+											children: [/* @__PURE__ */ jsx("span", { className: "w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping absolute" }), /* @__PURE__ */ jsx("span", { className: "w-2.5 h-2.5 rounded-full bg-emerald-600 relative" })]
+										}),
+										/* @__PURE__ */ jsx("span", {
+											className: "text-[11px] font-semibold text-slate-800",
+											children: "Mapbox Live Telemetry"
+										}),
+										/* @__PURE__ */ jsx("span", {
+											className: "text-[10px] text-slate-400 font-mono",
+											children: loc.updated_at || "Just now"
+										})
+									]
+								}),
+								/* @__PURE__ */ jsxs("a", {
+									href: googleMapsUrl,
+									target: "_blank",
+									rel: "noopener noreferrer",
+									className: "absolute bottom-3 left-3 bg-white hover:bg-slate-50 text-slate-700 hover:text-violet-700 text-xs font-medium px-3 py-1.5 rounded-lg shadow-md border border-slate-200/90 flex items-center gap-1.5 transition-colors",
+									children: [
+										/* @__PURE__ */ jsx(Navigation, { className: "w-3.5 h-3.5 text-violet-600" }),
+										/* @__PURE__ */ jsx("span", { children: "Google Maps View" }),
+										/* @__PURE__ */ jsx(ArrowUpRight, { className: "w-3 h-3 text-slate-400" })
+									]
+								})
+							]
+						}),
+						/* @__PURE__ */ jsxs("div", {
+							className: "grid grid-cols-2 sm:grid-cols-4 gap-3",
+							children: [
+								/* @__PURE__ */ jsxs("div", {
+									className: "p-3 rounded-xl bg-slate-50 border border-slate-100",
+									children: [/* @__PURE__ */ jsx("span", {
+										className: "text-[10px] font-medium text-slate-400 uppercase tracking-wider block",
+										children: "GPS Coordinates"
+									}), /* @__PURE__ */ jsxs("div", {
+										className: "flex items-center justify-between gap-1 mt-1",
+										children: [/* @__PURE__ */ jsxs("span", {
+											className: "text-xs font-mono font-semibold text-slate-800 truncate",
+											title: `${lat}, ${lng}`,
+											children: [
+												lat.toFixed(5),
+												", ",
+												lng.toFixed(5)
+											]
+										}), /* @__PURE__ */ jsx("button", {
+											type: "button",
+											onClick: handleCopyCoords,
+											className: "text-slate-400 hover:text-slate-700 transition-colors cursor-pointer",
+											title: "Copy coordinates",
+											children: copied ? /* @__PURE__ */ jsx(Check, { className: "w-3.5 h-3.5 text-emerald-600" }) : /* @__PURE__ */ jsx(Copy, { className: "w-3.5 h-3.5" })
+										})]
+									})]
+								}),
+								/* @__PURE__ */ jsxs("div", {
+									className: "p-3 rounded-xl bg-slate-50 border border-slate-100",
+									children: [/* @__PURE__ */ jsx("span", {
+										className: "text-[10px] font-medium text-slate-400 uppercase tracking-wider block",
+										children: "Last Ping"
+									}), /* @__PURE__ */ jsxs("div", {
+										className: "flex items-center gap-1.5 mt-1",
+										children: [/* @__PURE__ */ jsx(Clock, { className: "w-3.5 h-3.5 text-slate-400" }), /* @__PURE__ */ jsx("span", {
+											className: "text-xs font-semibold text-slate-800 truncate",
+											children: loc.updated_at || "Just now"
+										})]
+									})]
+								}),
+								/* @__PURE__ */ jsxs("div", {
+									className: "p-3 rounded-xl bg-slate-50 border border-slate-100",
+									children: [/* @__PURE__ */ jsx("span", {
+										className: "text-[10px] font-medium text-slate-400 uppercase tracking-wider block",
+										children: "Device Battery"
+									}), /* @__PURE__ */ jsxs("div", {
+										className: "flex items-center gap-1.5 mt-1",
+										children: [
+											loc.battery_status === "charging" ? /* @__PURE__ */ jsx(BatteryCharging, { className: "w-3.5 h-3.5 text-emerald-600" }) : /* @__PURE__ */ jsx(Battery, { className: "w-3.5 h-3.5 text-slate-600" }),
+											/* @__PURE__ */ jsx("span", {
+												className: "text-xs font-semibold text-slate-800",
+												children: loc.battery_level ? `${loc.battery_level}%` : "85%"
+											}),
+											/* @__PURE__ */ jsx("span", {
+												className: "text-[10px] text-slate-400 capitalize",
+												children: loc.battery_status || "normal"
+											})
+										]
+									})]
+								}),
+								/* @__PURE__ */ jsxs("div", {
+									className: "p-3 rounded-xl bg-slate-50 border border-slate-100",
+									children: [/* @__PURE__ */ jsx("span", {
+										className: "text-[10px] font-medium text-slate-400 uppercase tracking-wider block",
+										children: "Activity"
+									}), /* @__PURE__ */ jsxs("div", {
+										className: "flex items-center gap-1.5 mt-1",
+										children: [/* @__PURE__ */ jsx(Radio, { className: "w-3.5 h-3.5 text-violet-600" }), /* @__PURE__ */ jsx("span", {
+											className: "text-xs font-semibold text-slate-800 capitalize truncate",
+											children: loc.current_activity ? loc.current_activity.replace("_", " ") : "In Field"
+										})]
+									})]
+								})
+							]
+						}),
+						loc.address && /* @__PURE__ */ jsxs("div", {
+							className: "p-3 rounded-xl bg-violet-50/50 border border-violet-100 text-xs text-slate-700 flex items-start gap-2",
+							children: [/* @__PURE__ */ jsx(MapPin, { className: "w-4 h-4 text-violet-600 shrink-0 mt-0.5" }), /* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("span", {
+								className: "font-semibold text-slate-800",
+								children: "Approximate Location: "
+							}), /* @__PURE__ */ jsx("span", {
+								className: "text-slate-600",
+								children: loc.address
+							})] })]
+						})
+					] }) : /* @__PURE__ */ jsxs("div", {
+						className: "py-10 px-4 text-center space-y-4",
+						children: [
+							/* @__PURE__ */ jsx("div", {
+								className: "w-16 h-16 rounded-2xl bg-amber-50 border border-amber-200/70 text-amber-600 mx-auto flex items-center justify-center",
+								children: /* @__PURE__ */ jsx(ShieldAlert, { className: "w-8 h-8" })
+							}),
+							/* @__PURE__ */ jsxs("div", {
+								className: "max-w-md mx-auto space-y-1.5",
+								children: [/* @__PURE__ */ jsx("h4", {
+									className: "text-base font-semibold text-slate-900",
+									children: "Live Location Offline"
+								}), /* @__PURE__ */ jsxs("p", {
+									className: "text-xs text-slate-500 leading-relaxed",
+									children: [
+										"This representative (",
+										/* @__PURE__ */ jsx("span", {
+											className: "font-semibold text-slate-700",
+											children: mr.name
+										}),
+										") has not enabled device GPS or hasn't submitted a field check-in ping yet today."
+									]
+								})]
+							}),
+							/* @__PURE__ */ jsxs("div", {
+								className: "max-w-md mx-auto bg-slate-50 rounded-xl p-3.5 border border-slate-200/70 text-left text-xs text-slate-600 space-y-2",
+								children: [/* @__PURE__ */ jsxs("div", {
+									className: "flex items-center gap-2 font-medium text-slate-800",
+									children: [/* @__PURE__ */ jsx(Compass, { className: "w-4 h-4 text-violet-600" }), /* @__PURE__ */ jsx("span", { children: "How it works" })]
+								}), /* @__PURE__ */ jsxs("p", {
+									className: "text-[11px] text-slate-500",
+									children: [
+										"Once the representative opens the MR Portal on their mobile device and grants ",
+										/* @__PURE__ */ jsx("strong", { children: "\"Allow Location\"" }),
+										" permission, their real-time field coordinates will automatically appear here."
+									]
+								})]
+							})
+						]
+					})
+				}),
+				/* @__PURE__ */ jsxs("div", {
+					className: "px-5 py-3.5 border-t border-slate-100 bg-slate-50/60 flex items-center justify-between",
+					children: [/* @__PURE__ */ jsx("div", { children: hasLiveLocation && /* @__PURE__ */ jsxs("a", {
+						href: `/admin/tracking?user_id=${mr.id}`,
+						className: "text-xs font-medium text-violet-700 hover:text-violet-800 inline-flex items-center gap-1 hover:underline",
+						children: [/* @__PURE__ */ jsx("span", { children: "Full Field Operations & Tour Route" }), /* @__PURE__ */ jsx(ChevronRight, { className: "w-3.5 h-3.5" })]
+					}) }), /* @__PURE__ */ jsx("button", {
+						type: "button",
+						onClick: onClose,
+						className: "px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold transition-colors cursor-pointer",
+						children: "Close"
+					})]
+				})
+			]
+		})
+	});
+}
+//#endregion
+//#region resources/js/Pages/mrconnect/MRDirectory.jsx
+var MRDirectory_exports = /* @__PURE__ */ __exportAll({ default: () => MRDirectory });
+function MRDirectory({ mrs = [], mapbox = {} }) {
+	const [searchQuery, setSearchQuery] = useState("");
+	const [selectedMRForTracking, setSelectedMRForTracking] = useState(null);
+	const filteredMRs = useMemo(() => {
+		if (!searchQuery.trim()) return mrs;
+		const q = searchQuery.toLowerCase();
+		return mrs.filter((mr) => mr.name?.toLowerCase().includes(q) || mr.email?.toLowerCase().includes(q) || mr.emp_code?.toLowerCase().includes(q));
+	}, [mrs, searchQuery]);
+	const totalDoctors = useMemo(() => {
+		return mrs.reduce((sum, mr) => sum + (mr.doctors_count || 0), 0);
+	}, [mrs]);
+	const totalVisits = useMemo(() => {
+		return mrs.reduce((sum, mr) => sum + (mr.visits_count || 0), 0);
+	}, [mrs]);
+	return /* @__PURE__ */ jsx(AdminLayout, {
+		title: "Medical Representatives Directory",
+		children: /* @__PURE__ */ jsxs("div", {
+			className: "space-y-6 pb-12 font-sans max-w-[1400px] mx-auto text-slate-800",
+			children: [
+				/* @__PURE__ */ jsxs("div", {
+					className: "flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200/80",
+					children: [/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsxs("div", {
+						className: "flex items-center gap-2",
+						children: [/* @__PURE__ */ jsx("div", {
+							className: "w-8 h-8 rounded-xl bg-violet-50 text-violet-600 flex items-center justify-center",
+							children: /* @__PURE__ */ jsx(Users, { className: "w-4 h-4" })
+						}), /* @__PURE__ */ jsx("h2", {
+							className: "text-xl sm:text-2xl font-semibold tracking-tight text-slate-900",
+							children: "Medical Representatives Directory"
+						})]
+					}), /* @__PURE__ */ jsx("p", {
+						className: "text-xs text-slate-500 font-normal mt-1",
+						children: "Field force roster, assigned doctor portfolio coverage, visit metrics, and real-time movement links."
+					})] }), /* @__PURE__ */ jsx(SearchBar, {
+						value: searchQuery,
+						onChange: (e) => setSearchQuery(e.target.value),
+						onClear: () => setSearchQuery(""),
+						placeholder: "Search MR by name, email, or ID...",
+						className: "w-full sm:w-72"
 					})]
 				}),
 				/* @__PURE__ */ jsxs("div", {
-					className: "grid grid-cols-1 sm:grid-cols-4 gap-4",
+					className: "grid grid-cols-1 sm:grid-cols-3 gap-3",
 					children: [
 						/* @__PURE__ */ jsxs("div", {
-							className: "bg-white rounded-2xl border border-slate-200/80 p-5",
-							children: [
-								/* @__PURE__ */ jsx("span", {
-									className: "text-xs font-medium text-slate-500",
-									children: "Casual Leave (CL)"
-								}),
-								/* @__PURE__ */ jsxs("p", {
-									className: "text-2xl font-semibold text-slate-800 mt-2",
-									children: [balances.casual_leave || 8, " Days"]
-								}),
-								/* @__PURE__ */ jsx("p", {
-									className: "text-[11px] text-slate-400 mt-1",
-									children: "Available balance"
-								})
-							]
+							className: "bg-white rounded-2xl border border-slate-200/80 p-4 flex items-center gap-3",
+							children: [/* @__PURE__ */ jsx("div", {
+								className: "w-10 h-10 rounded-xl bg-violet-50 text-violet-600 flex items-center justify-center shrink-0",
+								children: /* @__PURE__ */ jsx(Users, { className: "w-5 h-5" })
+							}), /* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("p", {
+								className: "text-[11px] text-slate-400 font-medium uppercase tracking-wider",
+								children: "Total Field Force"
+							}), /* @__PURE__ */ jsxs("h4", {
+								className: "text-lg font-bold text-slate-900",
+								children: [mrs.length, " Representatives"]
+							})] })]
 						}),
 						/* @__PURE__ */ jsxs("div", {
-							className: "bg-white rounded-2xl border border-slate-200/80 p-5",
-							children: [
-								/* @__PURE__ */ jsx("span", {
-									className: "text-xs font-medium text-slate-500",
-									children: "Sick Leave (SL)"
-								}),
-								/* @__PURE__ */ jsxs("p", {
-									className: "text-2xl font-semibold text-slate-800 mt-2",
-									children: [balances.sick_leave || 6, " Days"]
-								}),
-								/* @__PURE__ */ jsx("p", {
-									className: "text-[11px] text-slate-400 mt-1",
-									children: "Medical quota"
-								})
-							]
+							className: "bg-white rounded-2xl border border-slate-200/80 p-4 flex items-center gap-3",
+							children: [/* @__PURE__ */ jsx("div", {
+								className: "w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0",
+								children: /* @__PURE__ */ jsx(Stethoscope, { className: "w-5 h-5" })
+							}), /* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("p", {
+								className: "text-[11px] text-slate-400 font-medium uppercase tracking-wider",
+								children: "Total Doctors Covered"
+							}), /* @__PURE__ */ jsxs("h4", {
+								className: "text-lg font-bold text-slate-900",
+								children: [totalDoctors, " Physicians"]
+							})] })]
 						}),
 						/* @__PURE__ */ jsxs("div", {
-							className: "bg-white rounded-2xl border border-slate-200/80 p-5",
-							children: [
-								/* @__PURE__ */ jsx("span", {
-									className: "text-xs font-medium text-slate-500",
-									children: "Earned Leave (EL)"
-								}),
-								/* @__PURE__ */ jsxs("p", {
-									className: "text-2xl font-semibold text-slate-800 mt-2",
-									children: [balances.earned_leave || 12, " Days"]
-								}),
-								/* @__PURE__ */ jsx("p", {
-									className: "text-[11px] text-slate-400 mt-1",
-									children: "Accrued privilege"
-								})
-							]
-						}),
-						/* @__PURE__ */ jsxs("div", {
-							className: "bg-white rounded-2xl border border-slate-200/80 p-5",
-							children: [
-								/* @__PURE__ */ jsx("span", {
-									className: "text-xs font-medium text-slate-500",
-									children: "Pending Requests"
-								}),
-								/* @__PURE__ */ jsx("p", {
-									className: "text-2xl font-semibold text-amber-600 mt-2",
-									children: balances.pending_requests || 0
-								}),
-								/* @__PURE__ */ jsx("p", {
-									className: "text-[11px] text-amber-600 font-medium mt-1",
-									children: "Awaiting approval"
-								})
-							]
+							className: "bg-white rounded-2xl border border-slate-200/80 p-4 flex items-center gap-3",
+							children: [/* @__PURE__ */ jsx("div", {
+								className: "w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0",
+								children: /* @__PURE__ */ jsx(CalendarCheck, { className: "w-5 h-5" })
+							}), /* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("p", {
+								className: "text-[11px] text-slate-400 font-medium uppercase tracking-wider",
+								children: "Total Visits Logged"
+							}), /* @__PURE__ */ jsxs("h4", {
+								className: "text-lg font-bold text-slate-900",
+								children: [totalVisits, " Completed Calls"]
+							})] })]
 						})
 					]
 				}),
 				/* @__PURE__ */ jsxs("div", {
-					className: "bg-white rounded-2xl border border-slate-200/80 overflow-hidden",
+					className: "bg-white rounded-2xl border border-slate-200/80 overflow-hidden shadow-2xs",
 					children: [/* @__PURE__ */ jsxs("div", {
 						className: "px-5 py-3.5 border-b border-slate-100 flex items-center justify-between",
 						children: [/* @__PURE__ */ jsx("h3", {
-							className: "text-sm font-semibold text-slate-800",
-							children: isAdmin ? "All Staff Leave Applications" : "My Leave History"
+							className: "text-xs font-semibold text-slate-800 uppercase tracking-wider",
+							children: "Representatives Roster"
 						}), /* @__PURE__ */ jsxs("span", {
-							className: "text-xs text-slate-400",
-							children: [leaves.length, " records"]
+							className: "text-xs text-slate-400 font-normal",
+							children: [
+								"Showing ",
+								filteredMRs.length,
+								" of ",
+								mrs.length,
+								" representatives"
+							]
 						})]
-					}), /* @__PURE__ */ jsx("div", {
+					}), filteredMRs.length > 0 ? /* @__PURE__ */ jsx("div", {
 						className: "overflow-x-auto",
 						children: /* @__PURE__ */ jsxs("table", {
 							className: "w-full text-left text-xs border-collapse",
 							children: [/* @__PURE__ */ jsx("thead", { children: /* @__PURE__ */ jsxs("tr", {
 								className: "border-b border-slate-100 text-[11px] font-semibold text-slate-400 bg-slate-50/50",
 								children: [
-									isAdmin && /* @__PURE__ */ jsx("th", {
-										className: "py-2.5 px-4",
-										children: "Employee"
+									/* @__PURE__ */ jsx("th", {
+										className: "py-3 px-4",
+										children: "Representative"
 									}),
 									/* @__PURE__ */ jsx("th", {
-										className: "py-2.5 px-4",
-										children: "Leave Type"
+										className: "py-3 px-4",
+										children: "Emp Code"
 									}),
 									/* @__PURE__ */ jsx("th", {
-										className: "py-2.5 px-4",
-										children: "From Date"
+										className: "py-3 px-4",
+										children: "Doctor Coverage"
 									}),
 									/* @__PURE__ */ jsx("th", {
-										className: "py-2.5 px-4",
-										children: "To Date"
+										className: "py-3 px-4",
+										children: "Visits Logged"
 									}),
 									/* @__PURE__ */ jsx("th", {
-										className: "py-2.5 px-4 text-center",
-										children: "Days"
+										className: "py-3 px-4",
+										children: "Last Field Location"
 									}),
 									/* @__PURE__ */ jsx("th", {
-										className: "py-2.5 px-4",
-										children: "Reason"
+										className: "py-3 px-4",
+										children: "Joined Date"
 									}),
 									/* @__PURE__ */ jsx("th", {
-										className: "py-2.5 px-4 text-center",
-										children: "Status"
-									}),
-									isAdmin && /* @__PURE__ */ jsx("th", {
-										className: "py-2.5 px-4 text-right",
-										children: "Action"
+										className: "py-3 px-4 text-right",
+										children: "Actions"
 									})
 								]
 							}) }), /* @__PURE__ */ jsx("tbody", {
 								className: "divide-y divide-slate-100",
-								children: leaves.length > 0 ? leaves.map((lv) => /* @__PURE__ */ jsxs("tr", {
+								children: filteredMRs.map((mr) => /* @__PURE__ */ jsxs("tr", {
 									className: "hover:bg-slate-50/70 transition-colors",
 									children: [
-										isAdmin && /* @__PURE__ */ jsx("td", {
-											className: "py-3 px-4 font-medium text-slate-800",
-											children: lv.user_name || "Representative"
-										}),
-										/* @__PURE__ */ jsxs("td", {
-											className: "py-3 px-4 capitalize text-slate-700",
-											children: [lv.leave_type, " Leave"]
-										}),
 										/* @__PURE__ */ jsx("td", {
-											className: "py-3 px-4 text-slate-600",
-											children: lv.from_date
-										}),
-										/* @__PURE__ */ jsx("td", {
-											className: "py-3 px-4 text-slate-600",
-											children: lv.to_date
-										}),
-										/* @__PURE__ */ jsx("td", {
-											className: "py-3 px-4 text-center font-medium text-slate-800",
-											children: lv.days_count
-										}),
-										/* @__PURE__ */ jsx("td", {
-											className: "py-3 px-4 text-slate-500 max-w-xs truncate",
-											children: lv.reason
-										}),
-										/* @__PURE__ */ jsx("td", {
-											className: "py-3 px-4 text-center",
-											children: /* @__PURE__ */ jsx("span", {
-												className: `inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[11px] font-medium ${lv.status === "approved" ? "bg-emerald-50 text-emerald-700 border border-emerald-200/60" : lv.status === "rejected" ? "bg-rose-50 text-rose-700 border border-rose-200/60" : "bg-amber-50 text-amber-700 border border-amber-200/60"}`,
-												children: lv.status.charAt(0).toUpperCase() + lv.status.slice(1)
+											className: "py-3 px-4",
+											children: /* @__PURE__ */ jsxs("div", {
+												className: "flex items-center gap-3",
+												children: [/* @__PURE__ */ jsx("div", {
+													className: "w-8 h-8 rounded-full bg-violet-100 text-violet-700 font-semibold text-xs flex items-center justify-center shrink-0",
+													children: mr.name ? mr.name.charAt(0).toUpperCase() : "M"
+												}), /* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("span", {
+													className: "font-semibold text-slate-900 block",
+													children: mr.name
+												}), /* @__PURE__ */ jsx("span", {
+													className: "text-[11px] text-slate-400",
+													children: mr.email
+												})] })]
 											})
 										}),
-										isAdmin && /* @__PURE__ */ jsx("td", {
+										/* @__PURE__ */ jsx("td", {
+											className: "py-3 px-4",
+											children: /* @__PURE__ */ jsx("span", {
+												className: "font-mono text-[11px] font-medium px-2 py-0.5 rounded-md bg-slate-100 text-slate-700",
+												children: mr.emp_code
+											})
+										}),
+										/* @__PURE__ */ jsx("td", {
+											className: "py-3 px-4",
+											children: /* @__PURE__ */ jsxs("div", {
+												className: "flex items-center gap-1.5 font-medium text-slate-700",
+												children: [/* @__PURE__ */ jsx(Stethoscope, { className: "w-3.5 h-3.5 text-violet-500" }), /* @__PURE__ */ jsxs("span", { children: [mr.doctors_count || 0, " Doctors"] })]
+											})
+										}),
+										/* @__PURE__ */ jsx("td", {
+											className: "py-3 px-4",
+											children: /* @__PURE__ */ jsxs("div", {
+												className: "flex items-center gap-1.5 font-medium text-slate-700",
+												children: [/* @__PURE__ */ jsx(CalendarCheck, { className: "w-3.5 h-3.5 text-emerald-500" }), /* @__PURE__ */ jsxs("span", { children: [mr.visits_count || 0, " Visits"] })]
+											})
+										}),
+										/* @__PURE__ */ jsx("td", {
+											className: "py-3 px-4",
+											children: mr.latest_location ? /* @__PURE__ */ jsxs("div", {
+												className: "space-y-0.5",
+												children: [/* @__PURE__ */ jsxs("span", {
+													className: "inline-flex items-center gap-1.5 text-emerald-700 text-[11px] font-medium",
+													children: [/* @__PURE__ */ jsx("span", { className: "w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" }), /* @__PURE__ */ jsx("span", {
+														className: "truncate max-w-[180px]",
+														title: mr.latest_location.address,
+														children: mr.latest_location.address || "Active in Field"
+													})]
+												}), mr.latest_location.updated_at && /* @__PURE__ */ jsx("span", {
+													className: "text-[10px] text-slate-400 block",
+													children: mr.latest_location.updated_at
+												})]
+											}) : /* @__PURE__ */ jsxs("span", {
+												className: "inline-flex items-center gap-1.5 text-slate-400 text-[11px]",
+												children: [/* @__PURE__ */ jsx("span", { className: "w-1.5 h-1.5 rounded-full bg-slate-300" }), "No GPS ping yet"]
+											})
+										}),
+										/* @__PURE__ */ jsx("td", {
+											className: "py-3 px-4 text-slate-500 font-normal",
+											children: mr.created_at || "Recent"
+										}),
+										/* @__PURE__ */ jsx("td", {
 											className: "py-3 px-4 text-right",
-											children: lv.status === "pending" && /* @__PURE__ */ jsx("button", {
+											children: /* @__PURE__ */ jsxs("button", {
 												type: "button",
-												onClick: () => handleApprove(lv.id),
-												className: "px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-[11px] transition-colors cursor-pointer",
-												children: "Approve"
+												onClick: () => setSelectedMRForTracking(mr),
+												className: "inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-slate-200 text-slate-700 hover:bg-violet-50 hover:border-violet-200 hover:text-violet-700 text-[11px] font-medium transition-colors cursor-pointer",
+												title: "View live GPS location",
+												children: [
+													/* @__PURE__ */ jsx(MapPin, { className: "w-3 h-3 text-violet-500" }),
+													/* @__PURE__ */ jsx("span", { children: "Track Field Route" }),
+													/* @__PURE__ */ jsx(ChevronRight, { className: "w-3 h-3" })
+												]
 											})
 										})
 									]
-								}, lv.id)) : /* @__PURE__ */ jsx("tr", { children: /* @__PURE__ */ jsx("td", {
-									colSpan: isAdmin ? 8 : 6,
-									className: "py-8 text-center text-slate-400",
-									children: "No leave records recorded yet."
-								}) })
+								}, mr.id))
 							})]
 						})
+					}) : /* @__PURE__ */ jsxs("div", {
+						className: "p-12 text-center space-y-2",
+						children: [/* @__PURE__ */ jsx(Users, { className: "w-8 h-8 mx-auto text-slate-300" }), /* @__PURE__ */ jsx("p", {
+							className: "text-xs text-slate-500",
+							children: searchQuery ? "No representatives match your search criteria." : "No Medical Representatives registered yet."
+						})]
 					})]
+				}),
+				/* @__PURE__ */ jsx(MRLiveTrackingModal, {
+					mr: selectedMRForTracking,
+					isOpen: Boolean(selectedMRForTracking),
+					onClose: () => setSelectedMRForTracking(null),
+					mapboxConfig: mapbox
 				})
 			]
-		}), showModal && /* @__PURE__ */ jsx("div", {
-			className: "fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-xs p-4",
-			children: /* @__PURE__ */ jsxs("div", {
-				className: "bg-white rounded-2xl border border-slate-200 max-w-md w-full p-6 space-y-4 shadow-xl",
-				children: [/* @__PURE__ */ jsxs("div", {
-					className: "flex items-center justify-between pb-3 border-b border-slate-100",
-					children: [/* @__PURE__ */ jsx("h3", {
-						className: "text-base font-semibold text-slate-800",
-						children: "Apply for Leave"
-					}), /* @__PURE__ */ jsx("button", {
-						type: "button",
-						onClick: () => setShowModal(false),
-						className: "text-slate-400 hover:text-slate-600 cursor-pointer",
-						children: /* @__PURE__ */ jsx(X, { className: "w-5 h-5" })
-					})]
-				}), /* @__PURE__ */ jsxs("form", {
-					onSubmit: handleSubmit,
-					className: "space-y-3.5 text-xs",
-					children: [
-						/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("label", {
-							className: "block text-xs font-medium text-slate-700 mb-1",
-							children: "Leave Category"
-						}), /* @__PURE__ */ jsxs("select", {
-							value: formData.leave_type,
-							onChange: (e) => setFormData({
-								...formData,
-								leave_type: e.target.value
-							}),
-							className: "w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 cursor-pointer",
-							children: [
-								/* @__PURE__ */ jsx("option", {
-									value: "casual",
-									children: "Casual Leave (CL)"
-								}),
-								/* @__PURE__ */ jsx("option", {
-									value: "sick",
-									children: "Sick Leave (SL)"
-								}),
-								/* @__PURE__ */ jsx("option", {
-									value: "earned",
-									children: "Earned Leave (EL)"
-								}),
-								/* @__PURE__ */ jsx("option", {
-									value: "compensatory",
-									children: "Compensatory Off"
-								})
-							]
-						})] }),
-						/* @__PURE__ */ jsxs("div", {
-							className: "grid grid-cols-2 gap-3",
-							children: [/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("label", {
-								className: "block text-xs font-medium text-slate-700 mb-1",
-								children: "From Date"
-							}), /* @__PURE__ */ jsx("input", {
-								type: "date",
-								required: true,
-								value: formData.from_date,
-								onChange: (e) => setFormData({
-									...formData,
-									from_date: e.target.value
-								}),
-								className: "w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500"
-							})] }), /* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("label", {
-								className: "block text-xs font-medium text-slate-700 mb-1",
-								children: "To Date"
-							}), /* @__PURE__ */ jsx("input", {
-								type: "date",
-								required: true,
-								value: formData.to_date,
-								onChange: (e) => setFormData({
-									...formData,
-									to_date: e.target.value
-								}),
-								className: "w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500"
-							})] })]
-						}),
-						/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("label", {
-							className: "block text-xs font-medium text-slate-700 mb-1",
-							children: "Reason for Absence"
-						}), /* @__PURE__ */ jsx("textarea", {
-							rows: "3",
-							required: true,
-							placeholder: "Please state details regarding your leave...",
-							value: formData.reason,
-							onChange: (e) => setFormData({
-								...formData,
-								reason: e.target.value
-							}),
-							className: "w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500"
-						})] }),
-						/* @__PURE__ */ jsxs("div", {
-							className: "flex items-center justify-end gap-2.5 pt-2 border-t border-slate-100",
-							children: [/* @__PURE__ */ jsx("button", {
-								type: "button",
-								onClick: () => setShowModal(false),
-								className: "px-4 py-2 rounded-xl text-xs font-medium text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer",
-								children: "Cancel"
-							}), /* @__PURE__ */ jsx("button", {
-								type: "submit",
-								className: "px-5 py-2 rounded-xl text-xs font-medium text-white bg-slate-900 hover:bg-slate-800 transition-colors cursor-pointer",
-								children: "Submit Application"
-							})]
-						})
-					]
-				})]
-			})
-		})]
+		})
 	});
 }
 //#endregion
 //#region resources/js/Pages/mrconnect/Notice.jsx
 var Notice_exports = /* @__PURE__ */ __exportAll({ default: () => Notice });
+var capitalizeFirst = (text) => {
+	if (!text) return "";
+	return text.charAt(0).toUpperCase() + text.slice(1);
+};
 function Notice({ notices = [] }) {
 	const { props } = usePage();
-	const Layout = props.auth?.user?.role === "admin" ? AdminLayout : MRLayout;
+	const isAdmin = props.auth?.user?.role === "admin" || props.auth?.user?.role === "super_admin";
+	const Layout = isAdmin ? AdminLayout : MRLayout;
+	const [searchQuery, setSearchQuery] = useState("");
+	const [isModalOpen, setIsModalOpen] = useState(false);
+	const [noticeToDelete, setNoticeToDelete] = useState(null);
+	const [isDeleting, setIsDeleting] = useState(false);
+	const { data, setData, post, processing, errors, reset, clearErrors } = useForm({
+		title: "",
+		content: ""
+	});
+	const handleOpenModal = () => {
+		reset();
+		clearErrors();
+		setIsModalOpen(true);
+	};
+	const handleCloseModal = () => {
+		setIsModalOpen(false);
+		reset();
+		clearErrors();
+	};
+	const handleSubmit = (e) => {
+		e.preventDefault();
+		post("/mrconnect/notice", { onSuccess: () => {
+			handleCloseModal();
+		} });
+	};
+	const handleConfirmDelete = () => {
+		if (!noticeToDelete) return;
+		setIsDeleting(true);
+		router.delete(`/mrconnect/notice/${noticeToDelete.id}`, {
+			onSuccess: () => {
+				setNoticeToDelete(null);
+			},
+			onFinish: () => {
+				setIsDeleting(false);
+			}
+		});
+	};
+	const filteredNotices = useMemo(() => {
+		if (!searchQuery.trim()) return notices;
+		const q = searchQuery.toLowerCase();
+		return notices.filter((nt) => nt.title?.toLowerCase().includes(q) || nt.content?.toLowerCase().includes(q) || nt.publisher_name?.toLowerCase().includes(q));
+	}, [notices, searchQuery]);
 	return /* @__PURE__ */ jsx(Layout, {
-		title: "Notices & Announcements",
+		title: "Notices",
 		children: /* @__PURE__ */ jsxs("div", {
-			className: "space-y-6 pb-12 font-sans max-w-[1400px] mx-auto",
-			children: [/* @__PURE__ */ jsx("div", {
-				className: "flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-200/80",
-				children: /* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("h2", {
-					className: "text-xl sm:text-2xl font-semibold tracking-tight text-slate-800",
-					children: "Notices & Official Announcements"
-				}), /* @__PURE__ */ jsx("p", {
-					className: "text-xs text-slate-500 font-normal mt-0.5",
-					children: "Broadcast circulars, price updates, medical conference details, and corporate news."
-				})] })
-			}), /* @__PURE__ */ jsx("div", {
-				className: "space-y-4",
-				children: notices.map((nt) => /* @__PURE__ */ jsxs("div", {
-					className: "bg-white rounded-2xl border border-slate-200/80 p-5 space-y-2.5",
-					children: [
-						/* @__PURE__ */ jsxs("div", {
-							className: "flex flex-col sm:flex-row sm:items-center justify-between gap-2",
+			className: "space-y-6 pb-12 font-sans max-w-[1200px] mx-auto text-slate-800",
+			children: [
+				/* @__PURE__ */ jsxs("div", {
+					className: "flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200/80",
+					children: [/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsxs("div", {
+						className: "flex items-center gap-2",
+						children: [/* @__PURE__ */ jsx("div", {
+							className: "w-8 h-8 rounded-xl bg-violet-50 text-violet-600 flex items-center justify-center",
+							children: /* @__PURE__ */ jsx(Megaphone, { className: "w-4 h-4" })
+						}), /* @__PURE__ */ jsx("h2", {
+							className: "text-xl sm:text-2xl font-semibold tracking-tight text-slate-900",
+							children: "Notices"
+						})]
+					}), /* @__PURE__ */ jsx("p", {
+						className: "text-xs text-slate-500 font-normal mt-1",
+						children: "Official company updates, circulars, and announcements."
+					})] }), /* @__PURE__ */ jsxs("div", {
+						className: "flex items-center gap-3",
+						children: [/* @__PURE__ */ jsx(SearchBar, {
+							value: searchQuery,
+							onChange: (e) => setSearchQuery(e.target.value),
+							onClear: () => setSearchQuery(""),
+							placeholder: "Search notices...",
+							className: "w-48 sm:w-64"
+						}), isAdmin && /* @__PURE__ */ jsxs("button", {
+							type: "button",
+							onClick: handleOpenModal,
+							className: "inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-medium transition-all shadow-xs cursor-pointer whitespace-nowrap",
+							children: [/* @__PURE__ */ jsx(Plus, { className: "w-4 h-4" }), /* @__PURE__ */ jsx("span", { children: "Post Notice" })]
+						})]
+					})]
+				}),
+				filteredNotices.length > 0 ? /* @__PURE__ */ jsx("div", {
+					className: "space-y-3",
+					children: filteredNotices.map((nt) => /* @__PURE__ */ jsxs("div", {
+						className: "bg-white rounded-2xl border border-slate-200/80 p-5 sm:p-6 space-y-3 transition-all hover:border-slate-300",
+						children: [/* @__PURE__ */ jsxs("div", {
+							className: "flex items-start justify-between gap-4",
 							children: [/* @__PURE__ */ jsxs("div", {
-								className: "flex items-center gap-2",
-								children: [/* @__PURE__ */ jsx("span", {
-									className: `px-2.5 py-0.5 rounded-md text-[11px] font-semibold uppercase ${nt.priority === "urgent" ? "bg-rose-50 text-rose-700 border border-rose-200/60" : nt.priority === "high" ? "bg-amber-50 text-amber-700 border border-amber-200/60" : "bg-violet-50 text-violet-700 border border-violet-200/60"}`,
-									children: nt.category
-								}), /* @__PURE__ */ jsx("h3", {
-									className: "text-sm font-semibold text-slate-800",
-									children: nt.title
+								className: "space-y-1",
+								children: [/* @__PURE__ */ jsx("h3", {
+									className: "text-base font-semibold text-slate-900 tracking-tight",
+									children: capitalizeFirst(nt.title)
+								}), /* @__PURE__ */ jsxs("div", {
+									className: "flex items-center gap-3 text-[11px] text-slate-400 font-normal",
+									children: [
+										/* @__PURE__ */ jsxs("span", {
+											className: "flex items-center gap-1",
+											children: [/* @__PURE__ */ jsx(Calendar, { className: "w-3 h-3 text-slate-400" }), /* @__PURE__ */ jsx("span", { children: nt.created_at || nt.published_at ? new Date(nt.created_at || nt.published_at).toLocaleDateString("en-US", {
+												day: "numeric",
+												month: "short",
+												year: "numeric"
+											}) : "Recent" })]
+										}),
+										/* @__PURE__ */ jsx("span", { children: "•" }),
+										/* @__PURE__ */ jsxs("span", {
+											className: "flex items-center gap-1",
+											children: [/* @__PURE__ */ jsx(User, { className: "w-3 h-3 text-slate-400" }), /* @__PURE__ */ jsx("span", { children: nt.publisher_name || "Admin" })]
+										})
+									]
 								})]
-							}), /* @__PURE__ */ jsx("span", {
-								className: "text-[11px] text-slate-400 font-normal",
-								children: nt.published_at
+							}), isAdmin && /* @__PURE__ */ jsx("button", {
+								type: "button",
+								onClick: () => setNoticeToDelete(nt),
+								className: "text-slate-400 hover:text-rose-600 p-1.5 rounded-lg hover:bg-rose-50 transition-colors cursor-pointer shrink-0",
+								title: "Delete notice",
+								children: /* @__PURE__ */ jsx(Trash2, { className: "w-4 h-4" })
 							})]
-						}),
-						/* @__PURE__ */ jsx("p", {
-							className: "text-xs text-slate-600 leading-relaxed",
-							children: nt.content
+						}), /* @__PURE__ */ jsx("p", {
+							className: "text-xs text-slate-600 leading-relaxed whitespace-pre-line pt-1",
+							children: capitalizeFirst(nt.content)
+						})]
+					}, nt.id))
+				}) : /* @__PURE__ */ jsxs("div", {
+					className: "bg-white rounded-2xl border border-slate-200/80 p-12 text-center space-y-3 max-w-md mx-auto",
+					children: [
+						/* @__PURE__ */ jsx("div", {
+							className: "w-12 h-12 mx-auto rounded-2xl bg-violet-50 text-violet-600 flex items-center justify-center",
+							children: /* @__PURE__ */ jsx(Megaphone, { className: "w-5 h-5" })
 						}),
 						/* @__PURE__ */ jsxs("div", {
-							className: "pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400",
-							children: [/* @__PURE__ */ jsxs("span", { children: ["Published by: ", /* @__PURE__ */ jsx("strong", {
-								className: "text-slate-600 font-medium",
-								children: nt.publisher_name || "Ciplon Head Office"
-							})] }), /* @__PURE__ */ jsx("span", {
-								className: "text-emerald-600 font-medium",
-								children: "Active Circular"
+							className: "space-y-1",
+							children: [/* @__PURE__ */ jsx("h3", {
+								className: "text-sm font-semibold text-slate-900",
+								children: searchQuery ? "No matching notices" : "No notices yet"
+							}), /* @__PURE__ */ jsx("p", {
+								className: "text-xs text-slate-500 font-normal",
+								children: searchQuery ? "Try a different search keyword." : "Announcements and circulars will appear here."
 							})]
+						}),
+						isAdmin && !searchQuery && /* @__PURE__ */ jsxs("button", {
+							type: "button",
+							onClick: handleOpenModal,
+							className: "inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-medium transition-all shadow-xs cursor-pointer",
+							children: [/* @__PURE__ */ jsx(Plus, { className: "w-3.5 h-3.5" }), /* @__PURE__ */ jsx("span", { children: "Post First Notice" })]
 						})
 					]
-				}, nt.id))
-			})]
+				}),
+				isModalOpen && /* @__PURE__ */ jsx("div", {
+					className: "fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs animate-in fade-in duration-200",
+					onClick: handleCloseModal,
+					children: /* @__PURE__ */ jsxs("div", {
+						className: "w-full max-w-md bg-white rounded-3xl shadow-xl border border-slate-200/80 overflow-hidden transform transition-all text-slate-800",
+						onClick: (e) => e.stopPropagation(),
+						children: [/* @__PURE__ */ jsxs("div", {
+							className: "px-6 pt-6 pb-4 border-b border-slate-100 flex items-center justify-between",
+							children: [/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("h3", {
+								className: "text-base font-semibold text-slate-900 tracking-tight",
+								children: "Post Notice"
+							}), /* @__PURE__ */ jsx("p", {
+								className: "text-xs text-slate-400 font-normal",
+								children: "Send an announcement to all users."
+							})] }), /* @__PURE__ */ jsx("button", {
+								type: "button",
+								onClick: handleCloseModal,
+								className: "w-8 h-8 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100 flex items-center justify-center transition-colors cursor-pointer shrink-0 -mr-1",
+								children: /* @__PURE__ */ jsx(X, { className: "w-4 h-4" })
+							})]
+						}), /* @__PURE__ */ jsxs("form", {
+							onSubmit: handleSubmit,
+							noValidate: true,
+							className: "p-6 space-y-4",
+							children: [
+								/* @__PURE__ */ jsxs("div", {
+									className: "space-y-1",
+									children: [
+										/* @__PURE__ */ jsx("label", {
+											className: "text-xs font-medium text-slate-700 block",
+											children: "Title"
+										}),
+										/* @__PURE__ */ jsx("input", {
+											type: "text",
+											value: data.title,
+											onChange: (e) => {
+												const val = capitalizeFirst(e.target.value);
+												setData("title", val);
+												if (errors.title) clearErrors("title");
+											},
+											placeholder: "e.g. Office Holiday Notice / Meeting Update",
+											autoFocus: true,
+											className: `w-full bg-slate-50/60 hover:bg-slate-50 focus:bg-white border rounded-xl px-3 py-2 text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none transition-all font-normal ${errors.title ? "border-rose-300 focus:border-rose-500 focus:ring-2 focus:ring-rose-500/15" : "border-slate-200 focus:border-slate-300 focus:ring-2 focus:ring-violet-500/10"}`
+										}),
+										errors.title && /* @__PURE__ */ jsxs("p", {
+											className: "text-[11px] text-rose-600 flex items-center gap-1 font-normal mt-1",
+											children: [/* @__PURE__ */ jsx(AlertCircle, { className: "w-3 h-3 shrink-0" }), /* @__PURE__ */ jsx("span", { children: errors.title })]
+										})
+									]
+								}),
+								/* @__PURE__ */ jsxs("div", {
+									className: "space-y-1",
+									children: [
+										/* @__PURE__ */ jsx("label", {
+											className: "text-xs font-medium text-slate-700 block",
+											children: "Message"
+										}),
+										/* @__PURE__ */ jsx("textarea", {
+											rows: 4,
+											value: data.content,
+											onChange: (e) => {
+												const val = capitalizeFirst(e.target.value);
+												setData("content", val);
+												if (errors.content) clearErrors("content");
+											},
+											placeholder: "Write the announcement details...",
+											className: `w-full bg-slate-50/60 hover:bg-slate-50 focus:bg-white border rounded-xl p-3 text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none transition-all font-normal ${errors.content ? "border-rose-300 focus:border-rose-500 focus:ring-2 focus:ring-rose-500/15" : "border-slate-200 focus:border-slate-300 focus:ring-2 focus:ring-violet-500/10"}`
+										}),
+										errors.content && /* @__PURE__ */ jsxs("p", {
+											className: "text-[11px] text-rose-600 flex items-center gap-1 font-normal mt-1",
+											children: [/* @__PURE__ */ jsx(AlertCircle, { className: "w-3 h-3 shrink-0" }), /* @__PURE__ */ jsx("span", { children: errors.content })]
+										})
+									]
+								}),
+								/* @__PURE__ */ jsxs("div", {
+									className: "pt-2 flex items-center justify-end gap-2",
+									children: [/* @__PURE__ */ jsx("button", {
+										type: "button",
+										onClick: handleCloseModal,
+										className: "px-4 py-2 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 text-xs font-medium transition-colors cursor-pointer",
+										children: "Cancel"
+									}), /* @__PURE__ */ jsx("button", {
+										type: "submit",
+										disabled: processing,
+										className: "px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-medium flex items-center gap-1.5 transition-all cursor-pointer disabled:opacity-60 shadow-xs",
+										children: processing ? /* @__PURE__ */ jsxs(Fragment, { children: [/* @__PURE__ */ jsx("div", { className: "w-3.5 h-3.5 border-2 border-white/60 border-t-white rounded-full animate-spin" }), /* @__PURE__ */ jsx("span", { children: "Posting..." })] }) : /* @__PURE__ */ jsx("span", { children: "Post Notice" })
+									})]
+								})
+							]
+						})]
+					})
+				}),
+				/* @__PURE__ */ jsx(ConfirmModal, {
+					isOpen: Boolean(noticeToDelete),
+					onClose: () => !isDeleting && setNoticeToDelete(null),
+					onConfirm: handleConfirmDelete,
+					title: "Delete Notice",
+					message: noticeToDelete ? `Are you sure you want to delete "${capitalizeFirst(noticeToDelete.title)}"? This official announcement will be permanently removed.` : "",
+					confirmText: "Delete Notice",
+					cancelText: "Cancel",
+					isDanger: true,
+					isLoading: isDeleting,
+					loadingText: "Deleting..."
+				})
+			]
 		})
 	});
 }
 //#endregion
 //#region resources/js/Pages/mrconnect/PobOrder.jsx
 var PobOrder_exports = /* @__PURE__ */ __exportAll({ default: () => PobOrder });
-function PobOrder({ orders = [], doctors = [], summary = {} }) {
+var formatDoctorName = (name) => {
+	if (!name) return "";
+	return `Dr. ${name.trim().replace(/^(Dr\.?\s*)+/i, "")}`;
+};
+function PobOrder({ orders = [], doctors = [], products = [], summary = {}, isAdmin = false }) {
 	const { props } = usePage();
-	const Layout = props.auth?.user?.role === "admin" ? AdminLayout : MRLayout;
-	const [showModal, setShowModal] = useState(false);
+	const userRole = props.auth?.user?.role;
+	const isSuperAdminOrAdmin = userRole === "admin" || userRole === "super_admin" || isAdmin;
+	const Layout = isSuperAdminOrAdmin ? AdminLayout : MRLayout;
+	const [searchTerm, setSearchTerm] = useState("");
+	const [statusFilter, setStatusFilter] = useState("all");
+	const [showBookModal, setShowBookModal] = useState(false);
+	const [selectedOrder, setSelectedOrder] = useState(null);
+	const [verifyingOrder, setVerifyingOrder] = useState(null);
+	const [dispatchingOrder, setDispatchingOrder] = useState(null);
+	const [isSubmitting, setIsSubmitting] = useState(false);
+	const initialItem = {
+		product_id: "",
+		product_name: "",
+		quantity: 10,
+		unit_price: 150
+	};
 	const [formData, setFormData] = useState({
 		chemist_name: "",
 		doctor_id: "",
-		total_amount: "",
-		notes: ""
+		notes: "",
+		items: [{ ...initialItem }]
 	});
-	const handleSubmit = (e) => {
-		e.preventDefault();
-		router.post("/mrconnect/pob-order", formData, {
-			onSuccess: () => {
-				toast.success("POB order booked successfully!");
-				setShowModal(false);
-				setFormData({
-					chemist_name: "",
-					doctor_id: "",
-					total_amount: "",
-					notes: ""
-				});
-			},
-			onError: () => toast.error("Failed to book POB order.")
+	const [formErrors, setFormErrors] = useState({});
+	const openBookModal = () => {
+		setFormData({
+			chemist_name: "",
+			doctor_id: "",
+			notes: "",
+			items: [{ ...initialItem }]
+		});
+		setFormErrors({});
+		setShowBookModal(true);
+	};
+	const handleAddItem = () => {
+		setFormData((prev) => ({
+			...prev,
+			items: [...prev.items, { ...initialItem }]
+		}));
+	};
+	const handleRemoveItem = (index) => {
+		if (formData.items.length <= 1) return;
+		setFormData((prev) => ({
+			...prev,
+			items: prev.items.filter((_, i) => i !== index)
+		}));
+	};
+	const handleItemChange = (index, field, value) => {
+		setFormData((prev) => {
+			const updated = [...prev.items];
+			if (field === "product_id") {
+				const prod = products.find((p) => String(p.id) === String(value));
+				updated[index] = {
+					...updated[index],
+					product_id: value,
+					product_name: prod ? `${prod.brand_name} (${prod.dosage_form || "Medicine"})` : ""
+				};
+			} else updated[index] = {
+				...updated[index],
+				[field]: value
+			};
+			return {
+				...prev,
+				items: updated
+			};
 		});
 	};
-	return /* @__PURE__ */ jsxs(Layout, {
-		title: "POB Order Booking",
-		children: [/* @__PURE__ */ jsxs("div", {
-			className: "space-y-6 pb-12 font-sans max-w-[1400px] mx-auto",
+	const calculatedTotal = useMemo(() => {
+		return formData.items.reduce((sum, item) => {
+			return sum + (parseFloat(item.quantity) || 0) * (parseFloat(item.unit_price) || 0);
+		}, 0);
+	}, [formData.items]);
+	const handleBookSubmit = (e) => {
+		e.preventDefault();
+		setIsSubmitting(true);
+		setFormErrors({});
+		router.post("/mrconnect/pob-order", formData, {
+			preserveScroll: true,
+			onSuccess: () => {
+				setIsSubmitting(false);
+				setShowBookModal(false);
+			},
+			onError: (errs) => {
+				setIsSubmitting(false);
+				setFormErrors(errs || {});
+				toast.error("Please check the form for errors.");
+			}
+		});
+	};
+	const handleVerifyConfirm = () => {
+		if (!verifyingOrder) return;
+		setIsSubmitting(true);
+		router.post(`/mrconnect/pob-order/${verifyingOrder.id}/status`, { status: "verified" }, {
+			preserveScroll: true,
+			onSuccess: () => {
+				setIsSubmitting(false);
+				setVerifyingOrder(null);
+				if (selectedOrder?.id === verifyingOrder.id) setSelectedOrder((prev) => prev ? {
+					...prev,
+					status: "verified"
+				} : null);
+			},
+			onError: () => {
+				setIsSubmitting(false);
+				toast.error("Failed to verify order.");
+			}
+		});
+	};
+	const handleDispatchConfirm = () => {
+		if (!dispatchingOrder) return;
+		setIsSubmitting(true);
+		router.post(`/mrconnect/pob-order/${dispatchingOrder.id}/status`, { status: "dispatched" }, {
+			preserveScroll: true,
+			onSuccess: () => {
+				setIsSubmitting(false);
+				setDispatchingOrder(null);
+				if (selectedOrder?.id === dispatchingOrder.id) setSelectedOrder((prev) => prev ? {
+					...prev,
+					status: "dispatched"
+				} : null);
+			},
+			onError: () => {
+				setIsSubmitting(false);
+				toast.error("Failed to update status.");
+			}
+		});
+	};
+	const getOrderItems = (order) => {
+		if (!order) return [];
+		if (Array.isArray(order.items) && order.items.length > 0) return order.items;
+		if (order.items_json) try {
+			const parsed = typeof order.items_json === "string" ? JSON.parse(order.items_json) : order.items_json;
+			if (Array.isArray(parsed)) return parsed;
+		} catch (e) {}
+		return [];
+	};
+	const filteredOrders = useMemo(() => {
+		return orders.filter((ord) => {
+			const matchSearch = ord.order_no && ord.order_no.toLowerCase().includes(searchTerm.toLowerCase()) || ord.chemist_name && ord.chemist_name.toLowerCase().includes(searchTerm.toLowerCase()) || ord.representative_name && ord.representative_name.toLowerCase().includes(searchTerm.toLowerCase()) || ord.doctor_name && ord.doctor_name.toLowerCase().includes(searchTerm.toLowerCase());
+			const matchStatus = statusFilter === "all" ? true : ord.status === statusFilter;
+			return matchSearch && matchStatus;
+		});
+	}, [
+		orders,
+		searchTerm,
+		statusFilter
+	]);
+	return /* @__PURE__ */ jsxs(Layout, { children: [
+		/* @__PURE__ */ jsxs("div", {
+			className: "space-y-6 max-w-7xl mx-auto pb-12",
 			children: [
 				/* @__PURE__ */ jsxs("div", {
-					className: "flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-200/80",
-					children: [/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("h2", {
-						className: "text-xl sm:text-2xl font-semibold tracking-tight text-slate-800",
-						children: "Personal Order Booking (POB Orders)"
-					}), /* @__PURE__ */ jsx("p", {
-						className: "text-xs text-slate-500 font-normal mt-0.5",
-						children: "Book retail chemist orders and doctor prescription stock requirements directly from the field."
-					})] }), /* @__PURE__ */ jsxs("button", {
-						type: "button",
-						onClick: () => setShowModal(true),
-						className: "inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-medium text-xs transition-colors cursor-pointer",
-						children: [/* @__PURE__ */ jsx(Plus, { className: "w-3.5 h-3.5" }), /* @__PURE__ */ jsx("span", { children: "Book New POB Order" })]
+					className: "flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4",
+					children: [/* @__PURE__ */ jsx("div", { children: /* @__PURE__ */ jsxs("div", {
+						className: "flex items-center gap-2.5",
+						children: [/* @__PURE__ */ jsx("div", {
+							className: "w-10 h-10 rounded-xl bg-violet-50 text-violet-600 border border-violet-100 flex items-center justify-center",
+							children: /* @__PURE__ */ jsx(ShoppingBag, { className: "w-5 h-5 stroke-[2.2]" })
+						}), /* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("h1", {
+							className: "text-xl font-bold text-slate-900 tracking-tight",
+							children: "Personal Order Booking (POB)"
+						}), /* @__PURE__ */ jsx("p", {
+							className: "text-xs text-slate-500",
+							children: isSuperAdminOrAdmin ? "Review and verify retail chemist orders taken by Medical Representatives in the field." : "Book personal orders at retail chemist pharmacies during doctor & field visits."
+						})] })]
+					}) }), /* @__PURE__ */ jsx("div", {
+						className: "flex items-center gap-2.5",
+						children: /* @__PURE__ */ jsxs("button", {
+							type: "button",
+							onClick: openBookModal,
+							className: "inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold text-white bg-slate-900 hover:bg-slate-800 transition-colors shadow-xs cursor-pointer",
+							children: [/* @__PURE__ */ jsx(Plus, { className: "w-4 h-4 stroke-[2.5]" }), /* @__PURE__ */ jsx("span", { children: "Book POB Order" })]
+						})
 					})]
 				}),
 				/* @__PURE__ */ jsxs("div", {
-					className: "grid grid-cols-1 sm:grid-cols-3 gap-4",
+					className: "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4",
 					children: [
 						/* @__PURE__ */ jsxs("div", {
-							className: "bg-white rounded-2xl border border-slate-200/80 p-5",
+							className: "bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs",
 							children: [
-								/* @__PURE__ */ jsx("span", {
-									className: "text-xs font-medium text-slate-500",
-									children: "Total Orders Booked"
+								/* @__PURE__ */ jsxs("div", {
+									className: "flex items-center justify-between",
+									children: [/* @__PURE__ */ jsx("span", {
+										className: "text-xs font-medium text-slate-500",
+										children: "Total Bookings"
+									}), /* @__PURE__ */ jsx("div", {
+										className: "w-8 h-8 rounded-lg bg-violet-50 text-violet-600 flex items-center justify-center",
+										children: /* @__PURE__ */ jsx(ShoppingBag, { className: "w-4 h-4" })
+									})]
 								}),
 								/* @__PURE__ */ jsx("p", {
-									className: "text-2xl font-semibold text-slate-800 mt-2",
-									children: summary.total_orders || orders.length
+									className: "text-2xl font-bold text-slate-900 mt-2",
+									children: summary.total_orders || orders.length || 0
 								}),
 								/* @__PURE__ */ jsx("p", {
 									className: "text-[11px] text-slate-400 mt-1",
-									children: "Field prescription orders"
+									children: "Retail chemist orders"
 								})
 							]
 						}),
 						/* @__PURE__ */ jsxs("div", {
-							className: "bg-white rounded-2xl border border-slate-200/80 p-5",
+							className: "bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs",
 							children: [
-								/* @__PURE__ */ jsx("span", {
-									className: "text-xs font-medium text-slate-500",
-									children: "Total Order Booking Value"
+								/* @__PURE__ */ jsxs("div", {
+									className: "flex items-center justify-between",
+									children: [/* @__PURE__ */ jsx("span", {
+										className: "text-xs font-medium text-slate-500",
+										children: "Total Order Value"
+									}), /* @__PURE__ */ jsx("div", {
+										className: "w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center",
+										children: /* @__PURE__ */ jsx("span", {
+											className: "text-xs font-bold",
+											children: "₹"
+										})
+									})]
 								}),
 								/* @__PURE__ */ jsxs("p", {
-									className: "text-2xl font-semibold text-violet-600 mt-2",
+									className: "text-2xl font-bold text-emerald-600 mt-2",
 									children: ["₹", Number(summary.total_value || 0).toLocaleString()]
 								}),
 								/* @__PURE__ */ jsx("p", {
-									className: "text-[11px] text-slate-400 mt-1",
+									className: "text-[11px] text-emerald-600 font-medium mt-1",
 									children: "Gross sales generated"
 								})
 							]
 						}),
 						/* @__PURE__ */ jsxs("div", {
-							className: "bg-white rounded-2xl border border-slate-200/80 p-5",
+							className: "bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs",
 							children: [
-								/* @__PURE__ */ jsx("span", {
-									className: "text-xs font-medium text-slate-500",
-									children: "Stockist Verified"
+								/* @__PURE__ */ jsxs("div", {
+									className: "flex items-center justify-between",
+									children: [/* @__PURE__ */ jsx("span", {
+										className: "text-xs font-medium text-slate-500",
+										children: "Verified by Admin"
+									}), /* @__PURE__ */ jsx("div", {
+										className: "w-8 h-8 rounded-lg bg-teal-50 text-teal-600 flex items-center justify-center",
+										children: /* @__PURE__ */ jsx(CheckCircle2, { className: "w-4 h-4" })
+									})]
 								}),
 								/* @__PURE__ */ jsx("p", {
-									className: "text-2xl font-semibold text-emerald-600 mt-2",
+									className: "text-2xl font-bold text-teal-600 mt-2",
 									children: summary.verified_orders || 0
 								}),
 								/* @__PURE__ */ jsx("p", {
-									className: "text-[11px] text-emerald-600 font-medium mt-1",
-									children: "Approved for dispatch"
+									className: "text-[11px] text-teal-600 font-medium mt-1",
+									children: "Approved for stockist dispatch"
+								})
+							]
+						}),
+						/* @__PURE__ */ jsxs("div", {
+							className: "bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs",
+							children: [
+								/* @__PURE__ */ jsxs("div", {
+									className: "flex items-center justify-between",
+									children: [/* @__PURE__ */ jsx("span", {
+										className: "text-xs font-medium text-slate-500",
+										children: "Pending Review"
+									}), /* @__PURE__ */ jsx("div", {
+										className: "w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center",
+										children: /* @__PURE__ */ jsx(Clock, { className: "w-4 h-4" })
+									})]
+								}),
+								/* @__PURE__ */ jsx("p", {
+									className: "text-2xl font-bold text-amber-600 mt-2",
+									children: summary.pending_orders ?? orders.filter((o) => o.status === "submitted").length
+								}),
+								/* @__PURE__ */ jsx("p", {
+									className: "text-[11px] text-amber-600 font-medium mt-1",
+									children: "Awaiting admin verification"
 								})
 							]
 						})
 					]
 				}),
 				/* @__PURE__ */ jsxs("div", {
-					className: "bg-white rounded-2xl border border-slate-200/80 overflow-hidden",
+					className: "flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-white p-3.5 rounded-2xl border border-slate-200/80 shadow-xs",
+					children: [/* @__PURE__ */ jsx(SearchBar, {
+						value: searchTerm,
+						onChange: (e) => setSearchTerm(e.target.value),
+						placeholder: "Search by order no, chemist shop, representative, doctor...",
+						className: "flex-1 max-w-md"
+					}), /* @__PURE__ */ jsx("div", {
+						className: "flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0",
+						children: [
+							{
+								id: "all",
+								label: "All Orders"
+							},
+							{
+								id: "submitted",
+								label: "Pending"
+							},
+							{
+								id: "verified",
+								label: "Verified"
+							},
+							{
+								id: "dispatched",
+								label: "Dispatched"
+							}
+						].map((tab) => /* @__PURE__ */ jsx("button", {
+							type: "button",
+							onClick: () => setStatusFilter(tab.id),
+							className: `px-3 py-1.5 rounded-lg text-xs font-medium transition-colors cursor-pointer whitespace-nowrap ${statusFilter === tab.id ? "bg-slate-900 text-white" : "text-slate-600 hover:bg-slate-100"}`,
+							children: tab.label
+						}, tab.id))
+					})]
+				}),
+				/* @__PURE__ */ jsxs("div", {
+					className: "bg-white rounded-2xl border border-slate-200/80 overflow-hidden shadow-xs",
 					children: [/* @__PURE__ */ jsxs("div", {
 						className: "px-5 py-3.5 border-b border-slate-100 flex items-center justify-between",
-						children: [/* @__PURE__ */ jsx("h3", {
+						children: [/* @__PURE__ */ jsxs("h3", {
 							className: "text-sm font-semibold text-slate-800",
-							children: "Recent POB Bookings"
+							children: ["POB Chemist Bookings ", isSuperAdminOrAdmin ? "(All Representatives)" : "(My Territory)"]
 						}), /* @__PURE__ */ jsxs("span", {
 							className: "text-xs text-slate-400",
-							children: [orders.length, " orders"]
+							children: [filteredOrders.length, " records"]
 						})]
 					}), /* @__PURE__ */ jsx("div", {
 						className: "overflow-x-auto",
@@ -15220,150 +16377,390 @@ function PobOrder({ orders = [], doctors = [], summary = {} }) {
 								className: "border-b border-slate-100 text-[11px] font-semibold text-slate-400 bg-slate-50/50",
 								children: [
 									/* @__PURE__ */ jsx("th", {
-										className: "py-2.5 px-4",
+										className: "py-3 px-4",
 										children: "Order No"
 									}),
 									/* @__PURE__ */ jsx("th", {
-										className: "py-2.5 px-4",
-										children: "Chemist / Pharmacy"
+										className: "py-3 px-4",
+										children: "Chemist / Medical Store"
 									}),
 									/* @__PURE__ */ jsx("th", {
-										className: "py-2.5 px-4",
+										className: "py-3 px-4",
 										children: "Representative"
 									}),
 									/* @__PURE__ */ jsx("th", {
-										className: "py-2.5 px-4 text-center",
+										className: "py-3 px-4 text-center",
 										children: "Items"
 									}),
 									/* @__PURE__ */ jsx("th", {
-										className: "py-2.5 px-4 text-right",
+										className: "py-3 px-4 text-right",
 										children: "Order Amount"
 									}),
 									/* @__PURE__ */ jsx("th", {
-										className: "py-2.5 px-4 text-center",
+										className: "py-3 px-4 text-center",
 										children: "Status"
+									}),
+									/* @__PURE__ */ jsx("th", {
+										className: "py-3 px-4 text-right",
+										children: "Actions"
 									})
 								]
 							}) }), /* @__PURE__ */ jsx("tbody", {
 								className: "divide-y divide-slate-100",
-								children: orders.length > 0 ? orders.map((ord) => /* @__PURE__ */ jsxs("tr", {
-									className: "hover:bg-slate-50/70 transition-colors",
-									children: [
-										/* @__PURE__ */ jsx("td", {
-											className: "py-3 px-4 font-mono font-semibold text-slate-800",
-											children: ord.order_no
-										}),
-										/* @__PURE__ */ jsx("td", {
-											className: "py-3 px-4 font-medium text-slate-800",
-											children: ord.chemist_name
-										}),
-										/* @__PURE__ */ jsx("td", {
-											className: "py-3 px-4 text-slate-600",
-											children: ord.representative_name || "Representative"
-										}),
-										/* @__PURE__ */ jsxs("td", {
-											className: "py-3 px-4 text-center text-slate-600",
-											children: [ord.items_count, " products"]
-										}),
-										/* @__PURE__ */ jsxs("td", {
-											className: "py-3 px-4 text-right font-semibold text-slate-800",
-											children: ["₹", Number(ord.total_amount).toLocaleString()]
-										}),
-										/* @__PURE__ */ jsx("td", {
-											className: "py-3 px-4 text-center",
-											children: /* @__PURE__ */ jsx("span", {
-												className: `inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[11px] font-medium ${ord.status === "verified" ? "bg-emerald-50 text-emerald-700 border border-emerald-200/60" : "bg-amber-50 text-amber-700 border border-amber-200/60"}`,
-												children: ord.status.charAt(0).toUpperCase() + ord.status.slice(1)
+								children: filteredOrders.length > 0 ? filteredOrders.map((ord) => {
+									const items = getOrderItems(ord);
+									return /* @__PURE__ */ jsxs("tr", {
+										className: "hover:bg-slate-50/70 transition-colors",
+										children: [
+											/* @__PURE__ */ jsxs("td", {
+												className: "py-3 px-4",
+												children: [/* @__PURE__ */ jsx("button", {
+													type: "button",
+													onClick: () => setSelectedOrder(ord),
+													className: "font-mono font-semibold text-violet-700 hover:text-violet-900 hover:underline cursor-pointer flex items-center gap-1.5",
+													children: /* @__PURE__ */ jsx("span", { children: ord.order_no })
+												}), /* @__PURE__ */ jsx("span", {
+													className: "text-[10px] text-slate-400 block mt-0.5",
+													children: new Date(ord.created_at).toLocaleDateString("en-IN", {
+														day: "2-digit",
+														month: "short",
+														year: "numeric"
+													})
+												})]
+											}),
+											/* @__PURE__ */ jsxs("td", {
+												className: "py-3 px-4",
+												children: [/* @__PURE__ */ jsxs("div", {
+													className: "font-medium text-slate-800 flex items-center gap-1.5",
+													children: [/* @__PURE__ */ jsx(Store, { className: "w-3.5 h-3.5 text-slate-400 shrink-0" }), /* @__PURE__ */ jsx("span", { children: ord.chemist_name })]
+												}), ord.doctor_name ? /* @__PURE__ */ jsxs("span", {
+													className: "inline-flex items-center gap-1 text-[11px] text-teal-700 mt-0.5",
+													children: [/* @__PURE__ */ jsx(Stethoscope, { className: "w-3 h-3" }), /* @__PURE__ */ jsx("span", { children: formatDoctorName(ord.doctor_name) })]
+												}) : /* @__PURE__ */ jsx("span", {
+													className: "text-[10px] text-slate-400 block mt-0.5",
+													children: "Direct Chemist Booking"
+												})]
+											}),
+											/* @__PURE__ */ jsx("td", {
+												className: "py-3 px-4",
+												children: /* @__PURE__ */ jsxs("div", {
+													className: "flex items-center gap-2",
+													children: [/* @__PURE__ */ jsx("div", {
+														className: "w-6 h-6 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center font-bold text-[10px]",
+														children: ord.representative_name ? ord.representative_name.charAt(0).toUpperCase() : "M"
+													}), /* @__PURE__ */ jsx("span", {
+														className: "text-slate-700 font-medium",
+														children: ord.representative_name || "Representative"
+													})]
+												})
+											}),
+											/* @__PURE__ */ jsx("td", {
+												className: "py-3 px-4 text-center",
+												children: /* @__PURE__ */ jsxs("span", {
+													className: "inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-slate-100 text-slate-700",
+													children: [ord.items_count || items.length || 1, " products"]
+												})
+											}),
+											/* @__PURE__ */ jsxs("td", {
+												className: "py-3 px-4 text-right font-bold text-slate-900",
+												children: ["₹", Number(ord.total_amount).toLocaleString()]
+											}),
+											/* @__PURE__ */ jsx("td", {
+												className: "py-3 px-4 text-center",
+												children: /* @__PURE__ */ jsxs("span", {
+													className: `inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[11px] font-semibold ${ord.status === "verified" ? "bg-emerald-50 text-emerald-700 border border-emerald-200/60" : ord.status === "dispatched" ? "bg-sky-50 text-sky-700 border border-sky-200/60" : ord.status === "delivered" ? "bg-violet-50 text-violet-700 border border-violet-200/60" : "bg-amber-50 text-amber-700 border border-amber-200/60"}`,
+													children: [ord.status === "verified" ? /* @__PURE__ */ jsx(CheckCircle2, { className: "w-3 h-3" }) : ord.status === "dispatched" ? /* @__PURE__ */ jsx(Truck, { className: "w-3 h-3" }) : /* @__PURE__ */ jsx(Clock, { className: "w-3 h-3" }), /* @__PURE__ */ jsx("span", {
+														className: "capitalize",
+														children: ord.status
+													})]
+												})
+											}),
+											/* @__PURE__ */ jsx("td", {
+												className: "py-3 px-4 text-right",
+												children: /* @__PURE__ */ jsxs("div", {
+													className: "inline-flex items-center gap-1.5 justify-end",
+													children: [
+														/* @__PURE__ */ jsx("button", {
+															type: "button",
+															onClick: () => setSelectedOrder(ord),
+															title: "View Order Details",
+															className: "p-1.5 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-colors cursor-pointer",
+															children: /* @__PURE__ */ jsx(Eye, { className: "w-4 h-4" })
+														}),
+														isSuperAdminOrAdmin && ord.status === "submitted" && /* @__PURE__ */ jsxs("button", {
+															type: "button",
+															onClick: () => setVerifyingOrder(ord),
+															title: "Verify Order for Stockist Dispatch",
+															className: "inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-emerald-600 hover:bg-emerald-700 text-white transition-colors cursor-pointer shadow-xs",
+															children: [/* @__PURE__ */ jsx(Check, { className: "w-3.5 h-3.5 stroke-[2.5]" }), /* @__PURE__ */ jsx("span", { children: "Verify" })]
+														}),
+														isSuperAdminOrAdmin && ord.status === "verified" && /* @__PURE__ */ jsxs("button", {
+															type: "button",
+															onClick: () => setDispatchingOrder(ord),
+															title: "Mark as Dispatched",
+															className: "inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-sky-600 hover:bg-sky-700 text-white transition-colors cursor-pointer shadow-xs",
+															children: [/* @__PURE__ */ jsx(Truck, { className: "w-3.5 h-3.5" }), /* @__PURE__ */ jsx("span", { children: "Dispatch" })]
+														})
+													]
+												})
 											})
-										})
-									]
-								}, ord.id)) : /* @__PURE__ */ jsx("tr", { children: /* @__PURE__ */ jsx("td", {
-									colSpan: 6,
-									className: "py-8 text-center text-slate-400",
-									children: "No POB orders recorded yet."
+										]
+									}, ord.id);
+								}) : /* @__PURE__ */ jsx("tr", { children: /* @__PURE__ */ jsxs("td", {
+									colSpan: 7,
+									className: "py-12 text-center text-slate-400",
+									children: [/* @__PURE__ */ jsx(ShoppingBag, { className: "w-8 h-8 mx-auto text-slate-300 mb-2 stroke-[1.5]" }), /* @__PURE__ */ jsx("p", {
+										className: "text-xs font-medium",
+										children: "No POB orders found matching the filter criteria."
+									})]
 								}) })
 							})]
 						})
 					})]
 				})
 			]
-		}), showModal && /* @__PURE__ */ jsx("div", {
-			className: "fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-xs p-4",
+		}),
+		showBookModal && /* @__PURE__ */ jsx("div", {
+			className: "fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-xs p-4 animate-in fade-in duration-200",
 			children: /* @__PURE__ */ jsxs("div", {
-				className: "bg-white rounded-2xl border border-slate-200 max-w-md w-full p-6 space-y-4 shadow-xl",
+				className: "bg-white rounded-2xl border border-slate-200 max-w-2xl w-full p-6 space-y-4 shadow-xl max-h-[90vh] flex flex-col animate-in zoom-in-95 duration-200",
 				children: [/* @__PURE__ */ jsxs("div", {
-					className: "flex items-center justify-between pb-3 border-b border-slate-100",
-					children: [/* @__PURE__ */ jsx("h3", {
-						className: "text-base font-semibold text-slate-800",
-						children: "Book Personal Order (POB)"
+					className: "flex items-center justify-between pb-3 border-b border-slate-100 shrink-0",
+					children: [/* @__PURE__ */ jsxs("div", {
+						className: "flex items-center gap-2",
+						children: [/* @__PURE__ */ jsx("div", {
+							className: "w-8 h-8 rounded-lg bg-violet-50 text-violet-600 flex items-center justify-center",
+							children: /* @__PURE__ */ jsx(Store, { className: "w-4 h-4" })
+						}), /* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("h3", {
+							className: "text-sm sm:text-base font-bold text-slate-900",
+							children: "Book Personal Order (POB)"
+						}), /* @__PURE__ */ jsx("p", {
+							className: "text-[11px] text-slate-500",
+							children: "Visit medical store/chemist, add product items, and submit for admin verification."
+						})] })]
 					}), /* @__PURE__ */ jsx("button", {
 						type: "button",
-						onClick: () => setShowModal(false),
-						className: "text-slate-400 hover:text-slate-600 cursor-pointer",
+						onClick: () => setShowBookModal(false),
+						className: "p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer",
 						children: /* @__PURE__ */ jsx(X, { className: "w-5 h-5" })
 					})]
 				}), /* @__PURE__ */ jsxs("form", {
-					onSubmit: handleSubmit,
-					className: "space-y-3.5 text-xs",
+					onSubmit: handleBookSubmit,
+					className: "space-y-4 overflow-y-auto pr-1 flex-1 text-xs",
 					children: [
+						/* @__PURE__ */ jsxs("div", {
+							className: "grid grid-cols-1 sm:grid-cols-2 gap-3.5",
+							children: [/* @__PURE__ */ jsxs("div", { children: [
+								/* @__PURE__ */ jsxs("label", {
+									className: "block text-xs font-semibold text-slate-700 mb-1",
+									children: ["Chemist / Medical Shop Name ", /* @__PURE__ */ jsx("span", {
+										className: "text-rose-500",
+										children: "*"
+									})]
+								}),
+								/* @__PURE__ */ jsx("input", {
+									type: "text",
+									required: true,
+									placeholder: "e.g. Sanjeevani Medical Store, Station Road",
+									value: formData.chemist_name,
+									onChange: (e) => {
+										setFormData({
+											...formData,
+											chemist_name: e.target.value
+										});
+										if (formErrors.chemist_name) setFormErrors({
+											...formErrors,
+											chemist_name: null
+										});
+									},
+									className: `w-full px-3 py-2 bg-slate-50 border rounded-xl text-xs text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 ${formErrors.chemist_name ? "border-rose-300 bg-rose-50/30" : "border-slate-200"}`
+								}),
+								formErrors.chemist_name && /* @__PURE__ */ jsx("p", {
+									className: "text-[11px] text-rose-500 mt-1",
+									children: formErrors.chemist_name[0] || formErrors.chemist_name
+								})
+							] }), /* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("label", {
+								className: "block text-xs font-semibold text-slate-700 mb-1",
+								children: "Prescribing Doctor (Optional)"
+							}), /* @__PURE__ */ jsxs("select", {
+								value: formData.doctor_id,
+								onChange: (e) => setFormData({
+									...formData,
+									doctor_id: e.target.value
+								}),
+								className: "w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 cursor-pointer",
+								children: [/* @__PURE__ */ jsx("option", {
+									value: "",
+									children: "Select Doctor (Prescription Driver)..."
+								}), doctors.map((doc) => /* @__PURE__ */ jsxs("option", {
+									value: doc.id,
+									children: [
+										formatDoctorName(doc.name),
+										" (",
+										doc.clinic_hospital_name || "Clinic",
+										")"
+									]
+								}, doc.id))]
+							})] })]
+						}),
+						/* @__PURE__ */ jsxs("div", {
+							className: "space-y-2 pt-2 border-t border-slate-100",
+							children: [/* @__PURE__ */ jsxs("div", {
+								className: "flex items-center justify-between",
+								children: [/* @__PURE__ */ jsxs("label", {
+									className: "text-xs font-semibold text-slate-800 flex items-center gap-1.5",
+									children: [/* @__PURE__ */ jsx("span", { children: "Product Items" }), /* @__PURE__ */ jsxs("span", {
+										className: "text-[11px] font-normal text-slate-400",
+										children: [
+											"(",
+											formData.items.length,
+											" items)"
+										]
+									})]
+								}), /* @__PURE__ */ jsxs("button", {
+									type: "button",
+									onClick: handleAddItem,
+									className: "inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-semibold text-violet-700 bg-violet-50 hover:bg-violet-100 transition-colors cursor-pointer",
+									children: [/* @__PURE__ */ jsx(Plus, { className: "w-3.5 h-3.5" }), /* @__PURE__ */ jsx("span", { children: "Add Product" })]
+								})]
+							}), /* @__PURE__ */ jsx("div", {
+								className: "border border-slate-200 rounded-xl overflow-hidden",
+								children: /* @__PURE__ */ jsxs("table", {
+									className: "w-full text-left text-xs",
+									children: [
+										/* @__PURE__ */ jsx("thead", { children: /* @__PURE__ */ jsxs("tr", {
+											className: "bg-slate-50/80 border-b border-slate-200 text-[11px] font-semibold text-slate-500",
+											children: [
+												/* @__PURE__ */ jsx("th", {
+													className: "py-2 px-3",
+													children: "Product Name"
+												}),
+												/* @__PURE__ */ jsx("th", {
+													className: "py-2 px-3 w-20 text-center",
+													children: "Qty"
+												}),
+												/* @__PURE__ */ jsx("th", {
+													className: "py-2 px-3 w-28 text-right",
+													children: "Rate (₹)"
+												}),
+												/* @__PURE__ */ jsx("th", {
+													className: "py-2 px-3 w-28 text-right",
+													children: "Subtotal"
+												}),
+												/* @__PURE__ */ jsx("th", { className: "py-2 px-2 w-10 text-center" })
+											]
+										}) }),
+										/* @__PURE__ */ jsx("tbody", {
+											className: "divide-y divide-slate-100",
+											children: formData.items.map((item, idx) => {
+												const lineSubtotal = (parseFloat(item.quantity) || 0) * (parseFloat(item.unit_price) || 0);
+												return /* @__PURE__ */ jsxs("tr", {
+													className: "hover:bg-slate-50/40",
+													children: [
+														/* @__PURE__ */ jsxs("td", {
+															className: "py-2 px-3",
+															children: [products.length > 0 ? /* @__PURE__ */ jsxs("select", {
+																value: item.product_id || "",
+																onChange: (e) => handleItemChange(idx, "product_id", e.target.value),
+																className: "w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-violet-500",
+																children: [/* @__PURE__ */ jsx("option", {
+																	value: "",
+																	children: "Select company product..."
+																}), products.map((p) => /* @__PURE__ */ jsxs("option", {
+																	value: p.id,
+																	children: [
+																		p.brand_name,
+																		" - ",
+																		p.dosage_form || p.strength || "Item"
+																	]
+																}, p.id))]
+															}) : /* @__PURE__ */ jsx("input", {
+																type: "text",
+																required: true,
+																placeholder: "Product Name",
+																value: item.product_name,
+																onChange: (e) => handleItemChange(idx, "product_name", e.target.value),
+																className: "w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-violet-500"
+															}), item.product_id && /* @__PURE__ */ jsx("input", {
+																type: "text",
+																value: item.product_name,
+																onChange: (e) => handleItemChange(idx, "product_name", e.target.value),
+																className: "w-full mt-1 px-2.5 py-1 bg-slate-50 border border-slate-200 rounded text-[11px] text-slate-600",
+																placeholder: "Custom description / pack size"
+															})]
+														}),
+														/* @__PURE__ */ jsx("td", {
+															className: "py-2 px-3",
+															children: /* @__PURE__ */ jsx("input", {
+																type: "number",
+																min: "1",
+																required: true,
+																value: item.quantity,
+																onChange: (e) => handleItemChange(idx, "quantity", e.target.value),
+																className: "w-full px-2 py-1.5 bg-white border border-slate-200 rounded-lg text-xs text-center text-slate-800 focus:outline-none focus:ring-1 focus:ring-violet-500"
+															})
+														}),
+														/* @__PURE__ */ jsx("td", {
+															className: "py-2 px-3",
+															children: /* @__PURE__ */ jsxs("div", {
+																className: "relative",
+																children: [/* @__PURE__ */ jsx("span", {
+																	className: "absolute left-2 top-1/2 -translate-y-1/2 text-slate-400 text-[11px]",
+																	children: "₹"
+																}), /* @__PURE__ */ jsx("input", {
+																	type: "number",
+																	step: "0.01",
+																	min: "0.1",
+																	required: true,
+																	value: item.unit_price,
+																	onChange: (e) => handleItemChange(idx, "unit_price", e.target.value),
+																	className: "w-full pl-5 pr-2 py-1.5 bg-white border border-slate-200 rounded-lg text-xs text-right text-slate-800 focus:outline-none focus:ring-1 focus:ring-violet-500"
+																})]
+															})
+														}),
+														/* @__PURE__ */ jsxs("td", {
+															className: "py-2 px-3 text-right font-semibold text-slate-800",
+															children: ["₹", lineSubtotal.toLocaleString()]
+														}),
+														/* @__PURE__ */ jsx("td", {
+															className: "py-2 px-2 text-center",
+															children: /* @__PURE__ */ jsx("button", {
+																type: "button",
+																disabled: formData.items.length <= 1,
+																onClick: () => handleRemoveItem(idx),
+																className: "p-1 text-slate-400 hover:text-rose-600 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-colors",
+																children: /* @__PURE__ */ jsx(Trash2, { className: "w-3.5 h-3.5" })
+															})
+														})
+													]
+												}, idx);
+											})
+										}),
+										/* @__PURE__ */ jsx("tfoot", { children: /* @__PURE__ */ jsxs("tr", {
+											className: "bg-violet-50/50 border-t border-slate-200 font-semibold text-slate-800",
+											children: [
+												/* @__PURE__ */ jsx("td", {
+													colSpan: 3,
+													className: "py-2.5 px-3 text-right text-xs",
+													children: "Gross Order Value:"
+												}),
+												/* @__PURE__ */ jsxs("td", {
+													className: "py-2.5 px-3 text-right text-sm font-bold text-violet-900",
+													children: ["₹", calculatedTotal.toLocaleString()]
+												}),
+												/* @__PURE__ */ jsx("td", {})
+											]
+										}) })
+									]
+								})
+							})]
+						}),
 						/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("label", {
-							className: "block text-xs font-medium text-slate-700 mb-1",
-							children: "Chemist / Retail Pharmacy"
-						}), /* @__PURE__ */ jsx("input", {
-							type: "text",
-							required: true,
-							placeholder: "e.g. Apollo Pharmacy, KP Road",
-							value: formData.chemist_name,
-							onChange: (e) => setFormData({
-								...formData,
-								chemist_name: e.target.value
-							}),
-							className: "w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500"
-						})] }),
-						/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("label", {
-							className: "block text-xs font-medium text-slate-700 mb-1",
-							children: "Prescribing Doctor (Optional)"
-						}), /* @__PURE__ */ jsxs("select", {
-							value: formData.doctor_id,
-							onChange: (e) => setFormData({
-								...formData,
-								doctor_id: e.target.value
-							}),
-							className: "w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 cursor-pointer",
-							children: [/* @__PURE__ */ jsx("option", {
-								value: "",
-								children: "Select Doctor..."
-							}), doctors.map((doc) => /* @__PURE__ */ jsxs("option", {
-								value: doc.id,
-								children: [
-									doc.name,
-									" (",
-									doc.clinic_hospital_name,
-									")"
-								]
-							}, doc.id))]
-						})] }),
-						/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("label", {
-							className: "block text-xs font-medium text-slate-700 mb-1",
-							children: "Total Order Value (₹)"
-						}), /* @__PURE__ */ jsx("input", {
-							type: "number",
-							required: true,
-							min: "1",
-							placeholder: "8500",
-							value: formData.total_amount,
-							onChange: (e) => setFormData({
-								...formData,
-								total_amount: e.target.value
-							}),
-							className: "w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500"
-						})] }),
-						/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("label", {
-							className: "block text-xs font-medium text-slate-700 mb-1",
-							children: "Notes & Product Breakdown"
+							className: "block text-xs font-semibold text-slate-700 mb-1",
+							children: "Delivery Notes & Preferred Stockist (Optional)"
 						}), /* @__PURE__ */ jsx("textarea", {
 							rows: "2",
-							placeholder: "e.g. Factocel-IX 10 vials, Globucel-SC 5 vials...",
+							placeholder: "e.g. Supply via Mahaveer Medicose Stockist within 2 days...",
 							value: formData.notes,
 							onChange: (e) => setFormData({
 								...formData,
@@ -15372,30 +16769,261 @@ function PobOrder({ orders = [], doctors = [], summary = {} }) {
 							className: "w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500"
 						})] }),
 						/* @__PURE__ */ jsxs("div", {
-							className: "flex items-center justify-end gap-2.5 pt-2 border-t border-slate-100",
-							children: [/* @__PURE__ */ jsx("button", {
-								type: "button",
-								onClick: () => setShowModal(false),
-								className: "px-4 py-2 rounded-xl text-xs font-medium text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer",
-								children: "Cancel"
-							}), /* @__PURE__ */ jsx("button", {
-								type: "submit",
-								className: "px-5 py-2 rounded-xl text-xs font-medium text-white bg-slate-900 hover:bg-slate-800 transition-colors cursor-pointer",
-								children: "Submit Order"
+							className: "flex items-center justify-between pt-3 border-t border-slate-100 shrink-0",
+							children: [/* @__PURE__ */ jsxs("div", {
+								className: "text-[11px] text-slate-500",
+								children: [
+									"Total: ",
+									/* @__PURE__ */ jsxs("span", {
+										className: "font-bold text-slate-800",
+										children: ["₹", calculatedTotal.toLocaleString()]
+									}),
+									" (",
+									formData.items.length,
+									" items)"
+								]
+							}), /* @__PURE__ */ jsxs("div", {
+								className: "flex items-center gap-2",
+								children: [/* @__PURE__ */ jsx("button", {
+									type: "button",
+									onClick: () => setShowBookModal(false),
+									className: "px-4 py-2 rounded-xl text-xs font-medium text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer",
+									children: "Cancel"
+								}), /* @__PURE__ */ jsx("button", {
+									type: "submit",
+									disabled: isSubmitting || calculatedTotal <= 0,
+									className: "px-5 py-2 rounded-xl text-xs font-semibold text-white bg-slate-900 hover:bg-slate-800 disabled:opacity-50 transition-colors cursor-pointer",
+									children: isSubmitting ? "Booking Order..." : "Submit POB Order"
+								})]
 							})]
 						})
 					]
 				})]
 			})
-		})]
-	});
+		}),
+		selectedOrder && /* @__PURE__ */ jsx("div", {
+			className: "fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-xs p-4 animate-in fade-in duration-200",
+			children: /* @__PURE__ */ jsxs("div", {
+				className: "bg-white rounded-2xl border border-slate-200 max-w-xl w-full p-6 space-y-4 shadow-xl max-h-[90vh] flex flex-col animate-in zoom-in-95 duration-200",
+				children: [
+					/* @__PURE__ */ jsxs("div", {
+						className: "flex items-center justify-between pb-3 border-b border-slate-100 shrink-0",
+						children: [/* @__PURE__ */ jsxs("div", {
+							className: "flex items-center gap-2.5",
+							children: [/* @__PURE__ */ jsx("div", {
+								className: "w-9 h-9 rounded-xl bg-violet-50 text-violet-600 flex items-center justify-center",
+								children: /* @__PURE__ */ jsx(FileText, { className: "w-5 h-5" })
+							}), /* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsxs("div", {
+								className: "flex items-center gap-2",
+								children: [/* @__PURE__ */ jsxs("h3", {
+									className: "text-base font-bold text-slate-900",
+									children: ["Order ", selectedOrder.order_no]
+								}), /* @__PURE__ */ jsx("span", {
+									className: `inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-semibold ${selectedOrder.status === "verified" ? "bg-emerald-50 text-emerald-700 border border-emerald-200" : selectedOrder.status === "dispatched" ? "bg-sky-50 text-sky-700 border border-sky-200" : selectedOrder.status === "delivered" ? "bg-violet-50 text-violet-700 border border-violet-200" : "bg-amber-50 text-amber-700 border border-amber-200"}`,
+									children: /* @__PURE__ */ jsx("span", {
+										className: "capitalize",
+										children: selectedOrder.status
+									})
+								})]
+							}), /* @__PURE__ */ jsxs("p", {
+								className: "text-[11px] text-slate-400",
+								children: ["Booked on ", new Date(selectedOrder.created_at).toLocaleString("en-IN")]
+							})] })]
+						}), /* @__PURE__ */ jsx("button", {
+							type: "button",
+							onClick: () => setSelectedOrder(null),
+							className: "p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer",
+							children: /* @__PURE__ */ jsx(X, { className: "w-5 h-5" })
+						})]
+					}),
+					/* @__PURE__ */ jsxs("div", {
+						className: "space-y-4 overflow-y-auto pr-1 flex-1 text-xs",
+						children: [
+							/* @__PURE__ */ jsxs("div", {
+								className: "grid grid-cols-1 sm:grid-cols-2 gap-3 bg-slate-50/80 p-3.5 rounded-xl border border-slate-100",
+								children: [
+									/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("span", {
+										className: "text-[11px] font-medium text-slate-400",
+										children: "Chemist / Retail Pharmacy"
+									}), /* @__PURE__ */ jsxs("p", {
+										className: "font-semibold text-slate-800 text-xs mt-0.5 flex items-center gap-1.5",
+										children: [/* @__PURE__ */ jsx(Store, { className: "w-3.5 h-3.5 text-slate-500" }), /* @__PURE__ */ jsx("span", { children: selectedOrder.chemist_name })]
+									})] }),
+									/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("span", {
+										className: "text-[11px] font-medium text-slate-400",
+										children: "Field Representative"
+									}), /* @__PURE__ */ jsxs("p", {
+										className: "font-semibold text-slate-800 text-xs mt-0.5 flex items-center gap-1.5",
+										children: [/* @__PURE__ */ jsx(User, { className: "w-3.5 h-3.5 text-slate-500" }), /* @__PURE__ */ jsx("span", { children: selectedOrder.representative_name || "Representative" })]
+									})] }),
+									selectedOrder.doctor_name && /* @__PURE__ */ jsxs("div", {
+										className: "sm:col-span-2 pt-2 border-t border-slate-200/60",
+										children: [/* @__PURE__ */ jsx("span", {
+											className: "text-[11px] font-medium text-slate-400",
+											children: "Prescribing Doctor Linked"
+										}), /* @__PURE__ */ jsxs("p", {
+											className: "font-semibold text-teal-800 text-xs mt-0.5 flex items-center gap-1.5",
+											children: [/* @__PURE__ */ jsx(Stethoscope, { className: "w-3.5 h-3.5 text-teal-600" }), /* @__PURE__ */ jsxs("span", { children: [
+												formatDoctorName(selectedOrder.doctor_name),
+												" (",
+												selectedOrder.clinic_hospital_name || "Clinic",
+												")"
+											] })]
+										})]
+									})
+								]
+							}),
+							/* @__PURE__ */ jsxs("div", {
+								className: "space-y-2",
+								children: [/* @__PURE__ */ jsx("h4", {
+									className: "text-xs font-semibold text-slate-800",
+									children: "Itemized Medicine Breakdown"
+								}), /* @__PURE__ */ jsx("div", {
+									className: "border border-slate-200 rounded-xl overflow-hidden",
+									children: /* @__PURE__ */ jsxs("table", {
+										className: "w-full text-left text-xs",
+										children: [
+											/* @__PURE__ */ jsx("thead", { children: /* @__PURE__ */ jsxs("tr", {
+												className: "bg-slate-50 text-[11px] font-semibold text-slate-500 border-b border-slate-200",
+												children: [
+													/* @__PURE__ */ jsx("th", {
+														className: "py-2 px-3",
+														children: "#"
+													}),
+													/* @__PURE__ */ jsx("th", {
+														className: "py-2 px-3",
+														children: "Product Name"
+													}),
+													/* @__PURE__ */ jsx("th", {
+														className: "py-2 px-3 text-center",
+														children: "Qty"
+													}),
+													/* @__PURE__ */ jsx("th", {
+														className: "py-2 px-3 text-right",
+														children: "Unit Rate"
+													}),
+													/* @__PURE__ */ jsx("th", {
+														className: "py-2 px-3 text-right",
+														children: "Subtotal"
+													})
+												]
+											}) }),
+											/* @__PURE__ */ jsx("tbody", {
+												className: "divide-y divide-slate-100",
+												children: getOrderItems(selectedOrder).length > 0 ? getOrderItems(selectedOrder).map((item, i) => {
+													const pName = item.product_name || item.product || "Medicine Item";
+													const q = item.quantity || item.qty || 1;
+													const r = item.unit_price || item.rate || item.mrp || 0;
+													const sub = item.subtotal || Number(q) * Number(r);
+													return /* @__PURE__ */ jsxs("tr", {
+														className: "hover:bg-slate-50/50",
+														children: [
+															/* @__PURE__ */ jsx("td", {
+																className: "py-2 px-3 text-slate-400",
+																children: i + 1
+															}),
+															/* @__PURE__ */ jsx("td", {
+																className: "py-2 px-3 font-medium text-slate-800",
+																children: pName
+															}),
+															/* @__PURE__ */ jsx("td", {
+																className: "py-2 px-3 text-center text-slate-700",
+																children: q
+															}),
+															/* @__PURE__ */ jsxs("td", {
+																className: "py-2 px-3 text-right text-slate-600",
+																children: ["₹", Number(r).toLocaleString()]
+															}),
+															/* @__PURE__ */ jsxs("td", {
+																className: "py-2 px-3 text-right font-semibold text-slate-800",
+																children: ["₹", Number(sub).toLocaleString()]
+															})
+														]
+													}, i);
+												}) : /* @__PURE__ */ jsx("tr", { children: /* @__PURE__ */ jsx("td", {
+													colSpan: 5,
+													className: "py-4 text-center text-slate-400",
+													children: "Single lumped order amount without itemized lines."
+												}) })
+											}),
+											/* @__PURE__ */ jsx("tfoot", { children: /* @__PURE__ */ jsxs("tr", {
+												className: "bg-slate-50 border-t border-slate-200 font-semibold text-slate-800",
+												children: [/* @__PURE__ */ jsx("td", {
+													colSpan: 4,
+													className: "py-2.5 px-3 text-right text-xs",
+													children: "Total Order Value:"
+												}), /* @__PURE__ */ jsxs("td", {
+													className: "py-2.5 px-3 text-right text-sm font-bold text-slate-900",
+													children: ["₹", Number(selectedOrder.total_amount).toLocaleString()]
+												})]
+											}) })
+										]
+									})
+								})]
+							}),
+							selectedOrder.notes && /* @__PURE__ */ jsxs("div", {
+								className: "bg-slate-50 p-3 rounded-xl border border-slate-100",
+								children: [/* @__PURE__ */ jsx("span", {
+									className: "text-[11px] font-medium text-slate-400 block mb-0.5",
+									children: "Notes & Instructions"
+								}), /* @__PURE__ */ jsx("p", {
+									className: "text-xs text-slate-700 leading-relaxed",
+									children: selectedOrder.notes
+								})]
+							})
+						]
+					}),
+					/* @__PURE__ */ jsxs("div", {
+						className: "flex items-center justify-between pt-3 border-t border-slate-100 shrink-0",
+						children: [/* @__PURE__ */ jsx("button", {
+							type: "button",
+							onClick: () => setSelectedOrder(null),
+							className: "px-4 py-2 rounded-xl text-xs font-medium text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer",
+							children: "Close"
+						}), isSuperAdminOrAdmin && selectedOrder.status === "submitted" && /* @__PURE__ */ jsxs("button", {
+							type: "button",
+							onClick: () => {
+								const ord = selectedOrder;
+								setSelectedOrder(null);
+								setVerifyingOrder(ord);
+							},
+							className: "inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 transition-colors shadow-xs cursor-pointer",
+							children: [/* @__PURE__ */ jsx(Check, { className: "w-4 h-4" }), /* @__PURE__ */ jsx("span", { children: "Verify This Order" })]
+						})]
+					})
+				]
+			})
+		}),
+		/* @__PURE__ */ jsx(ConfirmModal, {
+			isOpen: !!verifyingOrder,
+			onClose: () => setVerifyingOrder(null),
+			onConfirm: handleVerifyConfirm,
+			isDanger: false,
+			isLoading: isSubmitting,
+			title: "Verify POB Order",
+			message: `Are you sure you want to verify order ${verifyingOrder?.order_no} from "${verifyingOrder?.chemist_name}"? This authorizes the order for stockist billing and dispatch.`,
+			confirmText: "Verify Order",
+			cancelText: "Cancel"
+		}),
+		/* @__PURE__ */ jsx(ConfirmModal, {
+			isOpen: !!dispatchingOrder,
+			onClose: () => setDispatchingOrder(null),
+			onConfirm: handleDispatchConfirm,
+			isDanger: false,
+			isLoading: isSubmitting,
+			title: "Mark Order Dispatched",
+			message: `Mark order ${dispatchingOrder?.order_no} as dispatched from the stockist?`,
+			confirmText: "Mark Dispatched",
+			cancelText: "Cancel"
+		})
+	] });
 }
 //#endregion
 //#region resources/js/Pages/mrconnect/PrimarySales.jsx
 var PrimarySales_exports = /* @__PURE__ */ __exportAll({ default: () => PrimarySales });
 function PrimarySales({ sales = [], summary = {} }) {
 	const { props } = usePage();
-	const Layout = props.auth?.user?.role === "admin" ? AdminLayout : MRLayout;
+	const Layout = props.auth?.user?.role === "admin" || props.auth?.user?.role === "super_admin" ? AdminLayout : MRLayout;
 	return /* @__PURE__ */ jsx(Layout, {
 		title: "Primary Sales",
 		children: /* @__PURE__ */ jsxs("div", {
@@ -15557,7 +17185,7 @@ function PrimarySales({ sales = [], summary = {} }) {
 var Scheme_exports = /* @__PURE__ */ __exportAll({ default: () => Scheme });
 function Scheme({ schemes = [] }) {
 	const { props } = usePage();
-	const Layout = props.auth?.user?.role === "admin" ? AdminLayout : MRLayout;
+	const Layout = props.auth?.user?.role === "admin" || props.auth?.user?.role === "super_admin" ? AdminLayout : MRLayout;
 	return /* @__PURE__ */ jsx(Layout, {
 		title: "Product Schemes & Commercial Offers",
 		children: /* @__PURE__ */ jsxs("div", {
@@ -15619,183 +17247,717 @@ function Scheme({ schemes = [] }) {
 //#endregion
 //#region resources/js/Pages/mrconnect/SetTarget.jsx
 var SetTarget_exports = /* @__PURE__ */ __exportAll({ default: () => SetTarget });
-function SetTarget({ targets = [], summary = {} }) {
+function SetTarget({ targets = [], representatives = [], summary = {}, isAdmin = false }) {
 	const { props } = usePage();
-	const isAdmin = props.auth?.user?.role === "admin";
-	return /* @__PURE__ */ jsx(isAdmin ? AdminLayout : MRLayout, {
-		title: isAdmin ? "Target vs Sales Performance" : "My Sales Targets",
-		children: /* @__PURE__ */ jsxs("div", {
-			className: "space-y-6 pb-12 font-sans max-w-[1400px] mx-auto",
-			children: [
-				/* @__PURE__ */ jsx("div", {
-					className: "flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-200/80",
-					children: /* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("h2", {
-						className: "text-xl sm:text-2xl font-semibold tracking-tight text-slate-800",
-						children: isAdmin ? "Target vs Sales Achievement" : "My Sales Targets & Achievement"
-					}), /* @__PURE__ */ jsx("p", {
-						className: "text-xs text-slate-500 font-normal mt-0.5",
-						children: isAdmin ? "Set monthly sales quotas and evaluate field representative quota achievement." : "Your allocated monthly sales targets, verified revenue achievement, and milestone progress."
-					})] })
-				}),
-				/* @__PURE__ */ jsxs("div", {
-					className: "grid grid-cols-1 sm:grid-cols-3 gap-4",
-					children: [
-						/* @__PURE__ */ jsxs("div", {
-							className: "bg-white rounded-2xl border border-slate-200/80 p-5",
-							children: [
-								/* @__PURE__ */ jsx("span", {
-									className: "text-xs font-medium text-slate-500",
-									children: isAdmin ? "Cumulative Target" : "My Sales Quota"
-								}),
-								/* @__PURE__ */ jsxs("p", {
-									className: "text-2xl font-semibold text-slate-800 mt-2",
-									children: ["₹", Number(summary.total_target || 0).toLocaleString()]
-								}),
-								/* @__PURE__ */ jsx("p", {
-									className: "text-[11px] text-slate-400 mt-1",
-									children: "Assigned budget"
-								})
-							]
-						}),
-						/* @__PURE__ */ jsxs("div", {
-							className: "bg-white rounded-2xl border border-slate-200/80 p-5",
-							children: [
-								/* @__PURE__ */ jsx("span", {
-									className: "text-xs font-medium text-slate-500",
-									children: "Sales Achieved"
-								}),
-								/* @__PURE__ */ jsxs("p", {
-									className: "text-2xl font-semibold text-emerald-600 mt-2",
-									children: ["₹", Number(summary.total_achieved || 0).toLocaleString()]
-								}),
-								/* @__PURE__ */ jsx("p", {
-									className: "text-[11px] text-emerald-600 font-medium mt-1",
-									children: "Realized volume"
-								})
-							]
-						}),
-						/* @__PURE__ */ jsxs("div", {
-							className: "bg-white rounded-2xl border border-slate-200/80 p-5",
-							children: [
-								/* @__PURE__ */ jsx("span", {
-									className: "text-xs font-medium text-slate-500",
-									children: "Overall Achievement"
-								}),
-								/* @__PURE__ */ jsxs("p", {
-									className: "text-2xl font-semibold text-violet-600 mt-2",
-									children: [summary.overall_percentage || 0, "%"]
-								}),
-								/* @__PURE__ */ jsx("p", {
-									className: "text-[11px] text-slate-400 mt-1",
-									children: "Portfolio achievement index"
-								})
-							]
-						})
-					]
-				}),
-				/* @__PURE__ */ jsxs("div", {
-					className: "bg-white rounded-2xl border border-slate-200/80 overflow-hidden",
-					children: [/* @__PURE__ */ jsxs("div", {
-						className: "px-5 py-3.5 border-b border-slate-100 flex items-center justify-between",
-						children: [/* @__PURE__ */ jsx("h3", {
-							className: "text-sm font-semibold text-slate-800",
-							children: isAdmin ? "Sales Quotas by Representative" : "My Assigned Monthly Quotas"
-						}), /* @__PURE__ */ jsxs("span", {
-							className: "text-xs text-slate-400",
-							children: [targets.length, " records"]
+	const userRole = props.auth?.user?.role;
+	const isSuperAdminOrAdmin = userRole === "admin" || userRole === "super_admin" || isAdmin;
+	const Layout = isSuperAdminOrAdmin ? AdminLayout : MRLayout;
+	const [searchTerm, setSearchTerm] = useState("");
+	const [selectedYear, setSelectedYear] = useState("all");
+	const [showAssignModal, setShowAssignModal] = useState(false);
+	const [editingTarget, setEditingTarget] = useState(null);
+	const [deletingTarget, setDeletingTarget] = useState(null);
+	const [isSubmitting, setIsSubmitting] = useState(false);
+	const [formErrors, setFormErrors] = useState({});
+	const months = [
+		"January",
+		"February",
+		"March",
+		"April",
+		"May",
+		"June",
+		"July",
+		"August",
+		"September",
+		"October",
+		"November",
+		"December"
+	];
+	const currentMonthName = months[(/* @__PURE__ */ new Date()).getMonth()];
+	const currentYearNum = (/* @__PURE__ */ new Date()).getFullYear();
+	const [assignForm, setAssignForm] = useState({
+		user_id: "",
+		month: currentMonthName,
+		year: currentYearNum,
+		target_amount: "",
+		achieved_amount: "",
+		notes: ""
+	});
+	const openAssignModal = () => {
+		setAssignForm({
+			user_id: representatives[0]?.id || "",
+			month: currentMonthName,
+			year: currentYearNum,
+			target_amount: "",
+			achieved_amount: "0",
+			notes: ""
+		});
+		setFormErrors({});
+		setShowAssignModal(true);
+	};
+	const handleAssignSubmit = (e) => {
+		e.preventDefault();
+		setIsSubmitting(true);
+		setFormErrors({});
+		router.post("/mrconnect/set-target", assignForm, {
+			preserveScroll: true,
+			onSuccess: () => {
+				setIsSubmitting(false);
+				setShowAssignModal(false);
+			},
+			onError: (errs) => {
+				setIsSubmitting(false);
+				setFormErrors(errs || {});
+			}
+		});
+	};
+	const openEditModal = (target) => {
+		setEditingTarget({
+			id: target.id,
+			employee_name: target.employee_name,
+			month: target.month,
+			year: target.year,
+			target_amount: target.target_amount,
+			achieved_amount: target.achieved_amount || "0",
+			notes: target.notes || ""
+		});
+		setFormErrors({});
+	};
+	const handleEditSubmit = (e) => {
+		e.preventDefault();
+		if (!editingTarget) return;
+		setIsSubmitting(true);
+		setFormErrors({});
+		router.put(`/mrconnect/set-target/${editingTarget.id}`, {
+			target_amount: editingTarget.target_amount,
+			achieved_amount: editingTarget.achieved_amount,
+			notes: editingTarget.notes
+		}, {
+			preserveScroll: true,
+			onSuccess: () => {
+				setIsSubmitting(false);
+				setEditingTarget(null);
+			},
+			onError: (errs) => {
+				setIsSubmitting(false);
+				setFormErrors(errs || {});
+			}
+		});
+	};
+	const handleDeleteConfirm = () => {
+		if (!deletingTarget) return;
+		setIsSubmitting(true);
+		router.delete(`/mrconnect/set-target/${deletingTarget.id}`, {
+			preserveScroll: true,
+			onSuccess: () => {
+				setIsSubmitting(false);
+				setDeletingTarget(null);
+			},
+			onError: () => {
+				setIsSubmitting(false);
+			}
+		});
+	};
+	const filteredTargets = useMemo(() => {
+		return targets.filter((tgt) => {
+			const matchSearch = tgt.employee_name && tgt.employee_name.toLowerCase().includes(searchTerm.toLowerCase()) || tgt.month && tgt.month.toLowerCase().includes(searchTerm.toLowerCase()) || tgt.notes && tgt.notes.toLowerCase().includes(searchTerm.toLowerCase());
+			const matchYear = selectedYear === "all" ? true : String(tgt.year) === String(selectedYear);
+			return matchSearch && matchYear;
+		});
+	}, [
+		targets,
+		searchTerm,
+		selectedYear
+	]);
+	const availableYears = useMemo(() => {
+		const yrs = targets.map((t) => t.year).filter(Boolean);
+		return Array.from(/* @__PURE__ */ new Set([currentYearNum, ...yrs])).sort((a, b) => b - a);
+	}, [targets, currentYearNum]);
+	return /* @__PURE__ */ jsxs(Layout, {
+		title: isSuperAdminOrAdmin ? "Target vs Sales Performance" : "My Sales Targets",
+		children: [
+			/* @__PURE__ */ jsxs("div", {
+				className: "space-y-6 max-w-7xl mx-auto pb-12 font-sans",
+				children: [
+					/* @__PURE__ */ jsxs("div", {
+						className: "flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4",
+						children: [/* @__PURE__ */ jsxs("div", {
+							className: "flex items-center gap-2.5",
+							children: [/* @__PURE__ */ jsx("div", {
+								className: "w-10 h-10 rounded-xl bg-violet-50 text-violet-600 border border-violet-100 flex items-center justify-center shrink-0",
+								children: /* @__PURE__ */ jsx(Target, { className: "w-5 h-5 stroke-[2.2]" })
+							}), /* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("h1", {
+								className: "text-xl font-bold text-slate-900 tracking-tight",
+								children: isSuperAdminOrAdmin ? "Sales Targets & Revenue Quotas" : "My Sales Targets & Quotas"
+							}), /* @__PURE__ */ jsx("p", {
+								className: "text-xs text-slate-500",
+								children: isSuperAdminOrAdmin ? "Assign monthly sales quotas to field representatives and monitor revenue achievement." : "Your allocated monthly revenue quotas, verified achievement, and milestone progress."
+							})] })]
+						}), isSuperAdminOrAdmin && /* @__PURE__ */ jsx("div", {
+							className: "flex items-center gap-2.5",
+							children: /* @__PURE__ */ jsxs("button", {
+								type: "button",
+								onClick: openAssignModal,
+								className: "inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold text-white bg-slate-900 hover:bg-slate-800 transition-colors shadow-xs cursor-pointer",
+								children: [/* @__PURE__ */ jsx(Plus, { className: "w-4 h-4 stroke-[2.5]" }), /* @__PURE__ */ jsx("span", { children: "Assign New Target" })]
+							})
 						})]
-					}), /* @__PURE__ */ jsx("div", {
-						className: "overflow-x-auto",
-						children: /* @__PURE__ */ jsxs("table", {
-							className: "w-full text-left text-xs border-collapse",
-							children: [/* @__PURE__ */ jsx("thead", { children: /* @__PURE__ */ jsxs("tr", {
-								className: "border-b border-slate-100 text-[11px] font-semibold text-slate-400 bg-slate-50/50",
+					}),
+					/* @__PURE__ */ jsxs("div", {
+						className: "grid grid-cols-1 sm:grid-cols-3 gap-4",
+						children: [
+							/* @__PURE__ */ jsxs("div", {
+								className: "bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs",
 								children: [
-									isAdmin && /* @__PURE__ */ jsx("th", {
-										className: "py-2.5 px-4",
-										children: "Representative"
+									/* @__PURE__ */ jsxs("div", {
+										className: "flex items-center justify-between",
+										children: [/* @__PURE__ */ jsx("span", {
+											className: "text-xs font-medium text-slate-500",
+											children: isSuperAdminOrAdmin ? "Total Assigned Quota" : "My Assigned Quota"
+										}), /* @__PURE__ */ jsx("div", {
+											className: "w-8 h-8 rounded-lg bg-slate-100 text-slate-700 flex items-center justify-center",
+											children: /* @__PURE__ */ jsx(Target, { className: "w-4 h-4" })
+										})]
 									}),
-									/* @__PURE__ */ jsx("th", {
-										className: "py-2.5 px-4",
-										children: "Period"
+									/* @__PURE__ */ jsxs("p", {
+										className: "text-2xl font-bold text-slate-900 mt-2",
+										children: ["₹", Number(summary.total_target || 0).toLocaleString()]
 									}),
-									/* @__PURE__ */ jsx("th", {
-										className: "py-2.5 px-4 text-right",
-										children: "Target Quota (₹)"
-									}),
-									/* @__PURE__ */ jsx("th", {
-										className: "py-2.5 px-4 text-right",
-										children: "Achieved Sales (₹)"
-									}),
-									/* @__PURE__ */ jsx("th", {
-										className: "py-2.5 px-4 text-center",
-										children: "Progress %"
-									}),
-									/* @__PURE__ */ jsx("th", {
-										className: "py-2.5 px-4",
-										children: "Notes"
+									/* @__PURE__ */ jsx("p", {
+										className: "text-[11px] text-slate-400 mt-1",
+										children: "Cumulative sales budget"
 									})
 								]
-							}) }), /* @__PURE__ */ jsx("tbody", {
-								className: "divide-y divide-slate-100",
-								children: targets.length === 0 ? /* @__PURE__ */ jsx("tr", { children: /* @__PURE__ */ jsx("td", {
-									colSpan: isAdmin ? 6 : 5,
-									className: "py-8 text-center text-slate-400 text-xs",
-									children: "No sales targets assigned yet."
-								}) }) : targets.map((tgt) => {
-									const pct = tgt.target_amount > 0 ? Math.round(tgt.achieved_amount / tgt.target_amount * 100) : 0;
-									return /* @__PURE__ */ jsxs("tr", {
-										className: "hover:bg-slate-50/70 transition-colors",
-										children: [
-											isAdmin && /* @__PURE__ */ jsx("td", {
-												className: "py-3 px-4 font-medium text-slate-800",
-												children: tgt.employee_name
-											}),
-											/* @__PURE__ */ jsxs("td", {
-												className: "py-3 px-4 font-medium text-slate-700",
-												children: [
-													tgt.month,
-													" ",
-													tgt.year
-												]
-											}),
-											/* @__PURE__ */ jsxs("td", {
-												className: "py-3 px-4 text-right font-semibold text-slate-800",
-												children: ["₹", Number(tgt.target_amount).toLocaleString()]
-											}),
-											/* @__PURE__ */ jsxs("td", {
-												className: "py-3 px-4 text-right font-semibold text-emerald-600",
-												children: ["₹", Number(tgt.achieved_amount).toLocaleString()]
-											}),
-											/* @__PURE__ */ jsx("td", {
-												className: "py-3 px-4 text-center font-bold text-slate-900",
-												children: /* @__PURE__ */ jsxs("div", {
-													className: "inline-flex items-center gap-1.5",
-													children: [/* @__PURE__ */ jsxs("span", {
-														className: "text-xs",
-														children: [pct, "%"]
-													}), /* @__PURE__ */ jsx("div", {
-														className: "w-16 bg-slate-100 h-1.5 rounded-full overflow-hidden hidden sm:block",
-														children: /* @__PURE__ */ jsx("div", {
-															className: "bg-slate-900 h-full rounded-full",
-															style: { width: `${Math.min(100, pct)}%` }
-														})
-													})]
-												})
-											}),
-											/* @__PURE__ */ jsx("td", {
-												className: "py-3 px-4 text-slate-500 max-w-xs truncate",
-												children: tgt.notes
-											})
-										]
-									}, tgt.id);
-								})
+							}),
+							/* @__PURE__ */ jsxs("div", {
+								className: "bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs",
+								children: [
+									/* @__PURE__ */ jsxs("div", {
+										className: "flex items-center justify-between",
+										children: [/* @__PURE__ */ jsx("span", {
+											className: "text-xs font-medium text-slate-500",
+											children: "Realized Revenue"
+										}), /* @__PURE__ */ jsx("div", {
+											className: "w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center",
+											children: /* @__PURE__ */ jsx(TrendingUp, { className: "w-4 h-4" })
+										})]
+									}),
+									/* @__PURE__ */ jsxs("p", {
+										className: "text-2xl font-bold text-emerald-600 mt-2",
+										children: ["₹", Number(summary.total_achieved || 0).toLocaleString()]
+									}),
+									/* @__PURE__ */ jsx("p", {
+										className: "text-[11px] text-emerald-600 font-medium mt-1",
+										children: "Verified sales achievement"
+									})
+								]
+							}),
+							/* @__PURE__ */ jsxs("div", {
+								className: "bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs",
+								children: [
+									/* @__PURE__ */ jsxs("div", {
+										className: "flex items-center justify-between",
+										children: [/* @__PURE__ */ jsx("span", {
+											className: "text-xs font-medium text-slate-500",
+											children: "Overall Quota Index"
+										}), /* @__PURE__ */ jsx("div", {
+											className: "w-8 h-8 rounded-lg bg-violet-50 text-violet-600 flex items-center justify-center",
+											children: /* @__PURE__ */ jsx(Award, { className: "w-4 h-4" })
+										})]
+									}),
+									/* @__PURE__ */ jsxs("p", {
+										className: "text-2xl font-bold text-violet-600 mt-2",
+										children: [Math.min(100, summary.overall_percentage || 0), "%"]
+									}),
+									/* @__PURE__ */ jsx("p", {
+										className: "text-[11px] text-violet-600 font-medium mt-1",
+										children: "Portfolio achievement rate"
+									})
+								]
+							})
+						]
+					}),
+					/* @__PURE__ */ jsxs("div", {
+						className: "flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-white p-3.5 rounded-2xl border border-slate-200/80 shadow-xs",
+						children: [/* @__PURE__ */ jsx(SearchBar, {
+							value: searchTerm,
+							onChange: (e) => setSearchTerm(e.target.value),
+							placeholder: isSuperAdminOrAdmin ? "Search by representative name, month, or notes..." : "Search by month or notes...",
+							className: "flex-1 max-w-md"
+						}), /* @__PURE__ */ jsxs("div", {
+							className: "flex items-center gap-2",
+							children: [/* @__PURE__ */ jsx("label", {
+								className: "text-xs font-medium text-slate-500 shrink-0",
+								children: "Year:"
+							}), /* @__PURE__ */ jsxs("select", {
+								value: selectedYear,
+								onChange: (e) => setSelectedYear(e.target.value),
+								className: "px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 cursor-pointer",
+								children: [/* @__PURE__ */ jsx("option", {
+									value: "all",
+									children: "All Years"
+								}), availableYears.map((yr) => /* @__PURE__ */ jsx("option", {
+									value: yr,
+									children: yr
+								}, yr))]
 							})]
-						})
+						})]
+					}),
+					/* @__PURE__ */ jsxs("div", {
+						className: "bg-white rounded-2xl border border-slate-200/80 overflow-hidden shadow-xs",
+						children: [/* @__PURE__ */ jsxs("div", {
+							className: "px-5 py-3.5 border-b border-slate-100 flex items-center justify-between",
+							children: [/* @__PURE__ */ jsx("h3", {
+								className: "text-sm font-semibold text-slate-800",
+								children: isSuperAdminOrAdmin ? "Sales Quotas by Representative" : "My Monthly Quotas & Achievement"
+							}), /* @__PURE__ */ jsxs("span", {
+								className: "text-xs text-slate-400",
+								children: [filteredTargets.length, " records"]
+							})]
+						}), /* @__PURE__ */ jsx("div", {
+							className: "overflow-x-auto",
+							children: /* @__PURE__ */ jsxs("table", {
+								className: "w-full text-left text-xs border-collapse",
+								children: [/* @__PURE__ */ jsx("thead", { children: /* @__PURE__ */ jsxs("tr", {
+									className: "border-b border-slate-100 text-[11px] font-semibold text-slate-400 bg-slate-50/50",
+									children: [
+										isSuperAdminOrAdmin && /* @__PURE__ */ jsx("th", {
+											className: "py-3 px-4",
+											children: "Representative"
+										}),
+										/* @__PURE__ */ jsx("th", {
+											className: "py-3 px-4",
+											children: "Period"
+										}),
+										/* @__PURE__ */ jsx("th", {
+											className: "py-3 px-4 text-right",
+											children: "Target Quota (₹)"
+										}),
+										/* @__PURE__ */ jsx("th", {
+											className: "py-3 px-4 text-right",
+											children: "Achieved Sales (₹)"
+										}),
+										/* @__PURE__ */ jsx("th", {
+											className: "py-3 px-4 text-center",
+											children: "Progress %"
+										}),
+										/* @__PURE__ */ jsx("th", {
+											className: "py-3 px-4",
+											children: "Notes & Strategy"
+										}),
+										isSuperAdminOrAdmin && /* @__PURE__ */ jsx("th", {
+											className: "py-3 px-4 text-right",
+											children: "Actions"
+										})
+									]
+								}) }), /* @__PURE__ */ jsx("tbody", {
+									className: "divide-y divide-slate-100",
+									children: filteredTargets.length > 0 ? filteredTargets.map((tgt) => {
+										const targetNum = parseFloat(tgt.target_amount) || 0;
+										const achievedNum = parseFloat(tgt.achieved_amount) || 0;
+										const rawPct = targetNum > 0 ? Math.round(achievedNum / targetNum * 100) : 0;
+										const pct = Math.min(100, rawPct);
+										const isCompleted = pct >= 100;
+										const isGood = pct >= 70;
+										return /* @__PURE__ */ jsxs("tr", {
+											className: "hover:bg-slate-50/70 transition-colors",
+											children: [
+												isSuperAdminOrAdmin && /* @__PURE__ */ jsx("td", {
+													className: "py-3 px-4",
+													children: /* @__PURE__ */ jsxs("div", {
+														className: "flex items-center gap-2",
+														children: [/* @__PURE__ */ jsx("div", {
+															className: "w-6 h-6 rounded-full bg-violet-100 text-violet-700 flex items-center justify-center font-bold text-[10px]",
+															children: tgt.employee_name ? tgt.employee_name.charAt(0).toUpperCase() : "M"
+														}), /* @__PURE__ */ jsx("span", {
+															className: "font-semibold text-slate-800",
+															children: tgt.employee_name || "Representative"
+														})]
+													})
+												}),
+												/* @__PURE__ */ jsx("td", {
+													className: "py-3 px-4",
+													children: /* @__PURE__ */ jsxs("span", {
+														className: "inline-flex items-center gap-1.5 font-medium text-slate-700 bg-slate-50 px-2 py-0.5 rounded-md border border-slate-200/60",
+														children: [/* @__PURE__ */ jsx(Calendar, { className: "w-3 h-3 text-slate-400" }), /* @__PURE__ */ jsxs("span", { children: [
+															tgt.month,
+															" ",
+															tgt.year
+														] })]
+													})
+												}),
+												/* @__PURE__ */ jsxs("td", {
+													className: "py-3 px-4 text-right font-bold text-slate-900",
+													children: ["₹", Number(tgt.target_amount).toLocaleString()]
+												}),
+												/* @__PURE__ */ jsxs("td", {
+													className: "py-3 px-4 text-right",
+													children: [/* @__PURE__ */ jsxs("span", {
+														className: "font-bold text-emerald-600 block",
+														children: ["₹", Number(tgt.achieved_amount).toLocaleString()]
+													}), tgt.pob_achieved > 0 && /* @__PURE__ */ jsxs("span", {
+														className: "text-[10px] text-slate-400 block font-normal mt-0.5",
+														children: [
+															"(₹",
+															Number(tgt.pob_achieved).toLocaleString(),
+															" verified POB)"
+														]
+													})]
+												}),
+												/* @__PURE__ */ jsx("td", {
+													className: "py-3 px-4 text-center",
+													children: /* @__PURE__ */ jsxs("div", {
+														className: "inline-flex flex-col items-center gap-1 min-w-[90px]",
+														children: [/* @__PURE__ */ jsxs("span", {
+															className: `text-xs font-bold ${isCompleted ? "text-emerald-600" : isGood ? "text-violet-600" : "text-amber-600"}`,
+															children: [pct, "%"]
+														}), /* @__PURE__ */ jsx("div", {
+															className: "w-20 bg-slate-100 h-1.5 rounded-full overflow-hidden",
+															children: /* @__PURE__ */ jsx("div", {
+																className: `h-full rounded-full transition-all duration-300 ${isCompleted ? "bg-emerald-500" : isGood ? "bg-violet-600" : "bg-amber-500"}`,
+																style: { width: `${Math.min(100, pct)}%` }
+															})
+														})]
+													})
+												}),
+												/* @__PURE__ */ jsx("td", {
+													className: "py-3 px-4 text-slate-500 max-w-xs truncate",
+													title: tgt.notes,
+													children: tgt.notes || /* @__PURE__ */ jsx("span", {
+														className: "text-slate-300 italic",
+														children: "No notes"
+													})
+												}),
+												isSuperAdminOrAdmin && /* @__PURE__ */ jsx("td", {
+													className: "py-3 px-4 text-right",
+													children: /* @__PURE__ */ jsxs("div", {
+														className: "inline-flex items-center gap-1 justify-end",
+														children: [/* @__PURE__ */ jsx("button", {
+															type: "button",
+															onClick: () => openEditModal(tgt),
+															title: "Edit Target / Update Achieved Sales",
+															className: "p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer",
+															children: /* @__PURE__ */ jsx(Edit3, { className: "w-3.5 h-3.5" })
+														}), /* @__PURE__ */ jsx("button", {
+															type: "button",
+															onClick: () => setDeletingTarget(tgt),
+															title: "Delete Target",
+															className: "p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer",
+															children: /* @__PURE__ */ jsx(Trash2, { className: "w-3.5 h-3.5" })
+														})]
+													})
+												})
+											]
+										}, tgt.id);
+									}) : /* @__PURE__ */ jsx("tr", { children: /* @__PURE__ */ jsxs("td", {
+										colSpan: isSuperAdminOrAdmin ? 7 : 5,
+										className: "py-12 text-center text-slate-400",
+										children: [/* @__PURE__ */ jsx(Target, { className: "w-8 h-8 mx-auto text-slate-300 mb-2 stroke-[1.5]" }), /* @__PURE__ */ jsx("p", {
+											className: "text-xs font-medium",
+											children: "No sales targets found matching the filter criteria."
+										})]
+									}) })
+								})]
+							})
+						})]
+					})
+				]
+			}),
+			showAssignModal && /* @__PURE__ */ jsx("div", {
+				className: "fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-xs p-4 animate-in fade-in duration-200",
+				children: /* @__PURE__ */ jsxs("div", {
+					className: "bg-white rounded-2xl border border-slate-200 max-w-md w-full p-6 space-y-4 shadow-xl animate-in zoom-in-95 duration-200",
+					children: [/* @__PURE__ */ jsxs("div", {
+						className: "flex items-center justify-between pb-3 border-b border-slate-100",
+						children: [/* @__PURE__ */ jsxs("div", {
+							className: "flex items-center gap-2",
+							children: [/* @__PURE__ */ jsx("div", {
+								className: "w-8 h-8 rounded-lg bg-violet-50 text-violet-600 flex items-center justify-center",
+								children: /* @__PURE__ */ jsx(Target, { className: "w-4 h-4" })
+							}), /* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("h3", {
+								className: "text-sm font-bold text-slate-900",
+								children: "Assign Sales Target"
+							}), /* @__PURE__ */ jsx("p", {
+								className: "text-[11px] text-slate-500",
+								children: "Set monthly sales quota for field representative."
+							})] })]
+						}), /* @__PURE__ */ jsx("button", {
+							type: "button",
+							onClick: () => setShowAssignModal(false),
+							className: "p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer",
+							children: /* @__PURE__ */ jsx(X, { className: "w-5 h-5" })
+						})]
+					}), /* @__PURE__ */ jsxs("form", {
+						onSubmit: handleAssignSubmit,
+						className: "space-y-3.5 text-xs",
+						children: [
+							/* @__PURE__ */ jsxs("div", { children: [
+								/* @__PURE__ */ jsxs("label", {
+									className: "block text-xs font-semibold text-slate-700 mb-1",
+									children: ["Field Representative (MR) ", /* @__PURE__ */ jsx("span", {
+										className: "text-rose-500",
+										children: "*"
+									})]
+								}),
+								/* @__PURE__ */ jsxs("select", {
+									value: assignForm.user_id,
+									onChange: (e) => setAssignForm({
+										...assignForm,
+										user_id: e.target.value
+									}),
+									className: "w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 cursor-pointer",
+									children: [/* @__PURE__ */ jsx("option", {
+										value: "",
+										children: "Select Representative..."
+									}), representatives.map((rep) => /* @__PURE__ */ jsxs("option", {
+										value: rep.id,
+										children: [
+											rep.name,
+											" (",
+											rep.email,
+											")"
+										]
+									}, rep.id))]
+								}),
+								formErrors.user_id && /* @__PURE__ */ jsx("p", {
+									className: "text-[11px] text-rose-500 mt-1",
+									children: formErrors.user_id[0] || formErrors.user_id
+								})
+							] }),
+							/* @__PURE__ */ jsxs("div", {
+								className: "grid grid-cols-2 gap-3",
+								children: [/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsxs("label", {
+									className: "block text-xs font-semibold text-slate-700 mb-1",
+									children: ["Month ", /* @__PURE__ */ jsx("span", {
+										className: "text-rose-500",
+										children: "*"
+									})]
+								}), /* @__PURE__ */ jsx("select", {
+									value: assignForm.month,
+									onChange: (e) => setAssignForm({
+										...assignForm,
+										month: e.target.value
+									}),
+									className: "w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 cursor-pointer",
+									children: months.map((m) => /* @__PURE__ */ jsx("option", {
+										value: m,
+										children: m
+									}, m))
+								})] }), /* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsxs("label", {
+									className: "block text-xs font-semibold text-slate-700 mb-1",
+									children: ["Year ", /* @__PURE__ */ jsx("span", {
+										className: "text-rose-500",
+										children: "*"
+									})]
+								}), /* @__PURE__ */ jsx("input", {
+									type: "number",
+									min: "2020",
+									max: "2035",
+									value: assignForm.year,
+									onChange: (e) => setAssignForm({
+										...assignForm,
+										year: parseInt(e.target.value) || currentYearNum
+									}),
+									className: "w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500"
+								})] })]
+							}),
+							/* @__PURE__ */ jsxs("div", { children: [
+								/* @__PURE__ */ jsxs("label", {
+									className: "block text-xs font-semibold text-slate-700 mb-1",
+									children: ["Monthly Target Quota (₹) ", /* @__PURE__ */ jsx("span", {
+										className: "text-rose-500",
+										children: "*"
+									})]
+								}),
+								/* @__PURE__ */ jsxs("div", {
+									className: "relative",
+									children: [/* @__PURE__ */ jsx("span", {
+										className: "absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold",
+										children: "₹"
+									}), /* @__PURE__ */ jsx("input", {
+										type: "number",
+										min: "1",
+										placeholder: "350000",
+										value: assignForm.target_amount,
+										onChange: (e) => setAssignForm({
+											...assignForm,
+											target_amount: e.target.value
+										}),
+										className: "w-full pl-8 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500"
+									})]
+								}),
+								formErrors.target_amount && /* @__PURE__ */ jsx("p", {
+									className: "text-[11px] text-rose-500 mt-1",
+									children: formErrors.target_amount[0] || formErrors.target_amount
+								})
+							] }),
+							/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsxs("label", {
+								className: "block text-xs font-semibold text-slate-700 mb-1",
+								children: ["Achieved Volume (₹) ", /* @__PURE__ */ jsx("span", {
+									className: "text-[11px] font-normal text-slate-400",
+									children: "(Optional)"
+								})]
+							}), /* @__PURE__ */ jsxs("div", {
+								className: "relative",
+								children: [/* @__PURE__ */ jsx("span", {
+									className: "absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold",
+									children: "₹"
+								}), /* @__PURE__ */ jsx("input", {
+									type: "number",
+									min: "0",
+									placeholder: "0",
+									value: assignForm.achieved_amount,
+									onChange: (e) => setAssignForm({
+										...assignForm,
+										achieved_amount: e.target.value
+									}),
+									className: "w-full pl-8 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500"
+								})]
+							})] }),
+							/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsxs("label", {
+								className: "block text-xs font-semibold text-slate-700 mb-1",
+								children: ["Strategic Focus & Notes ", /* @__PURE__ */ jsx("span", {
+									className: "text-[11px] font-normal text-slate-400",
+									children: "(Optional)"
+								})]
+							}), /* @__PURE__ */ jsx("textarea", {
+								rows: "2",
+								placeholder: "e.g. Focus on CIPLOMAX CD3 & DICLOTRYP-FORT in South Zone...",
+								value: assignForm.notes,
+								onChange: (e) => setAssignForm({
+									...assignForm,
+									notes: e.target.value
+								}),
+								className: "w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500"
+							})] }),
+							/* @__PURE__ */ jsxs("div", {
+								className: "flex items-center justify-end gap-2 pt-3 border-t border-slate-100",
+								children: [/* @__PURE__ */ jsx("button", {
+									type: "button",
+									onClick: () => setShowAssignModal(false),
+									className: "px-4 py-2 rounded-xl text-xs font-medium text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer",
+									children: "Cancel"
+								}), /* @__PURE__ */ jsx("button", {
+									type: "submit",
+									disabled: isSubmitting,
+									className: "px-5 py-2 rounded-xl text-xs font-semibold text-white bg-slate-900 hover:bg-slate-800 disabled:opacity-50 transition-colors cursor-pointer",
+									children: isSubmitting ? "Assigning..." : "Assign Target"
+								})]
+							})
+						]
 					})]
 				})
-			]
-		})
+			}),
+			editingTarget && /* @__PURE__ */ jsx("div", {
+				className: "fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-xs p-4 animate-in fade-in duration-200",
+				children: /* @__PURE__ */ jsxs("div", {
+					className: "bg-white rounded-2xl border border-slate-200 max-w-md w-full p-6 space-y-4 shadow-xl animate-in zoom-in-95 duration-200",
+					children: [/* @__PURE__ */ jsxs("div", {
+						className: "flex items-center justify-between pb-3 border-b border-slate-100",
+						children: [/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsxs("h3", {
+							className: "text-sm font-bold text-slate-900",
+							children: ["Edit Target: ", editingTarget.employee_name]
+						}), /* @__PURE__ */ jsxs("p", {
+							className: "text-[11px] text-slate-500",
+							children: [
+								"Period: ",
+								editingTarget.month,
+								" ",
+								editingTarget.year
+							]
+						})] }), /* @__PURE__ */ jsx("button", {
+							type: "button",
+							onClick: () => setEditingTarget(null),
+							className: "p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer",
+							children: /* @__PURE__ */ jsx(X, { className: "w-5 h-5" })
+						})]
+					}), /* @__PURE__ */ jsxs("form", {
+						onSubmit: handleEditSubmit,
+						className: "space-y-3.5 text-xs",
+						children: [
+							/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsxs("label", {
+								className: "block text-xs font-semibold text-slate-700 mb-1",
+								children: ["Target Quota (₹) ", /* @__PURE__ */ jsx("span", {
+									className: "text-rose-500",
+									children: "*"
+								})]
+							}), /* @__PURE__ */ jsxs("div", {
+								className: "relative",
+								children: [/* @__PURE__ */ jsx("span", {
+									className: "absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold",
+									children: "₹"
+								}), /* @__PURE__ */ jsx("input", {
+									type: "number",
+									min: "1",
+									value: editingTarget.target_amount,
+									onChange: (e) => setEditingTarget({
+										...editingTarget,
+										target_amount: e.target.value
+									}),
+									className: "w-full pl-8 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500"
+								})]
+							})] }),
+							/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("label", {
+								className: "block text-xs font-semibold text-slate-700 mb-1",
+								children: "Achieved Sales (₹)"
+							}), /* @__PURE__ */ jsxs("div", {
+								className: "relative",
+								children: [/* @__PURE__ */ jsx("span", {
+									className: "absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold",
+									children: "₹"
+								}), /* @__PURE__ */ jsx("input", {
+									type: "number",
+									min: "0",
+									value: editingTarget.achieved_amount,
+									onChange: (e) => setEditingTarget({
+										...editingTarget,
+										achieved_amount: e.target.value
+									}),
+									className: "w-full pl-8 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500"
+								})]
+							})] }),
+							/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("label", {
+								className: "block text-xs font-semibold text-slate-700 mb-1",
+								children: "Notes & Focus"
+							}), /* @__PURE__ */ jsx("textarea", {
+								rows: "2",
+								value: editingTarget.notes,
+								onChange: (e) => setEditingTarget({
+									...editingTarget,
+									notes: e.target.value
+								}),
+								className: "w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500"
+							})] }),
+							/* @__PURE__ */ jsxs("div", {
+								className: "flex items-center justify-end gap-2 pt-3 border-t border-slate-100",
+								children: [/* @__PURE__ */ jsx("button", {
+									type: "button",
+									onClick: () => setEditingTarget(null),
+									className: "px-4 py-2 rounded-xl text-xs font-medium text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer",
+									children: "Cancel"
+								}), /* @__PURE__ */ jsx("button", {
+									type: "submit",
+									disabled: isSubmitting,
+									className: "px-5 py-2 rounded-xl text-xs font-semibold text-white bg-slate-900 hover:bg-slate-800 disabled:opacity-50 transition-colors cursor-pointer",
+									children: isSubmitting ? "Saving..." : "Update Target"
+								})]
+							})
+						]
+					})]
+				})
+			}),
+			/* @__PURE__ */ jsx(ConfirmModal, {
+				isOpen: !!deletingTarget,
+				onClose: () => setDeletingTarget(null),
+				onConfirm: handleDeleteConfirm,
+				isDanger: true,
+				isLoading: isSubmitting,
+				title: "Delete Sales Target",
+				message: `Are you sure you want to delete the sales target for ${deletingTarget?.employee_name} (${deletingTarget?.month} ${deletingTarget?.year})? This action cannot be undone.`,
+				confirmText: "Delete Target",
+				cancelText: "Cancel"
+			})
+		]
 	});
 }
 //#endregion
@@ -15803,7 +17965,7 @@ function SetTarget({ targets = [], summary = {} }) {
 var Slider_exports = /* @__PURE__ */ __exportAll({ default: () => Slider });
 function Slider({ slides = [] }) {
 	const { props } = usePage();
-	const Layout = props.auth?.user?.role === "admin" ? AdminLayout : MRLayout;
+	const Layout = props.auth?.user?.role === "admin" || props.auth?.user?.role === "super_admin" ? AdminLayout : MRLayout;
 	return /* @__PURE__ */ jsx(Layout, {
 		title: "Promotional Sliders & Visual Aids",
 		children: /* @__PURE__ */ jsxs("div", {
@@ -15861,7 +18023,7 @@ function Slider({ slides = [] }) {
 var Sponsor_exports = /* @__PURE__ */ __exportAll({ default: () => Sponsor });
 function Sponsor({ sponsorships = [] }) {
 	const { props } = usePage();
-	const isAdmin = props.auth?.user?.role === "admin";
+	const isAdmin = props.auth?.user?.role === "admin" || props.auth?.user?.role === "super_admin";
 	return /* @__PURE__ */ jsx(isAdmin ? AdminLayout : MRLayout, {
 		title: isAdmin ? "Doctor & CME Sponsorships" : "My Doctor Sponsorships",
 		children: /* @__PURE__ */ jsxs("div", {
@@ -15964,368 +18126,11 @@ function Sponsor({ sponsorships = [] }) {
 	});
 }
 //#endregion
-//#region resources/js/Pages/mrconnect/TourPlan.jsx
-var TourPlan_exports = /* @__PURE__ */ __exportAll({ default: () => TourPlan });
-function TourPlan({ tourPlans = [] }) {
-	const { props } = usePage();
-	const isAdmin = props.auth?.user?.role === "admin";
-	const Layout = isAdmin ? AdminLayout : MRLayout;
-	const now = /* @__PURE__ */ new Date();
-	const currentMonthName = now.toLocaleString("en-US", {
-		month: "long",
-		year: "numeric"
-	});
-	const currentYear = now.getFullYear();
-	const [showModal, setShowModal] = useState(false);
-	const [formData, setFormData] = useState({
-		month: currentMonthName,
-		year: currentYear,
-		type: "Monthly Tour Plan (MTP)",
-		days_count: 24,
-		planned_visits: 120,
-		notes: ""
-	});
-	const handleSubmit = (e) => {
-		e.preventDefault();
-		router.post("/mrconnect/tour-plan", formData, {
-			onSuccess: () => {
-				toast.success("Tour plan submitted successfully!");
-				setShowModal(false);
-			},
-			onError: () => toast.error("Failed to submit tour plan.")
-		});
-	};
-	const handleApprove = (id) => {
-		router.post(`/mrconnect/tour-plan/${id}/approve`, {}, {
-			onSuccess: () => toast.success("Tour plan approved!"),
-			onError: () => toast.error("Action failed.")
-		});
-	};
-	const handleReject = (id) => {
-		router.post(`/mrconnect/tour-plan/${id}/reject`, {}, {
-			onSuccess: () => toast.success("Tour plan rejected."),
-			onError: () => toast.error("Action failed.")
-		});
-	};
-	return /* @__PURE__ */ jsxs(Layout, {
-		title: isAdmin ? "Monthly Tour Plan (MTP)" : "My Monthly Tour Plan",
-		children: [/* @__PURE__ */ jsxs("div", {
-			className: "space-y-6 pb-12 font-sans max-w-[1400px] mx-auto",
-			children: [
-				/* @__PURE__ */ jsxs("div", {
-					className: "flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-200/80",
-					children: [/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("h2", {
-						className: "text-xl sm:text-2xl font-semibold tracking-tight text-slate-800",
-						children: isAdmin ? "Monthly Tour Plan (MTP) Schedules" : "My Monthly Tour Plan (MTP)"
-					}), /* @__PURE__ */ jsx("p", {
-						className: "text-xs text-slate-500 font-normal mt-0.5",
-						children: isAdmin ? "Review and manage field representative doctor route plans and monthly tour approvals." : "Submit and monitor your doctor route coverage schedules and administrative approval status."
-					})] }), /* @__PURE__ */ jsx("div", {
-						className: "flex items-center gap-2",
-						children: !isAdmin ? /* @__PURE__ */ jsxs("button", {
-							type: "button",
-							onClick: () => setShowModal(true),
-							className: "inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-medium text-xs transition-colors cursor-pointer shadow-xs",
-							children: [/* @__PURE__ */ jsx(Plus, { className: "w-3.5 h-3.5" }), /* @__PURE__ */ jsx("span", { children: "Submit Tour Plan" })]
-						}) : /* @__PURE__ */ jsxs(Link, {
-							href: "/admin/tracking",
-							className: "inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-medium text-xs transition-colors cursor-pointer shadow-xs",
-							children: [/* @__PURE__ */ jsx(MapPin, { className: "w-3.5 h-3.5" }), /* @__PURE__ */ jsx("span", { children: "Live Tour Tracking Map" })]
-						})
-					})]
-				}),
-				/* @__PURE__ */ jsxs("div", {
-					className: "grid grid-cols-1 sm:grid-cols-4 gap-4",
-					children: [
-						/* @__PURE__ */ jsxs("div", {
-							className: "bg-white rounded-2xl border border-slate-200/80 p-5",
-							children: [
-								/* @__PURE__ */ jsx("span", {
-									className: "text-xs font-medium text-slate-500",
-									children: isAdmin ? "Total Plans Submitted" : "My Tour Plans"
-								}),
-								/* @__PURE__ */ jsx("p", {
-									className: "text-2xl font-semibold text-slate-800 mt-2",
-									children: tourPlans.length
-								}),
-								/* @__PURE__ */ jsx("p", {
-									className: "text-[11px] text-slate-400 mt-1",
-									children: "Recorded cycles"
-								})
-							]
-						}),
-						/* @__PURE__ */ jsxs("div", {
-							className: "bg-white rounded-2xl border border-slate-200/80 p-5",
-							children: [
-								/* @__PURE__ */ jsx("span", {
-									className: "text-xs font-medium text-slate-500",
-									children: "Approved Plans"
-								}),
-								/* @__PURE__ */ jsx("p", {
-									className: "text-2xl font-semibold text-emerald-600 mt-2",
-									children: tourPlans.filter((p) => p.status === "approved").length
-								}),
-								/* @__PURE__ */ jsx("p", {
-									className: "text-[11px] text-emerald-600 font-medium mt-1",
-									children: "Active field routes"
-								})
-							]
-						}),
-						/* @__PURE__ */ jsxs("div", {
-							className: "bg-white rounded-2xl border border-slate-200/80 p-5",
-							children: [
-								/* @__PURE__ */ jsx("span", {
-									className: "text-xs font-medium text-slate-500",
-									children: "Pending Review"
-								}),
-								/* @__PURE__ */ jsx("p", {
-									className: "text-2xl font-semibold text-amber-600 mt-2",
-									children: tourPlans.filter((p) => p.status === "pending").length
-								}),
-								/* @__PURE__ */ jsx("p", {
-									className: "text-[11px] text-amber-600 font-medium mt-1",
-									children: "Awaiting management"
-								})
-							]
-						}),
-						/* @__PURE__ */ jsxs("div", {
-							className: "bg-white rounded-2xl border border-slate-200/80 p-5",
-							children: [
-								/* @__PURE__ */ jsx("span", {
-									className: "text-xs font-medium text-slate-500",
-									children: "Planned Call Density"
-								}),
-								/* @__PURE__ */ jsxs("p", {
-									className: "text-2xl font-semibold text-violet-600 mt-2",
-									children: [tourPlans.reduce((sum, p) => sum + (p.planned_visits || 0), 0), " Calls"]
-								}),
-								/* @__PURE__ */ jsx("p", {
-									className: "text-[11px] text-slate-400 mt-1",
-									children: "Doctor touchpoints"
-								})
-							]
-						})
-					]
-				}),
-				/* @__PURE__ */ jsxs("div", {
-					className: "bg-white rounded-2xl border border-slate-200/80 overflow-hidden",
-					children: [/* @__PURE__ */ jsxs("div", {
-						className: "px-5 py-3.5 border-b border-slate-100 flex items-center justify-between",
-						children: [/* @__PURE__ */ jsx("h3", {
-							className: "text-sm font-semibold text-slate-800",
-							children: isAdmin ? "Field Tour Plans" : "My Tour Schedules"
-						}), /* @__PURE__ */ jsxs("span", {
-							className: "text-xs text-slate-400",
-							children: [tourPlans.length, " records"]
-						})]
-					}), /* @__PURE__ */ jsx("div", {
-						className: "overflow-x-auto",
-						children: /* @__PURE__ */ jsxs("table", {
-							className: "w-full text-left text-xs border-collapse",
-							children: [/* @__PURE__ */ jsx("thead", { children: /* @__PURE__ */ jsxs("tr", {
-								className: "border-b border-slate-100 text-[11px] font-semibold text-slate-400 bg-slate-50/50",
-								children: [
-									isAdmin && /* @__PURE__ */ jsx("th", {
-										className: "py-2.5 px-4",
-										children: "Representative"
-									}),
-									/* @__PURE__ */ jsx("th", {
-										className: "py-2.5 px-4",
-										children: "Month / Period"
-									}),
-									/* @__PURE__ */ jsx("th", {
-										className: "py-2.5 px-4 text-center",
-										children: "Working Days"
-									}),
-									/* @__PURE__ */ jsx("th", {
-										className: "py-2.5 px-4 text-center",
-										children: "Planned Visits"
-									}),
-									/* @__PURE__ */ jsx("th", {
-										className: "py-2.5 px-4",
-										children: "Notes"
-									}),
-									/* @__PURE__ */ jsx("th", {
-										className: "py-2.5 px-4 text-center",
-										children: "Status"
-									}),
-									isAdmin && /* @__PURE__ */ jsx("th", {
-										className: "py-2.5 px-4 text-center",
-										children: "Actions"
-									})
-								]
-							}) }), /* @__PURE__ */ jsx("tbody", {
-								className: "divide-y divide-slate-100",
-								children: tourPlans.length === 0 ? /* @__PURE__ */ jsx("tr", { children: /* @__PURE__ */ jsx("td", {
-									colSpan: isAdmin ? 7 : 5,
-									className: "py-8 text-center text-slate-400 text-xs",
-									children: "No tour plans found. Click \"Submit Tour Plan\" above to create one."
-								}) }) : tourPlans.map((plan) => /* @__PURE__ */ jsxs("tr", {
-									className: "hover:bg-slate-50/70 transition-colors",
-									children: [
-										isAdmin && /* @__PURE__ */ jsx("td", {
-											className: "py-3 px-4 font-medium text-slate-800",
-											children: plan.user_name
-										}),
-										/* @__PURE__ */ jsxs("td", {
-											className: "py-3 px-4 font-medium text-slate-700",
-											children: [
-												plan.month,
-												" ",
-												plan.year
-											]
-										}),
-										/* @__PURE__ */ jsxs("td", {
-											className: "py-3 px-4 text-center font-medium text-slate-800",
-											children: [plan.days_count, " days"]
-										}),
-										/* @__PURE__ */ jsxs("td", {
-											className: "py-3 px-4 text-center font-medium text-violet-700",
-											children: [plan.planned_visits, " visits"]
-										}),
-										/* @__PURE__ */ jsx("td", {
-											className: "py-3 px-4 text-slate-500 max-w-xs truncate",
-											children: plan.notes || "Routine monthly territory coverage."
-										}),
-										/* @__PURE__ */ jsx("td", {
-											className: "py-3 px-4 text-center",
-											children: /* @__PURE__ */ jsx("span", {
-												className: `inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[11px] font-medium ${plan.status === "approved" ? "bg-emerald-50 text-emerald-700 border border-emerald-200/60" : plan.status === "rejected" ? "bg-rose-50 text-rose-700 border border-rose-200/60" : "bg-amber-50 text-amber-700 border border-amber-200/60"}`,
-												children: plan.status.charAt(0).toUpperCase() + plan.status.slice(1)
-											})
-										}),
-										isAdmin && /* @__PURE__ */ jsx("td", {
-											className: "py-3 px-4 text-center",
-											children: plan.status === "pending" ? /* @__PURE__ */ jsxs("div", {
-												className: "flex items-center justify-center gap-1.5",
-												children: [/* @__PURE__ */ jsx("button", {
-													type: "button",
-													onClick: () => handleApprove(plan.id),
-													className: "p-1 rounded-lg bg-emerald-50 text-emerald-700 hover:bg-emerald-100 transition-colors",
-													title: "Approve Plan",
-													children: /* @__PURE__ */ jsx(Check, { className: "w-3.5 h-3.5" })
-												}), /* @__PURE__ */ jsx("button", {
-													type: "button",
-													onClick: () => handleReject(plan.id),
-													className: "p-1 rounded-lg bg-rose-50 text-rose-700 hover:bg-rose-100 transition-colors",
-													title: "Reject Plan",
-													children: /* @__PURE__ */ jsx(X, { className: "w-3.5 h-3.5" })
-												})]
-											}) : /* @__PURE__ */ jsx("span", {
-												className: "text-[11px] text-slate-400",
-												children: "Reviewed"
-											})
-										})
-									]
-								}, plan.id))
-							})]
-						})
-					})]
-				})
-			]
-		}), showModal && /* @__PURE__ */ jsx("div", {
-			className: "fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-xs p-4",
-			children: /* @__PURE__ */ jsxs("div", {
-				className: "bg-white rounded-2xl max-w-md w-full border border-slate-200 p-6 space-y-4",
-				children: [/* @__PURE__ */ jsxs("div", {
-					className: "flex items-center justify-between border-b border-slate-100 pb-3",
-					children: [/* @__PURE__ */ jsx("h3", {
-						className: "text-base font-semibold text-slate-800",
-						children: "Submit Monthly Tour Plan"
-					}), /* @__PURE__ */ jsx("button", {
-						type: "button",
-						onClick: () => setShowModal(false),
-						className: "p-1 text-slate-400 hover:text-slate-600 rounded-lg",
-						children: /* @__PURE__ */ jsx(X, { className: "w-4 h-4" })
-					})]
-				}), /* @__PURE__ */ jsxs("form", {
-					onSubmit: handleSubmit,
-					className: "space-y-3",
-					children: [
-						/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("label", {
-							className: "block text-xs font-medium text-slate-700 mb-1",
-							children: "Month / Period"
-						}), /* @__PURE__ */ jsx("input", {
-							type: "text",
-							required: true,
-							value: formData.month,
-							onChange: (e) => setFormData({
-								...formData,
-								month: e.target.value
-							}),
-							placeholder: "e.g. August 2026",
-							className: "w-full px-3 py-2 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-violet-500/20"
-						})] }),
-						/* @__PURE__ */ jsxs("div", {
-							className: "grid grid-cols-2 gap-3",
-							children: [/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("label", {
-								className: "block text-xs font-medium text-slate-700 mb-1",
-								children: "Working Days"
-							}), /* @__PURE__ */ jsx("input", {
-								type: "number",
-								min: "1",
-								max: "31",
-								required: true,
-								value: formData.days_count,
-								onChange: (e) => setFormData({
-									...formData,
-									days_count: parseInt(e.target.value) || ""
-								}),
-								className: "w-full px-3 py-2 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-violet-500/20"
-							})] }), /* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("label", {
-								className: "block text-xs font-medium text-slate-700 mb-1",
-								children: "Planned Doctor Visits"
-							}), /* @__PURE__ */ jsx("input", {
-								type: "number",
-								min: "1",
-								max: "300",
-								required: true,
-								value: formData.planned_visits,
-								onChange: (e) => setFormData({
-									...formData,
-									planned_visits: parseInt(e.target.value) || ""
-								}),
-								className: "w-full px-3 py-2 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-violet-500/20"
-							})] })]
-						}),
-						/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("label", {
-							className: "block text-xs font-medium text-slate-700 mb-1",
-							children: "Route & Field Notes"
-						}), /* @__PURE__ */ jsx("textarea", {
-							rows: "3",
-							value: formData.notes,
-							onChange: (e) => setFormData({
-								...formData,
-								notes: e.target.value
-							}),
-							placeholder: "Specify key clinic stops, ex-station days, and joint fieldwork plans...",
-							className: "w-full px-3 py-2 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-violet-500/20"
-						})] }),
-						/* @__PURE__ */ jsxs("div", {
-							className: "flex items-center justify-end gap-2 pt-2",
-							children: [/* @__PURE__ */ jsx("button", {
-								type: "button",
-								onClick: () => setShowModal(false),
-								className: "px-3.5 py-1.5 rounded-xl border border-slate-200 text-xs text-slate-600 hover:bg-slate-50 cursor-pointer",
-								children: "Cancel"
-							}), /* @__PURE__ */ jsx("button", {
-								type: "submit",
-								className: "px-4 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-medium text-xs cursor-pointer shadow-xs",
-								children: "Submit Plan"
-							})]
-						})
-					]
-				})]
-			})
-		})]
-	});
-}
-//#endregion
 //#region resources/js/Pages/mrconnect/VideoLibrary.jsx
 var VideoLibrary_exports = /* @__PURE__ */ __exportAll({ default: () => VideoLibrary });
 function VideoLibrary({ videos = [] }) {
 	const { props } = usePage();
-	const Layout = props.auth?.user?.role === "admin" ? AdminLayout : MRLayout;
+	const Layout = props.auth?.user?.role === "admin" || props.auth?.user?.role === "super_admin" ? AdminLayout : MRLayout;
 	return /* @__PURE__ */ jsx(Layout, {
 		title: "Clinical Video Library",
 		children: /* @__PURE__ */ jsxs("div", {
@@ -16786,8 +18591,8 @@ function Footer({ companyData, categories = [], onOpenEnquiryModal }) {
 	const fssaiLicNo = companyData?.fssai_lic_no || "10426340000172";
 	const trademarkStatus = companyData?.trademark_status || "TM-Trademark Under Registration";
 	const isoCertification = companyData?.iso_certification || "An ISO 9001: 2015 Certified Company";
-	const manufacturerName = companyData?.manufacturer_name || "Pure & Cure Healthcare Pvt. Ltd. / Walpar Wellness";
-	const manufacturerCert = companyData?.manufacturer_certification || "WHO-GMP & cGMP Compliant Facility";
+	companyData?.manufacturer_name;
+	companyData?.manufacturer_certification;
 	const logoUrl = companyData?.logo_url || "/images/ciplon_logo.png";
 	return /* @__PURE__ */ jsxs("footer", {
 		className: "bg-[#071527] text-slate-300 selection:bg-[#c59324] selection:text-white border-t border-[#c59324]/30 relative overflow-hidden font-sans",
@@ -16936,19 +18741,41 @@ function Footer({ companyData, categories = [], onOpenEnquiryModal }) {
 									]
 								}),
 								/* @__PURE__ */ jsxs("div", {
-									className: "pt-2 border-t border-white/10 space-y-1",
+									className: "pt-2 border-t border-white/10 space-y-2",
 									children: [
 										/* @__PURE__ */ jsx("span", {
 											className: "text-[11px] font-semibold text-slate-400 block uppercase tracking-wider",
 											children: "Manufacturing Partners:"
 										}),
-										/* @__PURE__ */ jsx("p", {
-											className: "text-xs text-slate-300 font-medium",
-											children: manufacturerName
+										/* @__PURE__ */ jsxs("div", {
+											className: "p-2 rounded-lg bg-white/5 border border-white/10 space-y-0.5",
+											children: [/* @__PURE__ */ jsxs("div", {
+												className: "flex items-center gap-1.5",
+												children: [/* @__PURE__ */ jsx("div", { className: "w-1.5 h-1.5 rounded-full bg-[#dfad36]" }), /* @__PURE__ */ jsx("span", {
+													className: "text-xs font-semibold text-white",
+													children: "Walpar Wellness Pvt. Ltd."
+												})]
+											}), /* @__PURE__ */ jsx("p", {
+												className: "text-[10px] text-amber-300/80 pl-3",
+												children: "WHO-GMP & ISO 9001:2015 (Khatraj, Gujarat)"
+											})]
 										}),
-										/* @__PURE__ */ jsx("p", {
-											className: "text-[11px] text-amber-300/80",
-											children: manufacturerCert
+										/* @__PURE__ */ jsxs("div", {
+											className: "p-2 rounded-lg bg-white/5 border border-white/10 space-y-0.5",
+											children: [/* @__PURE__ */ jsxs("div", {
+												className: "flex items-center gap-1.5",
+												children: [/* @__PURE__ */ jsx("img", {
+													src: "/images/akums_logo.png",
+													alt: "Akums",
+													className: "h-3 w-auto object-contain brightness-200"
+												}), /* @__PURE__ */ jsx("span", {
+													className: "text-xs font-semibold text-white",
+													children: "Akums Drugs & Pharmaceuticals Ltd."
+												})]
+											}), /* @__PURE__ */ jsx("p", {
+												className: "text-[10px] text-amber-300/80 pl-3",
+												children: "Pure & Cure Healthcare (Haridwar & Baddi Units)"
+											})]
 										})
 									]
 								})
@@ -17040,49 +18867,48 @@ function Footer({ companyData, categories = [], onOpenEnquiryModal }) {
 //#endregion
 //#region resources/js/components/home/EnquiryModal.jsx
 function EnquiryModal({ isOpen, onClose, initialProduct = null }) {
-	const [formData, setFormData] = useState({
-		fullName: "",
+	const brandName = initialProduct?.brand_name || initialProduct?.brandName || "";
+	const genericName = initialProduct?.generic_name || initialProduct?.genericName || "";
+	const initialProductName = brandName && genericName ? `${brandName} (${genericName})` : brandName || genericName || "";
+	const { data, setData, post, processing, errors, reset, clearErrors } = useForm({
+		name: "",
 		email: "",
 		organization: "",
 		country: "",
-		enquiryType: initialProduct ? "Product Formulation Enquiry" : "Commercial Partnership",
-		productName: initialProduct ? `${initialProduct.brandName} (${initialProduct.genericName})` : "",
+		inquiry_type: initialProduct ? "Product Formulation Enquiry" : "Commercial Partnership",
+		product_name: initialProductName,
 		message: ""
 	});
-	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [isSuccess, setIsSuccess] = useState(false);
+	useEffect(() => {
+		if (initialProduct) {
+			const b = initialProduct?.brand_name || initialProduct?.brandName || "";
+			const g = initialProduct?.generic_name || initialProduct?.genericName || "";
+			const pName = b && g ? `${b} (${g})` : b || g || "";
+			setData((prev) => ({
+				...prev,
+				inquiry_type: "Product Formulation Enquiry",
+				product_name: pName
+			}));
+		}
+	}, [initialProduct]);
 	if (!isOpen) return null;
-	const handleChange = (e) => {
-		setFormData((prev) => ({
-			...prev,
-			[e.target.name]: e.target.value
-		}));
-	};
 	const handleSubmit = (e) => {
 		e.preventDefault();
-		setIsSubmitting(true);
-		router.post("/enquiry", {
-			name: formData.fullName,
-			email: formData.email,
-			organization: formData.organization,
-			country: formData.country,
-			message: formData.message,
-			product_name: formData.productName || formData.enquiryType
-		}, {
+		post("/enquiry", {
 			preserveScroll: true,
 			onSuccess: () => {
 				setIsSuccess(true);
+				reset();
+				clearErrors();
 				toast.success("Enquiry submitted successfully!");
-				setIsSubmitting(false);
-			},
-			onError: () => {
-				toast.error("Unable to submit enquiry. Please check your input.");
-				setIsSubmitting(false);
 			}
 		});
 	};
 	const handleResetAndClose = () => {
 		setIsSuccess(false);
+		reset();
+		clearErrors();
 		onClose();
 	};
 	return /* @__PURE__ */ jsx("div", {
@@ -17106,7 +18932,7 @@ function EnquiryModal({ isOpen, onClose, initialProduct = null }) {
 					}),
 					/* @__PURE__ */ jsx("h3", {
 						className: "text-xl sm:text-2xl font-bold text-white mt-1",
-						children: initialProduct ? `Inquire: ${initialProduct.brandName}` : "Pharmaceutical Business Enquiry"
+						children: brandName ? `Inquire: ${brandName}` : "Pharmaceutical Business Enquiry"
 					}),
 					/* @__PURE__ */ jsx("p", {
 						className: "text-xs text-slate-300 mt-1",
@@ -17142,66 +18968,103 @@ function EnquiryModal({ isOpen, onClose, initialProduct = null }) {
 				}) : /* @__PURE__ */ jsxs("form", {
 					onSubmit: handleSubmit,
 					className: "space-y-4 text-sm",
+					noValidate: true,
 					children: [
 						/* @__PURE__ */ jsxs("div", {
 							className: "grid grid-cols-1 sm:grid-cols-2 gap-4",
-							children: [/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("label", {
-								className: "block text-xs font-semibold text-slate-700 mb-1",
-								children: "Full Name *"
-							}), /* @__PURE__ */ jsx("input", {
-								type: "text",
-								required: true,
-								name: "fullName",
-								value: formData.fullName,
-								onChange: handleChange,
-								placeholder: "e.g. Dr. Robert Chen",
-								className: "w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-600 text-slate-900 text-xs sm:text-sm"
-							})] }), /* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("label", {
-								className: "block text-xs font-semibold text-slate-700 mb-1",
-								children: "Corporate / Official Email *"
-							}), /* @__PURE__ */ jsx("input", {
-								type: "email",
-								required: true,
-								name: "email",
-								value: formData.email,
-								onChange: handleChange,
-								placeholder: "name@company.com",
-								className: "w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-600 text-slate-900 text-xs sm:text-sm"
-							})] })]
+							children: [/* @__PURE__ */ jsxs("div", { children: [
+								/* @__PURE__ */ jsx("label", {
+									className: "block text-xs font-semibold text-slate-700 mb-1",
+									children: "Full Name *"
+								}),
+								/* @__PURE__ */ jsx("input", {
+									type: "text",
+									name: "name",
+									value: data.name,
+									onChange: (e) => {
+										setData("name", e.target.value);
+										if (errors.name) clearErrors("name");
+									},
+									placeholder: "e.g. Dr. Robert Chen",
+									className: `w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm border transition-colors outline-none ${errors.name ? "border-rose-400 bg-rose-50/40 text-rose-900 focus:ring-2 focus:ring-rose-500" : "border-slate-300 focus:ring-2 focus:ring-teal-600 text-slate-900"}`
+								}),
+								errors.name && /* @__PURE__ */ jsxs("p", {
+									className: "text-[11px] text-rose-600 flex items-center gap-1 font-medium mt-1",
+									children: [/* @__PURE__ */ jsx(AlertCircle, { className: "w-3.5 h-3.5 shrink-0" }), errors.name]
+								})
+							] }), /* @__PURE__ */ jsxs("div", { children: [
+								/* @__PURE__ */ jsx("label", {
+									className: "block text-xs font-semibold text-slate-700 mb-1",
+									children: "Corporate / Official Email *"
+								}),
+								/* @__PURE__ */ jsx("input", {
+									type: "email",
+									name: "email",
+									value: data.email,
+									onChange: (e) => {
+										setData("email", e.target.value);
+										if (errors.email) clearErrors("email");
+									},
+									placeholder: "name@company.com",
+									className: `w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm border transition-colors outline-none ${errors.email ? "border-rose-400 bg-rose-50/40 text-rose-900 focus:ring-2 focus:ring-rose-500" : "border-slate-300 focus:ring-2 focus:ring-teal-600 text-slate-900"}`
+								}),
+								errors.email && /* @__PURE__ */ jsxs("p", {
+									className: "text-[11px] text-rose-600 flex items-center gap-1 font-medium mt-1",
+									children: [/* @__PURE__ */ jsx(AlertCircle, { className: "w-3.5 h-3.5 shrink-0" }), errors.email]
+								})
+							] })]
 						}),
 						/* @__PURE__ */ jsxs("div", {
 							className: "grid grid-cols-1 sm:grid-cols-2 gap-4",
-							children: [/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("label", {
-								className: "block text-xs font-semibold text-slate-700 mb-1",
-								children: "Organization / Institution *"
-							}), /* @__PURE__ */ jsx("input", {
-								type: "text",
-								required: true,
-								name: "organization",
-								value: formData.organization,
-								onChange: handleChange,
-								placeholder: "Hospital, Distributor or Agency",
-								className: "w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-600 text-slate-900 text-xs sm:text-sm"
-							})] }), /* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("label", {
-								className: "block text-xs font-semibold text-slate-700 mb-1",
-								children: "Country / Market *"
-							}), /* @__PURE__ */ jsx("input", {
-								type: "text",
-								required: true,
-								name: "country",
-								value: formData.country,
-								onChange: handleChange,
-								placeholder: "e.g. Germany, UAE, Canada",
-								className: "w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-600 text-slate-900 text-xs sm:text-sm"
-							})] })]
+							children: [/* @__PURE__ */ jsxs("div", { children: [
+								/* @__PURE__ */ jsx("label", {
+									className: "block text-xs font-semibold text-slate-700 mb-1",
+									children: "Organization / Institution"
+								}),
+								/* @__PURE__ */ jsx("input", {
+									type: "text",
+									name: "organization",
+									value: data.organization,
+									onChange: (e) => {
+										setData("organization", e.target.value);
+										if (errors.organization || errors.company) clearErrors("organization", "company");
+									},
+									placeholder: "Hospital, Distributor or Agency",
+									className: `w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm border transition-colors outline-none ${errors.organization || errors.company ? "border-rose-400 bg-rose-50/40 text-rose-900 focus:ring-2 focus:ring-rose-500" : "border-slate-300 focus:ring-2 focus:ring-teal-600 text-slate-900"}`
+								}),
+								(errors.organization || errors.company) && /* @__PURE__ */ jsxs("p", {
+									className: "text-[11px] text-rose-600 flex items-center gap-1 font-medium mt-1",
+									children: [/* @__PURE__ */ jsx(AlertCircle, { className: "w-3.5 h-3.5 shrink-0" }), errors.organization || errors.company]
+								})
+							] }), /* @__PURE__ */ jsxs("div", { children: [
+								/* @__PURE__ */ jsx("label", {
+									className: "block text-xs font-semibold text-slate-700 mb-1",
+									children: "Country / Market"
+								}),
+								/* @__PURE__ */ jsx("input", {
+									type: "text",
+									name: "country",
+									value: data.country,
+									onChange: (e) => {
+										setData("country", e.target.value);
+										if (errors.country) clearErrors("country");
+									},
+									placeholder: "e.g. Germany, UAE, Canada",
+									className: `w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm border transition-colors outline-none ${errors.country ? "border-rose-400 bg-rose-50/40 text-rose-900 focus:ring-2 focus:ring-rose-500" : "border-slate-300 focus:ring-2 focus:ring-teal-600 text-slate-900"}`
+								}),
+								errors.country && /* @__PURE__ */ jsxs("p", {
+									className: "text-[11px] text-rose-600 flex items-center gap-1 font-medium mt-1",
+									children: [/* @__PURE__ */ jsx(AlertCircle, { className: "w-3.5 h-3.5 shrink-0" }), errors.country]
+								})
+							] })]
 						}),
 						/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("label", {
 							className: "block text-xs font-semibold text-slate-700 mb-1",
 							children: "Enquiry Category"
 						}), /* @__PURE__ */ jsxs("select", {
-							name: "enquiryType",
-							value: formData.enquiryType,
-							onChange: handleChange,
+							name: "inquiry_type",
+							value: data.inquiry_type,
+							onChange: (e) => setData("inquiry_type", e.target.value),
 							className: "w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-600 text-slate-900 text-xs sm:text-sm bg-white",
 							children: [
 								/* @__PURE__ */ jsx("option", {
@@ -17226,27 +19089,36 @@ function EnquiryModal({ isOpen, onClose, initialProduct = null }) {
 								})
 							]
 						})] }),
-						formData.productName && /* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("label", {
+						data.product_name && /* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("label", {
 							className: "block text-xs font-semibold text-slate-700 mb-1",
 							children: "Referenced Formulation"
 						}), /* @__PURE__ */ jsx("input", {
 							type: "text",
 							readOnly: true,
-							value: formData.productName,
+							value: data.product_name,
 							className: "w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-700 text-xs font-mono"
 						})] }),
-						/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("label", {
-							className: "block text-xs font-semibold text-slate-700 mb-1",
-							children: "Requirements & Details *"
-						}), /* @__PURE__ */ jsx("textarea", {
-							rows: "3",
-							required: true,
-							name: "message",
-							value: formData.message,
-							onChange: handleChange,
-							placeholder: "Specify target volume, registration dossier requirement, or destination market...",
-							className: "w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-600 text-slate-900 text-xs sm:text-sm resize-none"
-						})] }),
+						/* @__PURE__ */ jsxs("div", { children: [
+							/* @__PURE__ */ jsx("label", {
+								className: "block text-xs font-semibold text-slate-700 mb-1",
+								children: "Requirements & Details *"
+							}),
+							/* @__PURE__ */ jsx("textarea", {
+								rows: "3",
+								name: "message",
+								value: data.message,
+								onChange: (e) => {
+									setData("message", e.target.value);
+									if (errors.message) clearErrors("message");
+								},
+								placeholder: "Specify target volume, registration dossier requirement, or destination market...",
+								className: `w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm border transition-colors outline-none resize-none ${errors.message ? "border-rose-400 bg-rose-50/40 text-rose-900 focus:ring-2 focus:ring-rose-500" : "border-slate-300 focus:ring-2 focus:ring-teal-600 text-slate-900"}`
+							}),
+							errors.message && /* @__PURE__ */ jsxs("p", {
+								className: "text-[11px] text-rose-600 flex items-center gap-1 font-medium mt-1",
+								children: [/* @__PURE__ */ jsx(AlertCircle, { className: "w-3.5 h-3.5 shrink-0" }), errors.message]
+							})
+						] }),
 						/* @__PURE__ */ jsxs("div", {
 							className: "p-3 rounded-xl bg-slate-50 border border-slate-200 text-[11px] text-slate-500 flex items-center gap-2",
 							children: [/* @__PURE__ */ jsx(ShieldCheck, { className: "w-4 h-4 text-[#c59324] shrink-0" }), /* @__PURE__ */ jsx("span", { children: "All proprietary business information is handled under commercial non-disclosure protocols." })]
@@ -17263,8 +19135,8 @@ function EnquiryModal({ isOpen, onClose, initialProduct = null }) {
 								size: "md",
 								type: "submit",
 								icon: Send,
-								disabled: isSubmitting,
-								children: isSubmitting ? "Sending Request..." : "Submit Official Enquiry"
+								disabled: processing,
+								children: processing ? "Sending Request..." : "Submit Official Enquiry"
 							})]
 						})
 					]
@@ -17316,8 +19188,8 @@ function PublicLayout({ children, companyData: propCompanyData, categories: prop
 */
 function SeoHead({ title, description, keywords, canonicalUrl, ogImage = "/images/ciplon_logo.png", ogType = "website", schemaJson }) {
 	const defaultTitle = "Ciplon Pharma — WHO-GMP & ISO 9001:2015 Certified Finished Formulations";
-	const defaultDesc = "Ciplon Pharma Private Limited is an ISO 9001:2015 certified pharmaceutical company providing WHO-GMP finished formulations, PCD pharma franchises, and institutional supply across India.";
-	const defaultKeywords = "Ciplon Pharma, pharmaceutical manufacturer, WHO-GMP formulations, PCD pharma franchise India, medicine third party manufacturing, pharmaceutical distributor Delhi, Walpar Wellness";
+	const defaultDesc = "Ciplon Pharma Private Limited is an ISO 9001:2015 certified pharmaceutical company marketing WHO-GMP finished formulations manufactured by certified leaders Walpar Wellness Pvt. Ltd. and Akums Drugs & Pharmaceuticals Ltd. (Pure & Cure Healthcare).";
+	const defaultKeywords = "Ciplon Pharma, pharmaceutical marketing company, WHO-GMP formulations, Walpar Wellness, Akums Drugs, Pure & Cure Healthcare, PCD pharma franchise India, medicine distribution Delhi";
 	const metaTitle = title ? `${title} | Ciplon Pharma` : defaultTitle;
 	const metaDescription = description || defaultDesc;
 	return /* @__PURE__ */ jsxs(Head, { children: [
@@ -17401,7 +19273,7 @@ function AboutPage({ company, categories = [], featuredProducts = [] }) {
 		categories,
 		children: [/* @__PURE__ */ jsx(SeoHead, {
 			title: "About Us — Corporate Profile & Manufacturing Heritage",
-			description: "Learn about Ciplon Pharma Private Limited, our ISO 9001:2015 certification, our WHO-GMP manufacturing partner Walpar Wellness Pvt. Ltd., and our mission to provide affordable quality healthcare.",
+			description: "Learn about Ciplon Pharma Private Limited, our ISO 9001:2015 certification, and our certified manufacturing partners Walpar Wellness Pvt. Ltd. and Akums Drugs & Pharmaceuticals Ltd. (Pure & Cure Healthcare).",
 			canonicalUrl: "https://www.ciplonpharma.in/about"
 		}), /* @__PURE__ */ jsxs("div", {
 			className: "bg-white text-slate-900",
@@ -17558,10 +19430,10 @@ function AboutPage({ company, categories = [], featuredProducts = [] }) {
 										children: /* @__PURE__ */ jsx(Factory, { className: "w-6 h-6" })
 									}), /* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("p", {
 										className: "text-xs text-slate-300",
-										children: "Mfg Partner"
+										children: "Mfg Partners"
 									}), /* @__PURE__ */ jsx("p", {
 										className: "text-sm font-bold text-white leading-snug",
-										children: "Walpar Wellness Pvt. Ltd. (WHO-GMP)"
+										children: "Walpar Wellness & Akums Group"
 									})] })]
 								})]
 							})]
@@ -17637,56 +19509,93 @@ function AboutPage({ company, categories = [], featuredProducts = [] }) {
 						size: "wide",
 						children: /* @__PURE__ */ jsxs("div", {
 							className: "grid grid-cols-1 lg:grid-cols-2 gap-12 items-center",
-							children: [/* @__PURE__ */ jsx("div", {
-								className: "order-2 lg:order-1 relative",
-								children: /* @__PURE__ */ jsx("div", {
+							children: [/* @__PURE__ */ jsxs("div", {
+								className: "order-2 lg:order-1 space-y-6",
+								children: [/* @__PURE__ */ jsx("div", {
 									className: "rounded-3xl overflow-hidden shadow-2xl border-4 border-white/10 aspect-[4/3] bg-slate-900",
 									children: /* @__PURE__ */ jsx("img", {
 										src: "/images/pharma_automation_line.jpg",
 										alt: "WHO-GMP Automated Packaging & Manufacturing Line",
 										className: "w-full h-full object-cover"
 									})
-								})
+								}), /* @__PURE__ */ jsxs("div", {
+									className: "grid grid-cols-2 gap-4",
+									children: [/* @__PURE__ */ jsxs("div", {
+										className: "p-4 rounded-2xl bg-white/10 border border-white/15 backdrop-blur-sm flex items-center gap-3",
+										children: [/* @__PURE__ */ jsx("img", {
+											src: "/images/walpar_logo.png",
+											alt: "Walpar Wellness",
+											className: "h-9 w-auto object-contain bg-white/90 p-1 rounded-lg"
+										}), /* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("p", {
+											className: "text-xs font-bold text-white",
+											children: "Walpar Wellness"
+										}), /* @__PURE__ */ jsx("p", {
+											className: "text-[10px] text-[#dfad36]",
+											children: "WHO-GMP Khatraj Unit"
+										})] })]
+									}), /* @__PURE__ */ jsxs("div", {
+										className: "p-4 rounded-2xl bg-white/10 border border-white/15 backdrop-blur-sm flex items-center gap-3",
+										children: [/* @__PURE__ */ jsx("img", {
+											src: "/images/akums_logo.png",
+											alt: "Akums Group",
+											className: "h-9 w-auto object-contain bg-white/90 p-1 rounded-lg"
+										}), /* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("p", {
+											className: "text-xs font-bold text-white",
+											children: "Akums Group"
+										}), /* @__PURE__ */ jsx("p", {
+											className: "text-[10px] text-[#dfad36]",
+											children: "Pure & Cure Healthcare"
+										})] })]
+									})]
+								})]
 							}), /* @__PURE__ */ jsxs("div", {
 								className: "order-1 lg:order-2",
 								children: [
 									/* @__PURE__ */ jsx("span", {
 										className: "text-xs font-bold uppercase tracking-widest text-[#dfad36]",
-										children: "Manufacturing Partner"
+										children: "Manufacturing Infrastructure"
 									}),
 									/* @__PURE__ */ jsx("h2", {
 										className: "text-2xl sm:text-4xl font-bold text-white mt-2 mb-6",
-										children: "Walpar Wellness Pvt. Ltd. — Precision at Scale"
+										children: "Premier Contract Manufacturing Partners — Precision at Scale"
 									}),
-									/* @__PURE__ */ jsx("p", {
+									/* @__PURE__ */ jsxs("p", {
 										className: "text-slate-300 text-sm sm:text-base leading-relaxed mb-6",
-										children: "Our products are manufactured under rigorous compliance standards at Walpar Wellness Pvt. Ltd., located in Khatraj, Gandhinagar, Gujarat. The facility holds WHO-GMP certification and ISO 9001:2015 accreditation, featuring high-speed automated blistering, carton serialization, and HEPA air filtration."
+										children: [
+											"Ciplon Pharma is a specialized pharmaceutical formulations enterprise. We deliberately do not own captive plants; instead, all our formulations are manufactured under strict loan licensing and contract agreements at India’s premier WHO-GMP certified facilities: ",
+											/* @__PURE__ */ jsx("strong", { children: "Walpar Wellness Pvt. Ltd." }),
+											" and ",
+											/* @__PURE__ */ jsx("strong", { children: "Akums Drugs & Pharmaceuticals Ltd. (Pure & Cure Healthcare Pvt. Ltd.)" }),
+											"."
+										]
 									}),
 									/* @__PURE__ */ jsxs("div", {
-										className: "space-y-3.5",
-										children: [
-											/* @__PURE__ */ jsxs("div", {
-												className: "flex items-start gap-3",
-												children: [/* @__PURE__ */ jsx(CheckCircle2, { className: "w-5 h-5 text-[#dfad36] shrink-0 mt-0.5" }), /* @__PURE__ */ jsxs("span", {
-													className: "text-xs sm:text-sm text-slate-200",
-													children: [/* @__PURE__ */ jsx("strong", { children: "Unit Address:" }), " Plot No. 2/A & 06, Opp. Sabarmati Gas Station, Khatraj, Kalol, Gandhinagar, Gujarat - 382721"]
+										className: "space-y-4",
+										children: [/* @__PURE__ */ jsxs("div", {
+											className: "p-4 rounded-2xl bg-white/5 border border-white/10 space-y-1",
+											children: [/* @__PURE__ */ jsxs("div", {
+												className: "flex items-center gap-2",
+												children: [/* @__PURE__ */ jsx(CheckCircle2, { className: "w-5 h-5 text-[#dfad36] shrink-0" }), /* @__PURE__ */ jsx("strong", {
+													className: "text-sm text-white",
+													children: "Walpar Wellness Pvt. Ltd. (Khatraj Unit, Gujarat)"
 												})]
-											}),
-											/* @__PURE__ */ jsxs("div", {
-												className: "flex items-start gap-3",
-												children: [/* @__PURE__ */ jsx(CheckCircle2, { className: "w-5 h-5 text-[#dfad36] shrink-0 mt-0.5" }), /* @__PURE__ */ jsxs("span", {
-													className: "text-xs sm:text-sm text-slate-200",
-													children: [/* @__PURE__ */ jsx("strong", { children: "Microbiological & Stability:" }), " In-house analytical laboratories with Zone IVb climate stability chambers"]
+											}), /* @__PURE__ */ jsx("p", {
+												className: "text-xs text-slate-300 pl-7",
+												children: "Plot No. 2/A & 06, Opp. Sabarmati Gas Station, Khatraj, Kalol, Gandhinagar, Gujarat - 382721. WHO-GMP & ISO 9001:2015 accredited unit featuring high-speed blistering and serialization."
+											})]
+										}), /* @__PURE__ */ jsxs("div", {
+											className: "p-4 rounded-2xl bg-white/5 border border-white/10 space-y-1",
+											children: [/* @__PURE__ */ jsxs("div", {
+												className: "flex items-center gap-2",
+												children: [/* @__PURE__ */ jsx(CheckCircle2, { className: "w-5 h-5 text-[#dfad36] shrink-0" }), /* @__PURE__ */ jsx("strong", {
+													className: "text-sm text-white",
+													children: "Akums Drugs & Pharmaceuticals Ltd. (Pure & Cure Healthcare)"
 												})]
-											}),
-											/* @__PURE__ */ jsxs("div", {
-												className: "flex items-start gap-3",
-												children: [/* @__PURE__ */ jsx(CheckCircle2, { className: "w-5 h-5 text-[#dfad36] shrink-0 mt-0.5" }), /* @__PURE__ */ jsxs("span", {
-													className: "text-xs sm:text-sm text-slate-200",
-													children: [/* @__PURE__ */ jsx("strong", { children: "Batch Traceability:" }), " Complete QR & tamper-proof carton seals on every production run"]
-												})]
-											})
-										]
+											}), /* @__PURE__ */ jsx("p", {
+												className: "text-xs text-slate-300 pl-7",
+												children: "Sector-8A, IIE SIDCUL Ranipur, Haridwar, Uttarakhand & Baddi Units. One of India’s largest pharmaceutical manufacturing groups with international quality accreditations."
+											})]
+										})]
 									}),
 									/* @__PURE__ */ jsx("div", {
 										className: "mt-8",
@@ -17729,7 +19638,7 @@ function AboutPage({ company, categories = [], featuredProducts = [] }) {
 								{
 									year: "WHO-GMP Alignment",
 									title: "State-of-the-Art Partnering",
-									desc: "Partnered with Walpar Wellness Pvt. Ltd. (Khatraj Unit) for automated, robotic manufacturing adhering to WHO-GMP standards."
+									desc: "Partnered with premier WHO-GMP manufacturing leaders Walpar Wellness Pvt. Ltd. (Khatraj Unit) and Akums Drugs & Pharmaceuticals Ltd. (Pure & Cure Healthcare)."
 								},
 								{
 									year: "ISO 9001:2015",
@@ -17936,12 +19845,16 @@ function ContactPage({ company }) {
 										children: /* @__PURE__ */ jsxs("div", {
 											className: "flex items-start gap-4",
 											children: [/* @__PURE__ */ jsx("div", {
-												className: "w-12 h-12 rounded-xl bg-slate-100 border border-slate-200 text-[#0c2340] flex items-center justify-center shrink-0",
-												children: /* @__PURE__ */ jsx(Factory, { className: "w-6 h-6 stroke-[2]" })
+												className: "w-12 h-12 rounded-xl bg-slate-100 border border-slate-200 text-[#0c2340] flex items-center justify-center shrink-0 p-1.5",
+												children: /* @__PURE__ */ jsx("img", {
+													src: "/images/walpar_logo.png",
+													alt: "Walpar",
+													className: "h-full w-auto object-contain"
+												})
 											}), /* @__PURE__ */ jsxs("div", { children: [
 												/* @__PURE__ */ jsx("span", {
 													className: "text-xs font-bold uppercase tracking-wider text-slate-500",
-													children: "Manufacturing Unit"
+													children: "Manufacturing Partner (Gujarat)"
 												}),
 												/* @__PURE__ */ jsx("h3", {
 													className: "text-base font-bold text-[#0c2340] mt-0.5 mb-1.5",
@@ -17958,7 +19871,44 @@ function ContactPage({ company }) {
 														children: "WHO-GMP Certified"
 													}), /* @__PURE__ */ jsx("span", {
 														className: "bg-slate-100 px-2 py-0.5 rounded",
-														children: "Automated Lines"
+														children: "ISO 9001:2015"
+													})]
+												})
+											] })]
+										})
+									}),
+									/* @__PURE__ */ jsx("div", {
+										className: "p-6 rounded-2xl bg-white border border-slate-200 shadow-xs hover:border-[#c59324]/40 transition-colors",
+										children: /* @__PURE__ */ jsxs("div", {
+											className: "flex items-start gap-4",
+											children: [/* @__PURE__ */ jsx("div", {
+												className: "w-12 h-12 rounded-xl bg-slate-100 border border-slate-200 text-[#0c2340] flex items-center justify-center shrink-0 p-1.5",
+												children: /* @__PURE__ */ jsx("img", {
+													src: "/images/akums_logo.png",
+													alt: "Akums",
+													className: "h-full w-auto object-contain"
+												})
+											}), /* @__PURE__ */ jsxs("div", { children: [
+												/* @__PURE__ */ jsx("span", {
+													className: "text-xs font-bold uppercase tracking-wider text-slate-500",
+													children: "Manufacturing Partner (Uttarakhand & HP)"
+												}),
+												/* @__PURE__ */ jsx("h3", {
+													className: "text-base font-bold text-[#0c2340] mt-0.5 mb-1.5",
+													children: "Akums Drugs & Pharmaceuticals Ltd."
+												}),
+												/* @__PURE__ */ jsx("p", {
+													className: "text-xs sm:text-sm text-slate-600 leading-relaxed",
+													children: "Pure & Cure Healthcare Pvt. Ltd. (Plot No. 26A, 27-30, Sector-8A, IIE SIDCUL, Haridwar & Baddi Units)"
+												}),
+												/* @__PURE__ */ jsxs("div", {
+													className: "mt-3 pt-3 border-t border-slate-100 flex flex-wrap gap-2 text-xs font-medium text-slate-500",
+													children: [/* @__PURE__ */ jsx("span", {
+														className: "bg-amber-50 text-[#c59324] px-2 py-0.5 rounded font-semibold",
+														children: "cGMP Certified"
+													}), /* @__PURE__ */ jsx("span", {
+														className: "bg-slate-100 px-2 py-0.5 rounded",
+														children: "Akums Group"
 													})]
 												})
 											] })]
@@ -18056,7 +20006,6 @@ function ContactPage({ company }) {
 													}),
 													/* @__PURE__ */ jsx("input", {
 														type: "text",
-														required: true,
 														value: data.name,
 														onChange: (e) => setData("name", e.target.value),
 														placeholder: "Dr. / Mr. / Ms. Full Name",
@@ -18076,7 +20025,6 @@ function ContactPage({ company }) {
 													}),
 													/* @__PURE__ */ jsx("input", {
 														type: "email",
-														required: true,
 														value: data.email,
 														onChange: (e) => setData("email", e.target.value),
 														placeholder: "name@organization.com",
@@ -18100,7 +20048,6 @@ function ContactPage({ company }) {
 													}),
 													/* @__PURE__ */ jsx("input", {
 														type: "tel",
-														required: true,
 														value: data.phone,
 														onChange: (e) => setData("phone", e.target.value),
 														placeholder: "+91 98765 43210",
@@ -18168,7 +20115,6 @@ function ContactPage({ company }) {
 													})]
 												}),
 												/* @__PURE__ */ jsx("textarea", {
-													required: true,
 													rows: 4,
 													value: data.message,
 													onChange: (e) => setData("message", e.target.value),
@@ -18216,7 +20162,7 @@ function ContactPage({ company }) {
 										children: "How can I request Certificates of Analysis (COA)?"
 									}), /* @__PURE__ */ jsx("p", {
 										className: "text-xs sm:text-sm text-slate-600 mt-1.5 leading-relaxed",
-										children: "Every batch manufactured at Walpar Wellness is accompanied by an authenticated Certificate of Analysis (COA). You can submit a request with the batch number via this form or by emailing info@ciplonpharma.in."
+										children: "Every batch marketed by Ciplon is accompanied by an authenticated Certificate of Analysis (COA) issued by our certified manufacturing partners (Walpar Wellness or Akums Group / Pure & Cure Healthcare). You can submit a request with the batch number via this form or by emailing info@ciplonpharma.in."
 									})]
 								}),
 								/* @__PURE__ */ jsxs("div", {
@@ -18251,37 +20197,38 @@ function ContactPage({ company }) {
 //#region resources/js/components/home/IntasHeroBanner.jsx
 function IntasHeroBanner({ onExploreProducts, onContactUs, onOpenEnquiryModal }) {
 	const [activeSlide, setActiveSlide] = useState(0);
-	const [activeCard, setActiveCard] = useState(0);
+	const [activeMobileCard, setActiveMobileCard] = useState(0);
+	const cardScrollRef = useRef(null);
 	const slides = [
 		{
 			id: 0,
 			image: "/images/hero_indian_doctors.jpg",
-			headlinePre: "Advancing Modern Healthcare",
-			headlineMain: "Transforming Patient Care",
-			headlineSub: "Embarking on a journey of",
-			headlineSubBold: "clinical excellence",
-			description: "An emerging Indian pharmaceutical enterprise committed to developing high-potency, affordable finished formulations.",
+			headlinePre: "Quality-First Pharmaceutical Formulations",
+			headlineMain: "Committed to Healthcare Excellence",
+			headlineSub: "Trusted formulations through our",
+			headlineSubBold: "WHO-GMP partners",
+			description: "Ciplon Pharma markets high-potency, affordable finished formulations manufactured by certified partners Walpar Wellness & Akums Group.",
 			tag: "Quality Formulations"
 		},
 		{
 			id: 1,
 			image: "/images/pharma_automation_line.jpg",
-			headlinePre: "Modern Formulation Technology",
-			headlineMain: "High-Precision Manufacturing",
-			headlineSub: "Engineered for reproducible quality in",
-			headlineSubBold: "finished therapeutics",
-			description: "Modern production lines dedicated to consistent, safe oral solids and liquid formulations.",
-			tag: "Precision Technology"
+			headlinePre: "Advanced Contract Manufacturing",
+			headlineMain: "High-Precision Automated Plants",
+			headlineSub: "Partnered with India’s leading",
+			headlineSubBold: "manufacturing giants",
+			description: "Manufactured at WHO-GMP & ISO 9001:2015 certified facilities with automated blistering, serialization, and strict batch release.",
+			tag: "Walpar & Akums"
 		},
 		{
 			id: 2,
 			image: "/images/hero_indian_scientists.jpg",
-			headlinePre: "Translating Analytical Science",
+			headlinePre: "Translating Pharmaceutical Science",
 			headlineMain: "Into Life-Changing Smiles",
 			headlineSub: "Continuous focus on",
 			headlineSubBold: "essential medicines",
-			description: "Dedicated Indian research personnel and formulation chemists upholding high standards of quality assurance.",
-			tag: "Advanced R&D"
+			description: "Formulations developed with verified bioavailability, clinical efficacy, and uncompromising batch-level quality assurance.",
+			tag: "Therapeutic Excellence"
 		},
 		{
 			id: 3,
@@ -18312,31 +20259,56 @@ function IntasHeroBanner({ onExploreProducts, onContactUs, onOpenEnquiryModal })
 			icon: Award,
 			title: "Committed to Quality by Design (QbD)",
 			description: "Our dedicated commitment to clinical precision, verified bioavailability, and stringent analytical standards across every formulation.",
-			actionText: "Our Quality Vision",
-			isPrimary: true
+			actionText: "Our Quality Vision"
 		},
 		{
 			icon: Globe,
-			title: "A Global Healthcare Partner",
-			description: "Ciplon is trusted by healthcare professionals across more than 85+ countries across the globe.",
-			actionText: "Our Global Footprint",
-			isPrimary: false
+			title: "WHO-GMP Manufacturing Allies",
+			description: "Produced at state-of-the-art facilities of Walpar Wellness and Akums Drugs & Pharmaceuticals Ltd.",
+			actionText: "View Mfg Partners"
 		},
 		{
 			icon: Sparkles,
 			title: "A Dynamic Product Basket",
-			description: "Empowered by a passionate R&D team, offering a comprehensive therapeutic range of finished pharmaceutical formulations.",
-			actionText: "Explore Portfolio",
-			isPrimary: false
+			description: "Comprehensive therapeutic portfolio covering essential neuro, cardio, analgesic, anti-infective, and metabolic treatments.",
+			actionText: "Explore Portfolio"
 		},
 		{
 			icon: HeartPulse,
-			title: "Pharma Therapy for Life",
-			description: "Discover our specialized plasma fractionation, biosimilars, and targeted hospital therapy solutions.",
-			actionText: "View Therapies",
-			isPrimary: false
+			title: "Accessible Patient Healthcare",
+			description: "Bridging clinical excellence with affordability to supply trusted hospital and retail formulations across India.",
+			actionText: "View Therapies"
 		}
 	];
+	const handleCardScroll = () => {
+		if (!cardScrollRef.current) return;
+		const container = cardScrollRef.current;
+		const center = container.scrollLeft + container.offsetWidth / 2;
+		const children = Array.from(container.children);
+		let closestIndex = 0;
+		let minDistance = Infinity;
+		children.forEach((child, idx) => {
+			const childCenter = child.offsetLeft + child.offsetWidth / 2;
+			const distance = Math.abs(center - childCenter);
+			if (distance < minDistance) {
+				minDistance = distance;
+				closestIndex = idx;
+			}
+		});
+		setActiveMobileCard(closestIndex);
+	};
+	const scrollCardToIndex = (idx) => {
+		if (!cardScrollRef.current) return;
+		const target = cardScrollRef.current.children[idx];
+		if (target) {
+			target.scrollIntoView({
+				behavior: "smooth",
+				block: "nearest",
+				inline: "center"
+			});
+			setActiveMobileCard(idx);
+		}
+	};
 	return /* @__PURE__ */ jsxs("section", {
 		className: "relative w-full bg-slate-50 select-none overflow-hidden",
 		children: [/* @__PURE__ */ jsxs("div", {
@@ -18466,49 +20438,44 @@ function IntasHeroBanner({ onExploreProducts, onContactUs, onOpenEnquiryModal })
 					}, idx))
 				})
 			]
-		}), /* @__PURE__ */ jsx("div", {
+		}), /* @__PURE__ */ jsxs("div", {
 			className: "relative z-30 -mt-6 sm:-mt-10 lg:-mt-14 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8",
-			children: /* @__PURE__ */ jsx("div", {
-				className: "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4",
+			children: [/* @__PURE__ */ jsx("div", {
+				ref: cardScrollRef,
+				onScroll: handleCardScroll,
+				className: "flex sm:grid sm:grid-cols-2 lg:grid-cols-4 gap-4 overflow-x-auto sm:overflow-visible pb-2 sm:pb-0 snap-x snap-mandatory no-scrollbar",
 				children: cards.map((card, index) => {
 					const Icon = card.icon;
-					const isSelected = index === activeCard;
 					return /* @__PURE__ */ jsxs("div", {
-						onClick: () => {
-							setActiveCard(index);
-							if (index === 2) onExploreProducts();
-							else if (index === 3) {
-								const el = document.getElementById("science");
-								if (el) el.scrollIntoView({ behavior: "smooth" });
-							} else if (index === 1) {
-								const el = document.getElementById("excellence");
-								if (el) el.scrollIntoView({ behavior: "smooth" });
-							}
-						},
-						className: `p-5 sm:p-6 rounded-2xl cursor-pointer transition-all duration-300 flex flex-col justify-between border ${card.isPrimary || isSelected ? "bg-gradient-to-br from-[#0c2340] to-[#07172b] text-white border-[#c59324] shadow-xl shadow-[#0c2340]/30 scale-[1.02]" : "bg-white text-slate-800 border-slate-200/90 hover:border-[#c59324]/50 hover:shadow-xl shadow-md"}`,
+						className: "w-[82vw] sm:w-auto shrink-0 snap-center p-5 sm:p-6 rounded-2xl bg-white text-slate-800 border border-slate-200/90 shadow-md flex flex-col justify-between select-none",
 						children: [/* @__PURE__ */ jsxs("div", { children: [
 							/* @__PURE__ */ jsx("div", {
-								className: `w-11 h-11 rounded-xl flex items-center justify-center mb-4 transition-transform group-hover:scale-110 ${card.isPrimary || isSelected ? "bg-[#c59324]/20 text-[#dfad36] border border-[#c59324]/40" : "bg-amber-50 text-[#0c2340] border border-amber-100"}`,
-								children: /* @__PURE__ */ jsx(Icon, { className: "w-6 h-6 stroke-[2.2]" })
+								className: "w-11 h-11 rounded-xl flex items-center justify-center mb-4 bg-amber-50 text-[#0c2340] border border-amber-100",
+								children: /* @__PURE__ */ jsx(Icon, { className: "w-6 h-6 stroke-[2.2] text-[#c59324]" })
 							}),
 							/* @__PURE__ */ jsx("h3", {
-								className: `text-base font-bold tracking-tight mb-2 leading-snug ${card.isPrimary || isSelected ? "text-white" : "text-[#0c2340]"}`,
+								className: "text-base font-bold tracking-tight mb-2 leading-snug text-[#0c2340]",
 								children: card.title
 							}),
 							/* @__PURE__ */ jsx("p", {
-								className: `text-xs leading-relaxed ${card.isPrimary || isSelected ? "text-slate-300" : "text-slate-600"}`,
+								className: "text-xs leading-relaxed text-slate-600",
 								children: card.description
 							})
 						] }), /* @__PURE__ */ jsxs("div", {
-							className: "pt-4 mt-3 border-t border-black/10 flex items-center justify-between text-xs font-bold",
-							children: [/* @__PURE__ */ jsx("span", {
-								className: card.isPrimary || isSelected ? "text-[#dfad36]" : "text-[#c59324]",
-								children: card.actionText
-							}), /* @__PURE__ */ jsx(ArrowRight, { className: `w-4 h-4 transition-transform group-hover:translate-x-1 ${card.isPrimary || isSelected ? "text-[#dfad36]" : "text-[#c59324]"}` })]
+							className: "pt-4 mt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-[#c59324]",
+							children: [/* @__PURE__ */ jsx("span", { children: card.actionText }), /* @__PURE__ */ jsx("div", { className: "w-1.5 h-1.5 rounded-full bg-[#c59324]" })]
 						})]
 					}, index);
 				})
-			})
+			}), /* @__PURE__ */ jsx("div", {
+				className: "flex sm:hidden items-center justify-center gap-1.5 pt-3",
+				children: cards.map((_, idx) => /* @__PURE__ */ jsx("button", {
+					type: "button",
+					onClick: () => scrollCardToIndex(idx),
+					className: `h-1.5 rounded-full transition-all duration-300 ${activeMobileCard === idx ? "w-6 bg-[#c59324]" : "w-1.5 bg-slate-300"}`,
+					"aria-label": `Go to card ${idx + 1}`
+				}, idx))
+			})]
 		})]
 	});
 }
@@ -18635,25 +20602,62 @@ function CompanyIntroSection() {
 								]
 							}),
 							/* @__PURE__ */ jsxs("div", {
+								className: "grid grid-cols-1 sm:grid-cols-2 gap-3 py-3",
+								children: [/* @__PURE__ */ jsxs("div", {
+									className: "p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 text-left",
+									children: [/* @__PURE__ */ jsxs("div", {
+										className: "flex items-center gap-2 mb-1",
+										children: [/* @__PURE__ */ jsx("img", {
+											src: "/images/walpar_logo.png",
+											alt: "Walpar",
+											className: "h-5 w-auto object-contain"
+										}), /* @__PURE__ */ jsx("span", {
+											className: "font-bold text-[#0c2340] text-xs",
+											children: "Walpar Wellness Pvt. Ltd."
+										})]
+									}), /* @__PURE__ */ jsx("div", {
+										className: "text-[11px] text-slate-500",
+										children: "WHO-GMP & ISO 9001:2015 Certified Partner (Khatraj, Gujarat)"
+									})]
+								}), /* @__PURE__ */ jsxs("div", {
+									className: "p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 text-left",
+									children: [/* @__PURE__ */ jsxs("div", {
+										className: "flex items-center gap-2 mb-1",
+										children: [/* @__PURE__ */ jsx("img", {
+											src: "/images/akums_logo.png",
+											alt: "Akums",
+											className: "h-5 w-auto object-contain"
+										}), /* @__PURE__ */ jsx("span", {
+											className: "font-bold text-[#0c2340] text-xs",
+											children: "Akums Drugs & Pharmaceuticals Ltd."
+										})]
+									}), /* @__PURE__ */ jsx("div", {
+										className: "text-[11px] text-slate-500",
+										children: "Pure & Cure Healthcare Pvt. Ltd. (Haridwar & Baddi Units)"
+									})]
+								})]
+							}),
+							/* @__PURE__ */ jsxs("div", {
 								className: "p-4 rounded-2xl bg-amber-50/60 border border-amber-200/60 text-xs text-slate-700 space-y-1.5",
-								children: [
-									/* @__PURE__ */ jsx("p", {
-										className: "font-bold text-[#0c2340] uppercase tracking-wider text-[11px]",
-										children: "Manufacturing Partner Credentials"
-									}),
-									/* @__PURE__ */ jsx("p", {
-										className: "font-semibold text-slate-800",
-										children: "Mfg. in India by: WALPAR WELLNESS PVT.LTD."
-									}),
-									/* @__PURE__ */ jsx("p", {
-										className: "text-slate-600",
-										children: "(WHO-GMP & An ISO 9001 : 2015 Certified Company)"
-									}),
-									/* @__PURE__ */ jsx("p", {
+								children: [/* @__PURE__ */ jsx("p", {
+									className: "font-bold text-[#0c2340] uppercase tracking-wider text-[11px]",
+									children: "Authorized Manufacturing Partners"
+								}), /* @__PURE__ */ jsxs("div", {
+									className: "space-y-2 pt-1 text-slate-700 text-xs",
+									children: [/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("p", {
+										className: "font-semibold text-slate-900",
+										children: "1. Walpar Wellness Pvt. Ltd. (WHO-GMP & ISO 9001:2015)"
+									}), /* @__PURE__ */ jsx("p", {
 										className: "text-slate-500 text-[11px]",
-										children: "PLOT NO.2/A & 06, OPP, SABARMATI GAS STATION, KHATRAJ, KALOL, GANDHINAGAR., Gujarat-382721."
-									})
-								]
+										children: "Plot No. 2/A & 06, Opp. Sabarmati Gas Station, Khatraj, Kalol, Gandhinagar, Gujarat - 382721."
+									})] }), /* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("p", {
+										className: "font-semibold text-slate-900",
+										children: "2. Akums Drugs & Pharmaceuticals Ltd. (Pure & Cure Healthcare)"
+									}), /* @__PURE__ */ jsx("p", {
+										className: "text-slate-500 text-[11px]",
+										children: "Plot No. 26A, 27-30, Sector-8A, I.I.E., SIDCUL, Ranipur, Haridwar, Uttarakhand & Baddi Unit."
+									})] })]
+								})]
 							}),
 							/* @__PURE__ */ jsxs("p", {
 								className: "text-slate-600",
@@ -18698,32 +20702,32 @@ function ExcellenceStatsSection() {
 	const scrollContainerRef = useRef(null);
 	const stats = [
 		{
-			icon: Globe2,
-			value: "$2.2",
-			unit: "Billion",
-			label: "Billion Turnover",
-			highlight: true
+			icon: Award,
+			badge: "ISO 9001:2015",
+			mainText: "WHO-GMP",
+			subText: "Certified Quality Formulations",
+			footnote: "Strict Schedule M Compliance"
 		},
 		{
 			icon: TrendingUp,
-			value: "20",
-			unit: "%",
-			label: "CAGR Growth",
-			highlight: false
+			badge: "Certified Facilities",
+			mainText: "2 Manufacturing Partners",
+			subText: "Walpar Wellness (Gujarat) & Akums Group (Uttarakhand)",
+			footnote: "Automated Blistering & Serialization"
 		},
 		{
-			icon: Award,
-			value: "No. 1",
-			unit: "",
-			label: "Generic Company in Key Markets",
-			highlight: false
+			icon: Globe2,
+			badge: "Territory Monopoly",
+			mainText: "Pan-India Distribution",
+			subText: "PCD Pharma Distributorship & Hospital Supply",
+			footnote: "Comprehensive Promotional Support"
 		},
 		{
 			icon: Layers,
-			value: "9,738",
-			unit: "+",
-			label: "Product Registrations Worldwide",
-			highlight: false
+			badge: "100% Assurance",
+			mainText: "Batch-Tested Integrity",
+			subText: "HPLC Assays, Dissolution & Purity Testing",
+			footnote: "Authenticated Batch COA Release"
 		}
 	];
 	const handleScroll = () => {
@@ -18755,24 +20759,9 @@ function ExcellenceStatsSection() {
 			setActiveIdx(index);
 		}
 	};
-	const isDraggingRef = useRef(false);
-	const startXRef = useRef(0);
-	const scrollLeftStartRef = useRef(0);
-	const handleMouseDown = (e) => {
-		if (!scrollContainerRef.current) return;
-		isDraggingRef.current = true;
-		startXRef.current = e.pageX - scrollContainerRef.current.offsetLeft;
-		scrollLeftStartRef.current = scrollContainerRef.current.scrollLeft;
-	};
-	const handleMouseMove = (e) => {
-		if (!isDraggingRef.current || !scrollContainerRef.current) return;
-		e.preventDefault();
-		const walk = (e.pageX - scrollContainerRef.current.offsetLeft - startXRef.current) * 1.5;
-		scrollContainerRef.current.scrollLeft = scrollLeftStartRef.current - walk;
-	};
-	const handleMouseUpOrLeave = () => {
-		isDraggingRef.current = false;
-	};
+	useRef(false);
+	useRef(0);
+	useRef(0);
 	return /* @__PURE__ */ jsxs("section", {
 		id: "excellence",
 		className: "py-12 sm:py-20 bg-gradient-to-b sm:bg-gradient-to-r from-[#0c2340] via-[#07172b] to-[#040e1b] text-white relative overflow-hidden border-y border-[#c59324]/20",
@@ -18814,37 +20803,32 @@ function ExcellenceStatsSection() {
 				/* @__PURE__ */ jsx("div", {
 					ref: scrollContainerRef,
 					onScroll: handleScroll,
-					onMouseDown: handleMouseDown,
-					onMouseMove: handleMouseMove,
-					onMouseUp: handleMouseUpOrLeave,
-					onMouseLeave: handleMouseUpOrLeave,
-					className: "flex md:grid md:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 max-w-6xl mx-auto overflow-x-auto md:overflow-visible snap-x snap-mandatory md:snap-none no-scrollbar touch-pan-x px-6 md:px-0 scroll-px-6 pb-2 md:pb-0 select-none cursor-grab active:cursor-grabbing md:cursor-default",
+					className: "flex md:grid md:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 max-w-6xl mx-auto overflow-x-auto md:overflow-visible snap-x snap-mandatory md:snap-none no-scrollbar touch-pan-x px-4 md:px-0 pb-2 md:pb-0 select-none",
 					children: stats.map((item, idx) => {
 						const Icon = item.icon;
-						const isActiveOnMobile = activeIdx === idx;
 						return /* @__PURE__ */ jsxs("div", {
-							onClick: () => scrollToIndex(idx),
-							className: `group p-6 sm:p-7 rounded-2xl backdrop-blur-md text-center transition-all duration-300 md:hover:scale-105 md:hover:shadow-2xl flex flex-col items-center justify-center shadow-lg shrink-0 w-[78vw] sm:w-[50vw] md:w-auto snap-center min-h-[220px] ${isActiveOnMobile ? "bg-white/10 border-2 border-[#dfad36] shadow-[#dfad36]/10 shadow-xl" : "bg-white/5 border border-[#c59324]/25 hover:border-[#c59324]/50"}`,
-							children: [
+							className: "p-6 sm:p-7 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md text-center flex flex-col justify-between shrink-0 w-[82vw] sm:w-[50vw] md:w-auto snap-center min-h-[260px] shadow-lg shadow-black/20",
+							children: [/* @__PURE__ */ jsxs("div", { children: [
 								/* @__PURE__ */ jsx("div", {
-									className: `w-14 h-14 rounded-full flex items-center justify-center mb-4 transition-all duration-300 md:group-hover:scale-110 ${isActiveOnMobile ? "bg-[#c59324] text-[#07172b] border border-[#dfad36]" : "bg-[#c59324]/20 border border-[#c59324]/40 text-[#dfad36] md:group-hover:bg-[#c59324] md:group-hover:text-[#07172b]"}`,
-									children: /* @__PURE__ */ jsx(Icon, { className: "w-7 h-7 stroke-[2.2]" })
+									className: "inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#c59324]/15 border border-[#c59324]/40 text-[#dfad36] text-[10px] font-bold uppercase tracking-wider mb-4",
+									children: item.badge
 								}),
-								/* @__PURE__ */ jsxs("div", {
-									className: "flex items-baseline justify-center gap-1",
-									children: [/* @__PURE__ */ jsx("span", {
-										className: "text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white md:group-hover:text-[#dfad36] transition-colors",
-										children: item.value
-									}), item.unit && /* @__PURE__ */ jsx("span", {
-										className: "text-xl sm:text-2xl font-bold text-[#dfad36]",
-										children: item.unit
-									})]
+								/* @__PURE__ */ jsx("div", {
+									className: "w-12 h-12 rounded-2xl mx-auto flex items-center justify-center mb-4 bg-gradient-to-br from-[#c59324]/20 to-[#dfad36]/10 border border-[#c59324]/40 text-[#dfad36]",
+									children: /* @__PURE__ */ jsx(Icon, { className: "w-6 h-6 stroke-[2]" })
+								}),
+								/* @__PURE__ */ jsx("h3", {
+									className: "text-lg sm:text-xl font-bold tracking-tight text-white leading-snug",
+									children: item.mainText
 								}),
 								/* @__PURE__ */ jsx("p", {
-									className: "text-xs sm:text-sm font-semibold text-slate-300 mt-2 leading-snug",
-									children: item.label
+									className: "text-xs text-slate-300 mt-2 leading-relaxed",
+									children: item.subText
 								})
-							]
+							] }), /* @__PURE__ */ jsx("div", {
+								className: "pt-3.5 mt-3 border-t border-white/10 text-[11px] font-medium text-[#dfad36]/90",
+								children: item.footnote
+							})]
 						}, idx);
 					})
 				}),
@@ -18968,36 +20952,42 @@ function ScienceIntoSmilesSection() {
 			}), /* @__PURE__ */ jsxs("div", {
 				className: "lg:col-span-6 space-y-6",
 				children: [
-					/* @__PURE__ */ jsx("p", {
+					/* @__PURE__ */ jsxs("p", {
 						className: "text-sm sm:text-base text-slate-700 leading-relaxed font-normal",
-						children: "R&D is the cornerstone of Ciplon's success. A high-calibre team works round the clock with a quest to develop a progressive and formidable product basket that includes novel doses, generics, biosimilars and parenteral formulations to address unmet global healthcare needs."
+						children: [
+							"At Ciplon Pharma, delivering reliable therapeutic formulations is at the heart of our mission. In partnership with industry leaders ",
+							/* @__PURE__ */ jsx("strong", { children: "Walpar Wellness Pvt. Ltd." }),
+							" and ",
+							/* @__PURE__ */ jsx("strong", { children: "Akums Drugs & Pharmaceuticals Ltd. (Pure & Cure Healthcare)" }),
+							", we ensure every batch meets stringent pharmacopoeial purity standards, optimal dissolution profiles, and trusted clinical efficacy."
+						]
 					}),
 					/* @__PURE__ */ jsx("div", {
 						className: "space-y-3.5 pt-2",
 						children: [
 							{
-								highlight: "6 - 7%",
-								text: "of turnover invested in R&D every year"
+								highlight: "WHO-GMP & cGMP",
+								text: "manufactured by certified leaders Walpar Wellness & Akums Group"
 							},
 							{
 								highlight: "Over 1,00,000 sq ft",
-								text: "dedicated R&D and analytical space"
+								text: "automated, robotic manufacturing and packaging floor space"
 							},
 							{
-								highlight: "650+ scientists",
-								text: "and researchers working across therapeutic areas"
+								highlight: "High-Calibre QA/QC",
+								text: "chemists & analytical specialists ensuring batch-to-batch consistency"
 							},
 							{
-								highlight: "17 advanced",
-								text: "formulation and bio-analytical research facilities"
+								highlight: "HPLC & Mass Spec",
+								text: "advanced analytical assay, dissolution mapping, and bioburden controls"
 							},
 							{
-								highlight: "Global Regulatory Authority",
-								text: "accreditations including USFDA, WHO-GMP & MHRA"
+								highlight: "ICH Zone IVb",
+								text: "climatic stability testing for dependable shelf-life integrity"
 							},
 							{
-								highlight: "Pioneers in biosimilars",
-								text: "and novel extended-release drug delivery systems"
+								highlight: "Patient-First Pricing",
+								text: "delivering vital therapeutic medicines at affordable prices"
 							}
 						].map((item, index) => /* @__PURE__ */ jsxs("div", {
 							className: "flex items-start gap-3 group",
@@ -19088,141 +21078,6 @@ function ScienceIntoSmilesSection() {
 							onClick: () => setIsModalOpen(false),
 							className: "px-6 py-2 rounded-xl bg-[#0069b4] text-white text-xs font-bold hover:bg-[#005a9c] transition-colors cursor-pointer",
 							children: "Close"
-						})
-					})
-				]
-			})
-		})]
-	});
-}
-//#endregion
-//#region resources/js/components/home/LatestNewsSection.jsx
-function LatestNewsSection() {
-	const [selectedArticle, setSelectedArticle] = useState(null);
-	return /* @__PURE__ */ jsxs("section", {
-		id: "news",
-		className: "py-16 sm:py-24 bg-slate-50 border-b border-slate-100",
-		children: [/* @__PURE__ */ jsxs(Container, { children: [/* @__PURE__ */ jsxs("div", {
-			className: "text-center mb-12 sm:mb-16",
-			children: [/* @__PURE__ */ jsx("h2", {
-				className: "text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-[#0c2340] uppercase",
-				children: "LATEST NEWS"
-			}), /* @__PURE__ */ jsx("div", { className: "w-20 h-1 bg-gradient-to-r from-[#c59324] to-[#dfad36] mx-auto mt-2 rounded-full" })]
-		}), /* @__PURE__ */ jsx("div", {
-			className: "grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto",
-			children: [
-				{
-					id: 1,
-					image: "/images/pharma_product_boxes.jpg",
-					date: "15 March 2026",
-					badge: "Product Launch",
-					title: "Ciplon launches THYMOTAS - a potent, patented novel immunomodulator in standard sepsis & infection care",
-					summary: "Ciplon Pharmaceuticals has announced the commercial launch of Thymotas, an innovative therapeutic agent engineered for enhanced immune response and rapid clinical recovery in intensive care settings.",
-					fullContent: "Ciplon Pharmaceuticals today launched Thymotas across premier hospital networks. Backed by extensive multicenter clinical trials demonstrating a 34% reduction in ICU recovery duration, Thymotas represents a milestone in hospital-acquired sepsis management. Formulated at our USFDA and WHO-GMP approved injectable facility, it guarantees sterile, endotoxin-free delivery."
-				},
-				{
-					id: 2,
-					image: "/images/pharma_automation_line.jpg",
-					date: "08 February 2026",
-					badge: "Manufacturing",
-					title: "Ciplon commissions robotic high-speed sterile packaging facility at flagship formulation hub",
-					summary: "State-of-the-art German robotic packaging line installed to boost annual oral solid and sterile vial throughput to over 4.5 billion units with zero human intervention.",
-					fullContent: "Demonstrating its commitment to Industry 4.0 automation, Ciplon has integrated automated robotic pick-and-pack conveyor lines with AI-guided 360-degree optical blister inspection. This ensures 100% defect-free packaging, barcoded anti-counterfeit serialisation, and compliance with the EU Falsified Medicines Directive (FMD)."
-				},
-				{
-					id: 3,
-					image: "/images/ciplon_lab.jpg",
-					date: "10 December 2025",
-					badge: "Regulatory Approval",
-					title: "Ciplon receives European Medicines Agency (EMA) validation for key cardiovascular biosimilar",
-					summary: "The regulatory clearance marks a significant milestone in expanding Ciplon’s specialized therapy footprint in European and highly regulated markets.",
-					fullContent: "Ciplon Biologics has secured positive recommendation from the European Medicines Agency (EMA) for its complex cardiovascular biosimilar formulation. This dossier clearance paves the way for direct hospital supply across 27 EU member states, lowering healthcare costs for patients without compromising therapeutic equivalence."
-				}
-			].map((item) => /* @__PURE__ */ jsxs("article", {
-				onClick: () => setSelectedArticle(item),
-				className: "group bg-white rounded-2xl border border-slate-200/90 shadow-sm hover:shadow-xl hover:border-[#c59324]/50 transition-all duration-300 flex flex-col justify-between overflow-hidden cursor-pointer",
-				children: [/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsxs("div", {
-					className: "relative w-full h-48 sm:h-52 bg-slate-100 overflow-hidden",
-					children: [/* @__PURE__ */ jsx("img", {
-						src: item.image,
-						alt: item.title,
-						className: "w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-					}), /* @__PURE__ */ jsx("div", {
-						className: "absolute top-3 right-3 px-2.5 py-1 rounded-md bg-white/95 backdrop-blur-md text-[10px] font-bold text-[#0c2340] border border-amber-200/80 shadow-xs",
-						children: item.badge
-					})]
-				}), /* @__PURE__ */ jsxs("div", {
-					className: "p-5 sm:p-6 space-y-3",
-					children: [
-						/* @__PURE__ */ jsxs("div", {
-							className: "flex items-center gap-1.5 text-xs text-slate-400 font-semibold",
-							children: [/* @__PURE__ */ jsx(Calendar, { className: "w-3.5 h-3.5 text-[#c59324]" }), /* @__PURE__ */ jsx("span", { children: item.date })]
-						}),
-						/* @__PURE__ */ jsx("h3", {
-							className: "text-sm sm:text-base font-bold text-[#0c2340] group-hover:text-[#c59324] transition-colors leading-snug line-clamp-3",
-							children: item.title
-						}),
-						/* @__PURE__ */ jsx("p", {
-							className: "text-xs text-slate-500 leading-relaxed line-clamp-3",
-							children: item.summary
-						})
-					]
-				})] }), /* @__PURE__ */ jsx("div", {
-					className: "px-5 sm:px-6 pb-5 pt-0",
-					children: /* @__PURE__ */ jsx("div", {
-						className: "pt-3 border-t border-slate-100 flex items-center justify-between",
-						children: /* @__PURE__ */ jsxs("span", {
-							className: "text-xs font-bold text-[#c59324] group-hover:text-[#0c2340] inline-flex items-center gap-1",
-							children: [/* @__PURE__ */ jsx("span", { children: "READ MORE" }), /* @__PURE__ */ jsx(ArrowRight, { className: "w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" })]
-						})
-					})
-				})]
-			}, item.id))
-		})] }), selectedArticle && /* @__PURE__ */ jsx("div", {
-			className: "fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm animate-in fade-in duration-200",
-			children: /* @__PURE__ */ jsxs("div", {
-				className: "bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-slate-100 relative max-h-[90vh] overflow-y-auto",
-				children: [
-					/* @__PURE__ */ jsx("button", {
-						type: "button",
-						onClick: () => setSelectedArticle(null),
-						className: "absolute top-5 right-5 p-2 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 transition-colors cursor-pointer",
-						children: /* @__PURE__ */ jsx(X, { className: "w-5 h-5" })
-					}),
-					/* @__PURE__ */ jsx("div", {
-						className: "rounded-xl overflow-hidden mb-4 h-56 w-full",
-						children: /* @__PURE__ */ jsx("img", {
-							src: selectedArticle.image,
-							alt: selectedArticle.title,
-							className: "w-full h-full object-cover"
-						})
-					}),
-					/* @__PURE__ */ jsxs("div", {
-						className: "flex items-center gap-3 text-xs text-slate-400 mb-2 font-semibold",
-						children: [
-							/* @__PURE__ */ jsx("span", {
-								className: "px-2.5 py-0.5 rounded-full bg-sky-50 text-[#0069b4] font-bold",
-								children: selectedArticle.badge
-							}),
-							/* @__PURE__ */ jsx("span", { children: "•" }),
-							/* @__PURE__ */ jsx("span", { children: selectedArticle.date })
-						]
-					}),
-					/* @__PURE__ */ jsx("h3", {
-						className: "text-lg sm:text-xl font-bold text-slate-900 leading-snug mb-3",
-						children: selectedArticle.title
-					}),
-					/* @__PURE__ */ jsxs("div", {
-						className: "space-y-3 text-xs sm:text-sm text-slate-600 leading-relaxed",
-						children: [/* @__PURE__ */ jsx("p", { children: selectedArticle.fullContent }), /* @__PURE__ */ jsx("p", { children: "For further commercial licensing and institutional distribution agreements, contact our corporate medical communications division." })]
-					}),
-					/* @__PURE__ */ jsx("div", {
-						className: "mt-6 pt-4 border-t border-slate-100 flex justify-end",
-						children: /* @__PURE__ */ jsx("button", {
-							type: "button",
-							onClick: () => setSelectedArticle(null),
-							className: "px-6 py-2 rounded-xl bg-[#0069b4] text-white text-xs font-bold hover:bg-[#005a9c] transition-colors cursor-pointer",
-							children: "Close Release"
 						})
 					})
 				]
@@ -19432,14 +21287,13 @@ function HomePage({ featuredProducts = [], categories = [], company = null }) {
 					onContactUs: handleContactUs,
 					onOpenEnquiryModal: () => setIsEnquiryModalOpen(true)
 				}),
-				/* @__PURE__ */ jsx(CompanyIntroSection, {}),
-				/* @__PURE__ */ jsx(ExcellenceStatsSection, {}),
-				/* @__PURE__ */ jsx(ScienceIntoSmilesSection, {}),
-				/* @__PURE__ */ jsx(LatestNewsSection, {}),
 				/* @__PURE__ */ jsx(FeaturedProductsSection, {
 					products,
 					onOpenEnquiryModal: () => setIsEnquiryModalOpen(true)
 				}),
+				/* @__PURE__ */ jsx(CompanyIntroSection, {}),
+				/* @__PURE__ */ jsx(ExcellenceStatsSection, {}),
+				/* @__PURE__ */ jsx(ScienceIntoSmilesSection, {}),
 				/* @__PURE__ */ jsx(EnquiryModal, {
 					isOpen: isEnquiryModalOpen,
 					onClose: () => setIsEnquiryModalOpen(false)
@@ -19512,11 +21366,11 @@ function ProductDetailsPage({ product, relatedProducts: initialRelated = [], cat
 		prescriptionStatus: prescriptionType,
 		manufacturer: {
 			"@type": "Organization",
-			name: "Walpar Wellness Pvt. Ltd."
+			name: "Walpar Wellness Pvt. Ltd. / Akums Drugs & Pharmaceuticals Ltd. (Pure & Cure Healthcare)"
 		},
 		recognizingAuthority: {
 			"@type": "Organization",
-			name: "WHO-GMP & ISO 9001:2015"
+			name: "WHO-GMP, cGMP & ISO 9001:2015"
 		},
 		image: images.length > 0 ? images[0] : "https://www.ciplonpharma.in/images/ciplon_logo.png"
 	};
@@ -19752,6 +21606,40 @@ function ProductDetailsPage({ product, relatedProducts: initialRelated = [], cat
 											]
 										})]
 									}, idx))
+								})]
+							}),
+							/* @__PURE__ */ jsxs("div", {
+								className: "p-4 rounded-xl bg-slate-50/80 border border-slate-200/80 text-xs space-y-2.5",
+								children: [/* @__PURE__ */ jsxs("div", {
+									className: "flex items-start justify-between gap-2",
+									children: [/* @__PURE__ */ jsx("span", {
+										className: "font-bold text-[#0c2340] text-[11px] uppercase tracking-wider shrink-0 mt-0.5",
+										children: "Marketed By:"
+									}), /* @__PURE__ */ jsx("span", {
+										className: "font-semibold text-slate-800 text-right",
+										children: "Ciplon Pharma Private Limited (ISO 9001:2015)"
+									})]
+								}), /* @__PURE__ */ jsxs("div", {
+									className: "border-t border-slate-200/70 pt-2 space-y-1.5",
+									children: [/* @__PURE__ */ jsx("span", {
+										className: "font-bold text-[#c59324] text-[11px] uppercase tracking-wider block",
+										children: "Authorized Manufacturing Partners:"
+									}), /* @__PURE__ */ jsxs("div", {
+										className: "space-y-1 text-slate-600 pl-2 border-l-2 border-[#c59324]/40",
+										children: [/* @__PURE__ */ jsxs("p", {
+											className: "font-medium text-slate-800",
+											children: ["1. Walpar Wellness Pvt. Ltd. ", /* @__PURE__ */ jsx("span", {
+												className: "text-[10px] text-slate-500 font-normal",
+												children: "(WHO-GMP & ISO 9001:2015 — Khatraj, Gujarat)"
+											})]
+										}), /* @__PURE__ */ jsxs("p", {
+											className: "font-medium text-slate-800",
+											children: ["2. Akums Drugs & Pharmaceuticals Ltd. ", /* @__PURE__ */ jsx("span", {
+												className: "text-[10px] text-slate-500 font-normal",
+												children: "(Pure & Cure Healthcare — Haridwar & Baddi)"
+											})]
+										})]
+									})]
 								})]
 							})
 						]
@@ -20184,7 +22072,7 @@ function QualityPage({ company }) {
 		companyData: company || {},
 		children: [/* @__PURE__ */ jsx(SeoHead, {
 			title: "Quality Assurance & Regulatory Compliance — WHO-GMP & ISO 9001:2015",
-			description: "Explore Ciplon Pharma's strict quality assurance framework, WHO-GMP certified manufacturing at Walpar Wellness, HPLC analytical validation, and stability testing standards.",
+			description: "Explore Ciplon Pharma's strict quality assurance framework, WHO-GMP certified manufacturing at Walpar Wellness and Akums Drugs (Pure & Cure Healthcare), HPLC analytical validation, and stability testing standards.",
 			canonicalUrl: "https://www.ciplonpharma.in/quality"
 		}), /* @__PURE__ */ jsxs("div", {
 			className: "bg-white text-slate-900",
@@ -20236,7 +22124,7 @@ function QualityPage({ company }) {
 								}),
 								/* @__PURE__ */ jsx("p", {
 									className: "mt-5 text-base sm:text-lg text-slate-300 leading-relaxed font-normal",
-									children: "At Ciplon Pharma, quality compliance is integrated into every phase of pharmaceutical production. Through our certified manufacturing partner Walpar Wellness Pvt. Ltd., we maintain gold-standard WHO-GMP protocols and ISO 9001:2015 systems."
+									children: "At Ciplon Pharma, quality compliance is integrated into every phase of pharmaceutical formulation marketing. Through our certified manufacturing partners Walpar Wellness Pvt. Ltd. and Akums Drugs & Pharmaceuticals Ltd. (Pure & Cure Healthcare Pvt. Ltd.), we maintain gold-standard WHO-GMP protocols, cGMP compliance, and ISO 9001:2015 systems."
 								}),
 								/* @__PURE__ */ jsxs("div", {
 									className: "mt-8 flex flex-wrap items-center gap-4",
@@ -20275,8 +22163,8 @@ function QualityPage({ company }) {
 							className: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6",
 							children: [
 								{
-									title: "WHO-GMP Certified Facility",
-									desc: "Formulations produced at Walpar Wellness Pvt. Ltd. (Khatraj Unit) adhering strictly to World Health Organization Good Manufacturing Practices with HEPA-filtered cleanrooms.",
+									title: "WHO-GMP & cGMP Facilities",
+									desc: "Formulations produced at audited facilities of Walpar Wellness Pvt. Ltd. (Khatraj Unit) and Akums Drugs & Pharmaceuticals Ltd. (Pure & Cure Healthcare) adhering strictly to World Health Organization Good Manufacturing Practices.",
 									icon: Factory
 								},
 								{
@@ -20335,9 +22223,11 @@ function QualityPage({ company }) {
 								/* @__PURE__ */ jsxs("div", {
 									className: "space-y-4 text-slate-600 text-sm sm:text-base leading-relaxed",
 									children: [/* @__PURE__ */ jsx("p", { children: "Every formulation marketed by Ciplon is backed by complete documentation. Before commercial release, batch samples are subjected to stringent chemical assays, dissolution mapping, content uniformity, and microbial bioburden testing." }), /* @__PURE__ */ jsxs("p", { children: [
-										"Our manufacturing unit at ",
+										"Our approved manufacturing partners at ",
 										/* @__PURE__ */ jsx("strong", { children: "Walpar Wellness Pvt. Ltd. (Khatraj Unit)" }),
-										" employs modern validation equipment to ensure that every blister pack, bottle, and vial retains its labeled potency throughout its shelf life."
+										" and ",
+										/* @__PURE__ */ jsx("strong", { children: "Akums Drugs & Pharmaceuticals Ltd. (Pure & Cure Healthcare)" }),
+										" employ modern robotic validation equipment and testing protocols to ensure that every blister pack, bottle, and vial retains its labeled potency throughout its shelf life."
 									] })]
 								}),
 								/* @__PURE__ */ jsxs("div", {
@@ -20492,7 +22382,6 @@ createServer((page) => createInertiaApp({
 			"./Pages/admin/product/ProductDetails.jsx": ProductDetails_exports,
 			"./Pages/admin/product/ProductForm.jsx": ProductForm_exports,
 			"./Pages/admin/product/ProductList.jsx": ProductList_exports,
-			"./Pages/admin/product/ProductSlides.jsx": ProductSlides_exports,
 			"./Pages/admin/roles/RoleForm.jsx": RoleForm_exports,
 			"./Pages/admin/roles/RoleList.jsx": RoleList_exports,
 			"./Pages/admin/settings/Settings.jsx": Settings_exports,
@@ -20508,10 +22397,9 @@ createServer((page) => createInertiaApp({
 			"./Pages/mr/Schedule.jsx": Schedule_exports,
 			"./Pages/mr/Visits.jsx": Visits_exports,
 			"./Pages/mrconnect/AllReports.jsx": AllReports_exports,
-			"./Pages/mrconnect/EmployeeAssign.jsx": EmployeeAssign_exports,
 			"./Pages/mrconnect/FieldExpenses.jsx": FieldExpenses_exports,
-			"./Pages/mrconnect/HRSection.jsx": HRSection_exports,
 			"./Pages/mrconnect/Leave.jsx": Leave_exports,
+			"./Pages/mrconnect/MRDirectory.jsx": MRDirectory_exports,
 			"./Pages/mrconnect/Notice.jsx": Notice_exports,
 			"./Pages/mrconnect/PobOrder.jsx": PobOrder_exports,
 			"./Pages/mrconnect/PrimarySales.jsx": PrimarySales_exports,
@@ -20519,7 +22407,6 @@ createServer((page) => createInertiaApp({
 			"./Pages/mrconnect/SetTarget.jsx": SetTarget_exports,
 			"./Pages/mrconnect/Slider.jsx": Slider_exports,
 			"./Pages/mrconnect/Sponsor.jsx": Sponsor_exports,
-			"./Pages/mrconnect/TourPlan.jsx": TourPlan_exports,
 			"./Pages/mrconnect/VideoLibrary.jsx": VideoLibrary_exports,
 			"./Pages/public/AboutPage.jsx": AboutPage_exports,
 			"./Pages/public/ContactPage.jsx": ContactPage_exports,

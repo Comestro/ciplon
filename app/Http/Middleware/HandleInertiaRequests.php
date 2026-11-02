@@ -60,33 +60,40 @@ class HandleInertiaRequests extends Middleware
                     return null;
                 }
 
-                $user = $request->user();
-                $unread = Notification::where('user_id', $user->id)
-                    ->whereNull('read_at')
-                    ->count();
+                try {
+                    $user = $request->user();
+                    $unread = Notification::where('user_id', $user->id)
+                        ->whereNull('read_at')
+                        ->count();
 
-                $recent = Notification::where('user_id', $user->id)
-                    ->orderByDesc('created_at')
-                    ->limit(10)
-                    ->get()
-                    ->map(function ($n) {
-                        return [
-                            'id' => $n->id,
-                            'type' => $n->type,
-                            'title' => $n->title,
-                            'message' => $n->message,
-                            'link' => $n->link,
-                            'data' => $n->data,
-                            'read_at' => $n->read_at ? $n->read_at->toIso8601String() : null,
-                            'created_at' => $n->created_at ? $n->created_at->diffForHumans() : null,
-                            'created_at_raw' => $n->created_at ? $n->created_at->toIso8601String() : null,
-                        ];
-                    });
+                    $recent = Notification::where('user_id', $user->id)
+                        ->orderByDesc('created_at')
+                        ->limit(10)
+                        ->get()
+                        ->map(function ($n) {
+                            return [
+                                'id' => $n->id,
+                                'type' => $n->type,
+                                'title' => $n->title,
+                                'message' => $n->message,
+                                'link' => $n->link,
+                                'data' => $n->data,
+                                'read_at' => $n->read_at ? $n->read_at->toIso8601String() : null,
+                                'created_at' => $n->created_at ? $n->created_at->diffForHumans() : null,
+                                'created_at_raw' => $n->created_at ? $n->created_at->toIso8601String() : null,
+                            ];
+                        });
 
-                return [
-                    'unread_count' => $unread,
-                    'list' => $recent,
-                ];
+                    return [
+                        'unread_count' => $unread,
+                        'list' => $recent,
+                    ];
+                } catch (\Throwable $e) {
+                    return [
+                        'unread_count' => 0,
+                        'list' => [],
+                    ];
+                }
             },
             'company' => fn () => Setting::getPublicMap(),
             'navCategories' => fn () => Category::where('status', 'active')->whereNull('parent_id')->with('children:id,name,slug,parent_id')->orderBy('name')->get(['id', 'name', 'slug']),

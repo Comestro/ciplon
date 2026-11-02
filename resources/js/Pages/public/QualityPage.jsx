@@ -20,8 +20,8 @@ export default function QualityPage({ company }) {
 
   const qualityPillars = [
     {
-      title: 'WHO-GMP Certified Facility',
-      desc: 'Formulations produced at Walpar Wellness Pvt. Ltd. (Khatraj Unit) adhering strictly to World Health Organization Good Manufacturing Practices with HEPA-filtered cleanrooms.',
+      title: 'WHO-GMP & cGMP Facilities',
+      desc: 'Formulations produced at audited facilities of Walpar Wellness Pvt. Ltd. (Khatraj Unit) and Akums Drugs & Pharmaceuticals Ltd. (Pure & Cure Healthcare) adhering strictly to World Health Organization Good Manufacturing Practices.',
       icon: Factory,
     },
     {
@@ -52,7 +52,7 @@ export default function QualityPage({ company }) {
     <PublicLayout companyData={companyData}>
       <SeoHead
         title="Quality Assurance & Regulatory Compliance — WHO-GMP & ISO 9001:2015"
-        description="Explore Ciplon Pharma's strict quality assurance framework, WHO-GMP certified manufacturing at Walpar Wellness, HPLC analytical validation, and stability testing standards."
+        description="Explore Ciplon Pharma's strict quality assurance framework, WHO-GMP certified manufacturing at Walpar Wellness and Akums Drugs (Pure & Cure Healthcare), HPLC analytical validation, and stability testing standards."
         canonicalUrl="https://www.ciplonpharma.in/quality"
       />
       <div className="bg-white text-slate-900">
@@ -80,7 +80,7 @@ export default function QualityPage({ company }) {
                 Quality is a <span className="text-[#dfad36]">Matter of Fact</span>, Not a Compromise
               </h1>
               <p className="mt-5 text-base sm:text-lg text-slate-300 leading-relaxed font-normal">
-                At Ciplon Pharma, quality compliance is integrated into every phase of pharmaceutical production. Through our certified manufacturing partner Walpar Wellness Pvt. Ltd., we maintain gold-standard WHO-GMP protocols and ISO 9001:2015 systems.
+                At Ciplon Pharma, quality compliance is integrated into every phase of pharmaceutical formulation marketing. Through our certified manufacturing partners Walpar Wellness Pvt. Ltd. and Akums Drugs & Pharmaceuticals Ltd. (Pure & Cure Healthcare Pvt. Ltd.), we maintain gold-standard WHO-GMP protocols, cGMP compliance, and ISO 9001:2015 systems.
               </p>
               
               <div className="mt-8 flex flex-wrap items-center gap-4">
@@ -147,7 +147,7 @@ export default function QualityPage({ company }) {
                     Every formulation marketed by Ciplon is backed by complete documentation. Before commercial release, batch samples are subjected to stringent chemical assays, dissolution mapping, content uniformity, and microbial bioburden testing.
                   </p>
                   <p>
-                    Our manufacturing unit at <strong>Walpar Wellness Pvt. Ltd. (Khatraj Unit)</strong> employs modern validation equipment to ensure that every blister pack, bottle, and vial retains its labeled potency throughout its shelf life.
+                    Our approved manufacturing partners at <strong>Walpar Wellness Pvt. Ltd. (Khatraj Unit)</strong> and <strong>Akums Drugs & Pharmaceuticals Ltd. (Pure & Cure Healthcare)</strong> employ modern robotic validation equipment and testing protocols to ensure that every blister pack, bottle, and vial retains its labeled potency throughout its shelf life.
                   </p>
                 </div>
 

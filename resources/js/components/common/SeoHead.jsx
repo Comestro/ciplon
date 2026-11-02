@@ -14,9 +14,9 @@ export default function SeoHead({
 }) {
   const defaultTitle = 'Ciplon Pharma — WHO-GMP & ISO 9001:2015 Certified Finished Formulations';
   const defaultDesc =
-    'Ciplon Pharma Private Limited is an ISO 9001:2015 certified pharmaceutical company providing WHO-GMP finished formulations, PCD pharma franchises, and institutional supply across India.';
+    'Ciplon Pharma Private Limited is an ISO 9001:2015 certified pharmaceutical company marketing WHO-GMP finished formulations manufactured by certified leaders Walpar Wellness Pvt. Ltd. and Akums Drugs & Pharmaceuticals Ltd. (Pure & Cure Healthcare).';
   const defaultKeywords =
-    'Ciplon Pharma, pharmaceutical manufacturer, WHO-GMP formulations, PCD pharma franchise India, medicine third party manufacturing, pharmaceutical distributor Delhi, Walpar Wellness';
+    'Ciplon Pharma, pharmaceutical marketing company, WHO-GMP formulations, Walpar Wellness, Akums Drugs, Pure & Cure Healthcare, PCD pharma franchise India, medicine distribution Delhi';
 
   const metaTitle = title ? `${title} | Ciplon Pharma` : defaultTitle;
   const metaDescription = description || defaultDesc;

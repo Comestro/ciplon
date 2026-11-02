@@ -88,19 +88,37 @@ export default function CompanyIntroSection() {
                 </div>
               </div>
 
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 py-3">
+                <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 text-left">
+                  <div className="flex items-center gap-2 mb-1">
+                    <img src="/images/walpar_logo.png" alt="Walpar" className="h-5 w-auto object-contain" />
+                    <span className="font-bold text-[#0c2340] text-xs">Walpar Wellness Pvt. Ltd.</span>
+                  </div>
+                  <div className="text-[11px] text-slate-500">WHO-GMP & ISO 9001:2015 Certified Partner (Khatraj, Gujarat)</div>
+                </div>
+                <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 text-left">
+                  <div className="flex items-center gap-2 mb-1">
+                    <img src="/images/akums_logo.png" alt="Akums" className="h-5 w-auto object-contain" />
+                    <span className="font-bold text-[#0c2340] text-xs">Akums Drugs & Pharmaceuticals Ltd.</span>
+                  </div>
+                  <div className="text-[11px] text-slate-500">Pure & Cure Healthcare Pvt. Ltd. (Haridwar & Baddi Units)</div>
+                </div>
+              </div>
+
               <div className="p-4 rounded-2xl bg-amber-50/60 border border-amber-200/60 text-xs text-slate-700 space-y-1.5">
                 <p className="font-bold text-[#0c2340] uppercase tracking-wider text-[11px]">
-                  Manufacturing Partner Credentials
+                  Authorized Manufacturing Partners
                 </p>
-                <p className="font-semibold text-slate-800">
-                  Mfg. in India by: WALPAR WELLNESS PVT.LTD.
-                </p>
-                <p className="text-slate-600">
-                  (WHO-GMP & An ISO 9001 : 2015 Certified Company)
-                </p>
-                <p className="text-slate-500 text-[11px]">
-                  PLOT NO.2/A & 06, OPP, SABARMATI GAS STATION, KHATRAJ, KALOL, GANDHINAGAR., Gujarat-382721.
-                </p>
+                <div className="space-y-2 pt-1 text-slate-700 text-xs">
+                  <div>
+                    <p className="font-semibold text-slate-900">1. Walpar Wellness Pvt. Ltd. (WHO-GMP & ISO 9001:2015)</p>
+                    <p className="text-slate-500 text-[11px]">Plot No. 2/A & 06, Opp. Sabarmati Gas Station, Khatraj, Kalol, Gandhinagar, Gujarat - 382721.</p>
+                  </div>
+                  <div>
+                    <p className="font-semibold text-slate-900">2. Akums Drugs & Pharmaceuticals Ltd. (Pure & Cure Healthcare)</p>
+                    <p className="text-slate-500 text-[11px]">Plot No. 26A, 27-30, Sector-8A, I.I.E., SIDCUL, Ranipur, Haridwar, Uttarakhand & Baddi Unit.</p>
+                  </div>
+                </div>
               </div>
 
               <p className="text-slate-600">

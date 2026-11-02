@@ -113,11 +113,11 @@ export default function ProductDetailsPage({ product, relatedProducts: initialRe
     prescriptionStatus: prescriptionType,
     manufacturer: {
       '@type': 'Organization',
-      name: 'Walpar Wellness Pvt. Ltd.',
+      name: 'Walpar Wellness Pvt. Ltd. / Akums Drugs & Pharmaceuticals Ltd. (Pure & Cure Healthcare)',
     },
     recognizingAuthority: {
       '@type': 'Organization',
-      name: 'WHO-GMP & ISO 9001:2015',
+      name: 'WHO-GMP, cGMP & ISO 9001:2015',
     },
     image: images.length > 0 ? images[0] : 'https://www.ciplonpharma.in/images/ciplon_logo.png',
   };
@@ -368,6 +368,22 @@ export default function ProductDetailsPage({ product, relatedProducts: initialRe
                   </div>
                 </div>
               )}
+
+              {/* Manufacturing & Marketing Distinction (Listed One by One Elegantly) */}
+              <div className="p-4 rounded-xl bg-slate-50/80 border border-slate-200/80 text-xs space-y-2.5">
+                <div className="flex items-start justify-between gap-2">
+                  <span className="font-bold text-[#0c2340] text-[11px] uppercase tracking-wider shrink-0 mt-0.5">Marketed By:</span>
+                  <span className="font-semibold text-slate-800 text-right">Ciplon Pharma Private Limited (ISO 9001:2015)</span>
+                </div>
+                
+                <div className="border-t border-slate-200/70 pt-2 space-y-1.5">
+                  <span className="font-bold text-[#c59324] text-[11px] uppercase tracking-wider block">Authorized Manufacturing Partners:</span>
+                  <div className="space-y-1 text-slate-600 pl-2 border-l-2 border-[#c59324]/40">
+                    <p className="font-medium text-slate-800">1. Walpar Wellness Pvt. Ltd. <span className="text-[10px] text-slate-500 font-normal">(WHO-GMP & ISO 9001:2015 — Khatraj, Gujarat)</span></p>
+                    <p className="font-medium text-slate-800">2. Akums Drugs & Pharmaceuticals Ltd. <span className="text-[10px] text-slate-500 font-normal">(Pure & Cure Healthcare — Haridwar & Baddi)</span></p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 

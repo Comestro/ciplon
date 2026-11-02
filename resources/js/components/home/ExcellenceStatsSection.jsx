@@ -8,32 +8,32 @@ export default function ExcellenceStatsSection() {
 
   const stats = [
     {
-      icon: Globe2,
-      value: '$2.2',
-      unit: 'Billion',
-      label: 'Billion Turnover',
-      highlight: true,
+      icon: Award,
+      badge: 'ISO 9001:2015',
+      mainText: 'WHO-GMP',
+      subText: 'Certified Quality Formulations',
+      footnote: 'Strict Schedule M Compliance',
     },
     {
       icon: TrendingUp,
-      value: '20',
-      unit: '%',
-      label: 'CAGR Growth',
-      highlight: false,
+      badge: 'Certified Facilities',
+      mainText: '2 Manufacturing Partners',
+      subText: 'Walpar Wellness (Gujarat) & Akums Group (Uttarakhand)',
+      footnote: 'Automated Blistering & Serialization',
     },
     {
-      icon: Award,
-      value: 'No. 1',
-      unit: '',
-      label: 'Generic Company in Key Markets',
-      highlight: false,
+      icon: Globe2,
+      badge: 'Territory Monopoly',
+      mainText: 'Pan-India Distribution',
+      subText: 'PCD Pharma Distributorship & Hospital Supply',
+      footnote: 'Comprehensive Promotional Support',
     },
     {
       icon: Layers,
-      value: '9,738',
-      unit: '+',
-      label: 'Product Registrations Worldwide',
-      highlight: false,
+      badge: '100% Assurance',
+      mainText: 'Batch-Tested Integrity',
+      subText: 'HPLC Assays, Dissolution & Purity Testing',
+      footnote: 'Authenticated Batch COA Release',
     },
   ];
 
@@ -120,56 +120,45 @@ export default function ExcellenceStatsSection() {
           <div className="w-16 sm:w-20 h-1 bg-gradient-to-r from-[#c59324] to-[#dfad36] mx-auto mt-3 rounded-full" />
         </div>
 
-        {/* 4 Stats: Swipeable Carousel on Mobile (<768px), Clean 4-Col Grid on Desktop */}
+        {/* 4 Cards: Non-clickable, Uniform Elegant Card Design, Swipable on Mobile */}
         <div
           ref={scrollContainerRef}
           onScroll={handleScroll}
-          onMouseDown={handleMouseDown}
-          onMouseMove={handleMouseMove}
-          onMouseUp={handleMouseUpOrLeave}
-          onMouseLeave={handleMouseUpOrLeave}
-          className="flex md:grid md:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 max-w-6xl mx-auto overflow-x-auto md:overflow-visible snap-x snap-mandatory md:snap-none no-scrollbar touch-pan-x px-6 md:px-0 scroll-px-6 pb-2 md:pb-0 select-none cursor-grab active:cursor-grabbing md:cursor-default"
+          className="flex md:grid md:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 max-w-6xl mx-auto overflow-x-auto md:overflow-visible snap-x snap-mandatory md:snap-none no-scrollbar touch-pan-x px-4 md:px-0 pb-2 md:pb-0 select-none"
         >
           {stats.map((item, idx) => {
             const Icon = item.icon;
-            const isActiveOnMobile = activeIdx === idx;
             return (
               <div
                 key={idx}
-                onClick={() => scrollToIndex(idx)}
-                className={`group p-6 sm:p-7 rounded-2xl backdrop-blur-md text-center transition-all duration-300 md:hover:scale-105 md:hover:shadow-2xl flex flex-col items-center justify-center shadow-lg shrink-0 w-[78vw] sm:w-[50vw] md:w-auto snap-center min-h-[220px] ${
-                  isActiveOnMobile
-                    ? 'bg-white/10 border-2 border-[#dfad36] shadow-[#dfad36]/10 shadow-xl'
-                    : 'bg-white/5 border border-[#c59324]/25 hover:border-[#c59324]/50'
-                }`}
+                className="p-6 sm:p-7 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md text-center flex flex-col justify-between shrink-0 w-[82vw] sm:w-[50vw] md:w-auto snap-center min-h-[260px] shadow-lg shadow-black/20"
               >
-                {/* Icon */}
-                <div
-                  className={`w-14 h-14 rounded-full flex items-center justify-center mb-4 transition-all duration-300 md:group-hover:scale-110 ${
-                    isActiveOnMobile
-                      ? 'bg-[#c59324] text-[#07172b] border border-[#dfad36]'
-                      : 'bg-[#c59324]/20 border border-[#c59324]/40 text-[#dfad36] md:group-hover:bg-[#c59324] md:group-hover:text-[#07172b]'
-                  }`}
-                >
-                  <Icon className="w-7 h-7 stroke-[2.2]" />
+                <div>
+                  {/* Badge */}
+                  <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#c59324]/15 border border-[#c59324]/40 text-[#dfad36] text-[10px] font-bold uppercase tracking-wider mb-4">
+                    {item.badge}
+                  </div>
+
+                  {/* Icon */}
+                  <div className="w-12 h-12 rounded-2xl mx-auto flex items-center justify-center mb-4 bg-gradient-to-br from-[#c59324]/20 to-[#dfad36]/10 border border-[#c59324]/40 text-[#dfad36]">
+                    <Icon className="w-6 h-6 stroke-[2]" />
+                  </div>
+
+                  {/* Main Title */}
+                  <h3 className="text-lg sm:text-xl font-bold tracking-tight text-white leading-snug">
+                    {item.mainText}
+                  </h3>
+
+                  {/* Subtitle / Description */}
+                  <p className="text-xs text-slate-300 mt-2 leading-relaxed">
+                    {item.subText}
+                  </p>
                 </div>
 
-                {/* Number */}
-                <div className="flex items-baseline justify-center gap-1">
-                  <span className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white md:group-hover:text-[#dfad36] transition-colors">
-                    {item.value}
-                  </span>
-                  {item.unit && (
-                    <span className="text-xl sm:text-2xl font-bold text-[#dfad36]">
-                      {item.unit}
-                    </span>
-                  )}
+                {/* Footnote */}
+                <div className="pt-3.5 mt-3 border-t border-white/10 text-[11px] font-medium text-[#dfad36]/90">
+                  {item.footnote}
                 </div>
-
-                {/* Subtitle Label */}
-                <p className="text-xs sm:text-sm font-semibold text-slate-300 mt-2 leading-snug">
-                  {item.label}
-                </p>
               </div>
             );
           })}

@@ -26,8 +26,8 @@ class SettingSeeder extends Seeder
             ['key' => 'who_gmp_certified', 'value' => '1', 'group' => 'regulatory', 'type' => 'boolean', 'description' => 'Manufacturing partner WHO-GMP certified status'],
 
             // Manufacturing Partner
-            ['key' => 'manufacturer_name', 'value' => 'WALPAR WELLNESS PVT.LTD.', 'group' => 'manufacturing', 'type' => 'string', 'description' => 'Manufacturing enterprise name'],
-            ['key' => 'manufacturer_certification', 'value' => 'WHO-GMP & An ISO 9001 : 2015 Certified Company', 'group' => 'manufacturing', 'type' => 'string', 'description' => 'Manufacturer certification credentials'],
+            ['key' => 'manufacturer_name', 'value' => 'Walpar Wellness Pvt. Ltd. & Akums Drugs & Pharmaceuticals Ltd.', 'group' => 'manufacturing', 'type' => 'string', 'description' => 'Manufacturing enterprise partners'],
+            ['key' => 'manufacturer_certification', 'value' => 'WHO-GMP, cGMP & ISO 9001:2015 Certified Facilities', 'group' => 'manufacturing', 'type' => 'string', 'description' => 'Manufacturer certification credentials'],
             ['key' => 'manufacturing_unit_address', 'value' => 'PLOT NO.2/A & 06, OPP, SABARMATI GAS STATION, KHATRAJ, KALOL, GANDHINAGAR., Gujarat-382721', 'group' => 'manufacturing', 'type' => 'string', 'description' => 'Primary production manufacturing facility address'],
 
             // Contact Information

@@ -45,7 +45,7 @@ export default function AboutPage({ company, categories = [], featuredProducts =
 
   const milestones = [
     { year: 'Incorporation', title: 'Founded with a Vision', desc: 'Established Ciplon Pharma Private Limited with a core dedication to therapeutic excellence and patient-first healthcare.' },
-    { year: 'WHO-GMP Alignment', title: 'State-of-the-Art Partnering', desc: 'Partnered with Walpar Wellness Pvt. Ltd. (Khatraj Unit) for automated, robotic manufacturing adhering to WHO-GMP standards.' },
+    { year: 'WHO-GMP Alignment', title: 'State-of-the-Art Partnering', desc: 'Partnered with premier WHO-GMP manufacturing leaders Walpar Wellness Pvt. Ltd. (Khatraj Unit) and Akums Drugs & Pharmaceuticals Ltd. (Pure & Cure Healthcare).' },
     { year: 'ISO 9001:2015', title: 'Quality System Certified', desc: 'Attained formal ISO 9001:2015 quality management standards across all procurement, supply chain, and packaging stages.' },
     { year: 'Nationwide Expansion', title: '9,738+ Registrations', desc: 'Scaled multi-state distribution channels, institutional hospital supply, and specialized medical representative networks.' },
   ];
@@ -54,7 +54,7 @@ export default function AboutPage({ company, categories = [], featuredProducts =
     <PublicLayout companyData={companyData} categories={categories}>
       <SeoHead
         title="About Us — Corporate Profile & Manufacturing Heritage"
-        description="Learn about Ciplon Pharma Private Limited, our ISO 9001:2015 certification, our WHO-GMP manufacturing partner Walpar Wellness Pvt. Ltd., and our mission to provide affordable quality healthcare."
+        description="Learn about Ciplon Pharma Private Limited, our ISO 9001:2015 certification, and our certified manufacturing partners Walpar Wellness Pvt. Ltd. and Akums Drugs & Pharmaceuticals Ltd. (Pure & Cure Healthcare)."
         canonicalUrl="https://www.ciplonpharma.in/about"
       />
       <div className="bg-white text-slate-900">
@@ -158,8 +158,8 @@ export default function AboutPage({ company, categories = [], featuredProducts =
                     <Factory className="w-6 h-6" />
                   </div>
                   <div>
-                    <p className="text-xs text-slate-300">Mfg Partner</p>
-                    <p className="text-sm font-bold text-white leading-snug">Walpar Wellness Pvt. Ltd. (WHO-GMP)</p>
+                    <p className="text-xs text-slate-300">Mfg Partners</p>
+                    <p className="text-sm font-bold text-white leading-snug">Walpar Wellness & Akums Group</p>
                   </div>
                 </div>
               </div>
@@ -198,11 +198,11 @@ export default function AboutPage({ company, categories = [], featuredProducts =
           </Container>
         </section>
 
-        {/* 4. Manufacturing & Packaging Excellence (Walpar Wellness details) */}
+        {/* 4. Manufacturing & Packaging Excellence (Walpar Wellness & Akums Group details) */}
         <section className="py-16 sm:py-24 bg-[#0c2340] text-white relative overflow-hidden">
           <Container size="wide">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-              <div className="order-2 lg:order-1 relative">
+              <div className="order-2 lg:order-1 space-y-6">
                 <div className="rounded-3xl overflow-hidden shadow-2xl border-4 border-white/10 aspect-[4/3] bg-slate-900">
                   <img
                     src="/images/pharma_automation_line.jpg"
@@ -210,35 +210,53 @@ export default function AboutPage({ company, categories = [], featuredProducts =
                     className="w-full h-full object-cover"
                   />
                 </div>
+                {/* Partner Badges */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="p-4 rounded-2xl bg-white/10 border border-white/15 backdrop-blur-sm flex items-center gap-3">
+                    <img src="/images/walpar_logo.png" alt="Walpar Wellness" className="h-9 w-auto object-contain bg-white/90 p-1 rounded-lg" />
+                    <div>
+                      <p className="text-xs font-bold text-white">Walpar Wellness</p>
+                      <p className="text-[10px] text-[#dfad36]">WHO-GMP Khatraj Unit</p>
+                    </div>
+                  </div>
+                  <div className="p-4 rounded-2xl bg-white/10 border border-white/15 backdrop-blur-sm flex items-center gap-3">
+                    <img src="/images/akums_logo.png" alt="Akums Group" className="h-9 w-auto object-contain bg-white/90 p-1 rounded-lg" />
+                    <div>
+                      <p className="text-xs font-bold text-white">Akums Group</p>
+                      <p className="text-[10px] text-[#dfad36]">Pure & Cure Healthcare</p>
+                    </div>
+                  </div>
+                </div>
               </div>
 
               <div className="order-1 lg:order-2">
-                <span className="text-xs font-bold uppercase tracking-widest text-[#dfad36]">Manufacturing Partner</span>
+                <span className="text-xs font-bold uppercase tracking-widest text-[#dfad36]">Manufacturing Infrastructure</span>
                 <h2 className="text-2xl sm:text-4xl font-bold text-white mt-2 mb-6">
-                  Walpar Wellness Pvt. Ltd. — Precision at Scale
+                  Premier Contract Manufacturing Partners — Precision at Scale
                 </h2>
                 <p className="text-slate-300 text-sm sm:text-base leading-relaxed mb-6">
-                  Our products are manufactured under rigorous compliance standards at Walpar Wellness Pvt. Ltd., located in Khatraj, Gandhinagar, Gujarat. The facility holds WHO-GMP certification and ISO 9001:2015 accreditation, featuring high-speed automated blistering, carton serialization, and HEPA air filtration.
+                  Ciplon Pharma is a specialized pharmaceutical formulations enterprise. We deliberately do not own captive plants; instead, all our formulations are manufactured under strict loan licensing and contract agreements at India’s premier WHO-GMP certified facilities: <strong>Walpar Wellness Pvt. Ltd.</strong> and <strong>Akums Drugs & Pharmaceuticals Ltd. (Pure & Cure Healthcare Pvt. Ltd.)</strong>.
                 </p>
 
-                <div className="space-y-3.5">
-                  <div className="flex items-start gap-3">
-                    <CheckCircle2 className="w-5 h-5 text-[#dfad36] shrink-0 mt-0.5" />
-                    <span className="text-xs sm:text-sm text-slate-200">
-                      <strong>Unit Address:</strong> Plot No. 2/A & 06, Opp. Sabarmati Gas Station, Khatraj, Kalol, Gandhinagar, Gujarat - 382721
-                    </span>
+                <div className="space-y-4">
+                  <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-1">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle2 className="w-5 h-5 text-[#dfad36] shrink-0" />
+                      <strong className="text-sm text-white">Walpar Wellness Pvt. Ltd. (Khatraj Unit, Gujarat)</strong>
+                    </div>
+                    <p className="text-xs text-slate-300 pl-7">
+                      Plot No. 2/A & 06, Opp. Sabarmati Gas Station, Khatraj, Kalol, Gandhinagar, Gujarat - 382721. WHO-GMP & ISO 9001:2015 accredited unit featuring high-speed blistering and serialization.
+                    </p>
                   </div>
-                  <div className="flex items-start gap-3">
-                    <CheckCircle2 className="w-5 h-5 text-[#dfad36] shrink-0 mt-0.5" />
-                    <span className="text-xs sm:text-sm text-slate-200">
-                      <strong>Microbiological & Stability:</strong> In-house analytical laboratories with Zone IVb climate stability chambers
-                    </span>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <CheckCircle2 className="w-5 h-5 text-[#dfad36] shrink-0 mt-0.5" />
-                    <span className="text-xs sm:text-sm text-slate-200">
-                      <strong>Batch Traceability:</strong> Complete QR & tamper-proof carton seals on every production run
-                    </span>
+
+                  <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-1">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle2 className="w-5 h-5 text-[#dfad36] shrink-0" />
+                      <strong className="text-sm text-white">Akums Drugs & Pharmaceuticals Ltd. (Pure & Cure Healthcare)</strong>
+                    </div>
+                    <p className="text-xs text-slate-300 pl-7">
+                      Sector-8A, IIE SIDCUL Ranipur, Haridwar, Uttarakhand & Baddi Units. One of India’s largest pharmaceutical manufacturing groups with international quality accreditations.
+                    </p>
                   </div>
                 </div>
 

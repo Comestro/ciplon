@@ -22,7 +22,7 @@ export default function HeroSection({ onExploreProducts, onContactUs, onOpenEnqu
             </h1>
 
             <p className="text-base sm:text-lg text-slate-600 leading-relaxed max-w-2xl font-normal">
-              Ciplon is a research-driven pharmaceutical manufacturer delivering WHO-GMP certified finished formulations across critical therapeutic segments with uncompromising analytical rigor and global regulatory compliance.
+              Ciplon is a quality-focused pharmaceutical formulations enterprise marketing WHO-GMP certified finished formulations manufactured in partnership with leading manufacturing giants Walpar Wellness and Akums Drugs & Pharmaceuticals Ltd. across critical therapeutic segments.
             </p>
 
             <div className="flex flex-wrap items-center gap-4 pt-1">
