@@ -1,41 +1,42 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { ChevronLeft, ChevronRight, Award, Globe, Sparkles, HeartPulse, ArrowRight } from 'lucide-react';
 import Container from '../common/Container';
 
 export default function IntasHeroBanner({ onExploreProducts, onContactUs, onOpenEnquiryModal }) {
   const [activeSlide, setActiveSlide] = useState(0);
-  const [activeCard, setActiveCard] = useState(0);
+  const [activeMobileCard, setActiveMobileCard] = useState(0);
+  const cardScrollRef = useRef(null);
 
   const slides = [
     {
       id: 0,
       image: '/images/hero_indian_doctors.jpg',
-      headlinePre: 'Advancing Modern Healthcare',
-      headlineMain: 'Transforming Patient Care',
-      headlineSub: 'Embarking on a journey of',
-      headlineSubBold: 'clinical excellence',
-      description: 'An emerging Indian pharmaceutical enterprise committed to developing high-potency, affordable finished formulations.',
+      headlinePre: 'Quality-First Pharmaceutical Formulations',
+      headlineMain: 'Committed to Healthcare Excellence',
+      headlineSub: 'Trusted formulations through our',
+      headlineSubBold: 'WHO-GMP partners',
+      description: 'Ciplon Pharma markets high-potency, affordable finished formulations manufactured by certified partners Walpar Wellness & Akums Group.',
       tag: 'Quality Formulations',
     },
     {
       id: 1,
       image: '/images/pharma_automation_line.jpg',
-      headlinePre: 'Modern Formulation Technology',
-      headlineMain: 'High-Precision Manufacturing',
-      headlineSub: 'Engineered for reproducible quality in',
-      headlineSubBold: 'finished therapeutics',
-      description: 'Modern production lines dedicated to consistent, safe oral solids and liquid formulations.',
-      tag: 'Precision Technology',
+      headlinePre: 'Advanced Contract Manufacturing',
+      headlineMain: 'High-Precision Automated Plants',
+      headlineSub: 'Partnered with India’s leading',
+      headlineSubBold: 'manufacturing giants',
+      description: 'Manufactured at WHO-GMP & ISO 9001:2015 certified facilities with automated blistering, serialization, and strict batch release.',
+      tag: 'Walpar & Akums',
     },
     {
       id: 2,
       image: '/images/hero_indian_scientists.jpg',
-      headlinePre: 'Translating Analytical Science',
+      headlinePre: 'Translating Pharmaceutical Science',
       headlineMain: 'Into Life-Changing Smiles',
       headlineSub: 'Continuous focus on',
       headlineSubBold: 'essential medicines',
-      description: 'Dedicated Indian research personnel and formulation chemists upholding high standards of quality assurance.',
-      tag: 'Advanced R&D',
+      description: 'Formulations developed with verified bioavailability, clinical efficacy, and uncompromising batch-level quality assurance.',
+      tag: 'Therapeutic Excellence',
     },
     {
       id: 3,
@@ -74,30 +75,56 @@ export default function IntasHeroBanner({ onExploreProducts, onContactUs, onOpen
       title: "Committed to Quality by Design (QbD)",
       description: "Our dedicated commitment to clinical precision, verified bioavailability, and stringent analytical standards across every formulation.",
       actionText: "Our Quality Vision",
-      isPrimary: true,
     },
     {
       icon: Globe,
-      title: "A Global Healthcare Partner",
-      description: "Ciplon is trusted by healthcare professionals across more than 85+ countries across the globe.",
-      actionText: "Our Global Footprint",
-      isPrimary: false,
+      title: "WHO-GMP Manufacturing Allies",
+      description: "Produced at state-of-the-art facilities of Walpar Wellness and Akums Drugs & Pharmaceuticals Ltd.",
+      actionText: "View Mfg Partners",
     },
     {
       icon: Sparkles,
       title: "A Dynamic Product Basket",
-      description: "Empowered by a passionate R&D team, offering a comprehensive therapeutic range of finished pharmaceutical formulations.",
+      description: "Comprehensive therapeutic portfolio covering essential neuro, cardio, analgesic, anti-infective, and metabolic treatments.",
       actionText: "Explore Portfolio",
-      isPrimary: false,
     },
     {
       icon: HeartPulse,
-      title: "Pharma Therapy for Life",
-      description: "Discover our specialized plasma fractionation, biosimilars, and targeted hospital therapy solutions.",
+      title: "Accessible Patient Healthcare",
+      description: "Bridging clinical excellence with affordability to supply trusted hospital and retail formulations across India.",
       actionText: "View Therapies",
-      isPrimary: false,
     },
   ];
+
+  // Mobile horizontal swipe detection for cards
+  const handleCardScroll = () => {
+    if (!cardScrollRef.current) return;
+    const container = cardScrollRef.current;
+    const center = container.scrollLeft + container.offsetWidth / 2;
+    const children = Array.from(container.children);
+    let closestIndex = 0;
+    let minDistance = Infinity;
+
+    children.forEach((child, idx) => {
+      const childCenter = child.offsetLeft + child.offsetWidth / 2;
+      const distance = Math.abs(center - childCenter);
+      if (distance < minDistance) {
+        minDistance = distance;
+        closestIndex = idx;
+      }
+    });
+    setActiveMobileCard(closestIndex);
+  };
+
+  const scrollCardToIndex = (idx) => {
+    if (!cardScrollRef.current) return;
+    const container = cardScrollRef.current;
+    const target = container.children[idx];
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      setActiveMobileCard(idx);
+    }
+  };
 
   return (
     <section className="relative w-full bg-slate-50 select-none overflow-hidden">
@@ -245,79 +272,61 @@ export default function IntasHeroBanner({ onExploreProducts, onContactUs, onOpen
         </div>
       </div>
 
-      {/* 4 Feature Action Cards Docked Section (Directly underneath hero matching Intas layout) */}
+      {/* 4 Feature Cards Section (Swipable on Mobile, Docked Grid on Desktop, Non-clickable, Consistent Styling) */}
       <div className="relative z-30 -mt-6 sm:-mt-10 lg:-mt-14 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div
+          ref={cardScrollRef}
+          onScroll={handleCardScroll}
+          className="flex sm:grid sm:grid-cols-2 lg:grid-cols-4 gap-4 overflow-x-auto sm:overflow-visible pb-2 sm:pb-0 snap-x snap-mandatory no-scrollbar"
+        >
           {cards.map((card, index) => {
             const Icon = card.icon;
-            const isSelected = index === activeCard;
 
             return (
               <div
                 key={index}
-                onClick={() => {
-                  setActiveCard(index);
-                  if (index === 2) {
-                    onExploreProducts();
-                  } else if (index === 3) {
-                    const el = document.getElementById('science');
-                    if (el) el.scrollIntoView({ behavior: 'smooth' });
-                  } else if (index === 1) {
-                    const el = document.getElementById('excellence');
-                    if (el) el.scrollIntoView({ behavior: 'smooth' });
-                  }
-                }}
-                className={`p-5 sm:p-6 rounded-2xl cursor-pointer transition-all duration-300 flex flex-col justify-between border ${
-                  card.isPrimary || isSelected
-                    ? 'bg-gradient-to-br from-[#0c2340] to-[#07172b] text-white border-[#c59324] shadow-xl shadow-[#0c2340]/30 scale-[1.02]'
-                    : 'bg-white text-slate-800 border-slate-200/90 hover:border-[#c59324]/50 hover:shadow-xl shadow-md'
-                }`}
+                className="w-[82vw] sm:w-auto shrink-0 snap-center p-5 sm:p-6 rounded-2xl bg-white text-slate-800 border border-slate-200/90 shadow-md flex flex-col justify-between select-none"
               >
                 <div>
                   {/* Icon */}
-                  <div
-                    className={`w-11 h-11 rounded-xl flex items-center justify-center mb-4 transition-transform group-hover:scale-110 ${
-                      card.isPrimary || isSelected
-                        ? 'bg-[#c59324]/20 text-[#dfad36] border border-[#c59324]/40'
-                        : 'bg-amber-50 text-[#0c2340] border border-amber-100'
-                    }`}
-                  >
-                    <Icon className="w-6 h-6 stroke-[2.2]" />
+                  <div className="w-11 h-11 rounded-xl flex items-center justify-center mb-4 bg-amber-50 text-[#0c2340] border border-amber-100">
+                    <Icon className="w-6 h-6 stroke-[2.2] text-[#c59324]" />
                   </div>
 
                   {/* Title */}
-                  <h3
-                    className={`text-base font-bold tracking-tight mb-2 leading-snug ${
-                      card.isPrimary || isSelected ? 'text-white' : 'text-[#0c2340]'
-                    }`}
-                  >
+                  <h3 className="text-base font-bold tracking-tight mb-2 leading-snug text-[#0c2340]">
                     {card.title}
                   </h3>
 
                   {/* Description */}
-                  <p
-                    className={`text-xs leading-relaxed ${
-                      card.isPrimary || isSelected ? 'text-slate-300' : 'text-slate-600'
-                    }`}
-                  >
+                  <p className="text-xs leading-relaxed text-slate-600">
                     {card.description}
                   </p>
                 </div>
 
-                {/* Footer action link */}
-                <div className="pt-4 mt-3 border-t border-black/10 flex items-center justify-between text-xs font-bold">
-                  <span className={card.isPrimary || isSelected ? 'text-[#dfad36]' : 'text-[#c59324]'}>
-                    {card.actionText}
-                  </span>
-                  <ArrowRight
-                    className={`w-4 h-4 transition-transform group-hover:translate-x-1 ${
-                      card.isPrimary || isSelected ? 'text-[#dfad36]' : 'text-[#c59324]'
-                    }`}
-                  />
+                {/* Footer text badge (informative, non-clickable) */}
+                <div className="pt-4 mt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-[#c59324]">
+                  <span>{card.actionText}</span>
+                  <div className="w-1.5 h-1.5 rounded-full bg-[#c59324]" />
                 </div>
               </div>
             );
           })}
+        </div>
+
+        {/* Mobile Swipe Indicators (dots) */}
+        <div className="flex sm:hidden items-center justify-center gap-1.5 pt-3">
+          {cards.map((_, idx) => (
+            <button
+              key={idx}
+              type="button"
+              onClick={() => scrollCardToIndex(idx)}
+              className={`h-1.5 rounded-full transition-all duration-300 ${
+                activeMobileCard === idx ? 'w-6 bg-[#c59324]' : 'w-1.5 bg-slate-300'
+              }`}
+              aria-label={`Go to card ${idx + 1}`}
+            />
+          ))}
         </div>
       </div>
     </section>

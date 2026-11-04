@@ -5,6 +5,7 @@ import { Pill, RefreshCw } from 'lucide-react';
 import PublicLayout from '../../layouts/PublicLayout';
 import Container from '../../components/common/Container';
 import ProductCard from '../../components/home/ProductCard';
+import SeoHead from '../../components/common/SeoHead';
 
 export default function ProductsPage({ products = [], categories = [], filters = {} }) {
   const searchQuery = filters.search || '';
@@ -92,6 +93,11 @@ export default function ProductsPage({ products = [], categories = [], filters =
 
   return (
     <PublicLayout categories={categories}>
+      <SeoHead
+        title={selectedCategory !== 'All' ? `${selectedCategory} Formulations — Product Catalog` : 'Pharmaceutical Formulations Catalog'}
+        description={`Explore Ciplon Pharma's comprehensive portfolio of finished formulations${selectedCategory !== 'All' ? ` in ${selectedCategory}` : ''}, including tablets, capsules, injectables, and syrups.`}
+        canonicalUrl="https://www.ciplonpharma.in/products"
+      />
       <div className="min-h-screen bg-slate-50/60 pb-16">
         {/* Hero Header matching Home Page Corporate Theme */}
         <div className="bg-[#0c2340] text-white py-10 sm:py-12 border-b border-[#c59324]/40 relative overflow-hidden">

@@ -22,6 +22,7 @@ use App\Http\Controllers\MR\MRVisitController;
 use App\Http\Controllers\MRConnectController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProductCatalogController;
+use App\Http\Controllers\SeoController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 
@@ -34,6 +35,10 @@ Route::get('/products', [ProductCatalogController::class, 'index'])->name('produ
 Route::get('/products/{product}', [ProductCatalogController::class, 'show'])->name('products.show');
 Route::post('/products/{product}/enquiry', [ProductCatalogController::class, 'storeEnquiry'])->name('products.enquiry');
 Route::post('/enquiry', [ProductCatalogController::class, 'storeEnquiry'])->name('enquiry.store');
+
+// SEO Routes (Dynamic XML Sitemap & Robots.txt)
+Route::get('/sitemap.xml', [SeoController::class, 'sitemap'])->name('seo.sitemap');
+Route::get('/robots.txt', [SeoController::class, 'robots'])->name('seo.robots');
 
 // Authentication Routes
 Route::middleware('guest')->group(function () {

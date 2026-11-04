@@ -7,28 +7,28 @@ export default function ScienceIntoSmilesSection() {
 
   const bulletPoints = [
     {
-      highlight: "6 - 7%",
-      text: "of turnover invested in R&D every year",
+      highlight: "WHO-GMP & cGMP",
+      text: "manufactured by certified leaders Walpar Wellness & Akums Group",
     },
     {
       highlight: "Over 1,00,000 sq ft",
-      text: "dedicated R&D and analytical space",
+      text: "automated, robotic manufacturing and packaging floor space",
     },
     {
-      highlight: "650+ scientists",
-      text: "and researchers working across therapeutic areas",
+      highlight: "High-Calibre QA/QC",
+      text: "chemists & analytical specialists ensuring batch-to-batch consistency",
     },
     {
-      highlight: "17 advanced",
-      text: "formulation and bio-analytical research facilities",
+      highlight: "HPLC & Mass Spec",
+      text: "advanced analytical assay, dissolution mapping, and bioburden controls",
     },
     {
-      highlight: "Global Regulatory Authority",
-      text: "accreditations including USFDA, WHO-GMP & MHRA",
+      highlight: "ICH Zone IVb",
+      text: "climatic stability testing for dependable shelf-life integrity",
     },
     {
-      highlight: "Pioneers in biosimilars",
-      text: "and novel extended-release drug delivery systems",
+      highlight: "Patient-First Pricing",
+      text: "delivering vital therapeutic medicines at affordable prices",
     },
   ];
 
@@ -106,7 +106,7 @@ export default function ScienceIntoSmilesSection() {
           {/* Right Column: R&D Narrative & Highlight Bullets */}
           <div className="lg:col-span-6 space-y-6">
             <p className="text-sm sm:text-base text-slate-700 leading-relaxed font-normal">
-              R&D is the cornerstone of Ciplon's success. A high-calibre team works round the clock with a quest to develop a progressive and formidable product basket that includes novel doses, generics, biosimilars and parenteral formulations to address unmet global healthcare needs.
+              At Ciplon Pharma, delivering reliable therapeutic formulations is at the heart of our mission. In partnership with industry leaders <strong>Walpar Wellness Pvt. Ltd.</strong> and <strong>Akums Drugs & Pharmaceuticals Ltd. (Pure & Cure Healthcare)</strong>, we ensure every batch meets stringent pharmacopoeial purity standards, optimal dissolution profiles, and trusted clinical efficacy.
             </p>
 
             {/* Bullets with Golden Chevrons */}
