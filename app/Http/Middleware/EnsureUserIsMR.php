@@ -26,8 +26,9 @@ class EnsureUserIsMR
             return redirect()->guest('/login');
         }
 
-        $isAuthorized = $user->hasRole(['mr', 'super_admin'])
-            || in_array($user->role, ['mr', 'admin']);
+        $isAuthorized = $user->isAdmin()
+            || $user->hasRole(['mr', 'super_admin', 'manager', 'admin'])
+            || in_array($user->role, ['mr', 'super_admin', 'manager', 'admin'], true);
 
         if (! $isAuthorized) {
             if ($request->expectsJson()) {

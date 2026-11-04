@@ -13,9 +13,9 @@
 
 1. [Overview & Standards](#1-overview--standards)
 2. [Authentication & Security](#2-authentication--security)
-   - [CSRF Cookie Handshake](#21-csrf-cookie-handshake)
-   - [Authentication Session Login](#22-authentication-session-login)
-   - [Session Logout](#23-session-logout)
+   - [Mobile App API Login (No CSRF / Bearer Token)](#21-mobile-app-api-login-no-csrf--bearer-token)
+   - [Mobile App API Identity & Logout](#22-mobile-app-api-identity--logout)
+   - [Web Browser Session Login (Cookie / CSRF)](#23-web-browser-session-login-cookie--csrf)
    - [Password Reset via 6-Digit OTP](#24-password-reset-via-6-digit-otp)
 3. [Standard Response & Error Conventions](#3-standard-response--error-conventions)
 4. [MR Dashboard API](#4-mr-dashboard-api)
@@ -63,84 +63,138 @@ For all API interactions, clients must transmit standard JSON and CSRF headers:
 
 ## 2. Authentication & Security
 
-All API routes under `api/v1/mr/*` are protected by the `['web', 'auth', 'mr']` middleware pipeline. Requests are validated against user sessions and Spatie RBAC roles.
+The API supports two authentication flows:
+1. **Mobile App Clients (Flutter, React Native, iOS, Android):** Stateless Token Authentication using Laravel Sanctum Bearer tokens. **No CSRF token or cookie is required.**
+2. **Web Browser SPA / Inertia:** Stateful Cookie session authentication.
 
 ```mermaid
 sequenceDiagram
     autonumber
-    actor Client as Mobile / Web Client
-    participant App as Ciplon Laravel Server
+    actor Mobile as Mobile App (Flutter / React Native)
+    participant API as Ciplon API (/api/v1/...)
     participant DB as Database
 
-    Client->>App: GET /sanctum/csrf-cookie
-    App-->>Client: 204 No Content (Set-Cookie: XSRF-TOKEN & ciplon_session)
-    Client->>App: POST /login (email, password)
-    App->>DB: Validate user credentials & 'mr' role
-    App-->>Client: 302 Redirect to /mr/dashboard (Session Cookie Authenticated)
-    Client->>App: GET /api/v1/mr/dashboard (with Cookie + X-XSRF-TOKEN)
-    App-->>Client: 200 OK (JSON response)
+    Mobile->>API: POST /api/v1/auth/login (email, password, device_name)
+    API->>DB: Validate credentials & check MR role
+    API-->>Mobile: 200 OK (token: "1|...", token_type: "Bearer", user)
+    Note over Mobile: Store token securely (SecureStorage / Keychain)
+    Mobile->>API: GET /api/v1/mr/dashboard (Header: Authorization: Bearer <token>)
+    API-->>Mobile: 200 OK (JSON response)
 ```
 
-### 2.1 CSRF Cookie Handshake
-Initializes the CSRF protection session before posting credentials.
+### 2.1 Mobile App API Login (No CSRF / Bearer Token)
+Authenticates a Medical Representative from a mobile application and issues a personal access Bearer token.
 
-* **Endpoint:** `GET /sanctum/csrf-cookie`
-* **Auth Required:** None (Public)
-* **Response:** `204 No Content` with cookie headers.
-
-```bash
-curl -X GET "https://your-domain.test/sanctum/csrf-cookie" \
-  -H "Accept: application/json" \
-  -c cookies.txt
-```
-
----
-
-### 2.2 Authentication Session Login
-Authenticates an MR, Manager, or Admin and issues an active session.
-
-* **Endpoint:** `POST /login`
-* **Auth Required:** Guest
-* **Content-Type:** `application/json` or `application/x-www-form-urlencoded`
+* **Endpoints:**
+  - `POST /api/v1/auth/login` (Standard)
+  - `POST /api/v1/mr/login` (Alias)
+  - `POST /api/v1/login` (Alias)
+* **Auth Required:** None (Public, **CSRF verification exempt**)
+* **Headers:**
+  - `Accept: application/json`
+  - `Content-Type: application/json`
 
 #### Request Payload
 | Field | Type | Required | Description |
 |---|---|---|---|
-| `email` | string (email) | Yes | Registered account email address. |
+| `email` | string (email) | Yes | Account email address (e.g. `mr@ciplon.com`). |
 | `password` | string | Yes | Account password. |
-| `remember` | boolean | No | Optional persistent session flag (defaults to `false`). |
+| `device_name` | string | No | Client device identifier (e.g. `iPhone 15 Pro`, `Pixel 8`, `Ciplon Android`). Defaults to `'Mobile App'`. |
 
-#### Example Request
+#### Example Request (cURL)
 ```bash
-curl -X POST "https://your-domain.test/login" \
-  -b cookies.txt -c cookies.txt \
+curl -X POST "https://your-domain.test/api/v1/auth/login" \
   -H "Accept: application/json" \
   -H "Content-Type: application/json" \
-  -H "X-XSRF-TOKEN: <token>" \
   -d '{
-    "email": "mr@ciplon.com",
+    "email": "rep@ciplon.com",
     "password": "SecretPassword123!",
-    "remember": true
+    "device_name": "Flutter Android"
   }'
 ```
 
-#### Success Response (`302 Found` / `200 OK` on JSON)
-Redirects to `/mr/dashboard` on successful authentication.
+#### Success Response (`200 OK`)
+```json
+{
+  "success": true,
+  "message": "Login successful.",
+  "token": "1|qX8b7sA9Z1K2L3M4N5O6P7Q8R9S0T1U2V3W4X5Y6",
+  "token_type": "Bearer",
+  "user": {
+    "id": 5,
+    "name": "Rupesh MR",
+    "email": "rep@ciplon.com",
+    "role": "mr",
+    "roles": ["mr"]
+  }
+}
+```
+
+#### Error Responses
+- **401 Unauthorized (Invalid Credentials):**
+  ```json
+  {
+    "success": false,
+    "message": "The provided credentials do not match our records.",
+    "errors": {
+      "email": ["The provided credentials do not match our records."]
+    }
+  }
+  ```
+- **403 Forbidden (Non-MR User Role):**
+  ```json
+  {
+    "success": false,
+    "message": "Access denied. Medical Representative or authorized staff privileges required."
+  }
+  ```
 
 ---
 
-### 2.3 Session Logout
-Terminates the authenticated session and invalidates the session token.
+### 2.2 Mobile App API Identity & Logout
 
-* **Endpoint:** `POST /logout`
-* **Auth Required:** Authenticated user (`auth`)
+#### Get Current Profile
+* **Endpoint:** `GET /api/v1/auth/me` (or `GET /api/v1/mr/me`)
+* **Headers:** `Authorization: Bearer <token>`, `Accept: application/json`
+* **Success Response (`200 OK`):**
+  ```json
+  {
+    "success": true,
+    "user": {
+      "id": 5,
+      "name": "Rupesh MR",
+      "email": "rep@ciplon.com",
+      "role": "mr",
+      "roles": ["mr"]
+    }
+  }
+  ```
 
-```bash
-curl -X POST "https://your-domain.test/logout" \
-  -b cookies.txt -c cookies.txt \
-  -H "Accept: application/json" \
-  -H "X-XSRF-TOKEN: <token>"
-```
+#### Revoke Token (Logout)
+* **Endpoint:** `POST /api/v1/auth/logout` (or `POST /api/v1/mr/logout`)
+* **Headers:** `Authorization: Bearer <token>`, `Accept: application/json`
+* **Optional Request Body:**
+  ```json
+  {
+    "all_devices": true
+  }
+  ```
+* **Success Response (`200 OK`):**
+  ```json
+  {
+    "success": true,
+    "message": "Successfully logged out."
+  }
+  ```
+
+---
+
+### 2.3 Web Browser Session Login (Cookie / CSRF)
+For web browser SPAs and administrative portals using session cookies.
+
+* **CSRF Cookie Handshake:** `GET /sanctum/csrf-cookie`
+* **Web Login:** `POST /login`
+* **Web Logout:** `POST /logout`
 
 ---
 
