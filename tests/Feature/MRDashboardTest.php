@@ -14,6 +14,36 @@ test('unauthenticated users are redirected from mr dashboard', function () {
     $response->assertRedirect('/login');
 });
 
+test('unauthenticated users accessing /mr are redirected to login', function () {
+    $response = $this->get('/mr');
+
+    $response->assertRedirect('/login');
+});
+
+test('guest accessing /mr/login is redirected to /login', function () {
+    $response = $this->get('/mr/login');
+
+    $response->assertRedirect('/login');
+});
+
+test('mr user accessing /mr is redirected to /mr/dashboard', function () {
+    $mrUser = User::factory()->create(['role' => 'mr']);
+    $mrUser->assignRole('mr');
+
+    $response = $this->actingAs($mrUser)->get('/mr');
+
+    $response->assertRedirect('/mr/dashboard');
+});
+
+test('mr user accessing /admin is redirected to /mr/dashboard', function () {
+    $mrUser = User::factory()->create(['role' => 'mr']);
+    $mrUser->assignRole('mr');
+
+    $response = $this->actingAs($mrUser)->get('/admin');
+
+    $response->assertRedirect('/mr/dashboard');
+});
+
 test('unauthenticated users receive 401 from mr dashboard api', function () {
     $response = $this->getJson('/api/v1/mr/dashboard');
 

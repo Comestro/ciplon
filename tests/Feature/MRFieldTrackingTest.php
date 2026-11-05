@@ -86,11 +86,20 @@ test('mapbox settings can be saved and retrieved', function () {
     expect(Setting::get('mapbox_default_zoom'))->toBe(14);
 });
 
-test('mr cannot access admin tracking dashboard and gets 403', function () {
+test('mr cannot access admin tracking dashboard and is redirected to mr dashboard', function () {
     $mr = User::factory()->create(['role' => 'mr']);
     $mr->assignRole('mr');
 
     $response = $this->actingAs($mr)->get('/admin/tracking');
+
+    $response->assertRedirect(route('mr.dashboard'));
+});
+
+test('mr receives 403 when requesting admin tracking data as json', function () {
+    $mr = User::factory()->create(['role' => 'mr']);
+    $mr->assignRole('mr');
+
+    $response = $this->actingAs($mr)->getJson('/admin/tracking');
 
     $response->assertStatus(403);
 });

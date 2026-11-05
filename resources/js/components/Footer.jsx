@@ -1,10 +1,15 @@
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import { Mail, Phone, MapPin, Globe, ShieldCheck, Award, ArrowUpRight, CheckCircle2, ChevronRight } from 'lucide-react';
 import Container from './common/Container';
 
 const CURRENT_YEAR = new Date().getFullYear();
 
 export default function Footer({ companyData, categories = [], onOpenEnquiryModal }) {
+  const { auth } = usePage().props;
+  const user = auth?.user;
+  const isMR = user && (user.role === 'mr' || user.roles?.includes('mr'));
+  const isAdmin = user && (user.role === 'admin' || user.role === 'super_admin' || user.role === 'manager' || user.roles?.includes('admin') || user.roles?.includes('super_admin'));
+  const portalHref = isMR ? '/mr/dashboard' : (isAdmin ? '/admin' : '/login');
   const legalName = companyData?.legal_name || 'Ciplon Pharma Private Limited';
   const headquarters = companyData?.headquarters_address || 'M24/A, KH No. 294, 1st Floor, Batla House, Okhla, Jamia Nagar, South Delhi';
   const city = companyData?.city || 'New Delhi';
@@ -110,7 +115,7 @@ export default function Footer({ companyData, categories = [], onOpenEnquiryModa
                   </Link>
                 </li>
                 <li className="pt-1">
-                  <Link href="/login" className="inline-flex items-center gap-1 text-amber-300 hover:text-white font-semibold">
+                  <Link href={portalHref} className="inline-flex items-center gap-1 text-amber-300 hover:text-white font-semibold">
                     <span>MR Connect Portal</span>
                     <ArrowUpRight className="w-3 h-3" />
                   </Link>

@@ -18270,7 +18270,13 @@ function Header({ companyData, onOpenEnquiryModal }) {
 	const [isScrolled, setIsScrolled] = useState(false);
 	const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 	const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
-	const { url } = usePage();
+	const { url, props } = usePage();
+	const user = props?.auth?.user;
+	const isMR = user && (user.role === "mr" || user.roles?.includes("mr"));
+	const isAdmin = user && (user.role === "admin" || user.role === "super_admin" || user.role === "manager" || user.roles?.includes("admin") || user.roles?.includes("super_admin"));
+	const portalHref = isMR ? "/mr/dashboard" : isAdmin ? "/admin" : "/login";
+	const portalTitle = isMR ? "MR Connect Portal" : isAdmin ? "Admin Portal" : "MR Portal & Accord Healthcare Partner Network";
+	const portalMobileLabel = isMR ? "MR Portal" : isAdmin ? "Admin Portal" : "Portal Login";
 	const currentPath = url.split("?")[0];
 	const isProductsPage = currentPath.startsWith("/products");
 	const getQueryParam = (param) => {
@@ -18490,9 +18496,9 @@ function Header({ companyData, onOpenEnquiryModal }) {
 										})
 									})]
 								}), /* @__PURE__ */ jsx(Link, {
-									href: "/login",
+									href: portalHref,
 									className: "flex items-center gap-1.5 text-[#e05e00] hover:text-[#c44e00] transition-colors group py-1 px-1 focus:outline-none",
-									title: "MR Portal & Accord Healthcare Partner Network"
+									title: portalTitle
 								})]
 							}),
 							/* @__PURE__ */ jsxs("div", {
@@ -18548,10 +18554,10 @@ function Header({ companyData, onOpenEnquiryModal }) {
 								children: link.name
 							}, link.name)),
 							/* @__PURE__ */ jsxs(Link, {
-								href: "/login",
+								href: portalHref,
 								onClick: () => setMobileMenuOpen(false),
 								className: "block px-3 py-2 rounded-lg text-xs font-semibold text-slate-700 hover:bg-amber-50 hover:text-[#c59324] transition-colors flex items-center gap-2",
-								children: [/* @__PURE__ */ jsx(LogIn, { className: "w-4 h-4 text-slate-500" }), /* @__PURE__ */ jsx("span", { children: "Portal Login" })]
+								children: [/* @__PURE__ */ jsx(LogIn, { className: "w-4 h-4 text-slate-500" }), /* @__PURE__ */ jsx("span", { children: portalMobileLabel })]
 							}),
 							/* @__PURE__ */ jsxs("div", {
 								className: "pt-2 mt-2 border-t border-slate-100 space-y-2",
@@ -18580,6 +18586,11 @@ function Header({ companyData, onOpenEnquiryModal }) {
 //#region resources/js/components/Footer.jsx
 var CURRENT_YEAR = (/* @__PURE__ */ new Date()).getFullYear();
 function Footer({ companyData, categories = [], onOpenEnquiryModal }) {
+	const { auth } = usePage().props;
+	const user = auth?.user;
+	const isMR = user && (user.role === "mr" || user.roles?.includes("mr"));
+	const isAdmin = user && (user.role === "admin" || user.role === "super_admin" || user.role === "manager" || user.roles?.includes("admin") || user.roles?.includes("super_admin"));
+	const portalHref = isMR ? "/mr/dashboard" : isAdmin ? "/admin" : "/login";
 	const legalName = companyData?.legal_name || "Ciplon Pharma Private Limited";
 	const headquarters = companyData?.headquarters_address || "M24/A, KH No. 294, 1st Floor, Batla House, Okhla, Jamia Nagar, South Delhi";
 	const city = companyData?.city || "New Delhi";
@@ -18688,7 +18699,7 @@ function Footer({ companyData, categories = [], onOpenEnquiryModal }) {
 									/* @__PURE__ */ jsx("li", {
 										className: "pt-1",
 										children: /* @__PURE__ */ jsxs(Link, {
-											href: "/login",
+											href: portalHref,
 											className: "inline-flex items-center gap-1 text-amber-300 hover:text-white font-semibold",
 											children: [/* @__PURE__ */ jsx("span", { children: "MR Connect Portal" }), /* @__PURE__ */ jsx(ArrowUpRight, { className: "w-3 h-3" })]
 										})

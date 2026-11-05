@@ -27,6 +27,18 @@ return Application::configure(basePath: dirname(__DIR__))
             'admin' => EnsureUserIsAdmin::class,
             'mr' => EnsureUserIsMR::class,
         ]);
+        $middleware->redirectGuestsTo('/login');
+        $middleware->redirectUsersTo(function (Request $request) {
+            $user = $request->user();
+            if ($user && ($user->hasRole('mr') || $user->role === 'mr')) {
+                return route('mr.dashboard');
+            }
+            if ($user && ($user->isAdmin() || in_array($user->role, ['super_admin', 'admin', 'manager'], true))) {
+                return route('admin.dashboard');
+            }
+
+            return '/';
+        });
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

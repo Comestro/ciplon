@@ -30,6 +30,10 @@ class EnsureUserIsAdmin
                 ], 403);
             }
 
+            if ($request->user()->hasRole('mr') || $request->user()->role === 'mr') {
+                return redirect()->route('mr.dashboard')->with('error', 'Access denied. Administrator privileges required.');
+            }
+
             abort(403, 'Access denied. Administrator privileges required.');
         }
 

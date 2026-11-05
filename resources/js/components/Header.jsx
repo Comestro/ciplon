@@ -9,7 +9,14 @@ export default function Header({ companyData, onOpenEnquiryModal }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
 
-  const { url } = usePage();
+  const { url, props } = usePage();
+  const user = props?.auth?.user;
+  const isMR = user && (user.role === 'mr' || user.roles?.includes('mr'));
+  const isAdmin = user && (user.role === 'admin' || user.role === 'super_admin' || user.role === 'manager' || user.roles?.includes('admin') || user.roles?.includes('super_admin'));
+  const portalHref = isMR ? '/mr/dashboard' : (isAdmin ? '/admin' : '/login');
+  const portalTitle = isMR ? 'MR Connect Portal' : (isAdmin ? 'Admin Portal' : 'MR Portal & Accord Healthcare Partner Network');
+  const portalMobileLabel = isMR ? 'MR Portal' : (isAdmin ? 'Admin Portal' : 'Portal Login');
+
   const currentPath = url.split('?')[0];
   const isProductsPage = currentPath.startsWith('/products');
 
@@ -227,9 +234,9 @@ export default function Header({ companyData, onOpenEnquiryModal }) {
 
               {/* Accord Partner / MR Portal Logo (styled like & accord in orange) */}
               <Link
-                href="/login"
+                href={portalHref}
                 className="flex items-center gap-1.5 text-[#e05e00] hover:text-[#c44e00] transition-colors group py-1 px-1 focus:outline-none"
-                title="MR Portal & Accord Healthcare Partner Network"
+                title={portalTitle}
               >
               </Link>
             </div>
@@ -300,12 +307,12 @@ export default function Header({ companyData, onOpenEnquiryModal }) {
               ))}
 
               <Link
-                href="/login"
+                href={portalHref}
                 onClick={() => setMobileMenuOpen(false)}
                 className="block px-3 py-2 rounded-lg text-xs font-semibold text-slate-700 hover:bg-amber-50 hover:text-[#c59324] transition-colors flex items-center gap-2"
               >
                 <LogIn className="w-4 h-4 text-slate-500" />
-                <span>Portal Login</span>
+                <span>{portalMobileLabel}</span>
               </Link>
 
               <div className="pt-2 mt-2 border-t border-slate-100 space-y-2">

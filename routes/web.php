@@ -44,6 +44,7 @@ Route::get('/robots.txt', [SeoController::class, 'robots'])->name('seo.robots');
 Route::middleware('guest')->group(function () {
     Route::get('/login', [LoginController::class, 'create'])->name('login');
     Route::get('/admin/login', fn () => redirect()->route('login'));
+    Route::get('/mr/login', fn () => redirect()->route('login'));
     Route::post('/login', [LoginController::class, 'store'])->name('login.store');
 
     // Forgot Password & OTP Reset Routes
@@ -124,6 +125,7 @@ Route::get('/storage/{path}', function (string $path) {
 
 // Medical Representative (MR) Portal
 Route::middleware(['auth', 'mr'])->prefix('mr')->name('mr.')->group(function () {
+    Route::get('/', fn () => redirect()->route('mr.dashboard'));
     Route::get('/dashboard', [MRDashboardController::class, 'show'])->name('dashboard');
     Route::get('/doctors', [MRDoctorController::class, 'show'])->name('doctors');
     Route::get('/doctors/create', [MRDoctorController::class, 'create'])->name('doctors.create');
