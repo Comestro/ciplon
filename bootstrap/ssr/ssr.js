@@ -5737,6 +5737,9 @@ function DoctorMovementMap({ mapboxConfig = {}, doctorStops = {}, activeMR = nul
 				const hasValidMapboxToken = Boolean(token.trim() && token.trim().startsWith("pk."));
 				const effectiveToken = hasValidMapboxToken ? token.trim() : "pk.eyJ1IjoibXJjb25uZWN0LWRlbW8iLCJhIjoiY2x6cTFxZmxwMDJiazJqcXB0eGdxOGNteSJ9.mock";
 				window.mapboxgl.accessToken = effectiveToken;
+				try {
+					if (window.mapboxgl.config) window.mapboxgl.config.EVENTS_URL = "";
+				} catch {}
 				const centerLng = mrLiveLocation?.lng || allStops[0]?.lng || defaultLng;
 				const centerLat = mrLiveLocation?.lat || allStops[0]?.lat || defaultLat;
 				const effectiveStyle = hasValidMapboxToken ? mapStyle : {
@@ -15184,6 +15187,9 @@ function MRLiveTrackingModal({ mr = null, isOpen = false, onClose, mapboxConfig 
 				const hasValidMapboxToken = Boolean(token && token.startsWith("pk."));
 				const effectiveToken = hasValidMapboxToken ? token : "pk.eyJ1IjoibXJjb25uZWN0LWRlbW8iLCJhIjoiY2x6cTFxZmxwMDJiazJqcXB0eGdxOGNteSJ9.mock";
 				window.mapboxgl.accessToken = effectiveToken;
+				try {
+					if (window.mapboxgl.config) window.mapboxgl.config.EVENTS_URL = "";
+				} catch {}
 				const effectiveStyle = hasValidMapboxToken ? mapStyle : {
 					version: 8,
 					sources: { "osm-raster-tiles": {

@@ -12,7 +12,7 @@ class EnsureUserIsAdmin
     public function handle(Request $request, Closure $next): Response
     {
         if (! $request->user()) {
-            if ($request->expectsJson()) {
+            if ($request->expectsJson() && ! $request->header('X-Inertia')) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Unauthenticated.',
@@ -23,18 +23,14 @@ class EnsureUserIsAdmin
         }
 
         if (! $request->user()->isAdmin()) {
-            if ($request->expectsJson()) {
+            if ($request->expectsJson() && ! $request->header('X-Inertia')) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Access denied. Administrator privileges required.',
                 ], 403);
             }
 
-            if ($request->user()->hasRole('mr') || $request->user()->role === 'mr') {
-                return redirect()->route('mr.dashboard')->with('error', 'Access denied. Administrator privileges required.');
-            }
-
-            abort(403, 'Access denied. Administrator privileges required.');
+            return redirect()->route('mr.dashboard')->with('error', 'Access denied. Administrator privileges required.');
         }
 
         return $next($request);

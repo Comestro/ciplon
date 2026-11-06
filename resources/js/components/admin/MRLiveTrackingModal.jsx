@@ -72,6 +72,13 @@ export default function MRLiveTrackingModal({
           ? token
           : 'pk.eyJ1IjoibXJjb25uZWN0LWRlbW8iLCJhIjoiY2x6cTFxZmxwMDJiazJqcXB0eGdxOGNteSJ9.mock';
         window.mapboxgl.accessToken = effectiveToken;
+        try {
+          if (window.mapboxgl.config) {
+            window.mapboxgl.config.EVENTS_URL = '';
+          }
+        } catch {
+          // ignore
+        }
 
         // Use Mapbox streets style if token is configured; otherwise use full raster street tiles so map is never blank
         const effectiveStyle = hasValidMapboxToken

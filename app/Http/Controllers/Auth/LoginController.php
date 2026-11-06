@@ -57,6 +57,11 @@ class LoginController extends Controller
         $request->session()->regenerate();
 
         if ($user->hasRole('mr') || $user->role === 'mr') {
+            $intended = $request->session()->get('url.intended');
+            if ($intended && str_contains($intended, '/admin')) {
+                $request->session()->forget('url.intended');
+            }
+
             return redirect()->intended('/mr/dashboard')->with('success', 'Signed into MR portal successfully.');
         }
 
@@ -64,13 +69,13 @@ class LoginController extends Controller
     }
 
     // Terminate session and logout user.
-    public function destroy(Request $request): RedirectResponse
+    public function destroy(Request $request): mixed
     {
-        Auth::logout();
+        Auth::guard('web')->logout();
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect('/login')->with('success', 'Logged out successfully.');
+        return Inertia::location('/login');
     }
 }

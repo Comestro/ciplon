@@ -115,6 +115,13 @@ export default function DoctorMovementMap({
           ? token.trim()
           : 'pk.eyJ1IjoibXJjb25uZWN0LWRlbW8iLCJhIjoiY2x6cTFxZmxwMDJiazJqcXB0eGdxOGNteSJ9.mock';
         window.mapboxgl.accessToken = effectiveToken;
+        try {
+          if (window.mapboxgl.config) {
+            window.mapboxgl.config.EVENTS_URL = '';
+          }
+        } catch {
+          // ignore
+        }
 
         const centerLng = mrLiveLocation?.lng || (allStops[0]?.lng) || defaultLng;
         const centerLat = mrLiveLocation?.lat || (allStops[0]?.lat) || defaultLat;

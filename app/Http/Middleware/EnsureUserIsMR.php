@@ -16,7 +16,7 @@ class EnsureUserIsMR
         $user = $request->user();
 
         if (! $user) {
-            if ($request->expectsJson()) {
+            if ($request->expectsJson() && ! $request->header('X-Inertia')) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Unauthenticated.',
@@ -31,7 +31,7 @@ class EnsureUserIsMR
             || in_array($user->role, ['mr', 'super_admin', 'manager', 'admin'], true);
 
         if (! $isAuthorized) {
-            if ($request->expectsJson()) {
+            if ($request->expectsJson() && ! $request->header('X-Inertia')) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Access denied. Medical Representative privileges required.',

@@ -60,8 +60,7 @@ Route::middleware('guest')->group(function () {
         ->name('password.reset.submit');
 });
 
-Route::post('/logout', [LoginController::class, 'destroy'])
-    ->middleware('auth')
+Route::match(['get', 'post'], '/logout', [LoginController::class, 'destroy'])
     ->name('logout');
 
 // Admin Routes
