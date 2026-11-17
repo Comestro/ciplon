@@ -12,10 +12,12 @@ use Illuminate\Support\Str;
 class ProductSeeder extends Seeder
 {
     /**
-     * Seed only the 3 official Ciplon pharmaceutical products matching packaging designs:
+     * Seed the official Ciplon pharmaceutical products matching packaging designs:
      * 1. CIPLOMAX CD3 (Alpha Lipoic Acid, Benfotiamine, Chromium, Pyridoxine HCl, Folic Acid, Myo-Inositol, Mecobalamin, Vitamin D3, Calcium Carbonate Tablets)
      * 2. DICLOTRYP-FORT (Trypsin, Bromelain, Rutoside Trihydrate & Diclofenac Sodium Tablets)
      * 3. CIPLON-D (Esomeprazole & Sustained Release Domperidone Capsules)
+     * 4. THROTOX GARGLE (Chlorhexidine Gluconate, Sodium Fluoride & Zinc Chloride Mouth Wash)
+     * 5. VITOS GOLD (Lycopene, L-Lysine, Vitamin B12, Multivitamins, Multiminerals & Antioxidants Capsules)
      */
     public function run(): void
     {
@@ -50,6 +52,17 @@ class ProductSeeder extends Seeder
             [
                 'name' => 'Gastrointestinal & Hepatology',
                 'description' => 'Gastro-resistant proton pump inhibitors and prokinetic combinations.',
+                'status' => 'active',
+                'created_by' => $adminId,
+                'updated_by' => $adminId,
+            ]
+        );
+
+        $dentalCat = Category::firstOrCreate(
+            ['slug' => 'dental-and-oral-care'],
+            [
+                'name' => 'Dental & Oral Care',
+                'description' => 'Targeted antiseptic mouthwashes, cavity prevention, and gingival oral hygiene formulations.',
                 'status' => 'active',
                 'created_by' => $adminId,
                 'updated_by' => $adminId,
@@ -132,6 +145,70 @@ class ProductSeeder extends Seeder
                 'compositions' => [
                     ['ingredient_name' => 'Esomeprazole Magnesium Trihydrate IP (Eq. to Esomeprazole, as enteric coated pellets)', 'strength' => '40', 'unit' => 'mg'],
                     ['ingredient_name' => 'Domperidone IP (as sustained release pellets)', 'strength' => '30', 'unit' => 'mg'],
+                ],
+            ],
+
+            // 4. THROTOX GARGLE
+            [
+                'category_id' => $dentalCat->id,
+                'brand_name' => 'THROTOX GARGLE',
+                'generic_name' => 'Chlorhexidine Gluconate, Sodium Fluoride & Zinc Chloride Mouth Wash',
+                'product_code' => 'CIP-THR-GAR',
+                'dosage_form' => 'Mouth Wash',
+                'strength' => '0.20% w/v + 0.05% w/v + 0.09% w/v',
+                'short_description' => 'Triple-action antiseptic oral rinse with Chlorhexidine Gluconate, Sodium Fluoride, and Zinc Chloride for antimicrobial protection, cavity prevention, and healthy gums.',
+                'description' => "THROTOX GARGLE is an advanced triple-action antiseptic mouth wash combining Chlorhexidine Gluconate Solution (0.20% w/v), Sodium Fluoride (0.05% w/v, yielding 226 PPM Fluoride), and Zinc Chloride (0.09% w/v) in a pleasantly spearmint-flavoured aqueous base. Specially formulated for oral hygiene maintenance, dental caries prevention, antimicrobial plaque control, and gingival protection.\n\nManufactured by: Pure & Cure Healthcare Pvt. Ltd. (A subsidiary of Akums Drugs & Pharmaceuticals Ltd.), Plot No. 26A, 27-30, Sector-8A, I.I.E., SIDCUL, Ranipur, Haridwar-249 403, Uttarakhand.\nMarketed by: CIPLON PHARMA PRIVATE LIMITED (An ISO 9001:2015 Certified Company).\nPackaging: 100ml Bottle with dosing chamber.\nMfg. Lic. No.: 31/UA/2013.",
+                'indications' => 'Antimicrobial oral hygiene, dental caries and plaque prevention, gingivitis, healthy gums maintenance, halitosis (bad breath) control, and pre/post-operative oral rinse antisepsis.',
+                'directions' => 'Rinse mouth thoroughly with water, remove the cap and squeeze the bottle to fill dosing chamber to ~ 5ml, then pour into a glass (two times to get 10ml). Rinse with the undiluted solution around the teeth and gums for 60 seconds and then spit out. For oral rinse use only. Not to be swallowed.',
+                'precautions' => 'FOR ORAL RINSE USE ONLY. NOT TO BE SWALLOWED. Keep out of reach of children. Store protected from direct sunlight.',
+                'storage' => 'Store at a temperature not exceeding 30°C. Protect from direct sunlight.',
+                'prescription_type' => 'OTC / Oral Hygiene',
+                'is_featured' => true,
+                'image_path' => '/images/throtox_gargle.png',
+                'compositions' => [
+                    ['ingredient_name' => 'Chlorhexidine Gluconate Solution IP (diluted to Chlorhexidine Gluconate)', 'strength' => '0.20', 'unit' => '% w/v'],
+                    ['ingredient_name' => 'Sodium Fluoride IP (226 PPM Fluoride)', 'strength' => '0.05', 'unit' => '% w/v'],
+                    ['ingredient_name' => 'Zinc Chloride IP', 'strength' => '0.09', 'unit' => '% w/v'],
+                ],
+            ],
+
+            // 5. VITOS GOLD
+            [
+                'category_id' => $nutraceuticalsCat->id,
+                'brand_name' => 'VITOS GOLD',
+                'generic_name' => 'Lycopene, L-Lysine, Vitamin B12, Multivitamins, Multiminerals & Antioxidants Capsules',
+                'product_code' => 'CIP-VIT-GLD',
+                'dosage_form' => 'Softgel Capsule',
+                'strength' => 'Lycopene 5000mcg + L-Lysine 50mg + Multivitamins & Minerals Complex',
+                'short_description' => 'Comprehensive daily antioxidant and micronutrient softgel formulation with Lycopene, L-Lysine, and essential vitamins to boost energy, immunity, and cellular vitality.',
+                'description' => "VITOS GOLD is a premier dietary wellness and antioxidant supplement combining Lycopene (5000 mcg), L-Lysine Hydrochloride (50 mg), Vitamin B12 (Cyanocobalamin), comprehensive B-complex vitamins, Vitamin A, C, D3, E, and key bioavailable minerals (Zinc, Selenium, Chromium, Copper, Manganese, and Iodine). Specially engineered to combat free radical oxidative stress, bolster immune resilience, and support daily metabolic vitality.\n\nManufactured by: Walpar Wellness Pvt. Ltd., Plot No. 2/A & 06, Opp. Sabarmati Gas Station, Khatraj, Kalol, Gandhinagar, Gujarat-382721 (An ISO 9001:2015, WHO-GMP & cGMP Certified Facility).\nMarketed by: CIPLON PHARMA PRIVATE LIMITED (An ISO 9001:2015 Certified Company).\nPackaging: 10 x 1 x 15 Softgel Capsules (Outer carton: 135x93x84 mm; Inner pack: 90x78x12 mm; 77 mm blister foil).\nFSSAI Lic. No.: 10426340000172.\nDietary Food Supplement - Not for Medicinal Use.",
+                'indications' => 'Dietary nutritional supplementation, generalized weakness and fatigue, antioxidant support against cellular oxidative damage, immune system reinforcement, cardiovascular health, convalescence recovery, and daily micronutrient replenishment.',
+                'directions' => 'One softgel capsule daily after a meal, or as directed by a healthcare professional. Capsule should be swallowed whole with water; do not chew or crush.',
+                'precautions' => 'DIETARY FOOD SUPPLEMENT - NOT FOR MEDICINAL USE. Keep out of reach of children. Do not exceed the recommended daily serving. Appropriate overages of vitamins added to compensate for loss on storage.',
+                'storage' => 'Store in a cool, dry & dark place, at a temperature below 25°C. Protect from direct sunlight & moisture.',
+                'prescription_type' => 'Nutraceutical / Dietary Supplement',
+                'is_featured' => true,
+                'image_path' => '/images/vitos_gold.png',
+                'compositions' => [
+                    ['ingredient_name' => 'Lycopene (10%)', 'strength' => '5000', 'unit' => 'mcg'],
+                    ['ingredient_name' => 'L-Lysine Hydrochloride', 'strength' => '50', 'unit' => 'mg'],
+                    ['ingredient_name' => 'Vitamin B12 (Cyanocobalamin)', 'strength' => '5', 'unit' => 'mcg'],
+                    ['ingredient_name' => 'Vitamin A (as Palmitate)', 'strength' => '2500', 'unit' => 'IU'],
+                    ['ingredient_name' => 'Vitamin B1 (Thiamine Mononitrate)', 'strength' => '2', 'unit' => 'mg'],
+                    ['ingredient_name' => 'Vitamin B2 (Riboflavin)', 'strength' => '2.5', 'unit' => 'mg'],
+                    ['ingredient_name' => 'Vitamin B6 (Pyridoxine HCl)', 'strength' => '1.5', 'unit' => 'mg'],
+                    ['ingredient_name' => 'Vitamin C (Ascorbic Acid)', 'strength' => '50', 'unit' => 'mg'],
+                    ['ingredient_name' => 'Vitamin D3 (Cholecalciferol)', 'strength' => '400', 'unit' => 'IU'],
+                    ['ingredient_name' => 'Vitamin E (dl-Alpha Tocopheryl Acetate)', 'strength' => '10', 'unit' => 'IU'],
+                    ['ingredient_name' => 'Niacinamide (Vitamin B3)', 'strength' => '25', 'unit' => 'mg'],
+                    ['ingredient_name' => 'Calcium D-Pantothenate', 'strength' => '5', 'unit' => 'mg'],
+                    ['ingredient_name' => 'Folic Acid', 'strength' => '1', 'unit' => 'mg'],
+                    ['ingredient_name' => 'Zinc (as Zinc Sulphate Monohydrate)', 'strength' => '15', 'unit' => 'mg'],
+                    ['ingredient_name' => 'Copper (as Cupric Sulphate)', 'strength' => '1', 'unit' => 'mg'],
+                    ['ingredient_name' => 'Manganese (as Manganese Sulphate)', 'strength' => '2', 'unit' => 'mg'],
+                    ['ingredient_name' => 'Selenium (as Sodium Selenite)', 'strength' => '70', 'unit' => 'mcg'],
+                    ['ingredient_name' => 'Chromium (as Chromium Picolinate)', 'strength' => '65', 'unit' => 'mcg'],
+                    ['ingredient_name' => 'Iodine (as Potassium Iodide)', 'strength' => '100', 'unit' => 'mcg'],
                 ],
             ],
         ];

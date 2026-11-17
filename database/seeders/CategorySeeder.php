@@ -46,6 +46,11 @@ class CategorySeeder extends Seeder
                 'description' => 'Essential vitamins, zinc, minerals, and bioactive antioxidants designed to support immune function and metabolic vitality.',
                 'slug' => 'nutraceuticals-and-multivitamins',
             ],
+            [
+                'name' => 'Dental & Oral Care',
+                'description' => 'Targeted antiseptic mouthwashes, cavity prevention, and gingival oral hygiene formulations.',
+                'slug' => 'dental-and-oral-care',
+            ],
         ];
 
         foreach ($categories as $data) {
