@@ -7,7 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Jobs\UploadProductImageJob;
 use App\Models\Category;
 use App\Models\Product;
-use App\Services\ImageKitService;
+use App\Services\R2StorageService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -79,7 +79,7 @@ class ProductController extends Controller
     }
 
     // Store a newly created product in database.
-    public function store(Request $request, ImageKitService $imageKit): RedirectResponse
+    public function store(Request $request): RedirectResponse
     {
         // Decode compositions if sent as a JSON string in multipart/form-data
         if ($request->has('compositions') && is_string($request->input('compositions'))) {
@@ -208,7 +208,7 @@ class ProductController extends Controller
     }
 
     // Update the specified product in database.
-    public function update(Request $request, Product $product, ImageKitService $imageKit): RedirectResponse
+    public function update(Request $request, Product $product, R2StorageService $r2): RedirectResponse
     {
         if ($request->has('compositions') && is_string($request->input('compositions'))) {
             $decoded = json_decode($request->input('compositions'), true);
@@ -254,7 +254,7 @@ class ProductController extends Controller
             ? Product::generateUniqueSlug($validated['brand_name'], $product->id)
             : $product->slug;
 
-        DB::transaction(function () use ($product, $validated, $request, $slug, $imageKit) {
+        DB::transaction(function () use ($product, $validated, $request, $slug, $r2) {
             $product->update([
                 'category_id' => $validated['category_id'],
                 'brand_name' => $validated['brand_name'],
@@ -293,8 +293,8 @@ class ProductController extends Controller
             if (! empty($validated['removed_image_ids'])) {
                 $imagesToDelete = $product->images()->whereIn('id', $validated['removed_image_ids'])->get();
                 foreach ($imagesToDelete as $img) {
-                    if ($img->disk === 'imagekit' && ! empty($img->alt_text)) {
-                        $imageKit->delete($img->alt_text); // alt_text holds fileId for imagekit
+                    if ($img->disk === 'r2') {
+                        $r2->delete($img->file_path);
                     } elseif ($img->disk === 'public') {
                         Storage::disk('public')->delete($img->file_path);
                     }
@@ -323,16 +323,16 @@ class ProductController extends Controller
     }
 
     // Remove the specified product and its compositions and images.
-    public function destroy(Product $product, ImageKitService $imageKit): RedirectResponse
+    public function destroy(Product $product, R2StorageService $r2): RedirectResponse
     {
-        DB::transaction(function () use ($product, $imageKit) {
+        DB::transaction(function () use ($product, $r2) {
             // Delete compositions
             $product->compositions()->delete();
 
             // Delete images
             foreach ($product->images as $img) {
-                if ($img->disk === 'imagekit' && ! empty($img->alt_text)) {
-                    $imageKit->delete($img->alt_text);
+                if ($img->disk === 'r2') {
+                    $r2->delete($img->file_path);
                 } elseif ($img->disk === 'public') {
                     Storage::disk('public')->delete($img->file_path);
                 }

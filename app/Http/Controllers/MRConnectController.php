@@ -8,7 +8,7 @@ use App\Models\Product;
 use App\Models\Setting;
 use App\Models\User;
 use App\Models\Visit;
-use App\Services\ImageKitService;
+use App\Services\R2StorageService;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -57,7 +57,7 @@ class MRConnectController extends Controller
     /**
      * Store Expense Claim
      */
-    public function storeExpense(Request $request, ImageKitService $imageKit): RedirectResponse
+    public function storeExpense(Request $request, R2StorageService $r2): RedirectResponse
     {
         $validated = $request->validate([
             'date' => ['required', 'date'],
@@ -73,13 +73,13 @@ class MRConnectController extends Controller
         $receiptUrl = $validated['receipt_url'] ?? null;
         if ($request->hasFile('receipt')) {
             try {
-                $uploadData = $imageKit->upload(
+                $uploadData = $r2->upload(
                     file: $request->file('receipt'),
-                    folder: '/expenses'
+                    folder: 'expenses'
                 );
                 $receiptUrl = $uploadData['url'] ?? null;
             } catch (\Throwable $e) {
-                return back()->withErrors(['receipt' => 'Failed to upload receipt to ImageKit: '.$e->getMessage()]);
+                return back()->withErrors(['receipt' => 'Failed to upload receipt to Cloudflare R2: '.$e->getMessage()]);
             }
         }
 

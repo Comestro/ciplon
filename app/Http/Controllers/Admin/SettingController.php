@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Image;
 use App\Models\Setting;
-use App\Services\ImageKitService;
+use App\Services\R2StorageService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -37,18 +37,18 @@ class SettingController extends Controller
     }
 
     // Update settings in bulk and handle optional logo/image uploads.
-    public function update(Request $request, ImageKitService $imageKit): RedirectResponse
+    public function update(Request $request, R2StorageService $r2): RedirectResponse
     {
         $validated = $request->validate([
             'settings' => ['nullable'],
             'logo' => ['nullable', 'file', 'mimes:jpeg,png,jpg,webp,svg', 'max:5120'],
         ]);
 
-        // Process logo upload exclusively to ImageKit
+        // Process logo upload exclusively to Cloudflare R2
         if ($request->hasFile('logo')) {
-            $uploadData = $imageKit->upload(
+            $uploadData = $r2->upload(
                 file: $request->file('logo'),
-                folder: '/branding'
+                folder: 'branding'
             );
 
             $logoSetting = Setting::set(
@@ -60,22 +60,29 @@ class SettingController extends Controller
                 description: 'Official corporate logo'
             );
 
-            // Record in polymorphic images table for tracking
-            Image::where('model_type', Setting::class)
+            // Clean up any previously uploaded R2 logo objects before replacing DB record
+            $existingLogos = Image::where('model_type', Setting::class)
                 ->where('model_id', $logoSetting->id)
                 ->where('collection', 'logo')
-                ->delete();
+                ->get();
+
+            foreach ($existingLogos as $oldLogo) {
+                if ($oldLogo->disk === 'r2') {
+                    $r2->delete($oldLogo->file_path);
+                }
+                $oldLogo->delete();
+            }
 
             Image::create([
                 'model_type' => Setting::class,
                 'model_id' => $logoSetting->id,
                 'collection' => 'logo',
                 'file_name' => $uploadData['file_name'],
-                'file_path' => $uploadData['url'],
+                'file_path' => $uploadData['file_path'],
                 'mime_type' => $uploadData['mime_type'],
-                'disk' => 'imagekit',
+                'disk' => $uploadData['disk'],
                 'size' => $uploadData['size'],
-                'alt_text' => $uploadData['file_id'],
+                'alt_text' => 'Company Logo',
                 'sort_order' => 0,
             ]);
         }

@@ -3,7 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\Product;
-use App\Services\ImageKitService;
+use App\Services\R2StorageService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Log;
@@ -29,8 +29,8 @@ class UploadProductImageJob implements ShouldQueue
         public int $sortOrder = 0,
     ) {}
 
-    // Execute the job: upload temporary image to ImageKit and attach image record to product.
-    public function handle(ImageKitService $imageKit): void
+    // Execute the job: upload temporary image to Cloudflare R2 and attach image record to product.
+    public function handle(R2StorageService $r2): void
     {
         $disk = Storage::disk('local');
         $fullPath = $disk->path($this->tempRelativePath);
@@ -52,11 +52,11 @@ class UploadProductImageJob implements ShouldQueue
         }
 
         try {
-            // Upload to ImageKit folder
-            $uploadData = $imageKit->uploadFromPath(
+            // Upload to Cloudflare R2 products folder
+            $uploadData = $r2->uploadFromPath(
                 filePath: $fullPath,
                 originalFileName: $this->originalFileName,
-                folder: '/products',
+                folder: 'products',
                 fileSize: $this->fileSize ?? (filesize($fullPath) ?: 0),
                 mimeType: $this->mimeType ?? (mime_content_type($fullPath) ?: 'image/jpeg')
             );
@@ -65,18 +65,18 @@ class UploadProductImageJob implements ShouldQueue
             $product->images()->create([
                 'collection' => 'product-image',
                 'file_name' => $uploadData['file_name'],
-                'file_path' => $uploadData['url'],
+                'file_path' => $uploadData['file_path'],
                 'mime_type' => $uploadData['mime_type'],
-                'disk' => 'imagekit',
+                'disk' => $uploadData['disk'],
                 'size' => $uploadData['size'],
-                'alt_text' => $uploadData['file_id'],
+                'alt_text' => $product->brand_name.' Product Image',
                 'sort_order' => $this->sortOrder,
             ]);
 
             // Clean up temporary local file
             $disk->delete($this->tempRelativePath);
 
-            Log::info("UploadProductImageJob: Successfully uploaded image for Product #{$this->productId} to ImageKit");
+            Log::info("UploadProductImageJob: Successfully uploaded image for Product #{$this->productId} to Cloudflare R2");
         } catch (\Throwable $e) {
             Log::error("UploadProductImageJob failed for Product #{$this->productId}: ".$e->getMessage());
 

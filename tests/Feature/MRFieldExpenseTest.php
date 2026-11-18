@@ -1,9 +1,10 @@
 <?php
 
 use App\Models\User;
+use App\Services\R2StorageService;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
 use Spatie\Permission\Models\Role;
 
 beforeEach(function () {
@@ -12,15 +13,8 @@ beforeEach(function () {
     Role::firstOrCreate(['name' => 'admin']);
 });
 
-test('mr representative can submit expense claim with uploaded receipt file stored in imagekit', function () {
-    Http::fake([
-        'https://upload.imagekit.io/*' => Http::response([
-            'fileId' => 'exp_file_987',
-            'url' => 'https://ik.imagekit.io/ciplon/expenses/petrol_receipt_987.jpg',
-            'name' => 'petrol_receipt.jpg',
-            'size' => 120000,
-        ], 200),
-    ]);
+test('mr representative can submit expense claim with uploaded receipt file stored in cloudflare r2', function () {
+    Storage::fake('r2');
 
     $mr = User::factory()->create(['role' => 'mr']);
     $mr->assignRole('mr');
@@ -44,15 +38,16 @@ test('mr representative can submit expense claim with uploaded receipt file stor
     expect($record)->not->toBeNull();
     expect($record->expense_type)->toBe('travel_fuel');
     expect((float) $record->amount)->toBe(850.0);
-    expect($record->receipt_url)->toBe('https://ik.imagekit.io/ciplon/expenses/petrol_receipt_987.jpg');
+    expect($record->receipt_url)->toContain('/expenses/petrol-receipt_');
+
+    $files = Storage::disk('r2')->files('expenses');
+    expect($files)->toHaveCount(1);
 });
 
-test('imagekit upload failure returns validation error and does not use local storage', function () {
-    Http::fake([
-        'https://upload.imagekit.io/*' => Http::response([
-            'message' => 'Authentication failed or quota exceeded',
-        ], 403),
-    ]);
+test('r2 upload failure returns validation error and does not use local storage', function () {
+    $mock = Mockery::mock(R2StorageService::class);
+    $mock->shouldReceive('upload')->once()->andThrow(new RuntimeException('R2 connection failed'));
+    app()->instance(R2StorageService::class, $mock);
 
     $mr = User::factory()->create(['role' => 'mr']);
     $mr->assignRole('mr');

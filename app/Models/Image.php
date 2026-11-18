@@ -41,18 +41,11 @@ class Image extends Model
             return null;
         }
 
-        // If file_path is already a full URL (such as from ImageKit CDN)
+        // If file_path is already a full URL (such as CDN or external URL)
         if (str_starts_with($this->file_path, 'http://') || str_starts_with($this->file_path, 'https://')) {
             return $this->file_path;
         }
 
-        if ($this->disk === 'imagekit') {
-            $endpoint = rtrim((string) config('services.imagekit.url_endpoint'), '/');
-            $path = ltrim($this->file_path, '/');
-
-            return "{$endpoint}/{$path}";
-        }
-
-        return Storage::disk($this->disk ?? 'public')->url($this->file_path);
+        return Storage::disk($this->disk ?? 'r2')->url($this->file_path);
     }
 }
