@@ -28,7 +28,7 @@
     "src": "_instrument-sans-600-normal-B9e8oLYv.woff"
   },
   "resources/css/app.css": {
-    "file": "assets/app-B7nP2Q-L.css",
+    "file": "assets/app-D-FwC0pX.css",
     "name": "app",
     "names": [
       "app.css"
@@ -37,12 +37,12 @@
     "isEntry": true
   },
   "resources/js/app.jsx": {
-    "file": "assets/app-q0e9OvjR.js",
+    "file": "assets/app-DrzO5Vwc.js",
     "name": "app",
     "src": "resources/js/app.jsx",
     "isEntry": true,
     "css": [
-      "assets/app-B7nP2Q-L.css"
+      "assets/app-D-FwC0pX.css"
     ]
   }
 }

@@ -18383,7 +18383,6 @@ function Header({ companyData, onOpenEnquiryModal }) {
 	const isMR = user && (user.role === "mr" || user.roles?.includes("mr"));
 	const isAdmin = user && (user.role === "admin" || user.role === "super_admin" || user.role === "manager" || user.roles?.includes("admin") || user.roles?.includes("super_admin"));
 	const portalHref = isMR ? "/mr/dashboard" : isAdmin ? "/admin" : "/login";
-	const portalTitle = isMR ? "MR Connect Portal" : isAdmin ? "Admin Portal" : "MR Portal & Accord Healthcare Partner Network";
 	const portalMobileLabel = isMR ? "MR Portal" : isAdmin ? "Admin Portal" : "Portal Login";
 	const currentPath = url.split("?")[0];
 	const isProductsPage = currentPath.startsWith("/products");
@@ -18447,7 +18446,7 @@ function Header({ companyData, onOpenEnquiryModal }) {
 	return /* @__PURE__ */ jsx("header", {
 		className: "sticky top-0 z-50 w-full transition-all duration-300",
 		children: /* @__PURE__ */ jsx("nav", {
-			className: `bg-white transition-all duration-200 ${isScrolled ? "border-b border-slate-200 py-2.5" : "border-b border-slate-200 py-3 sm:py-4"}`,
+			className: `bg-white/95 backdrop-blur-xs border-b border-slate-200 transition-all duration-200 ${isScrolled ? "py-1.5 shadow-xs" : "py-2"}`,
 			children: /* @__PURE__ */ jsxs(Container, {
 				size: "wide",
 				children: [
@@ -18462,19 +18461,19 @@ function Header({ companyData, onOpenEnquiryModal }) {
 										behavior: "smooth"
 									});
 								},
-								className: "flex items-center shrink-0 group focus:outline-none",
+								className: "flex items-center shrink-0 group focus:outline-none py-0.5",
 								title: "Ciplon Pharmaceuticals",
 								children: /* @__PURE__ */ jsx("img", {
 									src: logoUrl || "/images/ciplon_logo.png",
 									alt: "Ciplon Pharma Private Limited",
-									className: "h-12 sm:h-14 md:h-16 lg:h-17 xl:h-18 w-auto max-w-[260px] sm:max-w-[320px] lg:max-w-[360px] object-contain transition-all",
+									className: "h-8 sm:h-9 lg:h-10 w-auto max-w-[160px] sm:max-w-[190px] lg:max-w-[210px] object-contain transition-all",
 									onError: (e) => {
 										e.currentTarget.src = "/images/ciplon_logo.png";
 									}
 								})
 							}),
 							/* @__PURE__ */ jsxs("nav", {
-								className: "hidden lg:flex items-center gap-3 xl:gap-5 2xl:gap-6 text-xs xl:text-[13px] font-semibold tracking-wide text-slate-700 whitespace-nowrap",
+								className: "hidden lg:flex items-center gap-4 xl:gap-6 text-xs font-semibold tracking-wide text-slate-700 whitespace-nowrap",
 								children: [
 									/* @__PURE__ */ jsx(Link, {
 										href: "/",
@@ -18482,7 +18481,7 @@ function Header({ companyData, onOpenEnquiryModal }) {
 										children: "HOME"
 									}),
 									/* @__PURE__ */ jsxs("div", {
-										className: "relative group/menu py-2",
+										className: "relative group/menu py-1",
 										children: [/* @__PURE__ */ jsxs(Link, {
 											href: "/about",
 											className: "flex items-center gap-1 hover:text-[#c59324] transition-colors uppercase whitespace-nowrap cursor-pointer",
@@ -18522,7 +18521,7 @@ function Header({ companyData, onOpenEnquiryModal }) {
 										children: "PRODUCTS"
 									}),
 									/* @__PURE__ */ jsxs("div", {
-										className: "relative group/menu py-2",
+										className: "relative group/menu py-1",
 										children: [/* @__PURE__ */ jsxs(Link, {
 											href: "/quality",
 											className: "flex items-center gap-1 hover:text-[#c59324] transition-colors uppercase whitespace-nowrap cursor-pointer",
@@ -18568,9 +18567,9 @@ function Header({ companyData, onOpenEnquiryModal }) {
 									})
 								]
 							}),
-							/* @__PURE__ */ jsxs("div", {
-								className: "hidden md:flex items-center gap-4 shrink-0",
-								children: [/* @__PURE__ */ jsxs("div", {
+							/* @__PURE__ */ jsx("div", {
+								className: "hidden md:flex items-center shrink-0",
+								children: /* @__PURE__ */ jsxs("div", {
 									className: "relative",
 									children: [/* @__PURE__ */ jsx("button", {
 										type: "button",
@@ -18603,11 +18602,7 @@ function Header({ companyData, onOpenEnquiryModal }) {
 											]
 										})
 									})]
-								}), /* @__PURE__ */ jsx(Link, {
-									href: portalHref,
-									className: "flex items-center gap-1.5 text-[#e05e00] hover:text-[#c44e00] transition-colors group py-1 px-1 focus:outline-none",
-									title: portalTitle
-								})]
+								})
 							}),
 							/* @__PURE__ */ jsxs("div", {
 								className: "flex items-center gap-1.5 lg:hidden",
