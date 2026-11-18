@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import MRLayout from '../../layouts/MR/MRLayout';
 import toast from 'react-hot-toast';
+import { resolveProductImageUrl } from '../../utils/media';
 
 export default function Detailing({ products = [], doctors = [], company = {} }) {
   // Setup State
@@ -378,12 +379,7 @@ export default function Detailing({ products = [], doctors = [], company = {} })
             const isBeingDragged = draggedIndex === actualIndex;
             const isDragTarget = dragOverIndex === actualIndex;
 
-            const imageUrl =
-              product.primary_image?.file_path ||
-              product.primary_image?.url ||
-              product.images?.[0]?.file_path ||
-              product.images?.[0]?.url ||
-              '/images/ciplon_d.png';
+            const imageUrl = resolveProductImageUrl(product, '/images/ciplon_d.png');
 
             return (
               <div
@@ -791,12 +787,7 @@ export default function Detailing({ products = [], doctors = [], company = {} })
               {slides[currentSlideIndex].type === 'product' && (
                 (() => {
                   const prod = slides[currentSlideIndex].data;
-                  const imageUrl =
-                    prod.primary_image?.file_path ||
-                    prod.primary_image?.url ||
-                    prod.images?.[0]?.file_path ||
-                    prod.images?.[0]?.url ||
-                    '/images/ciplon_d.png';
+                  const imageUrl = resolveProductImageUrl(prod, '/images/ciplon_d.png');
 
                   return (
                     <div className="py-2 sm:py-6">

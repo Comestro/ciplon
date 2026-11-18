@@ -6,6 +6,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use League\Flysystem\AwsS3V3\AwsS3V3Adapter;
 
 class R2StorageService
 {
@@ -18,6 +19,8 @@ class R2StorageService
      */
     public function upload(UploadedFile $file, string $folder = 'products', ?string $customFileName = null): array
     {
+        $this->ensureConfigured();
+
         $extension = $file->getClientOriginalExtension() ?: $file->extension() ?: 'bin';
         $baseName = $customFileName
             ? pathinfo($customFileName, PATHINFO_FILENAME)
@@ -60,6 +63,8 @@ class R2StorageService
         int $fileSize = 0,
         string $mimeType = 'image/jpeg'
     ): array {
+        $this->ensureConfigured();
+
         if (! is_file($filePath) || ! is_readable($filePath)) {
             throw new \RuntimeException("Source file is missing or unreadable: {$filePath}");
         }
@@ -157,5 +162,47 @@ class R2StorageService
         $ext = strtolower(ltrim($extension, '.'));
 
         return "{$slug}_".time().'_'.Str::lower(Str::random(6)).".{$ext}";
+    }
+
+    /**
+     * Ensure required Cloudflare R2 configuration values are present when using the S3 adapter.
+     */
+    protected function ensureConfigured(): void
+    {
+        $config = config('filesystems.disks.'.self::DISK, []);
+        if (($config['driver'] ?? null) !== 's3') {
+            return;
+        }
+
+        // Skip credential checks when the disk has been faked in tests (e.g. Storage::fake('r2'))
+        try {
+            $isS3Adapter = Storage::disk(self::DISK)->getAdapter() instanceof AwsS3V3Adapter;
+        } catch (\Throwable) {
+            $isS3Adapter = true;
+        }
+
+        if (! $isS3Adapter) {
+            return;
+        }
+
+        $missing = [];
+        if (empty($config['key'])) {
+            $missing[] = 'R2_ACCESS_KEY_ID';
+        }
+        if (empty($config['secret'])) {
+            $missing[] = 'R2_SECRET_ACCESS_KEY';
+        }
+        if (empty($config['bucket'])) {
+            $missing[] = 'R2_BUCKET';
+        }
+        if (empty($config['endpoint'])) {
+            $missing[] = 'R2_ENDPOINT';
+        }
+
+        if ($missing !== []) {
+            throw new \RuntimeException(
+                'Cloudflare R2 storage is not configured. Missing environment variables: '.implode(', ', $missing).'.'
+            );
+        }
     }
 }

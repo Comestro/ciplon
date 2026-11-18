@@ -46,10 +46,16 @@ class SettingController extends Controller
 
         // Process logo upload exclusively to Cloudflare R2
         if ($request->hasFile('logo')) {
-            $uploadData = $r2->upload(
-                file: $request->file('logo'),
-                folder: 'branding'
-            );
+            try {
+                $uploadData = $r2->upload(
+                    file: $request->file('logo'),
+                    folder: 'branding'
+                );
+            } catch (\Throwable $e) {
+                return back()
+                    ->withErrors(['logo' => 'Failed to upload logo to Cloudflare R2: '.$e->getMessage()])
+                    ->withInput();
+            }
 
             $logoSetting = Setting::set(
                 key: 'logo_url',

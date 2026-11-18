@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from '@inertiajs/react';
 import { Pill, FlaskConical, Droplet, ArrowRight, ShieldCheck } from 'lucide-react';
+import { resolveProductImageUrl } from '../../utils/media';
 
 export default function ProductCard({ product }) {
   const [imgError, setImgError] = useState(false);
@@ -14,25 +15,7 @@ export default function ProductCard({ product }) {
   const strength = product.strength || '';
   const categoryName = product.category?.name || (typeof product.category === 'string' ? product.category : '') || product.therapeuticArea || '';
 
-  const rawFilePath = product.primary_image?.file_path || product.primaryImage?.file_path;
-  const directPath = rawFilePath
-    ? (rawFilePath.startsWith('/') ? rawFilePath : `/${rawFilePath}`)
-    : null;
-
-  const imageUrl =
-    product.imageUrl ||
-    product.image_url ||
-    product.image ||
-    directPath ||
-    product.primary_image?.url ||
-    product.primary_image?.image_url ||
-    product.primaryImage?.url ||
-    product.primaryImage?.image_url ||
-    (Array.isArray(product.images) && product.images.length > 0
-      ? (typeof product.images[0] === 'string'
-          ? product.images[0]
-          : (product.images[0]?.file_path ? (product.images[0].file_path.startsWith('/') ? product.images[0].file_path : `/${product.images[0].file_path}`) : product.images[0]?.url))
-      : null);
+  const imageUrl = resolveProductImageUrl(product);
 
   const getDosageIcon = (form = '') => {
     const safeForm = String(form || '').toLowerCase();

@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { Link } from '@inertiajs/react';
 import { ArrowRight, ShieldCheck, Pill, Eye, Sparkles } from 'lucide-react';
 import Container from '../common/Container';
+import { resolveProductImageUrl } from '../../utils/media';
 
 export default function FeaturedProductsSection({ products = [], onOpenEnquiryModal }) {
   const [selectedFilter, setSelectedFilter] = useState('ALL');
@@ -9,13 +10,7 @@ export default function FeaturedProductsSection({ products = [], onOpenEnquiryMo
   // Database products formatted for grid display
   const formattedItems = useMemo(() => {
     return (products || []).map((p, index) => {
-      // Pick fallback or image path
-      const imagePath =
-        p.primary_image?.file_path
-          ? (p.primary_image.file_path.startsWith('/') ? p.primary_image.file_path : `/${p.primary_image.file_path}`)
-          : (p.primaryImage?.file_path
-              ? (p.primaryImage.file_path.startsWith('/') ? p.primaryImage.file_path : `/${p.primaryImage.file_path}`)
-              : (p.imageUrl || p.image_url || p.primary_image?.url || p.primaryImage?.url || '/images/pharma_product_boxes.jpg'));
+      const imagePath = resolveProductImageUrl(p, '/images/pharma_product_boxes.jpg');
 
       return {
         id: p.id || p.slug || index,

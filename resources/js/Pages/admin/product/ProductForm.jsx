@@ -12,6 +12,18 @@ import {
   ImageIcon
 } from 'lucide-react';
 import AdminLayout from '../../../layouts/AdminLayout';
+import { resolveImageUrl } from '../../../utils/media';
+
+const FieldError = ({ message }) => {
+  if (!message) return null;
+
+  return (
+    <p className="text-[11px] text-rose-600 flex items-center gap-1 mt-1">
+      <AlertCircle className="w-3 h-3 shrink-0" />
+      <span>{message}</span>
+    </p>
+  );
+};
 
 // Standard preset dosage forms
 const STANDARD_DOSAGE_FORMS = [
@@ -190,6 +202,11 @@ export default function ProductForm({ product = null, categories: propCategories
       updated[index][field] = finalVal;
       return updated;
     });
+
+    const errKey = `compositions.${index}.${field}`;
+    if (errors[errKey] || errors.compositions) {
+      setErrors((prev) => ({ ...prev, [errKey]: null, compositions: null }));
+    }
   };
 
   // Append new composition row
@@ -202,6 +219,16 @@ export default function ProductForm({ product = null, categories: propCategories
 
   // Remove composition row
   const removeCompositionRow = (index) => {
+    setErrors((prev) => {
+      const next = { ...prev };
+      Object.keys(next).forEach((k) => {
+        if (k.startsWith('compositions.')) {
+          delete next[k];
+        }
+      });
+      return next;
+    });
+
     if (compositions.length === 1) {
       setCompositions([{ ingredient_name: '', strength: '', unit: 'mg' }]);
       return;
@@ -220,12 +247,18 @@ export default function ProductForm({ product = null, categories: propCategories
     const files = Array.from(e.target.files || []);
     if (!files.length) return;
 
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'];
     const validFiles = [];
     const newPreviews = [];
+    const rejectedMessages = [];
 
     files.forEach((file) => {
-      if (file.size > 2 * 1024 * 1024) {
-        toast.error(`"${file.name}" exceeds the 2MB limit.`);
+      if (!allowedTypes.includes(file.type)) {
+        rejectedMessages.push(`"${file.name}" must be a JPEG, PNG, or WEBP image.`);
+        return;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        rejectedMessages.push(`"${file.name}" exceeds the 5MB limit.`);
         return;
       }
       validFiles.push(file);
@@ -235,8 +268,24 @@ export default function ProductForm({ product = null, categories: propCategories
       });
     });
 
+    if (rejectedMessages.length > 0) {
+      rejectedMessages.forEach((msg) => toast.error(msg));
+      setErrors((prev) => ({ ...prev, images: rejectedMessages[0] }));
+    } else {
+      setErrors((prev) => {
+        const next = { ...prev };
+        Object.keys(next).forEach((k) => {
+          if (k === 'images' || k.startsWith('images.')) {
+            delete next[k];
+          }
+        });
+        return next;
+      });
+    }
+
     setSelectedImages((prev) => [...prev, ...validFiles]);
     setImagePreviews((prev) => [...prev, ...newPreviews]);
+    e.target.value = '';
   };
 
   // Remove newly selected image
@@ -257,6 +306,18 @@ export default function ProductForm({ product = null, categories: propCategories
     if (!formData.category_id) {
       newErrors.category_id = 'Please select a Category';
     }
+
+    compositions.forEach((comp, idx) => {
+      const hasName = Boolean(comp.ingredient_name?.trim());
+      const hasStrength = Boolean(comp.strength?.trim());
+      if (hasName && !hasStrength) {
+        newErrors[`compositions.${idx}.strength`] = 'Strength value is required for this ingredient';
+      }
+      if (!hasName && hasStrength) {
+        newErrors[`compositions.${idx}.ingredient_name`] = 'Ingredient name is required for this variation';
+      }
+    });
+
     return newErrors;
   };
 
@@ -267,6 +328,9 @@ export default function ProductForm({ product = null, categories: propCategories
 
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
+      const firstMsg = Object.values(validationErrors)[0];
+      toast.error(firstMsg || 'Please fix the highlighted errors before saving.');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
 
@@ -321,6 +385,9 @@ export default function ProductForm({ product = null, categories: propCategories
       onError: (backendErrors) => {
         setErrors(backendErrors);
         setIsSubmitting(false);
+        const firstMsg = Object.values(backendErrors)[0];
+        toast.error(firstMsg || 'Failed to save product. Please check the errors below.');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       },
       onFinish: () => {
         setIsSubmitting(false);
@@ -328,9 +395,28 @@ export default function ProductForm({ product = null, categories: propCategories
     });
   };
 
+  const activeErrorEntries = Object.entries(errors).filter(([, msg]) => Boolean(msg));
+  const imageErrorMessages = Object.entries(errors)
+    .filter(([key, msg]) => Boolean(msg) && (key === 'images' || key.startsWith('images.')))
+    .map(([, msg]) => msg);
+
   return (
     <AdminLayout>
       <div className="max-w-5xl mx-auto space-y-6 pb-12 pt-2">
+        {activeErrorEntries.length > 0 && (
+          <div className="rounded-xl border border-rose-200 bg-rose-50/80 p-4 text-rose-900 space-y-1.5">
+            <div className="flex items-center gap-2 font-semibold text-xs sm:text-sm">
+              <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+              <span>Please review the errors below before saving:</span>
+            </div>
+            <ul className="list-disc list-inside text-xs space-y-0.5 text-rose-800">
+              {activeErrorEntries.map(([key, msg]) => (
+                <li key={key}>{msg}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Section 1: Basic Information */}
           <div className="bg-white rounded-xl border border-slate-200 p-6 sm:p-7 space-y-5">
@@ -381,8 +467,13 @@ export default function ProductForm({ product = null, categories: propCategories
                   value={formData.generic_name}
                   onChange={handleChange}
                   placeholder="e.g. Acetaminophen + Caffeine"
-                  className="w-full px-3.5 py-2 text-xs sm:text-sm rounded-lg border border-slate-200 bg-slate-50/50 hover:bg-white focus:bg-white focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-colors outline-none"
+                  className={`w-full px-3.5 py-2 text-xs sm:text-sm rounded-lg border transition-colors outline-none ${
+                    errors.generic_name
+                      ? 'border-rose-300 bg-rose-50/20 text-rose-900'
+                      : 'border-slate-200 bg-slate-50/50 hover:bg-white focus:bg-white focus:border-teal-500 focus:ring-1 focus:ring-teal-500'
+                  }`}
                 />
+                <FieldError message={errors.generic_name} />
               </div>
 
               <div className="space-y-1.5">
@@ -473,6 +564,7 @@ export default function ProductForm({ product = null, categories: propCategories
                     autoFocus
                   />
                 )}
+                <FieldError message={errors.dosage_form} />
               </div>
 
               <div className="space-y-1.5">
@@ -486,8 +578,13 @@ export default function ProductForm({ product = null, categories: propCategories
                   value={formData.strength}
                   onChange={handleChange}
                   placeholder="e.g. 500 mg, 10 mg/5ml"
-                  className="w-full px-3.5 py-2 text-xs sm:text-sm rounded-lg border border-slate-200 bg-slate-50/50 hover:bg-white focus:bg-white focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-colors outline-none"
+                  className={`w-full px-3.5 py-2 text-xs sm:text-sm rounded-lg border transition-colors outline-none ${
+                    errors.strength
+                      ? 'border-rose-300 bg-rose-50/20 text-rose-900'
+                      : 'border-slate-200 bg-slate-50/50 hover:bg-white focus:bg-white focus:border-teal-500 focus:ring-1 focus:ring-teal-500'
+                  }`}
                 />
+                <FieldError message={errors.strength} />
               </div>
 
               <div className="space-y-1.5">
@@ -515,6 +612,7 @@ export default function ProductForm({ product = null, categories: propCategories
                     autoFocus
                   />
                 )}
+                <FieldError message={errors.prescription_type} />
               </div>
             </div>
           </div>
@@ -543,56 +641,77 @@ export default function ProductForm({ product = null, categories: propCategories
             </div>
 
             <div className="space-y-3">
-              {compositions.map((item, idx) => (
-                <div
-                  key={idx}
-                  className="flex flex-col sm:flex-row items-center gap-3 p-3 rounded-lg border border-slate-200/80 bg-slate-50/40"
-                >
-                  <div className="flex-1 w-full space-y-1">
-                    <span className="text-[10px] uppercase font-semibold text-slate-400">Ingredient Name</span>
-                    <input
-                      type="text"
-                      value={item.ingredient_name}
-                      onChange={(e) => handleCompositionChange(idx, 'ingredient_name', e.target.value)}
-                      placeholder="e.g. Paracetamol (Acetaminophen)"
-                      className="w-full px-3 py-1.5 text-xs sm:text-sm rounded-lg border border-slate-200 bg-white focus:border-teal-500 outline-none"
-                    />
-                  </div>
+              {errors.compositions && <FieldError message={errors.compositions} />}
 
-                  <div className="w-full sm:w-36 space-y-1">
-                    <span className="text-[10px] uppercase font-semibold text-slate-400">Strength Value</span>
-                    <input
-                      type="text"
-                      value={item.strength}
-                      onChange={(e) => handleCompositionChange(idx, 'strength', e.target.value)}
-                      placeholder="e.g. 500"
-                      className="w-full px-3 py-1.5 text-xs sm:text-sm rounded-lg border border-slate-200 bg-white focus:border-teal-500 outline-none"
-                    />
-                  </div>
+              {compositions.map((item, idx) => {
+                const nameError = errors[`compositions.${idx}.ingredient_name`];
+                const strengthError = errors[`compositions.${idx}.strength`];
+                const unitError = errors[`compositions.${idx}.unit`];
 
-                  <div className="w-full sm:w-28 space-y-1">
-                    <span className="text-[10px] uppercase font-semibold text-slate-400">Unit</span>
-                    <input
-                      type="text"
-                      value={item.unit}
-                      onChange={(e) => handleCompositionChange(idx, 'unit', e.target.value)}
-                      placeholder="e.g. mg, mcg, %"
-                      className="w-full px-3 py-1.5 text-xs sm:text-sm rounded-lg border border-slate-200 bg-white focus:border-teal-500 outline-none"
-                    />
-                  </div>
+                return (
+                  <div
+                    key={idx}
+                    className={`flex flex-col sm:flex-row items-start gap-3 p-3 rounded-lg border ${
+                      nameError || strengthError || unitError
+                        ? 'border-rose-300 bg-rose-50/30'
+                        : 'border-slate-200/80 bg-slate-50/40'
+                    }`}
+                  >
+                    <div className="flex-1 w-full space-y-1">
+                      <span className="text-[10px] uppercase font-semibold text-slate-400">Ingredient Name</span>
+                      <input
+                        type="text"
+                        value={item.ingredient_name}
+                        onChange={(e) => handleCompositionChange(idx, 'ingredient_name', e.target.value)}
+                        placeholder="e.g. Paracetamol (Acetaminophen)"
+                        className={`w-full px-3 py-1.5 text-xs sm:text-sm rounded-lg border bg-white outline-none ${
+                          nameError ? 'border-rose-300 focus:border-rose-500' : 'border-slate-200 focus:border-teal-500'
+                        }`}
+                      />
+                      <FieldError message={nameError} />
+                    </div>
 
-                  <div className="self-end sm:self-center pt-2 sm:pt-4">
-                    <button
-                      type="button"
-                      onClick={() => removeCompositionRow(idx)}
-                      className="p-1.5 rounded-lg text-rose-500 hover:text-rose-700 hover:bg-rose-50 transition-colors cursor-pointer"
-                      title="Remove ingredient"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+                    <div className="w-full sm:w-36 space-y-1">
+                      <span className="text-[10px] uppercase font-semibold text-slate-400">Strength Value</span>
+                      <input
+                        type="text"
+                        value={item.strength}
+                        onChange={(e) => handleCompositionChange(idx, 'strength', e.target.value)}
+                        placeholder="e.g. 500"
+                        className={`w-full px-3 py-1.5 text-xs sm:text-sm rounded-lg border bg-white outline-none ${
+                          strengthError ? 'border-rose-300 focus:border-rose-500' : 'border-slate-200 focus:border-teal-500'
+                        }`}
+                      />
+                      <FieldError message={strengthError} />
+                    </div>
+
+                    <div className="w-full sm:w-28 space-y-1">
+                      <span className="text-[10px] uppercase font-semibold text-slate-400">Unit</span>
+                      <input
+                        type="text"
+                        value={item.unit}
+                        onChange={(e) => handleCompositionChange(idx, 'unit', e.target.value)}
+                        placeholder="e.g. mg, mcg, %"
+                        className={`w-full px-3 py-1.5 text-xs sm:text-sm rounded-lg border bg-white outline-none ${
+                          unitError ? 'border-rose-300 focus:border-rose-500' : 'border-slate-200 focus:border-teal-500'
+                        }`}
+                      />
+                      <FieldError message={unitError} />
+                    </div>
+
+                    <div className="self-end sm:self-center pt-2 sm:pt-4">
+                      <button
+                        type="button"
+                        onClick={() => removeCompositionRow(idx)}
+                        className="p-1.5 rounded-lg text-rose-500 hover:text-rose-700 hover:bg-rose-50 transition-colors cursor-pointer"
+                        title="Remove ingredient"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
 
@@ -711,7 +830,7 @@ export default function ProductForm({ product = null, categories: propCategories
               </div>
               <div>
                 <h3 className="text-base font-bold text-slate-900">Product Photography & Visuals</h3>
-                <p className="text-xs text-slate-500">High-resolution packaging, blister packs, and vials (Max 2MB per file)</p>
+                <p className="text-xs text-slate-500">High-resolution packaging, blister packs, and vials stored in Cloudflare R2 (Max 5MB per file)</p>
               </div>
             </div>
 
@@ -720,25 +839,41 @@ export default function ProductForm({ product = null, categories: propCategories
               <div className="space-y-2">
                 <span className="text-xs font-semibold text-slate-700 block">Existing Images</span>
                 <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-3">
-                  {existingImages.map((img) => (
-                    <div key={img.id} className="relative group rounded-lg border border-slate-200 overflow-hidden bg-slate-50 aspect-square">
-                      <img src={img.url} alt="" className="w-full h-full object-cover" />
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveExistingImage(img.id)}
-                        className="absolute top-1 right-1 p-1 rounded-md bg-rose-600 text-white opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer shadow-xs"
-                        title="Remove image"
-                      >
-                        <X className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  ))}
+                  {existingImages.map((img) => {
+                    const imgSrc = resolveImageUrl(img);
+                    return (
+                      <div key={img.id} className="relative group rounded-lg border border-slate-200 overflow-hidden bg-slate-50 aspect-square flex items-center justify-center">
+                        {imgSrc ? (
+                          <img
+                            src={imgSrc}
+                            alt={img.alt_text || ''}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              e.currentTarget.style.display = 'none';
+                            }}
+                          />
+                        ) : (
+                          <ImageIcon className="w-6 h-6 text-slate-300" />
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveExistingImage(img.id)}
+                          className="absolute top-1 right-1 p-1 rounded-md bg-rose-600 text-white opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer shadow-xs"
+                          title="Remove image"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             )}
 
             {/* Upload Zone */}
-            <div className="border-2 border-dashed border-slate-200 rounded-xl p-6 text-center hover:border-teal-400 transition-colors bg-slate-50/30">
+            <div className={`border-2 border-dashed rounded-xl p-6 text-center transition-colors bg-slate-50/30 ${
+              imageErrorMessages.length > 0 ? 'border-rose-300 bg-rose-50/20' : 'border-slate-200 hover:border-teal-400'
+            }`}>
               <input
                 type="file"
                 multiple
@@ -758,9 +893,17 @@ export default function ProductForm({ product = null, categories: propCategories
                   <span className="text-xs font-semibold text-teal-700 hover:underline">Click to upload product photos</span>
                   <span className="text-xs text-slate-500"> or drag and drop</span>
                 </div>
-                <p className="text-[11px] text-slate-400">PNG, JPG, or WEBP up to 2MB each</p>
+                <p className="text-[11px] text-slate-400">PNG, JPG, or WEBP up to 5MB each</p>
               </label>
             </div>
+
+            {imageErrorMessages.length > 0 && (
+              <div className="space-y-1">
+                {imageErrorMessages.map((msg, i) => (
+                  <FieldError key={i} message={msg} />
+                ))}
+              </div>
+            )}
 
             {/* Newly selected image previews */}
             {imagePreviews.length > 0 && (
@@ -832,6 +975,7 @@ export default function ProductForm({ product = null, categories: propCategories
                     </label>
                   ))}
                 </div>
+                <FieldError message={errors.status} />
               </div>
 
               <div>

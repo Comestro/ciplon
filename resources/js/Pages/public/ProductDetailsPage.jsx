@@ -27,6 +27,7 @@ import Container from '../../components/common/Container';
 import Button from '../../components/common/Button';
 import EnquiryModal from '../../components/home/EnquiryModal';
 import SeoHead from '../../components/common/SeoHead';
+import { resolveImageUrl } from '../../utils/media';
 
 export default function ProductDetailsPage({ product, relatedProducts: initialRelated = [], categories = [] }) {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
@@ -52,23 +53,14 @@ export default function ProductDetailsPage({ product, relatedProducts: initialRe
   // Extract available product images from dynamic database records
   const images = useMemo(() => {
     const list = [];
-    const getSrc = (img) => {
-      if (!img) return null;
-      if (typeof img === 'string') return img;
-      if (img.file_path) {
-        return img.file_path.startsWith('/') ? img.file_path : `/${img.file_path}`;
-      }
-      return img.url || img.image_url || null;
-    };
-
-    const primarySrc = getSrc(product?.primary_image || product?.primaryImage);
+    const primarySrc = resolveImageUrl(product?.primary_image || product?.primaryImage);
     if (primarySrc) {
       list.push(primarySrc);
     }
 
     if (Array.isArray(product?.images)) {
       product.images.forEach((img) => {
-        const src = getSrc(img);
+        const src = resolveImageUrl(img);
         if (src && !list.includes(src)) {
           list.push(src);
         }

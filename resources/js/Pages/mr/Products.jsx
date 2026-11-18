@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import MRLayout from '../../layouts/MR/MRLayout';
 import SearchBar from '../../components/common/SearchBar';
+import { resolveProductImageUrl } from '../../utils/media';
 
 export default function Products({ initialFilters = {} }) {
   const [products, setProducts] = useState([]);
@@ -230,7 +231,7 @@ export default function Products({ initialFilters = {} }) {
         ) : viewMode === 'grid' ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {products.map((p) => {
-              const primaryImg = p.primary_image?.file_path || p.images?.[0]?.file_path;
+              const primaryImg = resolveProductImageUrl(p);
 
               return (
                 <div

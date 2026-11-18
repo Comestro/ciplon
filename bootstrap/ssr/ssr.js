@@ -6,7 +6,7 @@ import { Fragment, jsx, jsxs } from "react/jsx-runtime";
 import axios from "axios";
 import createServer from "@inertiajs/react/server";
 import { renderToString } from "react-dom/server";
-//#region \0rolldown/runtime.js
+// \0rolldown/runtime.js
 var __defProp = Object.defineProperty;
 var __exportAll = (all, no_symbols) => {
 	let target = {};
@@ -17,8 +17,7 @@ var __exportAll = (all, no_symbols) => {
 	if (!no_symbols) __defProp(target, Symbol.toStringTag, { value: "Module" });
 	return target;
 };
-//#endregion
-//#region resources/js/components/admin/AdminSidebar.jsx
+// resources/js/components/admin/AdminSidebar.jsx
 function AdminSidebar({ isOpen, onClose }) {
 	const { url, props } = usePage();
 	const currentPath = url.split("?")[0];
@@ -331,8 +330,7 @@ function AdminSidebar({ isOpen, onClose }) {
 		]
 	})] });
 }
-//#endregion
-//#region resources/js/components/common/NotificationDropdown.jsx
+// resources/js/components/common/NotificationDropdown.jsx
 function NotificationDropdown() {
 	const { props } = usePage();
 	const serverNotifications = (props.notifications || {
@@ -525,8 +523,7 @@ function NotificationDropdown() {
 		})]
 	});
 }
-//#endregion
-//#region resources/js/components/admin/AdminNavbar.jsx
+// resources/js/components/admin/AdminNavbar.jsx
 function AdminNavbar({ onToggleSidebar }) {
 	const { url, props } = usePage();
 	const currentPath = url.split("?")[0];
@@ -654,8 +651,7 @@ function AdminNavbar({ onToggleSidebar }) {
 		})]
 	});
 }
-//#endregion
-//#region resources/js/components/common/ContentLoader.jsx
+// resources/js/components/common/ContentLoader.jsx
 function ContentLoader() {
 	const [loading, setLoading] = useState(false);
 	useEffect(() => {
@@ -704,8 +700,7 @@ function ContentLoader() {
 		})
 	});
 }
-//#endregion
-//#region resources/js/layouts/AdminLayout.jsx
+// resources/js/layouts/AdminLayout.jsx
 function AdminLayout({ children }) {
 	const [sidebarOpen, setSidebarOpen] = useState(false);
 	const { flash } = usePage().props;
@@ -737,8 +732,7 @@ function AdminLayout({ children }) {
 		})]
 	});
 }
-//#endregion
-//#region resources/js/Pages/admin/Dashboard.jsx
+// resources/js/Pages/admin/Dashboard.jsx
 var Dashboard_exports$1 = /* @__PURE__ */ __exportAll({ default: () => Dashboard$1 });
 function Dashboard$1({ stats = {}, recentProducts = [], recentEnquiries = [] }) {
 	const totalProducts = stats.totalProducts ?? 0;
@@ -1165,8 +1159,7 @@ function Dashboard$1({ stats = {}, recentProducts = [], recentEnquiries = [] }) 
 		]
 	}) });
 }
-//#endregion
-//#region resources/js/Pages/admin/category/CategoryForm.jsx
+// resources/js/Pages/admin/category/CategoryForm.jsx
 var CategoryForm_exports = /* @__PURE__ */ __exportAll({ default: () => CategoryForm });
 var ucfirst$1 = (str) => {
 	if (!str) return "";
@@ -1389,8 +1382,7 @@ function CategoryForm({ category = null, parentCategories = [] }) {
 		})]
 	}) });
 }
-//#endregion
-//#region resources/js/components/common/ConfirmModal.jsx
+// resources/js/components/common/ConfirmModal.jsx
 function ConfirmModal({ isOpen, onClose, onConfirm, title = "Confirm Action", message = "Are you sure you want to proceed? This action cannot be undone.", confirmText = "Confirm", cancelText = "Cancel", loadingText = null, isDanger = true, isLoading = false, icon = null, children = null }) {
 	useEffect(() => {
 		if (!isOpen) return;
@@ -1469,8 +1461,7 @@ function ConfirmModal({ isOpen, onClose, onConfirm, title = "Confirm Action", me
 		})]
 	});
 }
-//#endregion
-//#region resources/js/components/common/SearchBar.jsx
+// resources/js/components/common/SearchBar.jsx
 /**
 * Standard Reusable SearchBar component for all Ciplon MR & Admin pages.
 *
@@ -1515,8 +1506,7 @@ function SearchBar({ value = "", onChange, onClear, placeholder = "Search...", c
 		]
 	});
 }
-//#endregion
-//#region resources/js/Pages/admin/category/CategoryList.jsx
+// resources/js/Pages/admin/category/CategoryList.jsx
 var CategoryList_exports = /* @__PURE__ */ __exportAll({ default: () => CategoryList });
 function CategoryList({ categories: paginatedCategories, filters = {} }) {
 	const categories = Array.isArray(paginatedCategories) ? paginatedCategories : paginatedCategories?.data || [];
@@ -1915,8 +1905,7 @@ function CategoryList({ categories: paginatedCategories, filters = {} }) {
 		]
 	}) });
 }
-//#endregion
-//#region resources/js/Pages/admin/enquiry/EnquiryIndex.jsx
+// resources/js/Pages/admin/enquiry/EnquiryIndex.jsx
 var EnquiryIndex_exports = /* @__PURE__ */ __exportAll({ default: () => EnquiryIndex });
 function EnquiryIndex({ enquiries = {}, stats = {}, filters = {} }) {
 	const [searchTerm, setSearchTerm] = useState(filters.search || "");
@@ -2357,8 +2346,7 @@ function EnquiryIndex({ enquiries = {}, stats = {}, filters = {} }) {
 		isLoading: isDeleting
 	})] });
 }
-//#endregion
-//#region resources/js/Pages/admin/product/ProductDetails.jsx
+// resources/js/Pages/admin/product/ProductDetails.jsx
 var ProductDetails_exports = /* @__PURE__ */ __exportAll({ default: () => ProductDetails });
 var capitalizeFirst$1 = (text) => {
 	if (!text || typeof text !== "string") return text;
@@ -2699,9 +2687,42 @@ function ProductDetails({ product }) {
 		]
 	}) });
 }
-//#endregion
-//#region resources/js/Pages/admin/product/ProductForm.jsx
+// resources/js/utils/media.js
+/**
+* Resolve a product or media image object/string into a displayable URL.
+* Prefers the backend-resolved `url` (e.g. Cloudflare R2 public URL or static `/images/...` path),
+* falling back to `file_path` only when `url` is unavailable.
+*/
+function resolveImageUrl(image) {
+	if (!image) return null;
+	if (typeof image === "string") {
+		if (image.startsWith("http://") || image.startsWith("https://") || image.startsWith("/") || image.startsWith("data:") || image.startsWith("blob:")) return image;
+		return `/${image}`;
+	}
+	if (image.url) return image.url;
+	if (image.image_url) return image.image_url;
+	if (image.file_path) {
+		if (image.file_path.startsWith("http://") || image.file_path.startsWith("https://") || image.file_path.startsWith("/")) return image.file_path;
+		return `/${image.file_path}`;
+	}
+	return null;
+}
+/**
+* Resolve the primary display image URL for a product record.
+*/
+function resolveProductImageUrl(product, fallback = null) {
+	if (!product) return fallback;
+	return product.imageUrl || product.image_url || product.image || resolveImageUrl(product.primary_image) || resolveImageUrl(product.primaryImage) || (Array.isArray(product.images) && product.images.length > 0 ? resolveImageUrl(product.images[0]) : null) || fallback;
+}
+// resources/js/Pages/admin/product/ProductForm.jsx
 var ProductForm_exports = /* @__PURE__ */ __exportAll({ default: () => ProductForm });
+var FieldError$1 = ({ message }) => {
+	if (!message) return null;
+	return /* @__PURE__ */ jsxs("p", {
+		className: "text-[11px] text-rose-600 flex items-center gap-1 mt-1",
+		children: [/* @__PURE__ */ jsx(AlertCircle, { className: "w-3 h-3 shrink-0" }), /* @__PURE__ */ jsx("span", { children: message })]
+	});
+};
 var STANDARD_DOSAGE_FORMS = [
 	{
 		value: "Tablet",
@@ -2900,6 +2921,12 @@ function ProductForm({ product = null, categories: propCategories = [] }) {
 			updated[index][field] = finalVal;
 			return updated;
 		});
+		const errKey = `compositions.${index}.${field}`;
+		if (errors[errKey] || errors.compositions) setErrors((prev) => ({
+			...prev,
+			[errKey]: null,
+			compositions: null
+		}));
 	};
 	const addCompositionRow = () => {
 		setCompositions((prev) => [...prev, {
@@ -2909,6 +2936,13 @@ function ProductForm({ product = null, categories: propCategories = [] }) {
 		}]);
 	};
 	const removeCompositionRow = (index) => {
+		setErrors((prev) => {
+			const next = { ...prev };
+			Object.keys(next).forEach((k) => {
+				if (k.startsWith("compositions.")) delete next[k];
+			});
+			return next;
+		});
 		if (compositions.length === 1) {
 			setCompositions([{
 				ingredient_name: "",
@@ -2926,11 +2960,22 @@ function ProductForm({ product = null, categories: propCategories = [] }) {
 	const handleImageChange = (e) => {
 		const files = Array.from(e.target.files || []);
 		if (!files.length) return;
+		const allowedTypes = [
+			"image/jpeg",
+			"image/png",
+			"image/jpg",
+			"image/webp"
+		];
 		const validFiles = [];
 		const newPreviews = [];
+		const rejectedMessages = [];
 		files.forEach((file) => {
-			if (file.size > 2097152) {
-				toast.error(`"${file.name}" exceeds the 2MB limit.`);
+			if (!allowedTypes.includes(file.type)) {
+				rejectedMessages.push(`"${file.name}" must be a JPEG, PNG, or WEBP image.`);
+				return;
+			}
+			if (file.size > 5242880) {
+				rejectedMessages.push(`"${file.name}" exceeds the 5MB limit.`);
 				return;
 			}
 			validFiles.push(file);
@@ -2939,8 +2984,22 @@ function ProductForm({ product = null, categories: propCategories = [] }) {
 				name: file.name
 			});
 		});
+		if (rejectedMessages.length > 0) {
+			rejectedMessages.forEach((msg) => toast.error(msg));
+			setErrors((prev) => ({
+				...prev,
+				images: rejectedMessages[0]
+			}));
+		} else setErrors((prev) => {
+			const next = { ...prev };
+			Object.keys(next).forEach((k) => {
+				if (k === "images" || k.startsWith("images.")) delete next[k];
+			});
+			return next;
+		});
 		setSelectedImages((prev) => [...prev, ...validFiles]);
 		setImagePreviews((prev) => [...prev, ...newPreviews]);
+		e.target.value = "";
 	};
 	const removeSelectedImage = (index) => {
 		if (imagePreviews[index]?.url) URL.revokeObjectURL(imagePreviews[index].url);
@@ -2951,6 +3010,12 @@ function ProductForm({ product = null, categories: propCategories = [] }) {
 		const newErrors = {};
 		if (!formData.brand_name.trim()) newErrors.brand_name = "Brand Name is required";
 		if (!formData.category_id) newErrors.category_id = "Please select a Category";
+		compositions.forEach((comp, idx) => {
+			const hasName = Boolean(comp.ingredient_name?.trim());
+			const hasStrength = Boolean(comp.strength?.trim());
+			if (hasName && !hasStrength) newErrors[`compositions.${idx}.strength`] = "Strength value is required for this ingredient";
+			if (!hasName && hasStrength) newErrors[`compositions.${idx}.ingredient_name`] = "Ingredient name is required for this variation";
+		});
 		return newErrors;
 	};
 	const handleSubmit = (e) => {
@@ -2958,6 +3023,12 @@ function ProductForm({ product = null, categories: propCategories = [] }) {
 		const validationErrors = validate();
 		if (Object.keys(validationErrors).length > 0) {
 			setErrors(validationErrors);
+			const firstMsg = Object.values(validationErrors)[0];
+			toast.error(firstMsg || "Please fix the highlighted errors before saving.");
+			window.scrollTo({
+				top: 0,
+				behavior: "smooth"
+			});
 			return;
 		}
 		setIsSubmitting(true);
@@ -2994,15 +3065,32 @@ function ProductForm({ product = null, categories: propCategories = [] }) {
 			onError: (backendErrors) => {
 				setErrors(backendErrors);
 				setIsSubmitting(false);
+				const firstMsg = Object.values(backendErrors)[0];
+				toast.error(firstMsg || "Failed to save product. Please check the errors below.");
+				window.scrollTo({
+					top: 0,
+					behavior: "smooth"
+				});
 			},
 			onFinish: () => {
 				setIsSubmitting(false);
 			}
 		});
 	};
-	return /* @__PURE__ */ jsx(AdminLayout, { children: /* @__PURE__ */ jsx("div", {
+	const activeErrorEntries = Object.entries(errors).filter(([, msg]) => Boolean(msg));
+	const imageErrorMessages = Object.entries(errors).filter(([key, msg]) => Boolean(msg) && (key === "images" || key.startsWith("images."))).map(([, msg]) => msg);
+	return /* @__PURE__ */ jsx(AdminLayout, { children: /* @__PURE__ */ jsxs("div", {
 		className: "max-w-5xl mx-auto space-y-6 pb-12 pt-2",
-		children: /* @__PURE__ */ jsxs("form", {
+		children: [activeErrorEntries.length > 0 && /* @__PURE__ */ jsxs("div", {
+			className: "rounded-xl border border-rose-200 bg-rose-50/80 p-4 text-rose-900 space-y-1.5",
+			children: [/* @__PURE__ */ jsxs("div", {
+				className: "flex items-center gap-2 font-semibold text-xs sm:text-sm",
+				children: [/* @__PURE__ */ jsx(AlertCircle, { className: "w-4 h-4 text-rose-600 shrink-0" }), /* @__PURE__ */ jsx("span", { children: "Please review the errors below before saving:" })]
+			}), /* @__PURE__ */ jsx("ul", {
+				className: "list-disc list-inside text-xs space-y-0.5 text-rose-800",
+				children: activeErrorEntries.map(([key, msg]) => /* @__PURE__ */ jsx("li", { children: msg }, key))
+			})]
+		}), /* @__PURE__ */ jsxs("form", {
 			onSubmit: handleSubmit,
 			className: "space-y-6",
 			children: [
@@ -3049,20 +3137,24 @@ function ProductForm({ product = null, categories: propCategories = [] }) {
 							}),
 							/* @__PURE__ */ jsxs("div", {
 								className: "space-y-1.5",
-								children: [/* @__PURE__ */ jsxs("label", {
-									className: "text-xs font-semibold text-slate-700 flex items-center justify-between",
-									children: [/* @__PURE__ */ jsx("span", { children: "Generic Name" }), /* @__PURE__ */ jsx("span", {
-										className: "text-[10px] text-slate-400 font-normal",
-										children: "Capitalized automatically"
-									})]
-								}), /* @__PURE__ */ jsx("input", {
-									type: "text",
-									name: "generic_name",
-									value: formData.generic_name,
-									onChange: handleChange,
-									placeholder: "e.g. Acetaminophen + Caffeine",
-									className: "w-full px-3.5 py-2 text-xs sm:text-sm rounded-lg border border-slate-200 bg-slate-50/50 hover:bg-white focus:bg-white focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-colors outline-none"
-								})]
+								children: [
+									/* @__PURE__ */ jsxs("label", {
+										className: "text-xs font-semibold text-slate-700 flex items-center justify-between",
+										children: [/* @__PURE__ */ jsx("span", { children: "Generic Name" }), /* @__PURE__ */ jsx("span", {
+											className: "text-[10px] text-slate-400 font-normal",
+											children: "Capitalized automatically"
+										})]
+									}),
+									/* @__PURE__ */ jsx("input", {
+										type: "text",
+										name: "generic_name",
+										value: formData.generic_name,
+										onChange: handleChange,
+										placeholder: "e.g. Acetaminophen + Caffeine",
+										className: `w-full px-3.5 py-2 text-xs sm:text-sm rounded-lg border transition-colors outline-none ${errors.generic_name ? "border-rose-300 bg-rose-50/20 text-rose-900" : "border-slate-200 bg-slate-50/50 hover:bg-white focus:bg-white focus:border-teal-500 focus:ring-1 focus:ring-teal-500"}`
+									}),
+									/* @__PURE__ */ jsx(FieldError$1, { message: errors.generic_name })
+								]
 							}),
 							/* @__PURE__ */ jsxs("div", {
 								className: "space-y-1.5",
@@ -3160,25 +3252,30 @@ function ProductForm({ product = null, categories: propCategories = [] }) {
 										placeholder: "Enter custom dosage form (e.g. Lozenges)",
 										className: "w-full mt-2 px-3.5 py-2 text-xs sm:text-sm rounded-lg border border-teal-300 bg-teal-50/30 focus:bg-white focus:border-teal-500 transition-colors outline-none",
 										autoFocus: true
-									})
+									}),
+									/* @__PURE__ */ jsx(FieldError$1, { message: errors.dosage_form })
 								]
 							}),
 							/* @__PURE__ */ jsxs("div", {
 								className: "space-y-1.5",
-								children: [/* @__PURE__ */ jsxs("label", {
-									className: "text-xs font-semibold text-slate-700 flex items-center justify-between",
-									children: [/* @__PURE__ */ jsx("span", { children: "Strength" }), /* @__PURE__ */ jsx("span", {
-										className: "text-[10px] text-slate-400 font-normal",
-										children: "Capitalized automatically"
-									})]
-								}), /* @__PURE__ */ jsx("input", {
-									type: "text",
-									name: "strength",
-									value: formData.strength,
-									onChange: handleChange,
-									placeholder: "e.g. 500 mg, 10 mg/5ml",
-									className: "w-full px-3.5 py-2 text-xs sm:text-sm rounded-lg border border-slate-200 bg-slate-50/50 hover:bg-white focus:bg-white focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-colors outline-none"
-								})]
+								children: [
+									/* @__PURE__ */ jsxs("label", {
+										className: "text-xs font-semibold text-slate-700 flex items-center justify-between",
+										children: [/* @__PURE__ */ jsx("span", { children: "Strength" }), /* @__PURE__ */ jsx("span", {
+											className: "text-[10px] text-slate-400 font-normal",
+											children: "Capitalized automatically"
+										})]
+									}),
+									/* @__PURE__ */ jsx("input", {
+										type: "text",
+										name: "strength",
+										value: formData.strength,
+										onChange: handleChange,
+										placeholder: "e.g. 500 mg, 10 mg/5ml",
+										className: `w-full px-3.5 py-2 text-xs sm:text-sm rounded-lg border transition-colors outline-none ${errors.strength ? "border-rose-300 bg-rose-50/20 text-rose-900" : "border-slate-200 bg-slate-50/50 hover:bg-white focus:bg-white focus:border-teal-500 focus:ring-1 focus:ring-teal-500"}`
+									}),
+									/* @__PURE__ */ jsx(FieldError$1, { message: errors.strength })
+								]
 							}),
 							/* @__PURE__ */ jsxs("div", {
 								className: "space-y-1.5",
@@ -3206,7 +3303,8 @@ function ProductForm({ product = null, categories: propCategories = [] }) {
 										placeholder: "Enter prescription type",
 										className: "w-full mt-2 px-3.5 py-2 text-xs sm:text-sm rounded-lg border border-teal-300 bg-teal-50/30 focus:bg-white focus:border-teal-500 transition-colors outline-none",
 										autoFocus: true
-									})
+									}),
+									/* @__PURE__ */ jsx(FieldError$1, { message: errors.prescription_type })
 								]
 							})
 						]
@@ -3234,62 +3332,79 @@ function ProductForm({ product = null, categories: propCategories = [] }) {
 							className: "inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-teal-700 bg-teal-50 hover:bg-teal-100 rounded-lg transition-colors cursor-pointer",
 							children: [/* @__PURE__ */ jsx(Plus, { className: "w-3.5 h-3.5" }), /* @__PURE__ */ jsx("span", { children: "Add Ingredient" })]
 						})]
-					}), /* @__PURE__ */ jsx("div", {
+					}), /* @__PURE__ */ jsxs("div", {
 						className: "space-y-3",
-						children: compositions.map((item, idx) => /* @__PURE__ */ jsxs("div", {
-							className: "flex flex-col sm:flex-row items-center gap-3 p-3 rounded-lg border border-slate-200/80 bg-slate-50/40",
-							children: [
-								/* @__PURE__ */ jsxs("div", {
-									className: "flex-1 w-full space-y-1",
-									children: [/* @__PURE__ */ jsx("span", {
-										className: "text-[10px] uppercase font-semibold text-slate-400",
-										children: "Ingredient Name"
-									}), /* @__PURE__ */ jsx("input", {
-										type: "text",
-										value: item.ingredient_name,
-										onChange: (e) => handleCompositionChange(idx, "ingredient_name", e.target.value),
-										placeholder: "e.g. Paracetamol (Acetaminophen)",
-										className: "w-full px-3 py-1.5 text-xs sm:text-sm rounded-lg border border-slate-200 bg-white focus:border-teal-500 outline-none"
-									})]
-								}),
-								/* @__PURE__ */ jsxs("div", {
-									className: "w-full sm:w-36 space-y-1",
-									children: [/* @__PURE__ */ jsx("span", {
-										className: "text-[10px] uppercase font-semibold text-slate-400",
-										children: "Strength Value"
-									}), /* @__PURE__ */ jsx("input", {
-										type: "text",
-										value: item.strength,
-										onChange: (e) => handleCompositionChange(idx, "strength", e.target.value),
-										placeholder: "e.g. 500",
-										className: "w-full px-3 py-1.5 text-xs sm:text-sm rounded-lg border border-slate-200 bg-white focus:border-teal-500 outline-none"
-									})]
-								}),
-								/* @__PURE__ */ jsxs("div", {
-									className: "w-full sm:w-28 space-y-1",
-									children: [/* @__PURE__ */ jsx("span", {
-										className: "text-[10px] uppercase font-semibold text-slate-400",
-										children: "Unit"
-									}), /* @__PURE__ */ jsx("input", {
-										type: "text",
-										value: item.unit,
-										onChange: (e) => handleCompositionChange(idx, "unit", e.target.value),
-										placeholder: "e.g. mg, mcg, %",
-										className: "w-full px-3 py-1.5 text-xs sm:text-sm rounded-lg border border-slate-200 bg-white focus:border-teal-500 outline-none"
-									})]
-								}),
-								/* @__PURE__ */ jsx("div", {
-									className: "self-end sm:self-center pt-2 sm:pt-4",
-									children: /* @__PURE__ */ jsx("button", {
-										type: "button",
-										onClick: () => removeCompositionRow(idx),
-										className: "p-1.5 rounded-lg text-rose-500 hover:text-rose-700 hover:bg-rose-50 transition-colors cursor-pointer",
-										title: "Remove ingredient",
-										children: /* @__PURE__ */ jsx(Trash2, { className: "w-4 h-4" })
+						children: [errors.compositions && /* @__PURE__ */ jsx(FieldError$1, { message: errors.compositions }), compositions.map((item, idx) => {
+							const nameError = errors[`compositions.${idx}.ingredient_name`];
+							const strengthError = errors[`compositions.${idx}.strength`];
+							const unitError = errors[`compositions.${idx}.unit`];
+							return /* @__PURE__ */ jsxs("div", {
+								className: `flex flex-col sm:flex-row items-start gap-3 p-3 rounded-lg border ${nameError || strengthError || unitError ? "border-rose-300 bg-rose-50/30" : "border-slate-200/80 bg-slate-50/40"}`,
+								children: [
+									/* @__PURE__ */ jsxs("div", {
+										className: "flex-1 w-full space-y-1",
+										children: [
+											/* @__PURE__ */ jsx("span", {
+												className: "text-[10px] uppercase font-semibold text-slate-400",
+												children: "Ingredient Name"
+											}),
+											/* @__PURE__ */ jsx("input", {
+												type: "text",
+												value: item.ingredient_name,
+												onChange: (e) => handleCompositionChange(idx, "ingredient_name", e.target.value),
+												placeholder: "e.g. Paracetamol (Acetaminophen)",
+												className: `w-full px-3 py-1.5 text-xs sm:text-sm rounded-lg border bg-white outline-none ${nameError ? "border-rose-300 focus:border-rose-500" : "border-slate-200 focus:border-teal-500"}`
+											}),
+											/* @__PURE__ */ jsx(FieldError$1, { message: nameError })
+										]
+									}),
+									/* @__PURE__ */ jsxs("div", {
+										className: "w-full sm:w-36 space-y-1",
+										children: [
+											/* @__PURE__ */ jsx("span", {
+												className: "text-[10px] uppercase font-semibold text-slate-400",
+												children: "Strength Value"
+											}),
+											/* @__PURE__ */ jsx("input", {
+												type: "text",
+												value: item.strength,
+												onChange: (e) => handleCompositionChange(idx, "strength", e.target.value),
+												placeholder: "e.g. 500",
+												className: `w-full px-3 py-1.5 text-xs sm:text-sm rounded-lg border bg-white outline-none ${strengthError ? "border-rose-300 focus:border-rose-500" : "border-slate-200 focus:border-teal-500"}`
+											}),
+											/* @__PURE__ */ jsx(FieldError$1, { message: strengthError })
+										]
+									}),
+									/* @__PURE__ */ jsxs("div", {
+										className: "w-full sm:w-28 space-y-1",
+										children: [
+											/* @__PURE__ */ jsx("span", {
+												className: "text-[10px] uppercase font-semibold text-slate-400",
+												children: "Unit"
+											}),
+											/* @__PURE__ */ jsx("input", {
+												type: "text",
+												value: item.unit,
+												onChange: (e) => handleCompositionChange(idx, "unit", e.target.value),
+												placeholder: "e.g. mg, mcg, %",
+												className: `w-full px-3 py-1.5 text-xs sm:text-sm rounded-lg border bg-white outline-none ${unitError ? "border-rose-300 focus:border-rose-500" : "border-slate-200 focus:border-teal-500"}`
+											}),
+											/* @__PURE__ */ jsx(FieldError$1, { message: unitError })
+										]
+									}),
+									/* @__PURE__ */ jsx("div", {
+										className: "self-end sm:self-center pt-2 sm:pt-4",
+										children: /* @__PURE__ */ jsx("button", {
+											type: "button",
+											onClick: () => removeCompositionRow(idx),
+											className: "p-1.5 rounded-lg text-rose-500 hover:text-rose-700 hover:bg-rose-50 transition-colors cursor-pointer",
+											title: "Remove ingredient",
+											children: /* @__PURE__ */ jsx(Trash2, { className: "w-4 h-4" })
+										})
 									})
-								})
-							]
-						}, idx))
+								]
+							}, idx);
+						})]
 					})]
 				}),
 				/* @__PURE__ */ jsxs("div", {
@@ -3432,7 +3547,7 @@ function ProductForm({ product = null, categories: propCategories = [] }) {
 								children: "Product Photography & Visuals"
 							}), /* @__PURE__ */ jsx("p", {
 								className: "text-xs text-slate-500",
-								children: "High-resolution packaging, blister packs, and vials (Max 2MB per file)"
+								children: "High-resolution packaging, blister packs, and vials stored in Cloudflare R2 (Max 5MB per file)"
 							})] })]
 						}),
 						isEditMode && existingImages.length > 0 && /* @__PURE__ */ jsxs("div", {
@@ -3442,24 +3557,30 @@ function ProductForm({ product = null, categories: propCategories = [] }) {
 								children: "Existing Images"
 							}), /* @__PURE__ */ jsx("div", {
 								className: "grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-3",
-								children: existingImages.map((img) => /* @__PURE__ */ jsxs("div", {
-									className: "relative group rounded-lg border border-slate-200 overflow-hidden bg-slate-50 aspect-square",
-									children: [/* @__PURE__ */ jsx("img", {
-										src: img.url,
-										alt: "",
-										className: "w-full h-full object-cover"
-									}), /* @__PURE__ */ jsx("button", {
-										type: "button",
-										onClick: () => handleRemoveExistingImage(img.id),
-										className: "absolute top-1 right-1 p-1 rounded-md bg-rose-600 text-white opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer shadow-xs",
-										title: "Remove image",
-										children: /* @__PURE__ */ jsx(X, { className: "w-3.5 h-3.5" })
-									})]
-								}, img.id))
+								children: existingImages.map((img) => {
+									const imgSrc = resolveImageUrl(img);
+									return /* @__PURE__ */ jsxs("div", {
+										className: "relative group rounded-lg border border-slate-200 overflow-hidden bg-slate-50 aspect-square flex items-center justify-center",
+										children: [imgSrc ? /* @__PURE__ */ jsx("img", {
+											src: imgSrc,
+											alt: img.alt_text || "",
+											className: "w-full h-full object-cover",
+											onError: (e) => {
+												e.currentTarget.style.display = "none";
+											}
+										}) : /* @__PURE__ */ jsx(ImageIcon, { className: "w-6 h-6 text-slate-300" }), /* @__PURE__ */ jsx("button", {
+											type: "button",
+											onClick: () => handleRemoveExistingImage(img.id),
+											className: "absolute top-1 right-1 p-1 rounded-md bg-rose-600 text-white opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer shadow-xs",
+											title: "Remove image",
+											children: /* @__PURE__ */ jsx(X, { className: "w-3.5 h-3.5" })
+										})]
+									}, img.id);
+								})
 							})]
 						}),
 						/* @__PURE__ */ jsxs("div", {
-							className: "border-2 border-dashed border-slate-200 rounded-xl p-6 text-center hover:border-teal-400 transition-colors bg-slate-50/30",
+							className: `border-2 border-dashed rounded-xl p-6 text-center transition-colors bg-slate-50/30 ${imageErrorMessages.length > 0 ? "border-rose-300 bg-rose-50/20" : "border-slate-200 hover:border-teal-400"}`,
 							children: [/* @__PURE__ */ jsx("input", {
 								type: "file",
 								multiple: true,
@@ -3484,10 +3605,14 @@ function ProductForm({ product = null, categories: propCategories = [] }) {
 									})] }),
 									/* @__PURE__ */ jsx("p", {
 										className: "text-[11px] text-slate-400",
-										children: "PNG, JPG, or WEBP up to 2MB each"
+										children: "PNG, JPG, or WEBP up to 5MB each"
 									})
 								]
 							})]
+						}),
+						imageErrorMessages.length > 0 && /* @__PURE__ */ jsx("div", {
+							className: "space-y-1",
+							children: imageErrorMessages.map((msg, i) => /* @__PURE__ */ jsx(FieldError$1, { message: msg }, i))
 						}),
 						imagePreviews.length > 0 && /* @__PURE__ */ jsxs("div", {
 							className: "space-y-2 pt-2",
@@ -3534,50 +3659,54 @@ function ProductForm({ product = null, categories: propCategories = [] }) {
 						})] })]
 					}), /* @__PURE__ */ jsxs("div", {
 						className: "space-y-4",
-						children: [/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("label", {
-							className: "block text-xs font-semibold uppercase tracking-wider text-slate-700 mb-2",
-							children: "Publication Status"
-						}), /* @__PURE__ */ jsx("div", {
-							className: "grid grid-cols-1 sm:grid-cols-4 gap-3",
-							children: [
-								{
-									value: "active",
-									label: "Active",
-									desc: "Visible in commercial catalog"
-								},
-								{
-									value: "draft",
-									label: "Draft",
-									desc: "Work in progress / unlisted"
-								},
-								{
-									value: "inactive",
-									label: "Inactive",
-									desc: "Temporarily disabled"
-								},
-								{
-									value: "archived",
-									label: "Archived",
-									desc: "Discontinued monograph"
-								}
-							].map((s) => /* @__PURE__ */ jsxs("label", {
-								className: `flex items-start gap-2.5 p-3 rounded-lg border cursor-pointer transition-colors ${formData.status === s.value ? "border-teal-500 bg-teal-50/30 text-teal-950 font-medium" : "border-slate-200 hover:bg-slate-50 text-slate-700"}`,
-								children: [/* @__PURE__ */ jsx("input", {
-									type: "radio",
-									name: "status",
-									value: s.value,
-									checked: formData.status === s.value,
-									onChange: handleChange,
-									className: "w-4 h-4 mt-0.5 text-teal-600 focus:ring-teal-500"
-								}), /* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("span", {
-									className: "text-xs font-semibold block",
-									children: s.label
-								}), /* @__PURE__ */ jsx("span", {
-									className: "text-[10px] text-slate-500 block",
-									children: s.desc
-								})] })]
-							}, s.value))
-						})] }), /* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("label", {
+						children: [/* @__PURE__ */ jsxs("div", { children: [
+							/* @__PURE__ */ jsx("label", {
+								className: "block text-xs font-semibold uppercase tracking-wider text-slate-700 mb-2",
+								children: "Publication Status"
+							}),
+							/* @__PURE__ */ jsx("div", {
+								className: "grid grid-cols-1 sm:grid-cols-4 gap-3",
+								children: [
+									{
+										value: "active",
+										label: "Active",
+										desc: "Visible in commercial catalog"
+									},
+									{
+										value: "draft",
+										label: "Draft",
+										desc: "Work in progress / unlisted"
+									},
+									{
+										value: "inactive",
+										label: "Inactive",
+										desc: "Temporarily disabled"
+									},
+									{
+										value: "archived",
+										label: "Archived",
+										desc: "Discontinued monograph"
+									}
+								].map((s) => /* @__PURE__ */ jsxs("label", {
+									className: `flex items-start gap-2.5 p-3 rounded-lg border cursor-pointer transition-colors ${formData.status === s.value ? "border-teal-500 bg-teal-50/30 text-teal-950 font-medium" : "border-slate-200 hover:bg-slate-50 text-slate-700"}`,
+									children: [/* @__PURE__ */ jsx("input", {
+										type: "radio",
+										name: "status",
+										value: s.value,
+										checked: formData.status === s.value,
+										onChange: handleChange,
+										className: "w-4 h-4 mt-0.5 text-teal-600 focus:ring-teal-500"
+									}), /* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("span", {
+										className: "text-xs font-semibold block",
+										children: s.label
+									}), /* @__PURE__ */ jsx("span", {
+										className: "text-[10px] text-slate-500 block",
+										children: s.desc
+									})] })]
+								}, s.value))
+							}),
+							/* @__PURE__ */ jsx(FieldError$1, { message: errors.status })
+						] }), /* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("label", {
 							className: "block text-xs font-semibold uppercase tracking-wider text-slate-700 mb-2",
 							children: "Public Website Promotion"
 						}), /* @__PURE__ */ jsxs("label", {
@@ -3612,11 +3741,10 @@ function ProductForm({ product = null, categories: propCategories = [] }) {
 					})]
 				})
 			]
-		})
+		})]
 	}) });
 }
-//#endregion
-//#region resources/js/Pages/admin/product/ProductList.jsx
+// resources/js/Pages/admin/product/ProductList.jsx
 var ProductList_exports = /* @__PURE__ */ __exportAll({ default: () => ProductList });
 function ProductList({ products: paginatedProducts, categories: initialCategories = [], filters = {} }) {
 	const products = Array.isArray(paginatedProducts) ? paginatedProducts : paginatedProducts?.data || [];
@@ -4167,8 +4295,7 @@ function ProductList({ products: paginatedProducts, categories: initialCategorie
 		]
 	}) });
 }
-//#endregion
-//#region resources/js/Pages/admin/roles/RoleForm.jsx
+// resources/js/Pages/admin/roles/RoleForm.jsx
 var RoleForm_exports = /* @__PURE__ */ __exportAll({ default: () => RoleForm });
 function RoleForm({ isEdit = false, role = null, groupedPermissions = {} }) {
 	const isSuperAdmin = role?.name === "super_admin";
@@ -4339,8 +4466,7 @@ function RoleForm({ isEdit = false, role = null, groupedPermissions = {} }) {
 		})]
 	}) });
 }
-//#endregion
-//#region resources/js/Pages/admin/roles/RoleList.jsx
+// resources/js/Pages/admin/roles/RoleList.jsx
 var RoleList_exports = /* @__PURE__ */ __exportAll({ default: () => RoleList });
 function RoleList({ roles = [] }) {
 	const [deletingRole, setDeletingRole] = useState(null);
@@ -4470,10 +4596,10 @@ function RoleList({ roles = [] }) {
 		isLoading: isDeleting
 	})] });
 }
-//#endregion
-//#region resources/js/Pages/admin/settings/Settings.jsx
+// resources/js/Pages/admin/settings/Settings.jsx
 var Settings_exports = /* @__PURE__ */ __exportAll({ default: () => Settings$1 });
 function Settings$1({ grouped = {}, settings: initialSettings = {} }) {
+	const { errors = {} } = usePage().props;
 	const [activeTab, setActiveTab] = useState("all");
 	const [isSaving, setIsSaving] = useState(false);
 	const [hasChanges, setHasChanges] = useState(false);
@@ -4548,8 +4674,10 @@ function Settings$1({ grouped = {}, settings: initialSettings = {} }) {
 				setHasChanges(false);
 				setIsSaving(false);
 			},
-			onError: () => {
+			onError: (backendErrors) => {
 				setIsSaving(false);
+				const firstError = Object.values(backendErrors || {})[0];
+				toast.error(firstError || "Failed to save settings.");
 			},
 			onFinish: () => {
 				setIsSaving(false);
@@ -4707,53 +4835,60 @@ function Settings$1({ grouped = {}, settings: initialSettings = {} }) {
 									placeholder: "e.g. 2004",
 									className: "w-full px-3.5 py-2 bg-slate-50/50 border border-slate-200 rounded-lg text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all"
 								})] }),
-								/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("label", {
-									className: "block text-xs font-semibold text-slate-700 mb-1.5",
-									children: "Official Corporate Logo"
-								}), /* @__PURE__ */ jsxs("div", {
-									className: "flex items-center gap-4",
-									children: [
-										/* @__PURE__ */ jsx("div", {
-											className: "w-14 h-14 rounded-lg border border-slate-200 bg-slate-50 flex items-center justify-center overflow-hidden shrink-0",
-											children: logoPreview || settings.logo_url ? /* @__PURE__ */ jsx("img", {
-												src: logoPreview || settings.logo_url,
-												alt: "Logo",
-												className: "w-full h-full object-contain p-1",
-												onError: (e) => {
-													e.currentTarget.style.display = "none";
-												}
-											}) : /* @__PURE__ */ jsx(ImageIcon, { className: "w-6 h-6 text-slate-300" })
-										}),
-										/* @__PURE__ */ jsxs("div", {
-											className: "flex-1 space-y-1",
-											children: [
-												/* @__PURE__ */ jsx("input", {
-													type: "file",
-													id: "business-logo-input",
-													accept: "image/png,image/jpeg,image/svg+xml,image/webp",
-													onChange: handleLogoChange,
-													className: "hidden"
-												}),
-												/* @__PURE__ */ jsxs("label", {
-													htmlFor: "business-logo-input",
-													className: "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-700 cursor-pointer transition-colors",
-													children: [/* @__PURE__ */ jsx(Upload, { className: "w-3.5 h-3.5" }), /* @__PURE__ */ jsx("span", { children: settings.logo_url || logoPreview ? "Change Logo" : "Upload Logo" })]
-												}),
-												/* @__PURE__ */ jsx("p", {
-													className: "text-[11px] text-slate-400",
-													children: "PNG, SVG or WEBP with transparent background recommended."
-												})
-											]
-										}),
-										logoPreview && /* @__PURE__ */ jsx("button", {
-											type: "button",
-											onClick: removeLogoFile,
-											className: "p-1.5 rounded-lg text-rose-600 hover:bg-rose-50 border border-rose-200 cursor-pointer",
-											title: "Clear selection",
-											children: /* @__PURE__ */ jsx(X, { className: "w-3.5 h-3.5" })
-										})
-									]
-								})] })
+								/* @__PURE__ */ jsxs("div", { children: [
+									/* @__PURE__ */ jsx("label", {
+										className: "block text-xs font-semibold text-slate-700 mb-1.5",
+										children: "Official Corporate Logo"
+									}),
+									/* @__PURE__ */ jsxs("div", {
+										className: "flex items-center gap-4",
+										children: [
+											/* @__PURE__ */ jsx("div", {
+												className: "w-14 h-14 rounded-lg border border-slate-200 bg-slate-50 flex items-center justify-center overflow-hidden shrink-0",
+												children: logoPreview || settings.logo_url ? /* @__PURE__ */ jsx("img", {
+													src: logoPreview || settings.logo_url,
+													alt: "Logo",
+													className: "w-full h-full object-contain p-1",
+													onError: (e) => {
+														e.currentTarget.style.display = "none";
+													}
+												}) : /* @__PURE__ */ jsx(ImageIcon, { className: "w-6 h-6 text-slate-300" })
+											}),
+											/* @__PURE__ */ jsxs("div", {
+												className: "flex-1 space-y-1",
+												children: [
+													/* @__PURE__ */ jsx("input", {
+														type: "file",
+														id: "business-logo-input",
+														accept: "image/png,image/jpeg,image/svg+xml,image/webp",
+														onChange: handleLogoChange,
+														className: "hidden"
+													}),
+													/* @__PURE__ */ jsxs("label", {
+														htmlFor: "business-logo-input",
+														className: "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-700 cursor-pointer transition-colors",
+														children: [/* @__PURE__ */ jsx(Upload, { className: "w-3.5 h-3.5" }), /* @__PURE__ */ jsx("span", { children: settings.logo_url || logoPreview ? "Change Logo" : "Upload Logo" })]
+													}),
+													/* @__PURE__ */ jsx("p", {
+														className: "text-[11px] text-slate-400",
+														children: "PNG, SVG or WEBP with transparent background recommended."
+													})
+												]
+											}),
+											logoPreview && /* @__PURE__ */ jsx("button", {
+												type: "button",
+												onClick: removeLogoFile,
+												className: "p-1.5 rounded-lg text-rose-600 hover:bg-rose-50 border border-rose-200 cursor-pointer",
+												title: "Clear selection",
+												children: /* @__PURE__ */ jsx(X, { className: "w-3.5 h-3.5" })
+											})
+										]
+									}),
+									errors.logo && /* @__PURE__ */ jsx("p", {
+										className: "text-xs text-rose-600 font-medium mt-1.5",
+										children: errors.logo
+									})
+								] })
 							]
 						})]
 					}),
@@ -5247,8 +5382,7 @@ function Settings$1({ grouped = {}, settings: initialSettings = {} }) {
 		]
 	}) });
 }
-//#endregion
-//#region resources/js/Pages/admin/staff/StaffForm.jsx
+// resources/js/Pages/admin/staff/StaffForm.jsx
 var StaffForm_exports = /* @__PURE__ */ __exportAll({ default: () => StaffForm });
 var capitalizeWords$1 = (str) => {
 	if (!str || typeof str !== "string") return "";
@@ -5413,8 +5547,7 @@ function StaffForm({ isEdit = false, staff = null, roles = [] }) {
 		})
 	}) });
 }
-//#endregion
-//#region resources/js/Pages/admin/staff/StaffList.jsx
+// resources/js/Pages/admin/staff/StaffList.jsx
 var StaffList_exports = /* @__PURE__ */ __exportAll({ default: () => StaffList });
 var capitalizeWords = (str) => {
 	if (!str || typeof str !== "string") return "";
@@ -5659,8 +5792,7 @@ function StaffList({ staff, filters = {}, roles = [] }) {
 		isLoading: isDeleting
 	})] });
 }
-//#endregion
-//#region resources/js/components/maps/DoctorMovementMap.jsx
+// resources/js/components/maps/DoctorMovementMap.jsx
 /**
 * DoctorMovementMap Component
 * Integrates Mapbox GL JS SDK with fallback vector canvas/tiles
@@ -6072,8 +6204,7 @@ function DoctorMovementMap({ mapboxConfig = {}, doctorStops = {}, activeMR = nul
 		})]
 	});
 }
-//#endregion
-//#region resources/js/Pages/admin/tracking/TrackingDashboard.jsx
+// resources/js/Pages/admin/tracking/TrackingDashboard.jsx
 var TrackingDashboard_exports = /* @__PURE__ */ __exportAll({ default: () => TrackingDashboard });
 function TrackingDashboard({ mapbox = {}, kpi = {}, field_representatives = [], active_mr = null, doctor_stops = {}, leaderboard = [] }) {
 	const [selectedMRId, setSelectedMRId] = useState(active_mr?.id || field_representatives[0]?.id || null);
@@ -6560,8 +6691,7 @@ function TrackingDashboard({ mapbox = {}, kpi = {}, field_representatives = [], 
 		]
 	}) });
 }
-//#endregion
-//#region resources/js/components/auth/ForgotPasswordModal.jsx
+// resources/js/components/auth/ForgotPasswordModal.jsx
 function FieldError({ error }) {
 	if (!error) return null;
 	return /* @__PURE__ */ jsxs("p", {
@@ -7019,8 +7149,7 @@ function ForgotPasswordModal({ isOpen, onClose, onSuccess }) {
 		})
 	});
 }
-//#endregion
-//#region resources/js/Pages/auth/LoginPage.jsx
+// resources/js/Pages/auth/LoginPage.jsx
 var LoginPage_exports = /* @__PURE__ */ __exportAll({ default: () => LoginPage });
 function LoginPage() {
 	const { props } = usePage();
@@ -7272,8 +7401,7 @@ function LoginPage() {
 		]
 	});
 }
-//#endregion
-//#region resources/js/layouts/MR/MRSidebar.jsx
+// resources/js/layouts/MR/MRSidebar.jsx
 function MRSidebar({ isOpen, onClose }) {
 	const { url, props } = usePage();
 	const currentPath = url.split("?")[0];
@@ -7527,8 +7655,7 @@ function MRSidebar({ isOpen, onClose }) {
 		]
 	})] });
 }
-//#endregion
-//#region resources/js/services/api.js
+// resources/js/services/api.js
 var api = axios.create({
 	baseURL: "/",
 	headers: {
@@ -7537,8 +7664,7 @@ var api = axios.create({
 	},
 	withCredentials: true
 });
-//#endregion
-//#region resources/js/layouts/MR/MRHeader.jsx
+// resources/js/layouts/MR/MRHeader.jsx
 function MRHeader({ onToggleSidebar, title = "MR Dashboard" }) {
 	const { props } = usePage();
 	const authUser = props.auth?.user || {};
@@ -7713,8 +7839,7 @@ function MRHeader({ onToggleSidebar, title = "MR Dashboard" }) {
 		})]
 	});
 }
-//#endregion
-//#region resources/js/layouts/MR/MRLayout.jsx
+// resources/js/layouts/MR/MRLayout.jsx
 function MRLayout({ children, title = "MR Dashboard" }) {
 	const [sidebarOpen, setSidebarOpen] = useState(false);
 	const { url, props } = usePage();
@@ -7797,8 +7922,7 @@ function MRLayout({ children, title = "MR Dashboard" }) {
 		]
 	});
 }
-//#endregion
-//#region resources/js/Pages/mr/Dashboard.jsx
+// resources/js/Pages/mr/Dashboard.jsx
 var Dashboard_exports = /* @__PURE__ */ __exportAll({ default: () => Dashboard });
 function Dashboard({ initialData = null }) {
 	const { props } = usePage();
@@ -8286,8 +8410,7 @@ function Dashboard({ initialData = null }) {
 		})
 	});
 }
-//#endregion
-//#region resources/js/Pages/mr/Detailing.jsx
+// resources/js/Pages/mr/Detailing.jsx
 var Detailing_exports = /* @__PURE__ */ __exportAll({ default: () => Detailing });
 function Detailing({ products = [], doctors = [], company = {} }) {
 	const [selectedDoctorId, setSelectedDoctorId] = useState("");
@@ -8591,7 +8714,7 @@ function Detailing({ products = [], doctors = [], company = {} }) {
 						const slideNumber = actualIndex + 4;
 						const isBeingDragged = draggedIndex === actualIndex;
 						const isDragTarget = dragOverIndex === actualIndex;
-						const imageUrl = product.primary_image?.file_path || product.primary_image?.url || product.images?.[0]?.file_path || product.images?.[0]?.url || "/images/ciplon_d.png";
+						const imageUrl = resolveProductImageUrl(product, "/images/ciplon_d.png");
 						return /* @__PURE__ */ jsxs("div", {
 							draggable: true,
 							onDragStart: (e) => handleDragStart(e, actualIndex),
@@ -9059,7 +9182,7 @@ function Detailing({ products = [], doctors = [], company = {} }) {
 							}),
 							slides[currentSlideIndex].type === "product" && (() => {
 								const prod = slides[currentSlideIndex].data;
-								const imageUrl = prod.primary_image?.file_path || prod.primary_image?.url || prod.images?.[0]?.file_path || prod.images?.[0]?.url || "/images/ciplon_d.png";
+								const imageUrl = resolveProductImageUrl(prod, "/images/ciplon_d.png");
 								return /* @__PURE__ */ jsx("div", {
 									className: "py-2 sm:py-6",
 									children: /* @__PURE__ */ jsxs("div", {
@@ -9245,8 +9368,7 @@ function Detailing({ products = [], doctors = [], company = {} }) {
 		})]
 	});
 }
-//#endregion
-//#region resources/js/Pages/mr/DoctorForm.jsx
+// resources/js/Pages/mr/DoctorForm.jsx
 var DoctorForm_exports = /* @__PURE__ */ __exportAll({ default: () => DoctorForm });
 var SPECIALTY_OPTIONS$1 = [
 	"General Medicine",
@@ -9812,8 +9934,7 @@ function DoctorForm({ mode = "create", doctorId = null }) {
 		})
 	});
 }
-//#endregion
-//#region resources/js/Pages/mr/Doctors.jsx
+// resources/js/Pages/mr/Doctors.jsx
 var Doctors_exports = /* @__PURE__ */ __exportAll({ default: () => Doctors });
 var SPECIALTY_OPTIONS = [
 	"General Medicine",
@@ -10623,8 +10744,7 @@ function Doctors({ initialFilters = {} }) {
 		]
 	});
 }
-//#endregion
-//#region resources/js/Pages/mr/Products.jsx
+// resources/js/Pages/mr/Products.jsx
 var Products_exports = /* @__PURE__ */ __exportAll({ default: () => Products });
 function Products({ initialFilters = {} }) {
 	const [products, setProducts] = useState([]);
@@ -10835,7 +10955,7 @@ function Products({ initialFilters = {} }) {
 				}) : viewMode === "grid" ? /* @__PURE__ */ jsx("div", {
 					className: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4",
 					children: products.map((p) => {
-						const primaryImg = p.primary_image?.file_path || p.images?.[0]?.file_path;
+						const primaryImg = resolveProductImageUrl(p);
 						return /* @__PURE__ */ jsx("div", {
 							className: "bg-white rounded-2xl border border-slate-200/80 hover:border-slate-300 hover:shadow-xs transition-all p-5 flex flex-col justify-between gap-4 group",
 							children: /* @__PURE__ */ jsxs("div", {
@@ -10995,8 +11115,7 @@ function Products({ initialFilters = {} }) {
 		})
 	});
 }
-//#endregion
-//#region resources/js/Pages/mr/Schedule.jsx
+// resources/js/Pages/mr/Schedule.jsx
 var Schedule_exports = /* @__PURE__ */ __exportAll({ default: () => Schedule });
 var CALL_OUTCOMES$1 = [
 	"Spoke with Doctor - Positive response",
@@ -12007,8 +12126,7 @@ function Schedule({ schedules = [], metrics = {}, doctors = [], products = [], t
 		})
 	});
 }
-//#endregion
-//#region resources/js/Pages/mr/Visits.jsx
+// resources/js/Pages/mr/Visits.jsx
 var Visits_exports = /* @__PURE__ */ __exportAll({ default: () => Visits });
 var CALL_OUTCOMES = [
 	"Spoke with Doctor - Positive response",
@@ -13643,8 +13761,7 @@ function Visits({ schedules = [], metrics = {}, doctors = [], products = [], tod
 		})
 	});
 }
-//#endregion
-//#region resources/js/Pages/mrconnect/AllReports.jsx
+// resources/js/Pages/mrconnect/AllReports.jsx
 var AllReports_exports = /* @__PURE__ */ __exportAll({ default: () => AllReports });
 function AllReports({ reports = [] }) {
 	const { props } = usePage();
@@ -13713,8 +13830,7 @@ function AllReports({ reports = [] }) {
 		})
 	});
 }
-//#endregion
-//#region resources/js/Pages/mrconnect/FieldExpenses.jsx
+// resources/js/Pages/mrconnect/FieldExpenses.jsx
 var FieldExpenses_exports = /* @__PURE__ */ __exportAll({ default: () => FieldExpenses });
 function FieldExpenses({ expenses = [], summary = {} }) {
 	const { props } = usePage();
@@ -14546,8 +14662,7 @@ function FieldExpenses({ expenses = [], summary = {} }) {
 		]
 	});
 }
-//#endregion
-//#region resources/js/Pages/mrconnect/Leave.jsx
+// resources/js/Pages/mrconnect/Leave.jsx
 var Leave_exports = /* @__PURE__ */ __exportAll({ default: () => Leave });
 function Leave({ leaves = [], stats = {}, balances = {} }) {
 	const { props } = usePage();
@@ -15150,8 +15265,7 @@ function Leave({ leaves = [], stats = {}, balances = {} }) {
 		]
 	});
 }
-//#endregion
-//#region resources/js/components/admin/MRLiveTrackingModal.jsx
+// resources/js/components/admin/MRLiveTrackingModal.jsx
 function MRLiveTrackingModal({ mr = null, isOpen = false, onClose, mapboxConfig = {} }) {
 	const [copied, setCopied] = useState(false);
 	const [mapLoaded, setMapLoaded] = useState(false);
@@ -15543,8 +15657,7 @@ function MRLiveTrackingModal({ mr = null, isOpen = false, onClose, mapboxConfig 
 		})
 	});
 }
-//#endregion
-//#region resources/js/Pages/mrconnect/MRDirectory.jsx
+// resources/js/Pages/mrconnect/MRDirectory.jsx
 var MRDirectory_exports = /* @__PURE__ */ __exportAll({ default: () => MRDirectory });
 function MRDirectory({ mrs = [], mapbox = {} }) {
 	const [searchQuery, setSearchQuery] = useState("");
@@ -15786,8 +15899,7 @@ function MRDirectory({ mrs = [], mapbox = {} }) {
 		})
 	});
 }
-//#endregion
-//#region resources/js/Pages/mrconnect/Notice.jsx
+// resources/js/Pages/mrconnect/Notice.jsx
 var Notice_exports = /* @__PURE__ */ __exportAll({ default: () => Notice });
 var capitalizeFirst = (text) => {
 	if (!text) return "";
@@ -16047,8 +16159,7 @@ function Notice({ notices = [] }) {
 		})
 	});
 }
-//#endregion
-//#region resources/js/Pages/mrconnect/PobOrder.jsx
+// resources/js/Pages/mrconnect/PobOrder.jsx
 var PobOrder_exports = /* @__PURE__ */ __exportAll({ default: () => PobOrder });
 var formatDoctorName = (name) => {
 	if (!name) return "";
@@ -17024,8 +17135,7 @@ function PobOrder({ orders = [], doctors = [], products = [], summary = {}, isAd
 		})
 	] });
 }
-//#endregion
-//#region resources/js/Pages/mrconnect/PrimarySales.jsx
+// resources/js/Pages/mrconnect/PrimarySales.jsx
 var PrimarySales_exports = /* @__PURE__ */ __exportAll({ default: () => PrimarySales });
 function PrimarySales({ sales = [], summary = {} }) {
 	const { props } = usePage();
@@ -17186,8 +17296,7 @@ function PrimarySales({ sales = [], summary = {} }) {
 		})
 	});
 }
-//#endregion
-//#region resources/js/Pages/mrconnect/Scheme.jsx
+// resources/js/Pages/mrconnect/Scheme.jsx
 var Scheme_exports = /* @__PURE__ */ __exportAll({ default: () => Scheme });
 function Scheme({ schemes = [] }) {
 	const { props } = usePage();
@@ -17250,8 +17359,7 @@ function Scheme({ schemes = [] }) {
 		})
 	});
 }
-//#endregion
-//#region resources/js/Pages/mrconnect/SetTarget.jsx
+// resources/js/Pages/mrconnect/SetTarget.jsx
 var SetTarget_exports = /* @__PURE__ */ __exportAll({ default: () => SetTarget });
 function SetTarget({ targets = [], representatives = [], summary = {}, isAdmin = false }) {
 	const { props } = usePage();
@@ -17966,8 +18074,7 @@ function SetTarget({ targets = [], representatives = [], summary = {}, isAdmin =
 		]
 	});
 }
-//#endregion
-//#region resources/js/Pages/mrconnect/Slider.jsx
+// resources/js/Pages/mrconnect/Slider.jsx
 var Slider_exports = /* @__PURE__ */ __exportAll({ default: () => Slider });
 function Slider({ slides = [] }) {
 	const { props } = usePage();
@@ -18024,8 +18131,7 @@ function Slider({ slides = [] }) {
 		})
 	});
 }
-//#endregion
-//#region resources/js/Pages/mrconnect/Sponsor.jsx
+// resources/js/Pages/mrconnect/Sponsor.jsx
 var Sponsor_exports = /* @__PURE__ */ __exportAll({ default: () => Sponsor });
 function Sponsor({ sponsorships = [] }) {
 	const { props } = usePage();
@@ -18131,8 +18237,7 @@ function Sponsor({ sponsorships = [] }) {
 		})
 	});
 }
-//#endregion
-//#region resources/js/Pages/mrconnect/VideoLibrary.jsx
+// resources/js/Pages/mrconnect/VideoLibrary.jsx
 var VideoLibrary_exports = /* @__PURE__ */ __exportAll({ default: () => VideoLibrary });
 function VideoLibrary({ videos = [] }) {
 	const { props } = usePage();
@@ -18210,8 +18315,7 @@ function VideoLibrary({ videos = [] }) {
 		})
 	});
 }
-//#endregion
-//#region resources/js/components/common/Container.jsx
+// resources/js/components/common/Container.jsx
 function Container({ children, className = "", size = "default" }) {
 	const sizeClasses = {
 		narrow: "max-w-5xl",
@@ -18224,8 +18328,7 @@ function Container({ children, className = "", size = "default" }) {
 		children
 	});
 }
-//#endregion
-//#region resources/js/components/common/Button.jsx
+// resources/js/components/common/Button.jsx
 function Button({ children, variant = "primary", size = "md", href, onClick, type = "button", icon: Icon, iconPosition = "right", className = "", disabled = false, ...props }) {
 	const baseStyles = "inline-flex items-center justify-center font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none cursor-pointer";
 	const variants = {
@@ -18270,8 +18373,7 @@ function Button({ children, variant = "primary", size = "md", href, onClick, typ
 		children: content
 	});
 }
-//#endregion
-//#region resources/js/components/Header.jsx
+// resources/js/components/Header.jsx
 function Header({ companyData, onOpenEnquiryModal }) {
 	const [isScrolled, setIsScrolled] = useState(false);
 	const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -18588,8 +18690,7 @@ function Header({ companyData, onOpenEnquiryModal }) {
 		})
 	});
 }
-//#endregion
-//#region resources/js/components/Footer.jsx
+// resources/js/components/Footer.jsx
 var CURRENT_YEAR = (/* @__PURE__ */ new Date()).getFullYear();
 function Footer({ companyData, categories = [], onOpenEnquiryModal }) {
 	const { auth } = usePage().props;
@@ -18881,8 +18982,7 @@ function Footer({ companyData, categories = [], onOpenEnquiryModal }) {
 		]
 	});
 }
-//#endregion
-//#region resources/js/components/home/EnquiryModal.jsx
+// resources/js/components/home/EnquiryModal.jsx
 function EnquiryModal({ isOpen, onClose, initialProduct = null }) {
 	const brandName = initialProduct?.brand_name || initialProduct?.brandName || "";
 	const genericName = initialProduct?.generic_name || initialProduct?.genericName || "";
@@ -19162,8 +19262,7 @@ function EnquiryModal({ isOpen, onClose, initialProduct = null }) {
 		})
 	});
 }
-//#endregion
-//#region resources/js/layouts/PublicLayout.jsx
+// resources/js/layouts/PublicLayout.jsx
 function PublicLayout({ children, companyData: propCompanyData, categories: propCategories }) {
 	const { url, props } = usePage();
 	const companyData = propCompanyData || props.company || {};
@@ -19198,8 +19297,7 @@ function PublicLayout({ children, companyData: propCompanyData, categories: prop
 		]
 	});
 }
-//#endregion
-//#region resources/js/components/common/SeoHead.jsx
+// resources/js/components/common/SeoHead.jsx
 /**
 * SeoHead component for dynamic page SEO, OpenGraph, Twitter Cards, and JSON-LD schema
 */
@@ -19281,8 +19379,7 @@ function SeoHead({ title, description, keywords, canonicalUrl, ogImage = "/image
 		})
 	] });
 }
-//#endregion
-//#region resources/js/Pages/public/AboutPage.jsx
+// resources/js/Pages/public/AboutPage.jsx
 var AboutPage_exports = /* @__PURE__ */ __exportAll({ default: () => AboutPage });
 function AboutPage({ company, categories = [], featuredProducts = [] }) {
 	return /* @__PURE__ */ jsxs(PublicLayout, {
@@ -19719,8 +19816,7 @@ function AboutPage({ company, categories = [], featuredProducts = [] }) {
 		})]
 	});
 }
-//#endregion
-//#region resources/js/Pages/public/ContactPage.jsx
+// resources/js/Pages/public/ContactPage.jsx
 var ContactPage_exports = /* @__PURE__ */ __exportAll({ default: () => ContactPage });
 function ContactPage({ company }) {
 	const companyData = company || {};
@@ -20210,8 +20306,7 @@ function ContactPage({ company }) {
 		})]
 	});
 }
-//#endregion
-//#region resources/js/components/home/IntasHeroBanner.jsx
+// resources/js/components/home/IntasHeroBanner.jsx
 function IntasHeroBanner({ onExploreProducts, onContactUs, onOpenEnquiryModal }) {
 	const [activeSlide, setActiveSlide] = useState(0);
 	const [activeMobileCard, setActiveMobileCard] = useState(0);
@@ -20496,8 +20591,7 @@ function IntasHeroBanner({ onExploreProducts, onContactUs, onOpenEnquiryModal })
 		})]
 	});
 }
-//#endregion
-//#region resources/js/components/home/CompanyIntroSection.jsx
+// resources/js/components/home/CompanyIntroSection.jsx
 function CompanyIntroSection() {
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	return /* @__PURE__ */ jsxs("section", {
@@ -20712,8 +20806,7 @@ function CompanyIntroSection() {
 		})]
 	});
 }
-//#endregion
-//#region resources/js/components/home/ExcellenceStatsSection.jsx
+// resources/js/components/home/ExcellenceStatsSection.jsx
 function ExcellenceStatsSection() {
 	const [activeIdx, setActiveIdx] = useState(0);
 	const scrollContainerRef = useRef(null);
@@ -20895,8 +20988,7 @@ function ExcellenceStatsSection() {
 		})]
 	});
 }
-//#endregion
-//#region resources/js/components/home/ScienceIntoSmilesSection.jsx
+// resources/js/components/home/ScienceIntoSmilesSection.jsx
 function ScienceIntoSmilesSection() {
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	return /* @__PURE__ */ jsxs("section", {
@@ -21102,13 +21194,12 @@ function ScienceIntoSmilesSection() {
 		})]
 	});
 }
-//#endregion
-//#region resources/js/components/home/FeaturedProductsSection.jsx
+// resources/js/components/home/FeaturedProductsSection.jsx
 function FeaturedProductsSection({ products = [], onOpenEnquiryModal }) {
 	const [selectedFilter, setSelectedFilter] = useState("ALL");
 	const formattedItems = useMemo(() => {
 		return (products || []).map((p, index) => {
-			const imagePath = p.primary_image?.file_path ? p.primary_image.file_path.startsWith("/") ? p.primary_image.file_path : `/${p.primary_image.file_path}` : p.primaryImage?.file_path ? p.primaryImage.file_path.startsWith("/") ? p.primaryImage.file_path : `/${p.primaryImage.file_path}` : p.imageUrl || p.image_url || p.primary_image?.url || p.primaryImage?.url || "/images/pharma_product_boxes.jpg";
+			const imagePath = resolveProductImageUrl(p, "/images/pharma_product_boxes.jpg");
 			return {
 				id: p.id || p.slug || index,
 				slug: p.slug || p.id,
@@ -21249,8 +21340,7 @@ function FeaturedProductsSection({ products = [], onOpenEnquiryModal }) {
 		] })
 	});
 }
-//#endregion
-//#region resources/js/Pages/public/HomePage.jsx
+// resources/js/Pages/public/HomePage.jsx
 var HomePage_exports = /* @__PURE__ */ __exportAll({ default: () => HomePage });
 function HomePage({ featuredProducts = [], categories = [], company = null }) {
 	const { props } = usePage();
@@ -21319,8 +21409,7 @@ function HomePage({ featuredProducts = [], categories = [], company = null }) {
 		})]
 	});
 }
-//#endregion
-//#region resources/js/Pages/public/ProductDetailsPage.jsx
+// resources/js/Pages/public/ProductDetailsPage.jsx
 var ProductDetailsPage_exports = /* @__PURE__ */ __exportAll({ default: () => ProductDetailsPage });
 function ProductDetailsPage({ product, relatedProducts: initialRelated = [], categories = [] }) {
 	const [selectedImageIndex, setSelectedImageIndex] = useState(0);
@@ -21342,16 +21431,10 @@ function ProductDetailsPage({ product, relatedProducts: initialRelated = [], cat
 	const prescriptionType = product?.prescriptionType || product?.prescription_type || "Rx Only";
 	const images = useMemo(() => {
 		const list = [];
-		const getSrc = (img) => {
-			if (!img) return null;
-			if (typeof img === "string") return img;
-			if (img.file_path) return img.file_path.startsWith("/") ? img.file_path : `/${img.file_path}`;
-			return img.url || img.image_url || null;
-		};
-		const primarySrc = getSrc(product?.primary_image || product?.primaryImage);
+		const primarySrc = resolveImageUrl(product?.primary_image || product?.primaryImage);
 		if (primarySrc) list.push(primarySrc);
 		if (Array.isArray(product?.images)) product.images.forEach((img) => {
-			const src = getSrc(img);
+			const src = resolveImageUrl(img);
 			if (src && !list.includes(src)) list.push(src);
 		});
 		if (product?.image && !list.includes(product.image)) list.push(product.image);
@@ -21811,8 +21894,7 @@ function ProductDetailsPage({ product, relatedProducts: initialRelated = [], cat
 		})]
 	});
 }
-//#endregion
-//#region resources/js/components/home/ProductCard.jsx
+// resources/js/components/home/ProductCard.jsx
 function ProductCard({ product }) {
 	const [imgError, setImgError] = useState(false);
 	if (!product) return null;
@@ -21822,9 +21904,7 @@ function ProductCard({ product }) {
 	const dosageForm = product.dosageForm || product.dosage_form || "Solid Oral";
 	const strength = product.strength || "";
 	const categoryName = product.category?.name || (typeof product.category === "string" ? product.category : "") || product.therapeuticArea || "";
-	const rawFilePath = product.primary_image?.file_path || product.primaryImage?.file_path;
-	const directPath = rawFilePath ? rawFilePath.startsWith("/") ? rawFilePath : `/${rawFilePath}` : null;
-	const imageUrl = product.imageUrl || product.image_url || product.image || directPath || product.primary_image?.url || product.primary_image?.image_url || product.primaryImage?.url || product.primaryImage?.image_url || (Array.isArray(product.images) && product.images.length > 0 ? typeof product.images[0] === "string" ? product.images[0] : product.images[0]?.file_path ? product.images[0].file_path.startsWith("/") ? product.images[0].file_path : `/${product.images[0].file_path}` : product.images[0]?.url : null);
+	const imageUrl = resolveProductImageUrl(product);
 	const getDosageIcon = (form = "") => {
 		const safeForm = String(form || "").toLowerCase();
 		if (safeForm.includes("capsule")) return /* @__PURE__ */ jsxs("svg", {
@@ -21916,8 +21996,7 @@ function ProductCard({ product }) {
 		})]
 	});
 }
-//#endregion
-//#region resources/js/Pages/public/ProductsPage.jsx
+// resources/js/Pages/public/ProductsPage.jsx
 var ProductsPage_exports = /* @__PURE__ */ __exportAll({ default: () => ProductsPage });
 function ProductsPage({ products = [], categories = [], filters = {} }) {
 	const searchQuery = filters.search || "";
@@ -22081,8 +22160,7 @@ function ProductsPage({ products = [], categories = [], filters = {} }) {
 		})]
 	});
 }
-//#endregion
-//#region resources/js/Pages/public/QualityPage.jsx
+// resources/js/Pages/public/QualityPage.jsx
 var QualityPage_exports = /* @__PURE__ */ __exportAll({ default: () => QualityPage });
 function QualityPage({ company }) {
 	return /* @__PURE__ */ jsxs(PublicLayout, {
@@ -22385,8 +22463,7 @@ function QualityPage({ company }) {
 		})]
 	});
 }
-//#endregion
-//#region resources/js/ssr.jsx
+// resources/js/ssr.jsx
 createServer((page) => createInertiaApp({
 	page,
 	render: renderToString,
@@ -22438,5 +22515,4 @@ createServer((page) => createInertiaApp({
 	setup: ({ App, props }) => /* @__PURE__ */ jsx(App, { ...props }),
 	title: (title) => title ? `${title} - Ciplon Pharma` : "Ciplon Pharma — WHO-GMP & ISO 9001:2015 Certified Finished Formulations"
 }));
-//#endregion
 export {};

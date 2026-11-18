@@ -66,5 +66,6 @@
   "resources/js/layouts/MR/MRSidebar.jsx": [],
   "resources/js/layouts/PublicLayout.jsx": [],
   "resources/js/services/api.js": [],
-  "resources/js/ssr.jsx": []
+  "resources/js/ssr.jsx": [],
+  "resources/js/utils/media.js": []
 }

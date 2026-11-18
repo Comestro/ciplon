@@ -46,6 +46,11 @@ class Image extends Model
             return $this->file_path;
         }
 
-        return Storage::disk($this->disk ?? 'r2')->url($this->file_path);
+        // Static seeded/public assets stored under public/images/...
+        if ($this->disk !== 'r2' && str_starts_with($this->file_path, '/images/')) {
+            return $this->file_path;
+        }
+
+        return Storage::disk($this->disk ?? 'r2')->url(ltrim($this->file_path, '/'));
     }
 }

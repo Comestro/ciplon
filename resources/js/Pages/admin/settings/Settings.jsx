@@ -1,6 +1,6 @@
 // Business Profile and Settings management for pharma admin panel
 import { useState } from 'react';
-import { router } from '@inertiajs/react';
+import { router, usePage } from '@inertiajs/react';
 import { 
   Building2, 
   ShieldCheck, 
@@ -23,6 +23,7 @@ import toast from 'react-hot-toast';
 import AdminLayout from '../../../layouts/AdminLayout';
 
 export default function Settings({ grouped = {}, settings: initialSettings = {} }) {
+  const { errors = {} } = usePage().props;
   const [activeTab, setActiveTab] = useState('all');
   const [isSaving, setIsSaving] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
@@ -115,8 +116,10 @@ export default function Settings({ grouped = {}, settings: initialSettings = {} 
         setHasChanges(false);
         setIsSaving(false);
       },
-      onError: () => {
+      onError: (backendErrors) => {
         setIsSaving(false);
+        const firstError = Object.values(backendErrors || {})[0];
+        toast.error(firstError || 'Failed to save settings.');
       },
       onFinish: () => {
         setIsSaving(false);
@@ -317,6 +320,9 @@ export default function Settings({ grouped = {}, settings: initialSettings = {} 
                     </button>
                   )}
                 </div>
+                {errors.logo && (
+                  <p className="text-xs text-rose-600 font-medium mt-1.5">{errors.logo}</p>
+                )}
               </div>
             </div>
           </div>

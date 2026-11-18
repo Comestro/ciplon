@@ -4,15 +4,16 @@ namespace App\Http\Controllers\Admin;
 
 use App\Enums\ProductStatus;
 use App\Http\Controllers\Controller;
-use App\Jobs\UploadProductImageJob;
 use App\Models\Category;
 use App\Models\Product;
 use App\Services\R2StorageService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -79,41 +80,11 @@ class ProductController extends Controller
     }
 
     // Store a newly created product in database.
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request, R2StorageService $r2): RedirectResponse
     {
-        // Decode compositions if sent as a JSON string in multipart/form-data
-        if ($request->has('compositions') && is_string($request->input('compositions'))) {
-            $decoded = json_decode($request->input('compositions'), true);
-            if (is_array($decoded)) {
-                $request->merge(['compositions' => $decoded]);
-            }
-        }
+        $validated = $this->validateProductRequest($request);
 
-        $validated = $request->validate([
-            'brand_name' => ['required', 'string', 'max:255'],
-            'generic_name' => ['nullable', 'string', 'max:255'],
-            'product_code' => ['nullable', 'string', 'max:100', 'unique:products,product_code'],
-            'category_id' => ['required', 'exists:categories,id'],
-            'dosage_form' => ['nullable', 'string', 'max:100'],
-            'strength' => ['nullable', 'string', 'max:100'],
-            'short_description' => ['nullable', 'string'],
-            'description' => ['nullable', 'string'],
-            'indications' => ['nullable', 'string'],
-            'directions' => ['nullable', 'string'],
-            'precautions' => ['nullable', 'string'],
-            'storage' => ['nullable', 'string'],
-            'prescription_type' => ['nullable', 'string', 'max:50'],
-            'status' => ['required', Rule::enum(ProductStatus::class)],
-            'is_featured' => ['nullable', 'boolean'],
-            'compositions' => ['nullable', 'array'],
-            'compositions.*.ingredient_name' => ['required_with:compositions', 'string', 'max:255'],
-            'compositions.*.strength' => ['required_with:compositions', 'string', 'max:100'],
-            'compositions.*.unit' => ['nullable', 'string', 'max:50'],
-            'images' => ['nullable', 'array'],
-            'images.*' => ['file', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
-        ]);
-
-        $product = DB::transaction(function () use ($validated, $request) {
+        $product = DB::transaction(function () use ($validated, $request, $r2) {
             $product = Product::create([
                 'category_id' => $validated['category_id'],
                 'brand_name' => $validated['brand_name'],
@@ -148,20 +119,9 @@ class ProductController extends Controller
                 }
             }
 
-            // Handle image uploads via queued background job
+            // Upload product images directly to Cloudflare R2 so failures surface immediately
             if ($request->hasFile('images')) {
-                $sortOrder = 0;
-                foreach ($request->file('images') as $file) {
-                    $tempPath = $file->store('temp-uploads', 'local');
-                    UploadProductImageJob::dispatch(
-                        productId: $product->id,
-                        tempRelativePath: $tempPath,
-                        originalFileName: $file->getClientOriginalName(),
-                        mimeType: $file->getClientMimeType(),
-                        fileSize: $file->getSize(),
-                        sortOrder: $sortOrder++
-                    );
-                }
+                $this->uploadProductImages($product, $request->file('images'), $r2, 0);
             }
 
             return $product;
@@ -210,51 +170,15 @@ class ProductController extends Controller
     // Update the specified product in database.
     public function update(Request $request, Product $product, R2StorageService $r2): RedirectResponse
     {
-        if ($request->has('compositions') && is_string($request->input('compositions'))) {
-            $decoded = json_decode($request->input('compositions'), true);
-            if (is_array($decoded)) {
-                $request->merge(['compositions' => $decoded]);
-            }
-        }
-
-        if ($request->has('removed_image_ids') && is_string($request->input('removed_image_ids'))) {
-            $decoded = json_decode($request->input('removed_image_ids'), true);
-            if (is_array($decoded)) {
-                $request->merge(['removed_image_ids' => $decoded]);
-            }
-        }
-
-        $validated = $request->validate([
-            'brand_name' => ['required', 'string', 'max:255'],
-            'generic_name' => ['nullable', 'string', 'max:255'],
-            'product_code' => ['nullable', 'string', 'max:100', Rule::unique('products', 'product_code')->ignore($product->id)],
-            'category_id' => ['required', 'exists:categories,id'],
-            'dosage_form' => ['nullable', 'string', 'max:100'],
-            'strength' => ['nullable', 'string', 'max:100'],
-            'short_description' => ['nullable', 'string'],
-            'description' => ['nullable', 'string'],
-            'indications' => ['nullable', 'string'],
-            'directions' => ['nullable', 'string'],
-            'precautions' => ['nullable', 'string'],
-            'storage' => ['nullable', 'string'],
-            'prescription_type' => ['nullable', 'string', 'max:50'],
-            'status' => ['required', Rule::enum(ProductStatus::class)],
-            'is_featured' => ['nullable', 'boolean'],
-            'compositions' => ['nullable', 'array'],
-            'compositions.*.ingredient_name' => ['required_with:compositions', 'string', 'max:255'],
-            'compositions.*.strength' => ['required_with:compositions', 'string', 'max:100'],
-            'compositions.*.unit' => ['nullable', 'string', 'max:50'],
-            'removed_image_ids' => ['nullable', 'array'],
-            'removed_image_ids.*' => ['integer'],
-            'images' => ['nullable', 'array'],
-            'images.*' => ['file', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
-        ]);
+        $validated = $this->validateProductRequest($request, $product);
 
         $slug = $product->brand_name !== $validated['brand_name']
             ? Product::generateUniqueSlug($validated['brand_name'], $product->id)
             : $product->slug;
 
-        DB::transaction(function () use ($product, $validated, $request, $slug, $r2) {
+        $imagesToPurge = [];
+
+        DB::transaction(function () use ($product, $validated, $request, $slug, $r2, &$imagesToPurge) {
             $product->update([
                 'category_id' => $validated['category_id'],
                 'brand_name' => $validated['brand_name'],
@@ -289,35 +213,30 @@ class ProductController extends Controller
                 }
             }
 
-            // Delete requested images
+            // Upload new images to Cloudflare R2 before deleting old ones so failures do not lose existing images
+            if ($request->hasFile('images')) {
+                $currentMaxSort = (int) $product->images()->max('sort_order');
+                $this->uploadProductImages($product, $request->file('images'), $r2, $currentMaxSort + 1);
+            }
+
+            // Mark requested images for deletion and remove DB rows inside transaction
             if (! empty($validated['removed_image_ids'])) {
                 $imagesToDelete = $product->images()->whereIn('id', $validated['removed_image_ids'])->get();
                 foreach ($imagesToDelete as $img) {
-                    if ($img->disk === 'r2') {
-                        $r2->delete($img->file_path);
-                    } elseif ($img->disk === 'public') {
-                        Storage::disk('public')->delete($img->file_path);
-                    }
+                    $imagesToPurge[] = ['disk' => $img->disk, 'file_path' => $img->file_path];
                     $img->delete();
                 }
             }
-
-            // Upload new images via queued background job
-            if ($request->hasFile('images')) {
-                $currentMaxSort = (int) $product->images()->max('sort_order');
-                foreach ($request->file('images') as $file) {
-                    $tempPath = $file->store('temp-uploads', 'local');
-                    UploadProductImageJob::dispatch(
-                        productId: $product->id,
-                        tempRelativePath: $tempPath,
-                        originalFileName: $file->getClientOriginalName(),
-                        mimeType: $file->getClientMimeType(),
-                        fileSize: $file->getSize(),
-                        sortOrder: ++$currentMaxSort
-                    );
-                }
-            }
         });
+
+        // Purge deleted image files from remote/public storage only after DB transaction commits
+        foreach ($imagesToPurge as $img) {
+            if ($img['disk'] === 'r2') {
+                $r2->delete($img['file_path']);
+            } elseif ($img['disk'] === 'public') {
+                Storage::disk('public')->delete($img['file_path']);
+            }
+        }
 
         return redirect()->route('admin.products.index')->with('success', "Product \"{$product->brand_name}\" updated successfully.");
     }
@@ -358,5 +277,104 @@ class ProductController extends Controller
         ]);
 
         return back()->with('success', 'Product status updated successfully.');
+    }
+
+    /**
+     * Validate product creation/update input including JSON-encoded compositions and image files.
+     *
+     * @return array<string, mixed>
+     */
+    protected function validateProductRequest(Request $request, ?Product $product = null): array
+    {
+        if ($request->has('compositions') && is_string($request->input('compositions'))) {
+            $decoded = json_decode($request->input('compositions'), true);
+            if (is_array($decoded)) {
+                $request->merge(['compositions' => $decoded]);
+            }
+        }
+
+        if ($request->has('removed_image_ids') && is_string($request->input('removed_image_ids'))) {
+            $decoded = json_decode($request->input('removed_image_ids'), true);
+            if (is_array($decoded)) {
+                $request->merge(['removed_image_ids' => $decoded]);
+            }
+        }
+
+        $productCodeUniqueRule = $product
+            ? Rule::unique('products', 'product_code')->ignore($product->id)
+            : 'unique:products,product_code';
+
+        $rules = [
+            'brand_name' => ['required', 'string', 'max:255'],
+            'generic_name' => ['nullable', 'string', 'max:255'],
+            'product_code' => ['nullable', 'string', 'max:100', $productCodeUniqueRule],
+            'category_id' => ['required', 'exists:categories,id'],
+            'dosage_form' => ['nullable', 'string', 'max:100'],
+            'strength' => ['nullable', 'string', 'max:100'],
+            'short_description' => ['nullable', 'string'],
+            'description' => ['nullable', 'string'],
+            'indications' => ['nullable', 'string'],
+            'directions' => ['nullable', 'string'],
+            'precautions' => ['nullable', 'string'],
+            'storage' => ['nullable', 'string'],
+            'prescription_type' => ['nullable', 'string', 'max:50'],
+            'status' => ['required', Rule::enum(ProductStatus::class)],
+            'is_featured' => ['nullable', 'boolean'],
+            'compositions' => ['nullable', 'array'],
+            'compositions.*.ingredient_name' => ['required_with:compositions', 'string', 'max:255'],
+            'compositions.*.strength' => ['required_with:compositions', 'string', 'max:100'],
+            'compositions.*.unit' => ['nullable', 'string', 'max:50'],
+            'images' => ['nullable', 'array'],
+            'images.*' => ['file', 'mimes:jpeg,png,jpg,webp', 'max:5120'],
+        ];
+
+        if ($product !== null) {
+            $rules['removed_image_ids'] = ['nullable', 'array'];
+            $rules['removed_image_ids.*'] = ['integer'];
+        }
+
+        return $request->validate($rules, [
+            'compositions.*.ingredient_name.required_with' => 'Each composition variation must include an ingredient name.',
+            'compositions.*.strength.required_with' => 'Each composition variation must include a strength value.',
+            'images.*.mimes' => 'Product images must be JPEG, PNG, JPG, or WEBP files.',
+            'images.*.max' => 'Each product image must not exceed 5MB.',
+        ]);
+    }
+
+    /**
+     * Upload product images to Cloudflare R2 and clean up partial uploads if any file fails.
+     *
+     * @param  array<int, UploadedFile>  $files
+     */
+    protected function uploadProductImages(Product $product, array $files, R2StorageService $r2, int $startingSortOrder): void
+    {
+        $uploadedKeys = [];
+        $sortOrder = $startingSortOrder;
+
+        try {
+            foreach ($files as $file) {
+                $uploadData = $r2->upload(file: $file, folder: 'products');
+                $uploadedKeys[] = $uploadData['file_path'];
+
+                $product->images()->create([
+                    'collection' => 'product-image',
+                    'file_name' => $uploadData['file_name'],
+                    'file_path' => $uploadData['file_path'],
+                    'mime_type' => $uploadData['mime_type'],
+                    'disk' => $uploadData['disk'],
+                    'size' => $uploadData['size'],
+                    'alt_text' => $product->brand_name.' Product Image',
+                    'sort_order' => $sortOrder++,
+                ]);
+            }
+        } catch (\Throwable $e) {
+            foreach ($uploadedKeys as $key) {
+                $r2->delete($key);
+            }
+
+            throw ValidationException::withMessages([
+                'images' => 'Failed to upload product image to Cloudflare R2: '.$e->getMessage(),
+            ]);
+        }
     }
 }
