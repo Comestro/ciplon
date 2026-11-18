@@ -52,4 +52,24 @@ class CompanyPageController extends Controller
             'company' => Setting::getPublicMap(),
         ]);
     }
+
+    /**
+     * Display the Privacy Policy page for Google Play Store and general website compliance.
+     */
+    public function privacyPolicy(): Response
+    {
+        return Inertia::render('public/PrivacyPolicyPage', [
+            'company' => Setting::getPublicMap(),
+        ]);
+    }
+
+    /**
+     * Display the Account Deletion instructions page for users and Google Play Store compliance.
+     */
+    public function deleteAccount(): Response
+    {
+        return Inertia::render('public/DeleteAccountPage', [
+            'company' => Setting::getPublicMap(),
+        ]);
+    }
 }

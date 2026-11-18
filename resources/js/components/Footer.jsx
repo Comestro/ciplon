@@ -114,6 +114,18 @@ export default function Footer({ companyData, categories = [], onOpenEnquiryModa
                     <span>Contact Corporate Desk</span>
                   </Link>
                 </li>
+                <li>
+                  <Link href="/privacy-policy" className="hover:text-amber-300 transition-colors inline-flex items-center gap-1 text-slate-300">
+                    <ChevronRight className="w-3 h-3 text-[#c59324]" />
+                    <span>Privacy Policy</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/delete-account" className="hover:text-amber-300 transition-colors inline-flex items-center gap-1 text-slate-300">
+                    <ChevronRight className="w-3 h-3 text-[#c59324]" />
+                    <span>Delete Account</span>
+                  </Link>
+                </li>
                 <li className="pt-1">
                   <Link href={portalHref} className="inline-flex items-center gap-1 text-amber-300 hover:text-white font-semibold">
                     <span>MR Connect Portal</span>
@@ -225,6 +237,10 @@ export default function Footer({ companyData, categories = [], onOpenEnquiryModa
               <Link href="/products" className="hover:text-amber-300 transition-colors">Products</Link>
               <span>•</span>
               <Link href="/contact" className="hover:text-amber-300 transition-colors">Contact</Link>
+              <span>•</span>
+              <Link href="/privacy-policy" className="hover:text-amber-300 transition-colors">Privacy Policy</Link>
+              <span>•</span>
+              <Link href="/delete-account" className="hover:text-amber-300 transition-colors">Delete Account</Link>
               <span>•</span>
               <span className="text-slate-500">ISO 9001:2015</span>
             </div>

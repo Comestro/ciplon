@@ -47,6 +47,27 @@ test('public products catalog renders with inertia', function () {
     );
 });
 
+test('public privacy policy and delete account pages render with inertia', function () {
+    $this->get('/privacy-policy')
+        ->assertStatus(200)
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('public/PrivacyPolicyPage')
+            ->has('company')
+        );
+
+    $this->get('/delete-account')
+        ->assertStatus(200)
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('public/DeleteAccountPage')
+            ->has('company')
+        );
+
+    $this->get('/sitemap.xml')
+        ->assertStatus(200)
+        ->assertSee('/privacy-policy')
+        ->assertSee('/delete-account');
+});
+
 test('login page renders for guests', function () {
     $response = $this->get('/login');
 

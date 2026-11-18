@@ -46,6 +46,18 @@ class SeoController extends Controller
                 'changefreq' => 'monthly',
                 'priority' => '0.7',
             ],
+            [
+                'loc' => "{$baseUrl}/privacy-policy",
+                'lastmod' => now()->startOfMonth()->toAtomString(),
+                'changefreq' => 'monthly',
+                'priority' => '0.5',
+            ],
+            [
+                'loc' => "{$baseUrl}/delete-account",
+                'lastmod' => now()->startOfMonth()->toAtomString(),
+                'changefreq' => 'monthly',
+                'priority' => '0.5',
+            ],
         ];
 
         $categories = Category::query()
