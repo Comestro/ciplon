@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\AppUpdateController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\MR\MRDashboardController;
 use App\Http\Controllers\MR\MRDoctorController;
@@ -15,6 +16,7 @@ use Illuminate\Support\Facades\Route;
 | No CSRF required. Accepts email & password, returns Sanctum Bearer token.
 */
 Route::prefix('v1')->group(function () {
+    Route::get('/app/update', [AppUpdateController::class, 'check'])->name('api.v1.app.update');
     Route::post('/auth/login', [AuthController::class, 'login'])->name('api.v1.auth.login');
     Route::post('/mr/login', [AuthController::class, 'login'])->name('api.v1.mr.login');
     Route::post('/login', [AuthController::class, 'login'])->name('api.v1.login');
